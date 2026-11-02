@@ -2,7 +2,7 @@
 
 **An online monitor that watches one-minute returns and raises an alarm when volatility shifts up or down, with a proven limit on false alarms that holds however often you look at it.** It puts the MAD-based truncation used by Bapat (2026), an idea for jump robustness that goes back to Mancini (2009), inside e-detectors, a nonparametric framework for sequential change detection (Shin, Ramdas and Rinaldo 2024).
 
-> Status: research prototype, round 2 (November 2026). About 240 tests, 15 experiments on simulated and real data, seven alternative directions, proofs in [`docs/math.md`](docs/math.md). For the short version read [`PITCH_BAPAT.md`](PITCH_BAPAT.md); for every number read the [experiment report](docs/experiment_report.md).
+> Status: research prototype, round 2 (November 2026). About 240 tests, 15 experiments on simulated and real data, eight alternative directions, proofs in [`docs/math.md`](docs/math.md). For the short version read [`PITCH_BAPAT.md`](PITCH_BAPAT.md); for every number read the [experiment report](docs/experiment_report.md).
 
 Every result in this repository carries a label: **[PUBLISHED]** (taken from a paper), **[SYNTHETIC]** (our simulation) or **[REAL]** (our run on market data). Nothing is reported that was not run.
 
@@ -149,7 +149,7 @@ The full list, with what each one affects, is in [`docs/limitations.md`](docs/li
 ├── PITCH_BAPAT.md              short brief: ten questions answered
 ├── RESEARCH_STRATEGY_BAPAT.md  questions, hypotheses, scores, risks, roadmap
 ├── ITERATION_LOG.md            iterations in a fixed format: problem, hypothesis, change, result
-├── alternatives/               seven other directions, each with its own README and RESULTS
+├── alternatives/               eight other directions (ranked in ALTERNATIVES.md), each with its own README and RESULTS
 ├── data/                       raw data (git-ignored), MANIFEST.csv with hashes, README
 ├── docs/
 │   ├── paper_review.md         the paper in plain words

@@ -56,7 +56,7 @@ Bapat (2026) estimates integrated quarticity (the quantity behind confidence int
 
 1. A short joint paper on the monitor (a draft is in `paper/`): the bounded-statistic argument, the delay theory and the decrease speed limit, the confidence-sequence baseline, and the crypto and Nifty applications.
 2. An estimation follow-up on your estimator: a local-scale plug-in version that reaches 95% efficiency in simulation (ALT3), which needs a central limit theorem.
-3. A sequential-estimation bridge to your own field: purely sequential fixed-accuracy estimation of volatility with your quarticity estimator as the variance plug-in, compared with an anytime-valid confidence sequence (ALT6, in progress).
+3. A sequential-estimation bridge to your own field (ALT6, built): purely sequential fixed-accuracy estimation of the volatility level. Chow and Robbins on clipped squared returns, which runs on a running quarticity estimate, covers 94% to 96% at about the ideal sample size for every return law we tried, where raw squares fail under fat tails; an anytime-valid confidence sequence costs an exact factor 2 log(2/α) / z² = 1.92 more (1.55 with a running intersection); on BTC, about 50 minutes give plus or minus 20% on volatility. A natural next step is to use your robust kernel estimator as the variance plug-in and study its stopping time.
 4. Finish the benchmark against published methods (E13): check our reconstruction of the Bibinger, Jirak and Vetter test against the paper's equations, and try BOCPD with a heavy-tailed likelihood, since BOCPD is faster than our monitor for decreases on clean data.
 
 ## 10. What feedback or collaboration are we seeking?

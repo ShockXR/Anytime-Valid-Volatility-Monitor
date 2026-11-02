@@ -34,7 +34,7 @@ To rerun: `pip install -r requirements.txt && pip install -e .`, then `python sc
 | ALT3 | Robust local IQ estimator | Squaring a local variance is 95% efficient in simulation, against 86% for the kappa-corrected kernel with an estimated MAD (98% with an oracle cut-off) and 74% for untruncated RQ; one daily MAD stops converging when volatility moves within the day; on BTC and DOGE large returns come in bursts, and our version of the robust kernel is 0.33 to 0.42 times MedRQ. |
 | ALT4 | Correlation monitor | Sign concordance gives a valid correlation monitor that volatility changes cannot fool. |
 | ALT5 | Two-sample (rank) betting test | Ranks against a growing reference give an exactly valid detector for any return law and horizon (1.9% to 3.5% per day against 5%); ranks against a fixed reference fail like a plug-in baseline; 2.9 times faster for a change in tail shape, 4% to 19% slower for a scale change. |
-| ALT6 | Sequential fixed-accuracy estimation of volatility (classical purely sequential rules against anytime-valid confidence sequences) | In progress. |
+| ALT6 | Sequential fixed-accuracy estimation of volatility (classical purely sequential rules against anytime-valid confidence sequences) | Truncated Chow and Robbins covers 0.94 to 0.96 at about the oracle sample for every law tested (on raw squares 0.72 to 0.78 for t3); a betting confidence sequence stopped at width 2d is valid for any law and costs 2 log(2/α) / z² = 1.92 times the oracle (1.55 with the running intersection); on BTC about 50 minutes for plus or minus 20% on volatility (140 with a guarantee); under clustering only the recent window's average is reachable, and the running intersection is invalid. |
 
 ---
 
@@ -895,7 +895,7 @@ The half-life 1440 variant and all event times are in `results/e10c_real_forecas
 
 Script `experiments/e11_delay_theory.py` (parts A, B, C, C2, C3, C4, C4V, D, D2, E, E2, FIG), helpers `src/avmonitor/design.py`, tests `tests/test_delay_theory.py`, full theory with proofs in `docs/theory_delay.md`. All results are **[SYNTHETIC]** (numerical integration and simulation, fixed seeds). Unless stated otherwise: true baseline, truncation c = 3, alarm level A = 7800 per side, change at the first monitored step (ν = 1), Gaussian, jump (probability 0.005, size 8 sd) and Student t returns.
 
-**Why.** `docs/math.md` proves that false alarms are rare. E4 measured delays (87, 35 and 17 steps for sd ratios 1.25, 1.5 and 2) and a 10% to 70% penalty against the Gaussian likelihood ratio detector; E9 found the false alarm bound conservative by about 4. E11 explains these numbers, asks how the bets should be chosen, and (tracker B73) whether the detector is optimal as false alarms become rare.
+**Why.** `docs/math.md` proves that false alarms are rare. E4 measured median delays of 87, 35 and 17 steps for sd ratios 1.25, 1.5 and 2 (mean delays 99.7, 39.6 and 18.0, which are what the theory tables below compare with) and a 10% to 70% penalty against the Gaussian likelihood ratio detector; E9 found the false alarm bound conservative by about 4. E11 explains these numbers, asks how the bets should be chosen, and (tracker B73) whether the detector is optimal as false alarms become rare.
 
 ### Q11a. Predicting the delay
 
@@ -916,11 +916,11 @@ Script `experiments/e11_delay_theory.py` (parts A, B, C, C2, C3, C4, C4V, D, D2,
 
 | Gaussian data, c = 3 | sd 1.25 | sd 1.5 | sd 2 | sd 0.8 | sd 0.5 |
 |---|---|---|---|---|---|
-| truncation / nonparametric / grid loss | 1.03 / 1.10 / 1.02 | 1.08 / 1.23 / 1.02 | 1.27 / 1.48 / 1.04 | 1.00 / 1.25 / 1.02 | 1.00 / 3.61 / 1.05 |
+| truncation / nonparametric / grid loss | 1.03 / 1.10 / 1.02 | 1.08 / 1.23 / 1.02 | 1.27 / 1.48 / 1.04 | 1.00 / 1.24 / 1.02 | 1.00 / 3.61 / 1.05 |
 | predicted penalty `KL / g_grid` | 1.16 | 1.37 | 1.95 | 1.27 | 3.79 |
 | simulated penalty against the E4 Gaussian LR mixture | 1.14 | 1.35 | 1.73 | 1.48 | 3.45 |
 
-**Reading.** The information ratio explains E4's penalty (about 1.12, 1.35, 1.7). About 60% of the gap (log scale) is the price of making no distributional assumption, 20% to 36% is truncation. For decreases truncation caps the evidence per step at `log(B / (B - 1))`, about `1/c²`: with c = 3 no detector valid over the whole null can detect even a total collapse of volatility in fewer than 73 steps. **Truncation constant:** c = 3 to 4 for increases (with jumps, growth peaks at c = 3.25 to 4.25; without truncation a jump burst looks like 39% of a real 25% volatility rise, against 3.5% at c = 3); c = 1.5 to 2 for decreases (decrease delays fall by 26% to 49% at c = 2). The two sides may use different c.
+**Reading.** The information ratio explains E4's penalty (about 1.12, 1.35, 1.7). On a log scale the predicted gap `KL / g_grid` at sd 1.25 to 2 splits into 59% to 68% for making no distributional assumption, 19% to 35% for truncation and 6% to 16% for the finite grid (this splits the first-order prediction, not the simulated penalty). For decreases truncation caps the evidence per step at `log(B / (B - 1))`, about `1/c²`, and this cap applies to every bet that is valid over the whole null. With c = 3 and A = 7800, even a total collapse of volatility takes any Shiryaev-Roberts e-detector built from valid bets at least 58 steps (64 at the two-sided level 2A), and the default five-bet grid 73 (79); the floors for c = 2, 4 and 5 are 29, 96 and 141 steps for any valid bets and 36, 122 and 180 for the default grid (`docs/theory_delay.md`, Corollary 4). **Truncation constant:** c = 3 to 4 for increases (with jumps, growth peaks at c = 3.25 to 4.25; without truncation a jump burst looks like 39% of a real 25% volatility rise, against 3.5% at c = 3); c = 1.5 to 2 for decreases (with the true baseline and Gaussian data, mean decrease delays fall by 26% to 49% at c = 2). The two sides may use different c; the guarantee then needs a known or confidence-sequence baseline for each side, and E11f below shows that with prices rounded to a coarse tick the gain depends on the tick size.
 
 ### Q11c. Which bets?
 
@@ -937,19 +937,20 @@ Script `experiments/e11_delay_theory.py` (parts A, B, C, C2, C3, C4, C4V, D, D2,
 
 ### Q11d. Why the false alarm bound looks loose
 
-**Method.** An exact optional-stopping identity splits `P(false alarm within m) / (m / A)` into stopping (F1), the share of expected wealth on paths that crossed A (F2) and overshoot (F3). Dynamic programming gives the exact worst case over the whole nonparametric null for single bets (`e11d_*.csv`).
+**Method.** An exact optional-stopping identity splits `P(false alarm within m) / (m / A)` into stopping (F1), the share of expected wealth on paths that crossed A (F2) and overshoot (F3). For single bets, dynamic programming over the whole nonparametric null gives a lower bound on the worst case, reached by an explicit adversary (`e11d_*.csv`).
 
 | One day (m = 390), Gaussian null | false alarms | rate / bound | F2 | F3 |
 |---|---|---|---|---|
-| two-sided default (E9), 40,000 paths | 1.03% | 0.21 | 0.24 | 0.80 |
+| two-sided default (E9), 10,000 paths | 0.88% | 0.18 | 0.24 | 0.80 |
+| two-sided default (E9), 40,000 paths (factors not computed) | 1.03% | 0.21 | | |
 | increase side, single bet 0.5 | 3.52% | 0.70 | 0.92 | 0.67 |
-| worst null law, single bet 0.5 (dynamic programming) | 4.73% | 0.95 | | |
+| worst null law found for a single bet 0.5 (dynamic programming; a lower bound on the worst case) | 4.73% | 0.95 | | |
 
-**Reading.** The factor of about 5 (E9: about 4) is overshoot (1.25) times wealth stranded on paths that never alarm (about 4): 60% of it is held by the decrease side and 31% by the three smallest increase bets, which cannot build wealth within a day. The two-sided split is tight (both sides alarm on the same day in 0.00% of days). The bound itself is nearly attained by an adversarial null for single bets and exactly at m = A, so no much sharper threshold is provable for single bets; for the default mixture the best adversary found reaches 42% of the bound and a certified sharper bound is open. Provable gains: an uneven split of the budget between the sides, and dropping bets that cannot use it.
+**Reading.** The factor of about 5 (E9: about 4) is overshoot (1.25) times wealth stranded on paths that never alarm (about 4): 60% of it is held by the decrease side and 31% by the three smallest increase bets, which cannot build wealth within a day. The two-sided split is tight (both sides alarm on the same day in 0.00% of days). The bound itself is nearly attained by an adversarial null for single bets, and exactly at m = A for each side alone or a one-sided detector at level A (the two-sided rule alarms at 2A per side), so no much sharper threshold is provable for single bets; for the default mixture the best adversary found reaches 42% of the bound and a certified sharper bound is open. Provable gains: an uneven split of the budget between the sides, and dropping bets that cannot use it.
 
 ### Q11e. Optimality as false alarms become rare (tracker B73)
 
-**Theorem (proved in `docs/theory_delay.md`, section 9).** The worst-case delay of the Shiryaev-Roberts mixture equals its delay with the change at step 1. As `A → ∞`: a fixed grid has delay `(log A / KL_inf) × KL_inf / g_grid`; a grid refined with about `√(log A)` bets has delay `(log A + ½ log log A + O(1)) / KL_inf`; a continuous mixture over the bet has delay at most `(log A + log log A + O(1)) / KL_inf` (`½ log log A` by a Laplace heuristic). `log A / KL_inf` is the lower bound for every detector valid over the nonparametric null (Lorden 1971 at the least favourable null law; Ram and Ramdas 2026). Lai (1998) gives the simple-law bound `log A / I`; Shin, Ramdas and Rinaldo (2024) give matching upper bounds for mixtures of exponential e-detectors.
+**Theorem (proved in `docs/theory_delay.md`, section 9).** The worst-case delay of the Shiryaev-Roberts mixture equals its delay with the change at step 1. As `A → ∞`: for a fixed grid, the delay divided by `log A / KL_inf` tends to `KL_inf / g_grid` (1.00 to 1.08 for the default grid in the cases below), so a fixed grid is first-order optimal only when the best bet is one of its bets; a grid refined with about `√(log A)` bets has delay at most `(log A + ½ log log A + O(1)) / KL_inf`; a continuous mixture over the bet has delay at most `(log A + log log A + O(1)) / KL_inf` (`½ log log A` by a Laplace heuristic). These are upper bounds. `log A / KL_inf` is, to first order, the lower bound for every detector valid over the nonparametric null (Lorden 1971 at the least favourable null law; Ram and Ramdas 2026). First-order optimality for bounded means is already known (Ram and Ramdas 2026 prove the lower bound in general and show that it is attained for bounded means); what E11 adds is the refinement rate and the constants for this detector, with no claim of priority. Lai (1998) gives the simple-law bound `log A / I`; Shin, Ramdas and Rinaldo (2024) give matching upper bounds for mixtures of exponential e-detectors.
 
 | delay / (log A / KL_inf), Gaussian, A = 10^4 / 10^8 | sd 1.25 | sd 2 | sd 0.8 | sd 0.5 |
 |---|---|---|---|---|
@@ -966,34 +967,55 @@ Figures: `results/figures/e11_delay_predictions.png`, `e11_price_of_robustness.p
 
 ## E11f. A tighter clip for decreases, tested
 
-**Question.** Section 6.3 of `docs/theory_delay.md` predicts that clipping at c = 1.5 to 2 on the decrease side, while keeping c = 3 for increases, cuts decrease delays by a quarter to a half without touching the guarantee. Does it, with an estimated baseline, with ties and zeros, and on real data? The monitor now has this as an option, `VolatilityMonitor(c_down=...)` (plug-in baseline only; the default keeps c_down = c).
+**Question.** Section 6.3 of `docs/theory_delay.md` predicts that clipping at c = 1.5 to 2 on the decrease side, while keeping c = 3 for increases, cuts decrease delays by a quarter to a half. Does it, with an estimated baseline, with ties and zeros, and on real data? The monitor has this as an option, `VolatilityMonitor(c_down=...)`; the default keeps c_down = c.
 
-**Method.** `experiments/e11f_split_c.py`. Part a [SYNTHETIC]: plug-in baseline from a 1440-step calibration window, band 0, A = 28,800 (each side at 2A, so at most 5% per 1440-step day with the true baseline); 2000 no-change paths and 600 paths per decrease (sd × 0.8, 0.67, 0.5 at the first monitored step) for four return laws: Gaussian, Student t4, Gaussian with jumps (0.5% per step, 8 sd), and returns rounded to half a standard deviation ("ticks", about 20% zeros). The vectorised code is checked alarm for alarm against the class. Part b [REAL]: the five Binance coins, July to December 2025, deseasonalised with the past-only intraday profile, band 0.25; an alarm counts as confirmed when the robust scale of the next 1440 minutes is on the flagged side of the calibration scale. Files: `results/e11f_split_c_synthetic.csv`, `results/e11f_split_c_real.csv`.
+**What is guaranteed.** Each side is an e-detector for its own clipped statistic, and the two-sided rule needs only each side's guarantee. So the false alarm bound holds with c_down ≠ c when each side's baseline is known, or with the confidence-sequence baseline of `docs/math.md` section 6, which `VolatilityMonitor(baseline="cs", c_down=...)` now supports: the lower confidence sequence runs on `min(r², τ_dn²)` and the upper one on `min(r², τ²)`, each at level δ/2, so Theorem 6.4 of `docs/math.md` applies to each side with the same total δ (tested in `tests/test_monitor_cs.py`: coverage of both bounds, alarm counts on long null streams, and c_down = c reproducing the default exactly). The decrease side's null then reads "the mean of `min(r², τ_dn²)` has not fallen". For a fixed shape of the return distribution this follows from "volatility has not fallen", but a smaller clip is more sensitive to changes of shape at constant volatility, for example a larger share of zero returns. **The runs below use the plug-in baseline, which has no proof** (E4e), so their false alarm rates are empirical only.
 
-**Results [SYNTHETIC].** Median decrease delay in steps (every path detected):
+**Method.** `experiments/e11f_split_c.py`. Part a [SYNTHETIC]: plug-in baseline from a 1440-step calibration window, band 0, A = 28,800 (each side at 2A, so at most 5% per 1440-step day if the baseline were the true one); 2000 no-change paths per law; decreases (sd × 0.8, 0.67, 0.5 at the first monitored step) with the same paths for the three values of c_down. Two kinds of return law:
 
-| Law | sd × 0.8: c_down 3 / 2 / 1.5 | sd × 0.67 | sd × 0.5 | False alarm within one day, both sides (decrease side) |
+* continuous: Gaussian, Student t4, Gaussian with jumps (0.5% per step, 8 sd); 600 paths per decrease;
+* rounded prices ("ticks"): a Gaussian return is multiplied by its standard deviation and then rounded to a tick that is fixed in units of the pre-change standard deviation (0.25, 0.5 or 0.75 sd), as on a real price grid; 2000 paths per decrease, with the same normal draws for every tick size. Because the tick is fixed, more returns are zero after a fall: at a tick of 0.5 sd, 19.7% before the change and 24.5%, 29.1% and 38.3% after falls to 0.8, 0.67 and 0.5.
+
+The first version of this experiment rounded the returns before multiplying them by the change ratio, so the tick shrank with volatility and the share of zeros stayed at 19.7% (independent review round 2b, C2). That law is kept in the CSV only for comparison (`ticks_0.5_scaled`), on the same normal draws. The vectorised code is checked alarm for alarm against the class on 216 runs in `tests/test_e11f_split_c.py` (four laws, sd ratios 1, 0.8 and 0.5, c_down 3, 2 and 1.5, six paths each, with a shorter calibration and a lower A so that paths with an increase alarm, a decrease alarm and no alarm all occur). Part b [REAL]: the five Binance coins, July to December 2025, deseasonalised with the past-only intraday profile, band 0.25; an alarm counts as confirmed when the robust scale of the next 1440 minutes is on the flagged side of the calibration scale. Files: `results/e11f_split_c_synthetic.csv`, `results/e11f_split_c_real.csv`.
+
+**Results [SYNTHETIC], continuous laws.** Median decrease delay in steps (rounded to whole steps; every path detected):
+
+| Law | sd × 0.8: c_down 3 / 2 / 1.5 | sd × 0.67 | sd × 0.5 | No change: false alarm within one day, both sides (decrease side), c_down 3 / 2 / 1.5 |
 |---|---|---|---|---|
-| Gaussian | 247 / 176 / 185 | 158 / 85 / 73 | 118 / 58 / 40 | 5.7% (2.1%) / 5.7% (2.1%) / 6.1% (2.5%) |
-| Student t4 | 334 / 289 / 277 | 160 / 117 / 106 | 100 / 62 / 48 | 5.4% (2.7%) / 5.7% (2.9%) / 6.0% (3.2%) |
-| jumps | 273 / 196 / 206 | 161 / 88 / 74 | 119 / 59 / 40 | 6.1% (2.5%) / 6.2% (2.6%) / 6.7% (3.1%) |
-| ticks | 186 / 178 / 254 | 96 / 69 / 80 | 68 / 38 / 33 | 5.7% (2.9%) / 5.7% (2.9%) / 5.4% (2.6%) |
+| Gaussian | 247 / 176 / 185 | 158 / 85 / 73 | 118 / 58 / 40 | 5.7% (2.1%) / 5.65% (2.1%) / 6.1% (2.5%) |
+| Student t4 | 334 / 289 / 277 | 160 / 117 / 106 | 100 / 62 / 48 | 5.4% (2.65%) / 5.65% (2.9%) / 5.95% (3.2%) |
+| jumps | 273 / 196 / 206 | 161 / 88 / 74 | 119 / 59 / 40 | 6.05% (2.45%) / 6.15% (2.55%) / 6.7% (3.1%) |
 
-**Reading.** With c_down = 2 the decrease delay falls in all 12 cells, by 4% to 51% (29%, 46% and 51% for Gaussian data, against the theory's 26% to 49%). c_down = 1.5 is faster still for large falls but slower than c_down = 2 for a 20% fall, and with ticks it is slower than c = 3 for that fall (254 against 186 steps): with a small clip, the many zero and one-tick returns carry most of the statistic and a modest scale change moves it little. The false alarm rates are those of the plug-in baseline (E4e: above the 5% that the true baseline would guarantee, here 5.4% to 6.7%); the decrease side's share rises by at most 0.7 percentage points at c_down = 1.5, because its larger bets react more to errors in the estimated baseline. The proofs are unchanged: each side is valid for its own clipped statistic.
+**Results [SYNTHETIC], rounded prices.** Same layout, 2000 paths per cell. "Scale" is the median over paths of the calibration scale (scaled MAD) in units of the true pre-change standard deviation. With rounded returns the median absolute return is a whole number of ticks on almost every path, so the scale moves in steps of 1.4826 ticks and the clip c × scale, in units of the true standard deviation, depends on the tick.
 
-**Results [REAL].** Share of alarms confirmed by the next day (number of alarms in brackets):
+| Tick (scale) | sd × 0.8: c_down 3 / 2 / 1.5 | sd × 0.67 | sd × 0.5 | No change, both sides (decrease side) |
+|---|---|---|---|---|
+| 0.25 sd (scale 1.11) | 292 / 185 / 188 | 191 / 98 / 77 | 144 / 69 / 45 | 5.0% (2.45%) / 5.6% (3.05%) / 5.0% (2.45%) |
+| 0.5 sd (scale 0.74) | **188 / 211 / 251** | 99 / 80 / 86 | 70 / 39 / 35 | 5.7% (2.9%) / 5.7% (2.9%) / 5.4% (2.6%) |
+| 0.75 sd (scale 1.11) | 295 / 201 / 207 | 192 / 100 / 81 | 144 / 69 / 47 | 5.4% (2.45%) / 6.0% (3.05%) / 5.9% (2.95%) |
+| for comparison: 0.5 sd, tick shrinking with volatility (old law) | 185 / 173 / 244 | 96 / 69 / 80 | 68 / 38 / 33 | as for 0.5 sd |
 
-| Coin | Decrease alarms, c_down 3 / 2 / 1.5 | Increase alarms, c_down 3 / 2 / 1.5 |
-|---|---|---|
-| BTC | 85% (55) / 90% (50) / 94% (47) | 79% (72) / 78% (76) / 79% (75) |
-| ETH | 89% (46) / 91% (43) / 93% (40) | 79% (76) / 79% (80) / 79% (80) |
-| XRP | 90% (58) / 84% (58) / 87% (54) | 84% (71) / 80% (69) / 80% (70) |
-| SOL | 93% (46) / 96% (46) / 95% (39) | 79% (77) / 81% (77) / 78% (79) |
-| DOGE | 85% (53) / 90% (49) / 93% (42) | 76% (73) / 80% (77) / 74% (81) |
+**Reading.**
 
-On real data the tighter clip gives slightly fewer and, for four of five coins, more often confirmed decrease alarms, but with 40 to 58 alarms per coin these differences are within sampling noise (a 95% interval for 85% of 55 alarms runs from about 74% to 92%). Increase alarms are unaffected, as they should be. The monitor still spends about two thirds of the time calibrating, whatever c_down.
+* **Continuous laws: c_down = 2 is faster in all nine cells,** by 13% to 51% in median delay. For Gaussian data the mean delay falls by 25%, 44% and 50% at sd × 0.8, 0.67 and 0.5, against 26%, 43% and 49% predicted by the theory with the true baseline (`e11b_price_simulated.csv`, mean delays, c = 2 against c = 3). c_down = 1.5 is faster still for falls to 0.67 and 0.5, but for a 20% fall it is slower than c_down = 2 for Gaussian and jump data (185 against 176 and 206 against 196 steps) and slightly faster for Student t4 data (277 against 289).
+* **Rounded prices: the answer depends on the tick size.** With ticks of 0.25 and 0.75 sd, c_down = 2 is faster in all six cells, by 32% to 52%. With a tick of 0.5 sd it is **12% slower for a 20% fall** (median 211 against 188 steps; mean 234 against 205; paired difference +29 steps with standard error 1.7; slower on 66% of paths), and faster for larger falls (by 19% and 44%). c_down = 1.5 at a tick of 0.5 sd is 34% slower than c = 3 for a 20% fall (251 against 188 steps).
+* **Why the tick of 0.5 sd is different.** With rounded returns the calibration scale is, on almost every path, a whole number of ticks times 1.4826. At a tick of 0.5 sd the median absolute return is one tick, so the scale is 0.74 sd and c = 3, 2 and 1.5 clip at 2.2, 1.5 and 1.1 true standard deviations; at ticks of 0.25 and 0.75 sd the scale is 1.11 sd and the clips are at 3.3, 2.2 and 1.7. So at a tick of 0.5 sd the default c = 3 already clips near the value that section 6.3 of `docs/theory_delay.md` finds best for a 20% fall (c = 2 for Gaussian data), and the tighter clips go past it, while the growing share of zero returns after the fall adds to the effect. This is our reading of the numbers, not a proof.
+* **The old tick law overstated the case.** On the same normal draws, the law with a tick that shrinks with volatility gives c_down = 2 faster at a 20% fall (173 against 185 steps), the conclusion of the first version of this experiment. With a fixed tick of the same size it is slower.
+* **False alarms are plug-in rates.** With no change, the one-day rate is 5.0% to 6.7% over all 18 cells, and 5.0% to 6.05% with c_down = c (= 3) in the same CSV, so the excess over 5% is there without the split and comes from the estimated baseline (E4e); 5% is the bound that holds with the true baseline. With 2000 paths the standard error of a 5% rate is about 0.5 points. The decrease side's share rises by at most 0.65 percentage points when c_down is lowered, probably because its larger bets react more to errors in the estimated baseline.
 
-**Conclusion.** c_down = 2 is a safe default candidate: it is faster in every simulated cell, valid by construction, and neutral to slightly positive on real data. c_down = 1.5 should not be used on data with many ties. We kept c_down = c as the package default so that every earlier experiment stays reproducible, and recommend `c_down=2` for new runs.
+**Results [REAL].** Decrease and increase alarms per coin, and the share confirmed by the next day. The share is computed over the alarms with more than 720 observed returns in the next 1440 minutes (an alarm near the end of the sample or just before a gap in the data may have fewer), so its denominator is given:
+
+| Coin | Decrease alarms, c_down 3 / 2 / 1.5 | Confirmed decreases | Increase alarms, c_down 3 / 2 / 1.5 | Confirmed increases |
+|---|---|---|---|---|
+| BTC | 55 / 50 / 47 | 46 of 54 (85%) / 45 of 50 (90%) / 44 of 47 (94%) | 72 / 76 / 75 | 57 of 72 (79%) / 59 of 76 (78%) / 59 of 75 (79%) |
+| ETH | 46 / 43 / 40 | 41 of 46 (89%) / 39 of 43 (91%) / 37 of 40 (93%) | 76 / 80 / 80 | 60 of 76 (79%) / 63 of 80 (79%) / 63 of 80 (79%) |
+| XRP | 58 / 58 / 54 | 52 of 58 (90%) / 49 of 58 (84%) / 47 of 54 (87%) | 71 / 69 / 70 | 59 of 70 (84%) / 55 of 69 (80%) / 56 of 70 (80%) |
+| SOL | 46 / 46 / 39 | 43 of 46 (93%) / 44 of 46 (96%) / 36 of 38 (95%) | 77 / 77 / 79 | 61 of 77 (79%) / 62 of 77 (81%) / 62 of 79 (78%) |
+| DOGE | 53 / 49 / 42 | 45 of 53 (85%) / 44 of 49 (90%) / 39 of 42 (93%) | 73 / 77 / 81 | 55 of 72 (76%) / 61 of 76 (80%) / 60 of 81 (74%) |
+
+On real data the tighter clip gives the same number or slightly fewer decrease alarms and, for four of five coins at c_down = 2, a higher confirmed share, but with 38 to 58 checked alarms per coin these differences are within sampling noise (a 95% Wilson interval for 46 of 54 runs from 73% to 92%). Increase alarms are unaffected, as they should be. The coins have few ties (1.0% to 4.3% of the deseasonalised returns are zero). The monitor still spends about two thirds of the time calibrating, whatever c_down.
+
+**Conclusion.** c_down = 2 is faster than c = 3 in all nine cells of the three continuous laws and in all six cells with ticks of 0.25 and 0.75 sd, and neutral to slightly positive on the five coins, which have few ties. With rounded prices the result depends on the tick size and can reverse for small falls: at a tick of 0.5 sd, c_down = 2 is 12% slower for a 20% fall. c_down = 1.5 is no better than c_down = 2 for a 20% fall except under Student t4 data, and is much slower at the tick of 0.5 sd. The guarantee of the split holds with a known baseline or with `baseline="cs"`; the plug-in runs above have no guarantee, with or without the split. We kept c_down = c as the package default so that every earlier experiment stays reproducible. We recommend `c_down=2` for new runs on data with few ties. On data with a coarse tick, where zero returns are common, compare c_down = 2 with c = 3 at that tick first, for example by a simulation like this one.
 
 ---
 
@@ -2235,6 +2257,52 @@ The signed score (rank of `u` rather than `|u|`) alone detects a pure skew chang
 * On BTC and ETH the two designs mostly agree; the rank detector adds a few shape alarms and misses some decreases at this band. Its practical gain is the short reference, which the plug-in design cannot use.
 
 **Caveats.** Exchangeability fails on real one-minute returns (clustering), so real alarms are descriptive, not tested discoveries; ranks relative to a volatility forecast are the natural next step and were not built. The bands of the two designs are not on the same scale, so the real-data comparison is between two settings, not two designs in general. The rank detector gives no direction or size for shape alarms beyond the density ratio. About 80 microseconds per step in pure Python against about 10 for the main monitor (`results/t_timing.csv`). The conjecture that the Gaussianised score is asymptotically as efficient as the main monitor under Gaussian data is untested. One venue, two coins, six months.
+
+---
+
+## ALT6. Sequential fixed-accuracy estimation: how many minutes until the volatility level is known to plus or minus d?
+
+Code, tests, README (formulation, proofs, comparison with the literature) and full results are in `alternatives/sequential_estimation/`. Every number below is copied from its `results/` folder. [SYNTHETIC] marks simulated data, [REAL] marks Binance spot BTCUSDT one-minute bars (1 July to 31 December 2025). Iteration notes: `docs/iterations/ALT6.md`.
+
+**Question.** The main monitor asks whether volatility has changed. A simpler question comes first: after a restart, how long must one watch before the current level is known to within plus or minus `d` with confidence `1 - α`, and can the stopping rule keep its promise for heavy-tailed returns, jumps and clustering? The benchmark is the oracle sample size `n* = z² CV² / d²` (relative accuracy; `CV²` is the squared coefficient of variation of the statistic, unknown in practice).
+
+**Method.** All rules work on squared returns after a 30-return pilot, either raw or truncated at `τ = 3 ×` the pilot's scaled MAD (the main monitor's statistic, Bapat 2026). Classical rules: Chow and Robbins (1965) with Nadas' (1967) relative version (stop when the estimated `n*` is reached), Stein's (1945) two-stage rule, Robbins' (1959) minimum risk rule. Anytime-valid rules: confidence sequences for the mean of the bounded truncated statistic (empirical Bernstein and betting, after Waudby-Smith and Ramdas 2024), stopped as soon as their relative width reaches `d`; their coverage at the stop holds for any law and any stopping time (Theorem 1 of the README). Proposition 1 (a sequential Bahadur and Savage argument) shows that no rule can do this for the raw variance, so the target is the truncated variance `θ_τ`, with a map back to `σ²` under a stated shape. Laws: normal, t5, t3, normal with 1% jumps per minute, GARCH(1,1) with persistence 0.95 and 0.99; 1000 to 4000 paths per cell, fixed seeds. Real data: one window per start hour (4392 windows) of returns divided by the past-only intraday profile, and a stationary bootstrap (Politis and Romano 1994) of the 30 quietest days.
+
+**Classical rules on raw and truncated squares [SYNTHETIC].** Relative accuracy, `α = 0.05`, 2000 paths; "coverage / E[N]/n*":
+
+| law | CR-raw, d = 0.2 | CR-raw, d = 0.05 | CR-trunc, d = 0.2 | CR-trunc, d = 0.05 | CS-bet, d = 0.2 | CS-bet, d = 0.05 |
+|---|---|---|---|---|---|---|
+| normal | 0.948 / 0.97 | 0.942 / 1.00 | 0.952 / 0.99 | 0.942 / 1.00 | 0.982 / 1.84 | 0.969 / 1.57 |
+| t3 | **0.765** / N 2225 | **0.721** / N 126482 | 0.944 / 1.01 | 0.949 / 1.00 | 0.973 / 1.73 | 0.973 / 1.57 |
+| jumps | **0.783** / 0.47 | 0.929 / 0.96 | 0.942 / 0.98 | 0.945 / 1.00 | 0.976 / 1.79 | 0.973 / 1.58 |
+
+**The price of anytime validity [SYNTHETIC, closed form].** As `d → 0`, a confidence sequence stopped at width `2d` needs `2 log(2/α) / z²` times the oracle without the running intersection of its bounds (1.921 at `α = 0.05`, 2.215 at 0.10; coverage at the stop 0.993 and 0.986) and a Brownian first-passage constant with it (1.548 and 1.708). Simulated with intersection (normal returns, pilot 100): 1.702, 1.576, **1.545** at `d` = 0.1, 0.05, 0.025. The factor is the ratio of the squared Chernoff quantile to the squared normal quantile, so it is the price of an exponential tail bound in place of the central limit theorem, not of time-uniformity. Time-uniform bets cost 5.6 to 14.6 times the oracle.
+
+**Volatility clustering [SYNTHETIC].** GARCH(1,1), `d = 0.1`, 1000 paths; "coverage of the stationary level / coverage of the average conditional truncated variance over the window used / E[N]" (long-run `n*` 5370 and 22979):
+
+| procedure | persistence 0.95 | persistence 0.99 |
+|---|---|---|
+| CR-trunc | 0.514 / 0.956 / 783 | 0.317 / 0.948 / 769 |
+| CR-trunc with batch means | 0.911 / 1.000 / 4992 | 0.917 / 1.000 / 18916 |
+| CS-bet, running intersection | 0.455 / **0.713** / 774 | 0.279 / **0.682** / 666 |
+| CS-bet, no intersection | 0.695 / 0.992 / 1726 | 0.427 / 0.986 / 1815 |
+
+**Real data [REAL].** BTCUSDT, `α = 0.05`, median minutes until stop over 4392 hourly windows (range of the 24 hourly medians), including the 30-minute pilot; no coverage is claimed:
+
+| target accuracy | CR-raw | CR-trunc | Stein-trunc | CS-bet, no intersection | CR-raw not stopped within the start hour |
+|---|---|---|---|---|---|
+| d = 0.4 (about plus or minus 20% on volatility) | 66 (52 to 82) | **50** (46 to 52) | 55 (49 to 58) | 140 (131 to 149) | **58%** (42% to 69%), CR-trunc 27% |
+| d = 0.2 (plus or minus 20% on variance) | 411 (350 to 485) | **220** (200 to 230) | 220 (196 to 229) | 505 (447 to 551) | 100%; 6.0% not stopped within 24 hours |
+
+Stationary bootstrap of quiet days, `d = 0.2`: with i.i.d. resampling CR-trunc covers 0.949, CS-bet 0.979, CR-raw 0.919; with 30-minute blocks every procedure covers 0.70 to 0.82.
+
+**Reading.**
+* Truncation is what makes the classical rules usable: CR-trunc covers 0.936 to 0.964 at 0.96 to 1.01 times the oracle in all 16 law and accuracy cells, for any pilot from 10 to 100 returns. On raw squares the rule fails for t3 at every `d` (0.72 to 0.78, with N growing like `d^{-3}`) and for jumps (0.78), and Stein's rule is worse (down to 0.36). In absolute rather than relative accuracy even normal returns under-cover at `d = 0.2` (0.90, a skewness bias of the stopped mean), so accuracy should be stated relatively.
+* The anytime-valid betting sequence is valid everywhere and costs a known factor: about 1.55 times the oracle at small `d`, 1.8 at `d = 0.2`; on BTC, 2.3 to 2.8 times the minutes of truncated Chow and Robbins.
+* Under clustering the stationary level is out of reach within hours (every i.i.d. rule stops 7 to 47 times too early; batch means needs 2,000 to 19,000 returns). What the classical rule does cover is the window's average conditional truncated variance (0.948 to 0.966, martingale central limit theorem). The running intersection of the confidence sequence is invalid for that moving target; without it the sequence covers it at 0.986 to 1.000. On real data the intersected sequence stops suspiciously early (1.32 against 2.20 times the in-window `n*` proxy at `d = 0.2`), the same signature, so the figures without intersection are the ones to quote.
+* The hour of day matters little: the truncated rules' hourly medians stay within 10% of the overall median, because relative accuracy depends on the shape of the truncated squares, not on the level.
+
+**Caveats.** The guarantee is for the truncated variance; the map to `σ²` is exact only under the assumed shape (2.5% coverage for t3 under a normal shape). The classical rules are asymptotic. Under clustering only the window average is covered, never the stationary level. The bets of the betting sequence are tuned for the rule without intersection (about 5% left in the intersected limit) and were not re-tuned; the pilot's returns are not used by the sequence. Deseasonalisation removes the intraday pattern but not quiet weekends, which cause most of the windows that never stop. One coin, one venue, six months.
 
 ---
 

@@ -22,6 +22,7 @@ What the prototype does not establish, in one place. Each item says how large th
 * Truncation does not remove microstructure noise (`docs/estimator_issues.md`, 4b). At one-minute sampling the noise is small for the assets used here; at higher frequencies a noise-robust first stage would be needed (alternative `alternatives/preaveraging/`).
 * Clipping keeps τ⁴ for each large jump, so very frequent large jumps still bias truncated quarticity upward (E2c). Dropping instead of clipping (threshold RQ) removes more of this.
 * The κ₄ bias correction is exact only for locally Gaussian diffusive returns.
+* A fixed-accuracy estimate of the volatility level (alternative A8) is, under volatility clustering, an estimate of the recent window's average conditional variance, not of a long-run level; reaching the long-run level took 2,000 to 19,000 one-minute returns in simulation. Its confidence sequences are valid for that window average only without the running intersection.
 * Our reading of how the paper's tables were computed (unnormalised weights, raw MAD, no factor n in RQ) is an inference from the published numbers. It needs the author's code to confirm, and is presented as questions, not corrections.
 
 ## 4. Scope

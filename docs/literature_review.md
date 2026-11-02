@@ -95,7 +95,23 @@ The full list behind E15, with how each reference was checked, is in `docs/theor
 | Andersen, T. G., Todorov, V. and Zhou, B. (2025). Real-time detection of local no-arbitrage violations. *Quantitative Economics* 16(2), 459 to 495. doi:10.3982/QE2585 | Sequential stopping rules on high-frequency prices that flag local departures from the Itô semimartingale model in real time. | Closest real-time, high-frequency monitoring work found. Different target (no-arbitrage violations, not volatility regimes). |
 | Horváth, L., Trapani, L. and Wang, S. Sequential monitoring for explosive volatility regimes. arXiv:2404.17885 (published venue unverified) | Weighted CUSUM monitoring for a switch to explosive GARCH volatility, on daily data. | Online volatility monitoring, but parametric and daily. |
 
-## 9. The gap
+## 9. Sequential fixed-accuracy estimation (alternative A8)
+
+Background for `alternatives/sequential_estimation/`, which asks how many minutes of returns are needed to state the volatility level to a given relative accuracy. Its README has the full list (about 25 entries, each checked by web search).
+
+| Reference | What it does | Relation |
+|---|---|---|
+| Stein, C. (1945). A two-sample test for a linear hypothesis whose power is independent of the variance. *Annals of Mathematical Statistics* 16(3), 243 to 258 | Two-stage procedure: a pilot sample fixes the size of the second stage, giving a fixed-width interval with exact coverage under normality. | One of the classical rules compared in A8. Needs a pilot of at least 30 returns there. |
+| Robbins, H. (1959). Sequential estimation of the mean of a normal population. In U. Grenander (ed.), *Probability and Statistics (the Harald Cramér volume)*, Almqvist and Wiksell, Stockholm, 235 to 245 | Minimum risk point estimation: stop when the estimated loss from sampling more exceeds its cost. | On the truncated statistic, within 3% of the optimal risk from a pilot of 200 (A8). |
+| Chow, Y. S. and Robbins, H. (1965). On the asymptotic theory of fixed-width sequential confidence intervals for the mean. *Annals of Mathematical Statistics* 36, 457 to 462. doi:10.1214/aoms/1177700156 | Purely sequential fixed-width interval for any law with finite variance, valid as the width shrinks. | The main classical rule of A8. On min(r², τ²) it covers 0.94 to 0.96 at about the oracle sample size; on raw r² it fails for heavy tails. |
+| Nadas, A. (1967). *An extension of a theorem of Chow and Robbins on sequential confidence intervals for the mean*. PhD dissertation, Columbia University (a 1969 journal version is cited in the literature; volume and pages not verified) | Relative (proportional) accuracy version of Chow and Robbins. | The form used in A8, since volatility is quoted in relative terms. |
+| Banerjee, S. and Mukhopadhyay, N. (2016). A general sequential fixed-accuracy confidence interval estimation methodology for a positive parameter. *Annals of the Institute of Statistical Mathematics* 68(3), 541 to 570. doi:10.1007/s10463-015-0504-2 | Fixed-accuracy intervals for positive parameters (an interval whose ratio of end points is fixed). | The modern statement of the problem A8 solves for a volatility level. |
+| Konev, V. and Nazarenko, B. (2020). Sequential fixed accuracy estimation for nonstationary autoregressive processes. *Annals of the Institute of Statistical Mathematics* 72(1), 235 to 264. doi:10.1007/s10463-018-0689-2 | Fixed-accuracy estimation for dependent data. | Relevant to the clustering case, where A8 finds that rules built for independent data stop 7 to 47 times too early for the stationary level. |
+| Politis, D. N. and Romano, J. P. (1994). The stationary bootstrap. *Journal of the American Statistical Association* 89(428), 1303 to 1313. doi:10.1080/01621459.1994.10476870 | Resampling of dependent series in random-length blocks. | Used in A8 to resample quiet BTC days with and without their dependence. |
+
+Waudby-Smith and Ramdas (2024), Howard et al. (2021) and Bahadur and Savage (1956), all in section 7, are the other main references of A8: the first two give the confidence sequences it stops at a target width, the third the reason no rule can be exactly valid for the raw variance.
+
+## 10. The gap
 
 Our search (November 2026, not exhaustive) found:
 
