@@ -7,8 +7,12 @@ writes PNG files to paper/figures/. Run from the repository root:
 
 Figure 1, signal_cap.png: the signal cap of forecast-relative monitoring (E10, Q10d).
 The curve is the closed form rho(k) = k (1 - beta) / (1 - alpha - beta + alpha k);
-the markers are the simulated ratio of means and mean of ratios from
+the filled circles are the simulated ratio of means, pooled over paths (column
+ratio_of_means_pooled, with two bootstrap standard errors as bars), and the open
+triangles the simulated mean of the ratio (column mean_of_ratio_sim), both from
 results/e10d_signal_cap.csv; the dashed lines are the caps (1 - beta) / alpha.
+The column ratio_of_means_sim (an average of per-path ratios, biased upward)
+is not plotted.
 """
 
 from pathlib import Path
@@ -41,9 +45,18 @@ def fig_signal_cap():
         col = colours.get(p, "k")
         ax.plot(k, rho(k, a, b), color=col, lw=1.8, label=f"closed form, alpha + beta = {p}")
         ax.axhline((1 - b) / a, color=col, ls="--", lw=0.9)
-        ax.scatter(g["k"], g["ratio_of_means_sim"], color=col, marker="o", s=22, zorder=3)
+        ax.errorbar(
+            g["k"],
+            g["ratio_of_means_pooled"],
+            yerr=2.0 * g["ratio_of_means_pooled_se"],
+            color=col,
+            fmt="o",
+            ms=4.5,
+            capsize=2,
+            zorder=3,
+        )
         ax.scatter(g["k"], g["mean_of_ratio_sim"], color=col, marker="^", s=22, facecolors="none", zorder=3)
-    ax.scatter([], [], color="grey", marker="o", s=22, label="simulated ratio of means")
+    ax.scatter([], [], color="grey", marker="o", s=22, label="simulated ratio of means (pooled)")
     ax.scatter([], [], color="grey", marker="^", s=22, facecolors="none", label="simulated mean of ratio (monitored)")
     ax.plot([], [], color="grey", ls="--", lw=0.9, label="cap (1 - beta) / alpha")
     ax.set_xscale("log")
