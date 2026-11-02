@@ -254,6 +254,12 @@ class RankBetCore:
             self.S_h[rows] = 0.0
             self.counts[rows] = 0.0
 
+    def density_ratio(self, learner: int = 0) -> np.ndarray:
+        """Current estimate of (frequency of new p-values in each bin) / (bin width), shape ``(reps, K)``."""
+        c = self.counts[:, learner, :]
+        pi = (c + self.cfg.prior * self.q) / (c.sum(axis=1, keepdims=True) + self.cfg.prior)
+        return pi / self.q
+
     def family_stats(self) -> np.ndarray:
         """Weighted contribution of each family to ``M`` (shape ``(reps, 3)``)."""
         return np.column_stack([
@@ -336,6 +342,7 @@ class RankEvent:
     share_down: float
     share_hist: float
     mean_p_recent: float  # mean p-value over the last 240 monitored steps (0.5 under the null)
+    density_ratio: tuple = ()  # learned p-value frequency / bin width per bin (shortest-memory learner); 1 = no change
 
 
 class RankMonitor:
@@ -392,7 +399,7 @@ class RankMonitor:
             fam = self.core.family_stats()[0]
             sh = fam / fam.sum()
             ev = RankEvent(self.t, self.start, self.cal_start, M, float(sh[0]), float(sh[1]), float(sh[2]),
-                           float(np.mean(self._recent_p)))
+                           float(np.mean(self._recent_p)), tuple(float(v) for v in self.core.density_ratio(0)[0]))
             self.events.append(ev)
             self._reset()
             return ev

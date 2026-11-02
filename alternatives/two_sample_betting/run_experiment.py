@@ -442,9 +442,10 @@ HIST, START, END = "2025-04-01", "2025-07-01", "2026-01-01"
 MATCH = 60  # minutes
 WIN = 240  # evidence window before an alarm, minutes
 N_RANDOM = 2000
-# Detectors fixed before looking at any real alarm. "nonzero only" skips exact-zero returns (14.8% of BTC
-# minutes in the last days of June 2025, a data property checked before the run, not an alarm outcome):
-# the subsequence of nonzero returns of an exchangeable sequence is exchangeable, so it is just as valid.
+# Detectors fixed before looking at any real alarm. "nonzero only" skips exact-zero returns (frequent in
+# BTCUSDT one-minute data, a data property checked before the run, not an alarm outcome; the share is in
+# q4_real_summary.csv): the subsequence of nonzero returns of an exchangeable sequence is exchangeable,
+# so this variant is just as valid.
 Q4_RANK = {
     "RANK omnibus (abs), b 0": (R.RankBetConfig(), False),
     "RANK omnibus (abs), b 0.25": (R.RankBetConfig(band=0.25), False),
@@ -454,11 +455,14 @@ Q4_RANK = {
 SHORT_REF = "RANK omnibus (abs), b 0.25, 120-minute reference"  # validity does not need a long reference
 
 
-def _monitored_share(segment_starts, events, n) -> float:
-    """Share of the n monitored-period minutes that a monitor spent monitoring (not calibrating)."""
+def _intervals(segment_starts, events, n) -> list:
+    """Monitored intervals [start, end] (inclusive) of a monitor; the rest of the time it was calibrating."""
     ends = {e.monitored_since: e.index for e in events}
-    tot = sum((ends[s0] - s0 + 1) if s0 in ends else (n - s0) for s0 in segment_starts)
-    return tot / n
+    return [(s0, ends.get(s0, n - 1)) for s0 in segment_starts]
+
+
+def _monitored_share(intervals, n) -> float:
+    return sum(b - a + 1 for a, b in intervals) / n
 REFERENCE_MAIN = "MAIN plug-in, band 0.25"
 
 
@@ -503,11 +507,12 @@ def _q4_job(coin: str):
 
     idx, u, i0, checks = q4_prepare(coin)
     x = u[i0:]
-    events, monitored = {}, {}
+    events, intervals = {}, {}
     for band in (0.0, 0.25):
         mon = VolatilityMonitor(threshold=A, c=3.0, cal_len=CAL, null_band=band)
         ev = mon.run(x)
-        monitored[f"MAIN plug-in, band {band:g}"] = _monitored_share([sg["start"] for sg in mon.segments], ev, x.size)
+        intervals[f"MAIN plug-in, band {band:g}"] = [(a + i0, b + i0) for a, b in
+                                                     _intervals([sg["start"] for sg in mon.segments], ev, x.size)]
         events[f"MAIN plug-in, band {band:g}"] = [dict(index=e.index + i0, monitored_since=e.monitored_since + i0,
                                                        cal_start=e.monitored_since + i0 - CAL, direction=e.direction,
                                                        share_up=np.nan, share_down=np.nan, share_hist=np.nan,
@@ -516,15 +521,34 @@ def _q4_job(coin: str):
         mon = R.RankMonitor(threshold=A, cal_len=120 if name == SHORT_REF else CAL, config=cfg, seed=4)
         xx = np.where(x == 0, np.nan, x) if nonzero else x
         ev = mon.run(xx)
-        monitored[name] = _monitored_share([sg["start"] for sg in mon.segments], ev, x.size)
+        intervals[name] = [(a + i0, b + i0) for a, b in _intervals([sg["start"] for sg in mon.segments], ev, x.size)]
         rows = []
         for e in ev:
             sh = np.array([e.share_up, e.share_down, e.share_hist])
             rows.append(dict(index=e.index + i0, monitored_since=e.monitored_since + i0, cal_start=e.cal_start + i0,
                              direction=("up", "down", "shape")[int(np.argmax(sh))], share_up=e.share_up,
-                             share_down=e.share_down, share_hist=e.share_hist, mean_p_recent=e.mean_p_recent))
+                             share_down=e.share_down, share_hist=e.share_hist, mean_p_recent=e.mean_p_recent,
+                             **{f"dr{k}": v for k, v in enumerate(e.density_ratio)}))
         events[name] = rows
-    return coin, idx, u, i0, checks, events, monitored
+    return coin, idx, u, i0, checks, events, intervals
+
+
+PARTNER = {"MAIN": "RANK omnibus (abs), b 0.25", "RANK": REFERENCE_MAIN}
+
+
+def _inside(t: np.ndarray, iv: list) -> np.ndarray:
+    """True where time t lies in one of the (sorted, disjoint) monitored intervals."""
+    if not iv:
+        return np.zeros(t.size, bool)
+    a = np.array([x[0] for x in iv])
+    b = np.array([x[1] for x in iv])
+    k = np.searchsorted(a, t, side="right") - 1
+    return (k >= 0) & (t <= b[np.clip(k, 0, None)])
+
+
+def _agg(col: pd.Series) -> float:
+    """Median of a numeric column; share of True for a boolean one (used for the weekend share)."""
+    return float(col.mean()) if col.dtype == bool else float(col.median())
 
 
 def part_q4():
@@ -532,16 +556,20 @@ def part_q4():
         results = pool.map(_q4_job, list(COINS))
     rng = np.random.default_rng(44)
     ev_rows, sum_rows, ctrl_rows = [], [], []
-    for coin, idx, u, i0, checks, events, monitored in results:
+    idx_of = {r[0]: r[1] for r in results}
+    for coin, idx, u, i0, checks, events, intervals in results:
         n = u.size
         days = (n - i0) / DAY
-        main_t = np.array([e["index"] for e in events[REFERENCE_MAIN]], int)
         lo_t, hi_t = i0 + 2 * DAY + WIN, n - DAY - 1
-        # matched-delay random-time control
+        seg = u[i0:]
+        seg = seg[np.isfinite(seg)]
         for det, evs in events.items():
+            partner = PARTNER[det.split()[0]]
+            pt = np.array([e["index"] for e in events[partner]], int)
             t = np.array([e["index"] for e in evs], int)
-            dist = np.array([np.min(np.abs(main_t - tt)) if main_t.size else np.inf for tt in t])
-            for e, d in zip(evs, dist):
+            dist = np.array([np.min(np.abs(pt - tt)) if pt.size else np.inf for tt in t])
+            p_mon = _inside(t, intervals[partner])
+            for e, d, pm in zip(evs, dist, p_mon):
                 tt = e["index"]
                 a = max(e["monitored_since"], tt - WIN + 1)
                 m = window_metrics(u, e["cal_start"], e["monitored_since"], a, tt + 1)
@@ -549,22 +577,30 @@ def part_q4():
                 ev_rows.append(dict(coin=coin, detector=det, time=idx[tt], index=tt, delay_minutes=tt - e["monitored_since"],
                                     label=e["direction"], share_up=e["share_up"], share_down=e["share_down"],
                                     share_hist=e["share_hist"], mean_p_recent=e["mean_p_recent"],
-                                    minutes_to_nearest_main25=float(d), matched_main25=bool(d <= MATCH),
+                                    **{f"dr{k}": e.get(f"dr{k}", np.nan) for k in range(len(R.DEFAULT_EDGES) - 1)},
+                                    partner=partner, minutes_to_nearest_partner=float(d), matched=bool(d <= MATCH),
+                                    partner_monitoring=bool(pm),
                                     **m, **{f"post_{k}": v for k, v in post.items()}))
             # chance overlap: shift this detector's alarms by random offsets of 1 to 30 days (circular)
             span = n - i0
             chance = []
             for _ in range(200):
                 sh = (t - i0 + rng.integers(DAY, 30 * DAY)) % span + i0
-                dd = np.array([np.min(np.abs(main_t - x)) if main_t.size else np.inf for x in sh])
+                dd = np.array([np.min(np.abs(pt - y)) if pt.size else np.inf for y in sh])
                 chance.append(np.mean(dd <= MATCH) if dd.size else np.nan)
             labels = [e["direction"] for e in evs]
-            sum_rows.append(dict(coin=coin, detector=det, days=days, monitored_share=monitored[det], alarms=t.size,
-                                 alarms_per_day=t.size / days, alarms_per_monitored_day=t.size / (days * monitored[det]),
+            unmatched = dist > MATCH
+            mshare = _monitored_share(intervals[det], n - i0)
+            sum_rows.append(dict(coin=coin, detector=det, days=days, zero_return_share=float(np.mean(seg == 0)),
+                                 monitored_share=mshare, alarms=t.size,
+                                 alarms_per_day=t.size / days, alarms_per_monitored_day=t.size / (days * mshare),
                                  up=labels.count("up"), down=labels.count("down"), shape=labels.count("shape"),
-                                 matched_main25_within_60min=int(np.sum(dist <= MATCH)),
-                                 matched_share=float(np.mean(dist <= MATCH)) if t.size else np.nan,
-                                 chance_matched_share=float(np.nanmean(chance)) if t.size else np.nan))
+                                 partner=partner, matched_within_60min=int(np.sum(~unmatched)),
+                                 matched_share=float(np.mean(~unmatched)) if t.size else np.nan,
+                                 chance_matched_share=float(np.nanmean(chance)) if t.size else np.nan,
+                                 unmatched=int(unmatched.sum()),
+                                 unmatched_partner_monitoring=int(np.sum(unmatched & p_mon)),
+                                 unmatched_partner_calibrating=int(np.sum(unmatched & ~p_mon))))
         # random times with a reference that ended as long before as a typical alarm's calibration did
         delays = [e["index"] - e["monitored_since"] for e in events["RANK omnibus (abs), b 0.25"]]
         for _ in range(N_RANDOM):
@@ -577,27 +613,35 @@ def part_q4():
             ctrl_rows.append(dict(coin=coin, index=tt, delay_minutes=d, **m, **{f"post_{k}": v for k, v in post.items()}))
         print(coin, checks, flush=True)
     ev = pd.DataFrame(ev_rows)
+    ev["weekend"] = pd.to_datetime(ev.time, utc=True).dt.dayofweek >= 5  # Saturday or Sunday, UTC
     ev.to_csv(OUT / "q4_real_events.csv", index=False)
+    only = ev[(ev.detector == "RANK omnibus (abs), b 0.25") & ~ev.matched & ev.partner_monitoring]
+    only[["coin", "time", "label", "share_up", "share_down", "share_hist", "scale_ratio", "trunc_var_ratio", "shape_ks",
+          "zero_ref", "zero_win", "tail_ref", "tail_win", "dr0", "dr1", "dr9", "dr10", "dr11", "weekend"]].to_csv(
+        OUT / "q4_real_rank_only_alarms.csv", index=False)
     ctrl = pd.DataFrame(ctrl_rows)
     ctrl.to_csv(OUT / "q4_real_random_times.csv", index=False)
     summ = pd.DataFrame(sum_rows)
     summ.to_csv(OUT / "q4_real_summary.csv", index=False)
     # profile: medians of the window metrics by group
     cols = ["scale_ratio", "trunc_var_ratio", "shape_ks", "zero_ref", "zero_win", "tail_ref", "tail_win", "pos_share_win",
-            "post_scale_ratio", "post_shape_ks", "post_zero_win"]
+            "post_scale_ratio", "post_shape_ks", "post_zero_win", "weekend"] + [f"dr{k}" for k in range(len(R.DEFAULT_EDGES) - 1)]
     prof = []
     for (coin, det), g in ev.groupby(["coin", "detector"]):
-        groups = {"all alarms": g}
+        groups = {"all alarms": g, "matched (partner alarm within 60 min)": g[g.matched],
+                  "unmatched": g[~g.matched],
+                  "unmatched, partner was monitoring": g[(~g.matched) & g.partner_monitoring],
+                  "unmatched, partner was calibrating": g[(~g.matched) & ~g.partner_monitoring]}
         if det.startswith("RANK"):
-            groups["matched (MAIN 0.25 alarm within 60 min)"] = g[g.matched_main25]
-            groups["rank only"] = g[~g.matched_main25]
             for lab in ("up", "down", "shape"):
-                groups[f"rank only, label {lab}"] = g[(~g.matched_main25) & (g.label == lab)]
+                groups[f"unmatched, label {lab}"] = g[(~g.matched) & (g.label == lab)]
+                groups[f"unmatched, partner monitoring, label {lab}"] = g[(~g.matched) & g.partner_monitoring & (g.label == lab)]
         for gname, gg in groups.items():
-            prof.append(dict(coin=coin, detector=det, group=gname, n=len(gg), **{c: float(gg[c].median()) if len(gg) else np.nan for c in cols}))
+            prof.append(dict(coin=coin, detector=det, group=gname, n=len(gg), **{c: _agg(gg[c]) if len(gg) else np.nan for c in cols}))
     for coin, g in ctrl.groupby("coin"):
+        g = g.assign(weekend=pd.to_datetime(idx_of[coin][g["index"].to_numpy()]).dayofweek >= 5)
         prof.append(dict(coin=coin, detector="control: random times (matched delay)", group="random", n=len(g),
-                         **{c: float(g[c].median()) for c in cols}))
+                         **{c: _agg(g[c]) if c in g else np.nan for c in cols}))
     prof = pd.DataFrame(prof)
     prof.to_csv(OUT / "q4_real_profiles.csv", index=False)
     print(summ.to_string())
@@ -669,10 +713,14 @@ def part_figs():
         ax.scatter(np.log2(c.scale_ratio), c.shape_ks, s=5, color="#b5b4ad", alpha=0.5, label="random times (control)",
                    linewidths=0)
         e = ev[(ev.coin == coin) & (ev.detector == det)]
-        for k, (lab, m) in enumerate((("rank alarm, main monitor also alarms within 60 min", e.matched_main25),
-                                      ("rank alarm only", ~e.matched_main25))):
+        for k, (lab, m) in enumerate((("rank alarm, main monitor also alarms within 60 min", e.matched),
+                                      ("rank alarm only", ~e.matched))):
             ax.scatter(np.log2(e.scale_ratio[m]), e.shape_ks[m], s=16, color=COLORS[k], label=lab,
                        edgecolors="white", linewidths=0.5)
+        out = int(np.sum(np.abs(np.log2(c.scale_ratio)) > 3))
+        ax.set_xlim(-3, 3)
+        ax.text(0.99, 0.98, f"{out} of {len(c)} random times lie outside the x range", transform=ax.transAxes,
+                ha="right", va="top", fontsize=7, color=MUTED)
         ax.set_title(f"[REAL] {COINS[coin]}, Jul to Dec 2025", fontsize=10, color=INK, loc="left")
         ax.set_xlabel("log2 robust scale ratio (240 min before alarm / calibration window)", fontsize=8, color=MUTED)
         ax.axvline(0, color=MUTED, linewidth=0.6)
@@ -682,6 +730,36 @@ def part_figs():
     axes[0].legend(fontsize=7, frameon=False, loc="upper left")
     fig.tight_layout()
     fig.savefig(OUT / "fig2_real_alarm_profiles.png", dpi=150)
+    plt.close(fig)
+
+    # Figure 3: learned density ratio of new versus reference move sizes at the alarm
+    edges = np.asarray(R.DEFAULT_EDGES)
+    labels = [f"{100 * a:g} to {100 * b:g}" for a, b in zip(edges[:-1], edges[1:])]
+    fig, axes = plt.subplots(1, 2, figsize=(10, 4.2), sharey=True)
+    for ax, coin in zip(axes, COINS):
+        e = ev[(ev.coin == coin) & (ev.detector == det)]
+        groups = (("alarm matched by the main monitor within 60 min", e[e.matched]),
+                  ("rank only, main monitor watching", e[~e.matched & e.partner_monitoring]))
+        for k, (lab, g) in enumerate(groups):
+            med = g[[f"dr{i}" for i in range(len(labels))]].median().to_numpy()
+            ax.plot(np.arange(len(labels)), med, marker="o", markersize=4, linewidth=2, color=COLORS[k],
+                    label=f"{lab} (n = {len(g)})")
+        ax.axhline(1, color=MUTED, linewidth=0.8)
+        ax.set_yscale("log")
+        ax.set_yticks([0.25, 0.5, 1, 2, 4])
+        ax.set_yticklabels(["0.25", "0.5", "1", "2", "4"])
+        ax.minorticks_off()
+        ax.set_xticks(np.arange(len(labels)))
+        ax.set_xticklabels(labels, rotation=60, fontsize=7)
+        ax.set_xlabel("rank bin: % of earlier moves that were larger (0 = largest moves, 100 = smallest moves)", fontsize=8,
+                      color=MUTED)
+        ax.set_title(f"[REAL] {COINS[coin]}: what changed at the alarm (median)", fontsize=10, color=INK, loc="left")
+        _style(ax)
+        ax.grid(axis="y", color=GRID, linewidth=0.6)
+    axes[0].set_ylabel("new frequency / reference frequency (log scale)", fontsize=8, color=MUTED)
+    axes[0].legend(fontsize=7, frameon=False, loc="upper center")
+    fig.tight_layout()
+    fig.savefig(OUT / "fig3_real_density_ratio.png", dpi=150)
     plt.close(fig)
 
 

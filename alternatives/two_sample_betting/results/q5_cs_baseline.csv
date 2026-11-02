@@ -1,0 +1,7 @@
+part,scenario,detector,fa_1d,fa_1d_lo,fa_1d_hi,bound_1d,fa_7d,fa_7d_lo,fa_7d_hi,bound_7d,false_alarm_before_change,fa_lo,fa_hi,detected,median_delay,median_delay_lo,median_delay_hi,mean_delay
+Q1 paths,Gaussian,"MAIN confidence-sequence baseline (delta 0.01), band 0",0.0,2.168404344971009e-19,0.0038267585456940676,0.05,0.001,0.00017654636867653686,0.005642558659926143,0.35,,,,,,,,
+Q2 paths,sd x1.25 (variance x1.56),"MAIN confidence-sequence baseline (delta 0.01), band 0",,,,,,,,,0.0,0.0,0.009512294482932589,1.0,348.0,322.0,377.0,407.1625
+Q2 paths,sd x0.8 (variance x0.64),"MAIN confidence-sequence baseline (delta 0.01), band 0",,,,,,,,,0.0,0.0,0.009512294482932589,1.0,400.0,383.0,419.0,435.9475
+Q2 paths,"tails: Gaussian to t4, same variance","MAIN confidence-sequence baseline (delta 0.01), band 0",,,,,,,,,0.0,0.0,0.009512294482932589,0.1025,2251.0,1755.0,2974.0,2249.4146341463415
+Q2 paths,"jumps: 0.2% to 1% per step, same variance","MAIN confidence-sequence baseline (delta 0.01), band 0",,,,,,,,,0.0,0.0,0.009512294482932589,0.92,1129.5,1057.0,1226.0,1360.4103260869565
+Q2 paths,"skew: large moves 80% negative, same |u| law","MAIN confidence-sequence baseline (delta 0.01), band 0",,,,,,,,,0.0,0.0,0.009512294482932589,0.0,,,,
