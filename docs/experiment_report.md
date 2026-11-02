@@ -20,7 +20,7 @@ To rerun: `pip install -r requirements.txt && pip install -e .`, then `python sc
 | E4 | False alarms and delay against parametric and classical detectors | The robust e-detector is the only valid one under jumps and fat tails, 10% to 70% slower on clean Gaussian data. The plug-in baseline roughly triples the false alarm rate with short calibration (E4e). |
 | E5 | Real data, Bitstamp BTC | 81% and 90% of up and down alarms are followed by volatility in the flagged direction, but clustering explains much of the up figure. |
 | E6 | The paper's five coins on Binance | Published tables imply unnormalised weights, the raw MAD and about 2,000 missing minutes; an ETH sign slip and a DOGE contradiction. Alarms beat EWMA and HAR forecasts, but a hindsight-tuned ratio rule is as precise. |
-| E7 | Nifty 50 and India VIX | Out of sample, 78% of up alarms are followed by higher volatility (47% at random); every budget day watched from the open raised an alarm; the monitor answers "has volatility changed?", not "is it high?". |
+| E7 | Nifty 50 and India VIX | Out of sample, 78% of up alarms are followed by higher volatility (47% at random); every budget day watched from the open raised an alarm; the monitor answers "has volatility changed?", not "is it high?". India VIX moves with the alarms on the same day but the alarms do not lead it. |
 | E8 | A guarantee with an estimated baseline | Proved: P(false alarm within m steps) ≤ δ + m / A with a confidence-sequence baseline; observed at most 0.27% against 5%. |
 | E9 | How tight is the guarantee, and when does it fail? | About 4 times conservative and distribution free; persistent GARCH clustering breaks it. |
 | E10 | Monitoring relative to a volatility forecast | Restores the guarantee under clustering; a frozen persistent forecast lets through at most (1 - β)/α of any break, and an information bound puts the delay near two days. |
@@ -31,9 +31,9 @@ To rerun: `pip install -r requirements.txt && pip install -e .`, then `python sc
 | E15 | Panel monitoring with false discovery control | In progress. |
 | ALT1 | Quarticity stream; pre-averaging for noise | Price noise breaks the raw-return guarantee; non-overlapping pre-averaged blocks restore it. |
 | ALT2 | Risk switch | Tails on par with daily volatility targeting, worse tracking, no Sharpe difference; the robust trigger beats the Gaussian one. |
-| ALT3 | Robust local IQ estimator | In progress. |
+| ALT3 | Robust local IQ estimator | Squaring a local variance is 95% efficient against 74% for RQ-type estimators; one daily MAD stops converging when volatility moves within the day; on BTC and DOGE large returns come in bursts and scale-truncated estimators remove a third to a half of IQ. |
 | ALT4 | Correlation monitor | Sign concordance gives a valid correlation monitor that volatility changes cannot fool. |
-| ALT5 | Two-sample betting test | In progress. |
+| ALT5 | Two-sample (rank) betting test | Ranks against a growing reference give an exactly valid detector for any return law and horizon (1.9% to 3.5% per day against 5%); ranks against a fixed reference fail like a plug-in baseline; 2.9 times faster for a change in tail shape, 4% to 19% slower for a scale change. |
 
 ---
 
@@ -420,7 +420,7 @@ Pooled over the five Binance coins; band 0.25 unless stated; p is a two-proporti
 
 **Data [REAL].** Nifty 50 index, one-minute bars in Indian Standard Time (IST), April 2017 to October 2026, loaded with `avmonitor.data.load_nifty` (source in `data/MANIFEST.csv`). A regular session runs 09:15 to 15:29, which is 375 bars and 374 intraday returns. Overnight returns are excluded, so the gap between one day's close and the next day's open never enters any statistic. An index has no bid-ask bounce (the jitter between buy and sell prices that affects a single traded price), but it is computed from the last traded prices of 50 stocks, so it can lag ("stale prices"); the lag-1 autocorrelation of minute returns is small but positive (0.027). Scripts: `experiments/e07_nifty.py` (Q7a, Q7b), `experiments/e07c_india_vix.py` (Q7c), `experiments/e07d_events.py` (Q7d). Notes on each iteration, including the failed ones: `docs/iterations/E7.md`.
 
-**Cleaning.** A 50-stock index whose value does not change for 5 or more minutes in a row is not trading normally. That happened 76 times: two exchange outages (10 July 2017 and 24 February 2021), the two market-wide trading halts of 13 and 23 March 2020 (when the market fell 10% and trading stopped for 45 minutes), a stretch on 7 March 2022, and from 3 August 2026 the last 12 to 14 minutes of every session, which a web search ties to the start of NSE's Closing Auction Session that day (source in `data/events/nifty_events.csv`). These frozen minutes would look like "zero volatility", so they are set to missing, together with the first return after each frozen stretch (it spans the whole halt). The two outage sessions, where more than a quarter of the returns were frozen, are dropped, as are 6 short special sessions. Result: 2,361 sessions and 882,001 returns (`results/e07a_frozen_runs.csv`). As an outside check, NSE's own published daily high and low of the Nifty 50 match the minute data within 0.01% on about 94% of days (`results/e07c_nse_crosscheck.csv`).
+**Cleaning.** A 50-stock index whose value does not change for 5 or more minutes in a row is not trading normally. That happened 76 times: two exchange outages (10 July 2017 and 24 February 2021), the two market-wide trading halts of 13 and 23 March 2020 (when the market fell 10% and trading stopped for 45 minutes), a stretch on 7 March 2022, and from 3 August 2026 the last 12 to 14 minutes of every session, which a web search ties to the start of NSE's Closing Auction Session that day (source in `data/events/nifty_events.csv`). These frozen minutes would look like "zero volatility", so they are set to missing, together with the first return after each frozen stretch (it spans the whole halt). The two outage sessions, where more than a quarter of the returns were frozen, are dropped, as are 6 short special sessions. Result: 2,361 sessions and 882,001 returns (`results/e07a_frozen_runs.csv`). As an outside check, NSE's own published daily high and low of the Nifty 50 match the minute data within 0.01% on 94% and 96% of the 2,369 days, and within 0.1% on more than 99% (`results/e07c_nse_crosscheck.csv`, see Q7c).
 
 ### Q7a. What do Nifty minute returns look like, and how large is the truncation bias?
 
@@ -506,7 +506,39 @@ The random-time intervals are about ±1.5 percentage points. A second, simpler c
 
 ### Q7c. External check with India VIX
 
-[filled in below after the download]
+**Data [REAL].** India VIX is an index that NSE computes from Nifty option prices. It measures the volatility the options market expects in the coming weeks, so it is forward-looking and the monitor never sees it. The NSE daily index close files (`archives.nseindia.com/content/indices/ind_close_all_DDMMYYYY.csv`) were fetched for all 2,369 session dates of the minute data, one request per second with Python's default user agent, and cached in `data/raw/india_vix/` (git-ignored). **No file was missing**, and every file has an "India VIX" row (`python -I experiments/e07c_india_vix.py download`, then `python -I experiments/e07c_india_vix.py`). On 2 days (12 February 2021 and 30 March 2021) the row has no open, high or low and repeats the previous close with a change of 0, so those two values are treated as missing; 2,367 VIX closes remain. The VIX close ranged from 9.15 to 83.61 (median 14.78).
+
+**Side result: checking the minute data against NSE.** The same files carry NSE's official Nifty 50 open, high, low and close. The daily high and low built from the minute bars match NSE's within 0.01% on 93.7% and 96.1% of days and within 0.1% on 99.5% and 99.7%. The close matches less well (median difference 0.045%, within 0.1% on 81% of days), because before August 2026 NSE's official closing value is not simply the last traded value of the 15:29 bar. From 3 August 2026 the official close equals the 15:29 bar on all 62 days, which fits the closing auction found in the cleaning step.
+
+**Method.** Session level, primary configuration (calibration 750, band 0.25) and the Gaussian benchmark (calibration 750); the other configurations are in `results/e07c_vix_alarm_check.csv`. A session is an "up alarm session" if it has an up alarm (no session has more than one alarm). Two VIX changes per session d: **same day**, log VIX close(d) minus log VIX close(d minus 1), which includes the hours before the alarm, so it measures agreement, not prediction; and **next day**, log VIX close(d plus 1) minus log VIX close(d), which is strictly after the alarm. Control: all sessions of the same period. Fisher exact test of alarm sessions against the other sessions. Wilson 95% intervals in brackets.
+
+Same day (does VIX close higher on an up alarm day, lower on a down alarm day?):
+
+| Detector [REAL] | Period | Up alarm sessions | VIX rose | All sessions | p | Down alarm sessions | VIX fell | All sessions | p |
+|---|---|---|---|---|---|---|---|---|---|
+| Robust, primary | dev | 165 | **68%** (60 to 75) | 47% | < 0.001 | 134 | **70%** (62 to 77) | 53% | < 0.001 |
+| | held-out | 161 | 53% (46 to 61) | 46% | 0.06 | 150 | **66%** (58 to 73) | 53% | < 0.001 |
+| Gaussian LR | dev | 318 | 54% (48 to 59) | 47% | 0.004 | 166 | 64% (56 to 71) | 53% | 0.002 |
+| | held-out | 349 | 53% (48 to 59) | 46% | 0.003 | 155 | 61% (53 to 69) | 53% | 0.03 |
+
+Next day (does VIX keep moving in the alarm's direction after the alarm day?):
+
+| Detector [REAL] | Period | Up alarm sessions | VIX rose | All sessions | p | Down alarm sessions | VIX fell | All sessions | p |
+|---|---|---|---|---|---|---|---|---|---|
+| Robust, primary | dev | 165 | 48% (41 to 56) | 47% | 0.61 | 134 | 51% (43 to 60) | 53% | 0.85 |
+| | held-out | 161 | 45% (38 to 53) | 46% | 0.80 | 150 | 45% (37 to 53) | 53% | 0.04 |
+| Gaussian LR | dev | 318 | 48% (42 to 53) | 47% | 0.74 | 166 | 58% (51 to 66) | 53% | 0.11 |
+| | held-out | 349 | 43% (38 to 49) | 46% | 0.18 | 155 | 52% (44 to 59) | 53% | 0.80 |
+
+Across all six robust configurations and both periods, the same-day share was 50 to 72% for up alarms (control 46 to 47%) and 59 to 76% for down alarms (control 53%), significant at the 5% level in 21 of 24 cells. The next-day share was 42 to 49% for up alarms and 41 to 60% for down alarms; no cell was significant in the alarm's direction, and three held-out down-alarm cells were significant in the opposite direction.
+
+**Reading.**
+* **The options market agrees with the alarms on the same day.** When the monitor flags a rise in volatility, India VIX closes higher that day more often than on other days (68% against 47% in the development years for the primary configuration), and when it flags a fall, VIX closes lower (70% and 66% against 53%). On held-out data the agreement is clear for down alarms and weaker for up alarms (53% against 46%, p = 0.06).
+* **The alarms do not lead VIX.** On the day after an alarm, VIX moves in the alarm's direction no more often than on any other day (up alarms 45 to 48% against 46 to 47%). After held-out down alarms VIX even rose more often than usual the next day (it fell on 45% of them against 53% of all days). So the answer to Q7c is **no**: up alarms are not followed by VIX rises, nor down alarms by falls, more often than random sessions; the agreement is concurrent only.
+* This does not contradict Q7b. There, the next session's realised volatility stayed on the alarm's side of the baseline (78% and 76% held-out). A plausible reading is that the options market has already priced the new level by the close of the alarm day, so the next day's VIX change is close to a coin flip, while realised volatility simply persists.
+* The robust monitor agrees with VIX more than the Gaussian benchmark in the development years (68% against 54% for up alarms), but not clearly on held-out data (53% each for up alarms, 66% against 61% for down alarms).
+
+**Caveats.** VIX reacts to many things besides intraday Nifty volatility (for example option demand before events), and it looks further ahead than one session. Close-to-close changes are coarse: an alarm at 15:00 and one at 10:00 get the same "same day" window. The control shares are not 50% because VIX fell on slightly more days than it rose in both periods.
 
 ### Q7d. Event study with verified dates
 
@@ -1086,6 +1118,71 @@ Alarm rates of the frozen robust monitor: 93 a year per coin on crypto in 2025 (
 
 ---
 
+## Report part ALT3: a robust local plug-in estimator of integrated quarticity (A5)
+
+Code, tests, README (mathematics, proofs, comparison with the literature) and full results are in `alternatives/robust_iq_estimator/`. Every number below is copied from its `results/` folder. [SYNTHETIC] marks simulated data or closed-form theory, [REAL] marks Binance spot one-minute bars (BTCUSDT and DOGEUSDT, 1 July to 31 December 2025, 184 UTC days each). Iteration notes: `docs/iterations/ALT3.md`.
+
+**Question.** Integrated quarticity (`IQ = int sigma^4`, the quantity that sets the width of every confidence interval for daily variance) is estimated in Bapat (2026) by clipping returns at `c x MAD` and averaging kernel-weighted local fourth powers. `docs/estimator_issues.md` lists four problems with it. Can the paper's idea (robust-scale truncation plus local smoothing) be turned into an estimator that is consistent, close to the efficient asymptotic variance `8 int sigma^8`, robust to jumps, equipped with a confidence interval, and better behaved on real minute data?
+
+**Method.** Two changes of principle and one of detail. (1) Aggregate by **squaring a local variance** (the plug-in principle of Jacod and Rosenbaum 2013) instead of averaging local fourth powers: over blocks of k returns, `IQ_hat = sum over blocks of k delta (block mean of r^2 / delta)^2`, whose asymptotic variance is `8 (k + 3) / (k + 2) int sigma^8` (RQ-type estimators, including the paper's averaged kernel, are at `32/3`). (2) Truncate against a **local** scale (median absolute deviation, then a truncated root mean square, over about three blocks) with either a fixed cut-off a = 3 or the growing cut-off `a_n = sqrt(2 log n)`, and **drop** truncated returns rather than clip them. (3) Remove the squaring and truncation biases with an **exact finite-sample correction**, computed from the cumulants of a clipped or dropped squared normal, so the estimator is unbiased under locally constant volatility for every block size. The same algebra gives `int sigma^8` and hence a 95% interval. Main proposal **PI-LU** (local scale, `a_n`, drop, `k = ceil(sqrt n)`). Second proposal **PI-NN** (added in iteration 3, after the real data): PI-LU with the scale raised to 1.4826 times the median of the six nearest absolute returns when that is larger, and blocks of `round(n^(1/4))`. Simulations: log-OU stochastic volatility from `avmonitor.simulate`, vol of vol 0.5 or 1 with a U-shaped intraday pattern, 0 or 4 jumps a day of three sizes, n = 390, 1440, 23,400, 500 days per cell, 15 estimators, true IQ known exactly.
+
+**Q1 Efficiency [SYNTHETIC].** Constant volatility, n = 1440, 8000 days. AVAR in units of `int sigma^8` (closed form / simulated) and efficiency `8 / AVAR`:
+
+| RQ | TPQ | MedRQ | MinRQ | RK-k (Bapat, normalised, corrected) | PI-LU (k = 38) | PI-NN (k = 6) |
+|---|---|---|---|---|---|---|
+| 10.67 / 10.81, 0.74 | 13.65 / 13.48, 0.59 | 14.24 (sim.), 0.56 | 18.50 (sim.), 0.43 | 9.26 (sim.), 0.86 | 8.20 / 8.46, 0.95 | 9.00 / 9.17, 0.87 |
+
+A jump clipped at a = 3 leaves 17.55 (plug-in) or 27.01 (fourth powers) times `sigma^4 delta` (simulation 17.56 and 27.02); a dropped jump leaves 0.003. At n = 390 each clipped jump is 4.5% to 6.9% of the day's IQ.
+
+**Q2 Consistency [SYNTHETIC].** Strong stochastic volatility plus intraday pattern, no jumps (S5): relative bias at n = 390 / 1440 / 23,400 and slope of log RMSE on log n (minus 0.5 is the `sqrt(n)` rate):
+
+| | RK (Bapat) | RK-k | PI-G3 (daily scale) | TRQ-M (Mancini) | MedRQ | PI-LU | PI-NN |
+|---|---|---|---|---|---|---|---|
+| bias | -0.209 / -0.159 / -0.144 | -0.179 / -0.128 / -0.112 | -0.069 / -0.061 / -0.055 | -0.038 / -0.028 / -0.024 | -0.017 / 0.005 / 0.002 | -0.002 / -0.001 / 0.000 | 0.008 / 0.006 / 0.001 |
+| slope | -0.11 | -0.14 | -0.22 | -0.36 | -0.50 | -0.51 | -0.51 |
+
+**Q3 Bandwidth [SYNTHETIC].** The paper's cross-validation (eq. 17 as printed) picks the smallest bandwidth offered (h = 5) on 58% to 97% of days. Its expected value under constant volatility is 74.3, 77.2, 99.2, 142.8 at h = 5, 10, 20, 30 (minimum at h = 5 whatever the data). A corrected target picks the oracle spot bandwidth (median h = 50 to 150), but that oversmooths for the integrated quantity (kernel plug-in RMSE 0.250 at the corrected choice against 0.198 at h = 10, S5, n = 390). The block length of PI-LU matters little in smooth designs (default within 1% to 8% of the best k).
+
+**Q4 Comparison and intervals [SYNTHETIC].** Relative RMSE at n = 390 (n = 1440 in brackets):
+
+| | S1 no jumps | S3 medium jumps | S4 large jumps | S5 strong SV | S6 S5 + jumps |
+|---|---|---|---|---|---|
+| RQ | 0.167 (0.091) | 28.2 (102) | 3017 (12917) | 0.197 (0.111) | 31.2 (95.1) |
+| TPQ | 0.189 (0.100) | 0.630 (0.379) | 3.54 (2.99) | 0.239 (0.130) | 0.782 (0.383) |
+| MedRQ | 0.186 (0.106) | 0.471 (2.10) | 177 (93.4) | 0.236 (0.127) | 19.3 (1.19) |
+| RK (Bapat) | 0.156 (0.091) | 0.249 (0.091) | 0.312 (0.089) | 0.256 (0.184) | 0.198 (0.154) |
+| PI-LU | 0.154 (0.078) | **0.179 (0.082)** | **0.163 (0.078)** | 0.183 (0.098) | 0.217 (0.106) |
+| PI-NN | 0.162 (0.085) | 0.320 (0.121) | 0.236 (0.088) | 0.192 (0.105) | 0.375 (0.129) |
+
+PI-LU's 95% interval covers the true IQ 92.6% to 97.2% of the time in all 18 cells (simulation standard error about 1%).
+
+**Q5 Real data [REAL].** Median over days of each estimator's ratio to MedRQ of the same day, and rank correlation with MedRQ:
+
+| | RK (Bapat) | RK-k | PI-G3 | TRQ-M | PI-L3 | PI-LU | KPI-L3 | PI-NN | MinRQ | TPQ |
+|---|---|---|---|---|---|---|---|---|---|---|
+| BTC | 0.33 | 0.35 | 0.38 | 0.63 | 0.70 | 0.66 | 0.72 | **0.95** | 1.03 | 0.99 |
+| DOGE | 0.42 | 0.44 | 0.46 | 0.66 | 0.71 | 0.69 | 0.73 | **0.96** | 1.05 | 1.03 |
+| Spearman, BTC / DOGE | 0.865 / 0.814 | 0.865 / 0.814 | 0.879 / 0.837 | 0.927 / 0.890 | 0.939 / 0.908 | 0.931 / 0.888 | 0.941 / 0.911 | **0.975 / 0.965** | 0.995 / 0.994 | 0.987 / 0.987 |
+
+**Q6 Bursts or jumps [REAL + SYNTHETIC].** Locally standardised one-minute returns: 65% (BTC) and 44% (DOGE) of returns beyond `sqrt(2 log n)` have a neighbour beyond 2 sd, and the lag-1 autocorrelation of capped squared returns is 0.114 and 0.099; isolated jumps on a slowly varying volatility give 0% and minus 0.008. A two-factor volatility model with a fast factor (sd 0.75 in log variance, half-life 3 minutes), picked from a 3 by 3 grid on these diagnostics, gives 41% and 0.120 and reproduces the real ratios (PI-LU / MedRQ 0.68 against 0.66 to 0.69; PI-NN 0.95 against 0.95 to 0.96; 1-minute over 5-minute MedRQ 1.41 against 1.33 to 1.45). In that model, median relative error and RMSE at n = 390 / 1440 / 23,400:
+
+| | RK (Bapat) | PI-LU | MedRQ | TPQ | PI-NN |
+|---|---|---|---|---|---|
+| median error, no jumps | -0.58 / -0.59 / -0.57 | -0.49 / -0.47 / -0.26 | -0.40 / -0.20 / -0.02 | -0.40 / -0.20 / -0.02 | -0.36 / -0.23 / -0.04 |
+| RMSE, no jumps | 0.59 / 0.59 / 0.59 | 0.49 / 0.46 / 0.27 | 0.42 / 0.29 / 0.08 | 0.42 / 0.28 / 0.08 | **0.39 / 0.28 / 0.07** |
+| RMSE, 4 jumps a day | 0.54 / 0.56 / 0.58 | 0.48 / 0.44 / 0.27 | 0.89 / 1.63 / 1.28 | 0.43 / 0.51 / 0.17 | **0.36 / 0.26 / 0.07** |
+
+**Reading.**
+* Squaring a local variance instead of averaging fourth powers raises efficiency from 0.74 (RQ, and Bapat's averaged kernel, which is RQ in disguise) to 0.95, and the exact correction makes it unbiased at every n (without it PI-LU is 9.2% too high at n = 390).
+* Bapat's rule with one daily MAD is inconsistent when volatility moves during the day: its bias does not shrink (minus 14% at n = 23,400) and its RMSE falls like `n^-0.1`. A local scale restores the `sqrt(n)` rate for every truncation rule; the growing cut-off with dropping (PI-LU) also removes jumps without a residual and is the best estimator in the jump scenarios at n = 390 and 1440.
+* The paper's cross-validation choice is a scale artefact, and even a corrected CV answers the wrong question for an integrated quantity: the IQ estimator wants less smoothing than the spot estimator.
+* On real data the local estimators agree with MedRQ and MinRQ far better than the MAD-truncated ones, but only PI-NN closes the gap. The diagnosis: large one-minute crypto returns come in bursts of a few minutes, which are part of volatility. In a model calibrated to that, every estimator that truncates against a scale measured over hours (Bapat's, PI-LU, PI-L3, the kernel plug-in) removes 20% to 59% of IQ, while the nearest-neighbour fourth-power estimators keep bursts but break with jumps. PI-NN combines both properties and has the lowest RMSE among robust estimators there, with and without jumps.
+* Practical rule: compute the clustering diagnostic first. Isolated large returns: use PI-LU. Clustered ones: use PI-NN, and do not trust agreement with a 5-minute estimate (in the model the 5-minute MedRQ is 0.57 of the true IQ at the median).
+
+**Caveats.** PI-NN was designed after seeing the real data, with settings chosen in exploratory runs (other seeds), so its numbers are not strictly out of sample; it is worse than PI-LU with isolated jumps at small n (S3, n = 390: 0.320 against 0.179) and its `int sigma^8` estimate is not robust. The burst reading is a model fit, not a proof: clustered small jumps or microstructure effects could leave similar signatures, and the daily-scale estimators fit the real data less well (RK 0.53 in the model, 0.33 to 0.42 real). No central limit theorem is proved for the feasible estimators; coverage is numerical evidence. One venue, two coins, six months, no microstructure noise in the simulations.
+
+---
+
 ## ALT4. Can the recipe detect a change in the correlation between two assets, without mistaking a volatility change for it?
 
 Prototype in `alternatives/correlation_monitor/` (README with the formulation and proofs, `RESULTS.md` with every number, Q0 to Q4). Script `run_experiment.py`, results in `alternatives/correlation_monitor/results/`.
@@ -1114,6 +1211,47 @@ Median delay for a correlation change from 0.3 to 0.6 at step 500 (1000 paths): 
 **Reading.** The sign statistic turns the volatility monitor into a correlation monitor with the same guarantee, with no scale estimate and no truncation needed, and it is the only detector tested that a pure volatility change cannot trigger. It pays for this with a delay 2 to 3 times that of the Gaussian-optimal detector on clean Gaussian data, and is about as fast as the truncated product at c = 3, whose bets are throttled by Bapat's truncation bound.
 
 **Caveats.** Plug-in baseline (a band of 0.05 to 0.1 or the confidence-sequence baseline of section 6 is needed; with band 0 the 5-day false alarm rate is 23% against a bound of 25%). The 5-day confirmation on real data can partly reflect mean reversion of the rolling correlation. The basket statistic dilutes a change confined to one pair; weighted variants and a forecast-relative null were not built.
+
+---
+
+## ALT5. Two-sample betting: can the monitor compare the recent window with the calibration window without estimating a baseline?
+
+Code, tests, README (formulation, proof, comparison with the literature) and full results are in `alternatives/two_sample_betting/`. Every number below is copied from its `results/` folder. [SYNTHETIC] marks simulated data, [REAL] marks Binance spot one-minute bars (BTCUSDT and ETHUSDT, 1 July to 31 December 2025, 184 days each). Iteration notes: `docs/iterations/ALT5.md`.
+
+**Question.** The main monitor bets that the mean of the truncated squared return equals a baseline `m0` estimated from the calibration window; its guarantee is proved for a known `m0`. Alternative A4 asks for a sequential two-sample test by betting that detects any change in the law of the returns, with nothing estimated. Is it exactly valid, how much speed does it give up on variance changes, what does it see that a variance monitor cannot, and what does it flag on real data?
+
+**Method.** Each new return is ranked among all earlier returns of the segment (calibration window plus monitored returns, a growing reference), giving a smoothed conformal p-value. Under exchangeability these p-values are exactly i.i.d. uniform (Vovk, Nouretdinov and Gammerman 2003), so any bet `1 + lam (w(p) - b E_U|w|)` with a predictable witness `w` of mean 0 under the uniform law is fair, and the Shiryaev-Roberts mixture of such bets is an e-detector with the guarantees of `docs/math.md` 5.4 (average run length at least `A`, false alarm within `m` steps at most `m / A`), in the filtration of the p-values. The null band `b` allows the density of each p-value to be within `1 +- b` of uniform. Three bettor families: scale up and scale down bets on the Gaussianised truncated score `min(z^2, 9) / kappa2` of the p-value (the main monitor's statistic, but with null mean exactly 1), and histogram learners that estimate the density ratio of new to reference p-values (the rank-space analogue of a kernel two-sample witness, Shekhar and Ramdas 2024). Weights 0.25, 0.25 and 0.5, frozen from a pilot on development seeds. Truncation does not matter for ranks (monotone invariance, ties handled exactly) except to bound the Gaussianised decrease bet. Volatility clustering breaks exchangeability, as it breaks the main monitor's null. `A = 28,800` everywhere (5% per 1440-step day).
+
+**Validity with no change [SYNTHETIC].** 1000 paths per law; share with a false alarm within 1 day (bound 5%) and 7 days (bound 35%), one-day calibration window, and within 1 day with a two-hour window:
+
+| Detector | Gaussian, 1 d / 7 d | Student t4, 1 d / 7 d | Jumps, 1 d / 7 d | Two-hour window, 1 d (three laws) |
+|---|---|---|---|---|
+| main monitor, plug-in, band 0 | 5.4% / **57.0%** | 6.0% / **52.5%** | 4.6% / **51.4%** | **42.0% to 45.7%** |
+| rank detector, omnibus, b 0 | 2.4% / 22.6% | 3.1% / 24.2% | 2.4% / 23.0% | 2.2% to 3.5% |
+| rank detector, fixed reference (240 / 1440 steps) | 90.4% / 100% and 21.2% / 98.4% (Gaussian, 500 paths) | | | |
+
+The plug-in baseline's error acts as a constant drift that the bets find within days; ranking against the calibration window only (quantile bins learned once) fails the same way, because the p-values then share one reference and are dependent. With the growing reference every rate is below its bound at 1, 7 and 14 days. The repo's proved variant (`baseline="cs"`) is valid but conservative: 0.0% per day and 0.1% per week.
+
+**Power [SYNTHETIC].** Change at monitored step 500, 400 paths, median delay in steps [share detected within 4000 steps when below 95%]:
+
+| Change | main, plug-in, band 0 | main, confidence-sequence baseline | rank, scale bets only | rank, omnibus |
+|---|---|---|---|---|
+| sd x1.25 | 127 | 348 | 136 | 152 |
+| sd x0.8 | 211 | 400 | 222 | 237 |
+| Gaussian to t4, same variance | 1203 | 2251 [10%] | 1404 [86%] | **417** |
+| jumps 0.2% to 1% per step, same variance | **361** | 1129.5 [92%] | 418 | 399 |
+| jumps 0.2% to 0.5% per step, same variance | **1393** [88%] | not run | 1698 [57%] | 1688 [54%] |
+
+The signed score (rank of `u` rather than `|u|`) alone detects a pure skew change (809 steps, 99%); for every `|u|`-based detector the law of the statistic does not change there. Truncating the rank score at 3 sd moves delays by at most about 6%. With a 120-step reference the rank detector stays valid (at most 0.8% false alarms before the change, bound 1.7%) and is 17% to 52% slower; the plug-in monitor with the same window has 11.5% to 14.0%. Under GARCH(1,1) clustering both designs alarm on most days (band 0.25, persistence 0.99: main 67.0%, rank 53.0%).
+
+**Real data [REAL].** Returns divided by `intraday_scale`, one-day calibration, recalibration after each alarm. At band 0.25 the main monitor raises 127 (BTC) and 122 (ETH) alarms, the rank detector 123 and 114; 50% and 61% of the rank alarms are matched by a main-monitor alarm within an hour (chance 5.7%). Each monitor is calibrating about two thirds of the time, and 44 of the 61 unmatched BTC rank alarms (40 of 45 for ETH) fell while the main monitor was calibrating. While the main monitor was watching, the rank detector alone raised 17 BTC and 5 ETH alarms. The BTC ones are shape changes at constant scale: robust scale ratio 0.994, scale-free shape distance 0.131 against 0.076 at random times, and a learned density ratio of 0.32 for the largest 0.2% of moves and about 1.5 for the smallest ones, with more zero returns (5.0% against 3.8% in the reference). Dropping zero returns halves the group to 8, so part of it is a change in price stickiness rather than volatility. The main monitor alone raised 32 alarms per coin while the rank detector watched, all volatility decreases (truncated variance ratio 0.50 and 0.52). With a 120-minute reference the rank detector monitors 88% to 91% of the time.
+
+**Reading.**
+* The rank detector has the strongest guarantee of the designs tested: exact for any return law, any reference length and any horizon. The plug-in main monitor holds its bound for a day but not for a week (51% to 57% against 35%), which matters for every deployment that does not recalibrate daily.
+* On variance changes it costs 4% to 7% in delay with scale bets alone and 11% to 19% with the full mixture; against the proved confidence-sequence variant it is 1.7 to 2.8 times faster. It is 2.9 times faster than the plug-in monitor for a tail change at fixed variance, which the variance monitors barely see. A change of jump intensity at fixed total variance is a negative result: the variance monitor is faster, because the diffusive variance falls.
+* On BTC and ETH the two designs mostly agree; the rank detector adds a few shape alarms and misses some decreases at this band. Its practical gain is the short reference, which the plug-in design cannot use.
+
+**Caveats.** Exchangeability fails on real one-minute returns (clustering), so real alarms are descriptive, not tested discoveries; ranks relative to a volatility forecast are the natural next step and were not built. The bands of the two designs are not on the same scale, so the real-data comparison is between two settings, not two designs in general. The rank detector gives no direction or size for shape alarms beyond the density ratio. About 80 microseconds per step in pure Python against about 10 for the main monitor (`results/t_timing.csv`). The conjecture that the Gaussianised score is asymptotically as efficient as the main monitor under Gaussian data is untested. One venue, two coins, six months.
 
 ---
 
