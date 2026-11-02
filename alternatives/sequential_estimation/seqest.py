@@ -77,6 +77,42 @@ def cs_limit_coverage(alpha: float) -> float:
     return 1.0 - 2.0 * stats.norm.sf(math.sqrt(2.0 * math.log(2.0 / alpha)))
 
 
+def brownian_limit(alpha: float, kappa: float = 1.0, intersect: bool = True, reps: int = 20_000,
+                   du: float = 1e-3, umax: float = 4.0, seed: int = 0, chunk: int = 2000) -> dict:
+    """Limit of ``E[N_cs] / n*`` as ``d -> 0`` for a confidence sequence intersected over time.
+
+    With constant bets ``lam = kappa d / var`` the bounds in units of d, at time
+    ``u n*`` (``n* = z^2 var / d^2``), converge to
+    ``U(u) = W(u) / (z u) + L / (kappa z^2 u) + kappa / 2`` and
+    ``L(u) = W(u) / (z u) - L / (kappa z^2 u) - kappa / 2`` with ``L = log(2/alpha)`` and W a
+    standard Brownian motion (centred at the true mean). The intersected sequence stops at
+    ``u* = inf{u : min_{v<=u} U(v) - max_{v<=u} L(v) <= 2}``. Without intersection
+    ``u* = 2 L / (kappa (2 - kappa) z^2)`` (``= 2 log(2/alpha) / z^2`` at kappa = 1). Returns
+    the Monte Carlo mean of ``u*``, its standard error and the coverage at ``u*``.
+    """
+    z = zq(alpha)
+    L = math.log(2.0 / alpha)
+    if not intersect:
+        return dict(ratio=2 * L / (kappa * (2 - kappa) * z * z), se=0.0, coverage=float("nan"))
+    rng = np.random.default_rng(seed)
+    nst = int(round(umax / du))
+    u = du * np.arange(1, nst + 1)
+    us, cov = [], []
+    for _ in range(max(1, reps // chunk)):
+        W = np.cumsum(rng.standard_normal((chunk, nst)) * math.sqrt(du), axis=1)
+        Um = np.minimum.accumulate(W / (z * u) + L / (kappa * z * z * u) + kappa / 2, axis=1)
+        Lm = np.maximum.accumulate(W / (z * u) - L / (kappa * z * z * u) - kappa / 2, axis=1)
+        ok = (Um - Lm) <= 2.0
+        hit = ok.any(axis=1)
+        idx = ok.argmax(axis=1)
+        us.append(np.where(hit, u[idx], np.inf))
+        r = np.arange(chunk)
+        cov.append((Lm[r, idx] <= 0) & (Um[r, idx] >= 0))
+    us = np.concatenate(us)
+    return dict(ratio=float(us.mean()), se=float(us.std() / math.sqrt(us.size)),
+                coverage=float(np.concatenate(cov).mean()), not_stopped=float(np.isinf(us).mean()))
+
+
 def kappa2(a):
     """``E[min(Z^2, a^2)]`` for standard normal Z (vectorised)."""
     a = np.asarray(a, float)
@@ -730,26 +766,35 @@ class _CS(_Proc):
         self.U_at = np.full(reps, np.nan)
         self.cm_at = np.full((3, reps), np.nan)
         if bets == "bet":
-            span = s.bet_span
+            # log grid on [zhat0 / span, span zhat0]; between grid points a second-order bound is used
             G = s.bet_grid
-            f = np.geomspace(1.0 / span, span, G)
+            f = np.geomspace(1.0 / s.bet_span, s.bet_span, G)
             self.grid = np.clip(self.z0[:, None] * f[None, :], 1e-6, 1 - 1e-6)
+            # per grid point: log capital F, slope sum D = sum lam / x, curvature sum C = sum (lam / x)^2,
+            # x = 1 + lam (m - Z) (upper) or 1 + lam (Z - m) (lower)
             self.logK_up = np.zeros((reps, G))
             self.logK_lo = np.zeros((reps, G))
+            self.D_up = np.zeros((reps, G))
+            self.D_lo = np.zeros((reps, G))
+            self.C_up = np.zeros((reps, G))
+            self.C_lo = np.zeros((reps, G))
             self.cap_up = s.cs_cap / (1.0 - self.grid[:, 0])  # 1 + lam (m - Z) > 0 for every m on the grid
             self.cap_lo = s.cs_cap / self.grid[:, -1]  # 1 + lam (Z - m) > 0 for every m on the grid
-            self.nbins = 64
-            self.edges = np.linspace(0.0, 1.0, self.nbins)  # last bin holds Z == 1 (the clipped returns)
+            # binned law of Z for the bets: bins of width zhat0 / 8 up to 10 zhat0, one overflow bin and
+            # one bin for Z = 1 (clipped returns); per-bin sums keep the binned mean exact
+            self.nbins = 82
             self.hist = np.zeros((reps, self.nbins))
-            zp = np.clip(z_pilot, 0, 1)
-            for i in range(reps):
-                self.hist[i] += np.bincount(self._bin(zp[i]), minlength=self.nbins)
-            self.centers = np.append(0.5 * (self.edges[:-1] + self.edges[1:]), 1.0)[: self.nbins]
-            self.centers[-1] = 1.0
+            self.hsum = np.zeros((reps, self.nbins))
+            self._add_hist(np.arange(reps), np.clip(z_pilot, 0, 1))
 
-    def _bin(self, z):
-        b = np.searchsorted(self.edges[1:-1], z, side="right")
-        return np.where(z >= 1.0 - 1e-12, self.nbins - 1, np.minimum(b, self.nbins - 2))
+    def _add_hist(self, g, z):
+        v = z / self.z0[g][:, None]
+        b = np.minimum(np.floor(v * 8.0).astype(int), self.nbins - 2)
+        b = np.where(z >= 1.0 - 1e-12, self.nbins - 1, b)
+        flat = (np.arange(g.size)[:, None] * self.nbins + b).ravel()
+        n = g.size * self.nbins
+        self.hist[g] += np.bincount(flat, minlength=n).reshape(g.size, self.nbins)
+        self.hsum[g] += np.bincount(flat, weights=z.ravel(), minlength=n).reshape(g.size, self.nbins)
 
     def _bets(self, g, zprev, s2prev, tt):
         s = self.s
@@ -775,12 +820,15 @@ class _CS(_Proc):
         """Growth-rate optimal bets against ``zhat +- w`` under the binned empirical law of Z seen so far."""
         s = self.s
         w = s.d * zc if s.relative else self.dz[g]
-        p = self.hist[g] / self.hist[g].sum(axis=1, keepdims=True)
+        cnt = self.hist[g]
+        p = cnt / cnt.sum(axis=1, keepdims=True)
+        with np.errstate(invalid="ignore", divide="ignore"):
+            cen = np.where(cnt > 0, self.hsum[g] / cnt, 0.0)
         out = []
         for side, cap in ((+1, self.cap_up[g]), (-1, self.cap_lo[g])):
             lam = np.geomspace(1e-3, 1.0, 48)[None, :] * cap[:, None]
             m = zc + side * w
-            xi = (m[:, None] - self.centers[None, :]) * side  # up: m - Z; lo: Z - m
+            xi = (m[:, None] - cen) * side  # up: m - Z; lo: Z - m
             val = np.log1p(np.maximum(lam[:, :, None] * xi[:, None, :], -0.999999))
             gro = (val * p[:, None, :]).sum(axis=2)
             out.append(lam[np.arange(g.size), gro.argmax(axis=1)])
@@ -853,58 +901,94 @@ class _CS(_Proc):
         self.U[g] = U[:, -1]
         self.L[g] = L[:, -1]
 
+    @staticmethod
+    def _quad_root(F0, D0, C0, thr, h):
+        """Smallest y in [0, h] with ``F0 + D0 y - C0 y^2 / 2 >= thr`` (``F0 < thr``), or h if none."""
+        disc = D0 * D0 - 2.0 * C0 * (thr - F0)
+        with np.errstate(invalid="ignore", divide="ignore"):
+            y = np.where(C0 > 0, (D0 - np.sqrt(np.maximum(disc, 0.0))) / C0, (thr - F0) / D0)
+        ok = (disc >= 0) & (D0 > 0) & (y >= 0) & (y <= h)
+        return np.where(ok, y, h)
+
     def _update_bet(self, g, z, zprev):
-        """Betting sequence: per-step loop over the block, vectorised over rows and grid points."""
+        """Betting sequence: per-step loop over the block, vectorised over rows and grid points.
+
+        Bounds between grid points. Upper side: ``F(m) = sum log(1 + lam (m - Z_i))`` is
+        nondecreasing and concave, and ``|F''|`` is nonincreasing in m, so on ``[m0, m1]``
+        ``F(m) >= max(chord, F(m0) + F'(m0) y - |F''(m0)| y^2 / 2)`` with ``y = m - m0``.
+        Lower side: ``F(m) = sum log(1 + lam (Z_i - m))`` is nonincreasing and concave, ``|F''|``
+        is nondecreasing in m, so ``F(m) >= max(chord, F(m1) + |F'(m1)| y - |F''(m1)| y^2 / 2)``
+        with ``y = m1 - m``. Every candidate mean where a lower bound reaches ``log(2/alpha)``
+        is rejected, so the reported bounds are conservative.
+        """
         k = z.shape[1]
         lu, ll = self._gro_bets(g, zprev[:, 0])  # bets fixed for the block (predictable)
         grid = self.grid[g]
-        Ku, Kl = self.logK_up[g], self.logK_lo[g]
+        Fu, Fl = self.logK_up[g], self.logK_lo[g]
+        Du, Dl = self.D_up[g], self.D_lo[g]
+        Cu, Cl = self.C_up[g], self.C_lo[g]
         Uo, Lo = self.U[g].copy(), self.L[g].copy()
         U = np.empty((g.size, k))
         L = np.empty((g.size, k))
         thr = self.logd
         G = grid.shape[1]
         ar = np.arange(g.size)
+        lu2, ll2 = lu[:, None], ll[:, None]
         for j in range(k):
             zj = z[:, j][:, None]
-            Ku = Ku + np.log1p(lu[:, None] * (grid - zj))
-            Kl = Kl + np.log1p(ll[:, None] * (zj - grid))
-            # upper: log K_up nondecreasing and concave in m; first grid point at or above the threshold
-            ru = Ku >= thr
+            xu = 1.0 + lu2 * (grid - zj)
+            xl = 1.0 + ll2 * (zj - grid)
+            Fu = Fu + np.log(xu)
+            Fl = Fl + np.log(xl)
+            qu = lu2 / xu
+            ql = ll2 / xl
+            Du = Du + qu
+            Dl = Dl + ql
+            Cu = Cu + qu * qu
+            Cl = Cl + ql * ql
+            # upper bound: first grid point that is rejected, then refine inside the cell below it
+            ru = Fu >= thr
             anyu = ru.any(axis=1)
             iu = np.where(anyu, ru.argmax(axis=1), G)
             ub = np.ones(g.size)
             first = anyu & (iu == 0)
             ub[first] = grid[first, 0]
             mid = anyu & (iu > 0)
-            i1 = iu[mid]
-            r_ = ar[mid]
-            k0, k1 = Ku[r_, i1 - 1], Ku[r_, i1]
-            m0, m1 = grid[r_, i1 - 1], grid[r_, i1]
-            ub[mid] = m0 + (thr - k0) / (k1 - k0) * (m1 - m0)
-            # lower: log K_lo nonincreasing and concave in m; last grid point at or above the threshold
-            rl = Kl >= thr
+            if mid.any():
+                i1 = iu[mid]
+                r_ = ar[mid]
+                F0, F1 = Fu[r_, i1 - 1], Fu[r_, i1]
+                m0, m1 = grid[r_, i1 - 1], grid[r_, i1]
+                h = m1 - m0
+                y_ch = (thr - F0) / (F1 - F0) * h
+                y_q = self._quad_root(F0, Du[r_, i1 - 1], Cu[r_, i1 - 1], thr, h)
+                ub[mid] = m0 + np.minimum(y_ch, y_q)
+            # lower bound: last grid point that is rejected, then refine inside the cell above it
+            rl = Fl >= thr
             anyl = rl.any(axis=1)
             il = np.where(anyl, G - 1 - rl[:, ::-1].argmax(axis=1), -1)
             lb = np.zeros(g.size)
             last = anyl & (il == G - 1)
             lb[last] = grid[last, -1]
             mid = anyl & (il < G - 1)
-            i0 = il[mid]
-            r_ = ar[mid]
-            k0, k1 = Kl[r_, i0], Kl[r_, i0 + 1]
-            m0, m1 = grid[r_, i0], grid[r_, i0 + 1]
-            lb[mid] = m0 + (k0 - thr) / (k0 - k1) * (m1 - m0)
+            if mid.any():
+                i0 = il[mid]
+                r_ = ar[mid]
+                F0, F1 = Fl[r_, i0], Fl[r_, i0 + 1]
+                m0, m1 = grid[r_, i0], grid[r_, i0 + 1]
+                h = m1 - m0
+                y_ch = (thr - F1) / (F0 - F1) * h  # distance from m1 down to the chord crossing
+                y_q = self._quad_root(F1, Dl[r_, i0 + 1], Cl[r_, i0 + 1], thr, h)
+                lb[mid] = m1 - np.minimum(y_ch, y_q)
             Uo = np.minimum(Uo, ub) if self.s.intersect else ub
             Lo = np.maximum(Lo, lb) if self.s.intersect else lb
             U[:, j] = Uo
             L[:, j] = Lo
-        self.logK_up[g], self.logK_lo[g] = Ku, Kl
-        # update the histogram used by the bets (after the block: predictable for the next block)
-        b = self._bin(np.clip(z, 0, 1))
-        flat = (np.arange(g.size)[:, None] * self.nbins + b).ravel()
-        add = np.bincount(flat, minlength=g.size * self.nbins).reshape(g.size, self.nbins)
-        self.hist[g] += add
+        self.logK_up[g], self.logK_lo[g] = Fu, Fl
+        self.D_up[g], self.D_lo[g] = Du, Dl
+        self.C_up[g], self.C_lo[g] = Cu, Cl
+        # update the binned law used by the bets (after the block: predictable for the next block)
+        self._add_hist(g, np.clip(z, 0, 1))
         lams = (np.broadcast_to(lu[:, None], z.shape), np.broadcast_to(ll[:, None], z.shape))
         self.sl[0, g] += lu * k
         self.sl[1, g] += ll * k

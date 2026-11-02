@@ -128,6 +128,14 @@ def test_cs_prediction_tends_to_limit():
         assert S.cs_n_predict(mz, vz, d / 9, 0.05, bets="opt") <= 1.01 * S.cs_n_predict(mz, vz, d / 9, 0.05)
 
 
+def test_brownian_limit():
+    # without intersection the limit is deterministic: 2 log(2/alpha) / (kappa (2 - kappa) z^2)
+    assert S.brownian_limit(0.05, intersect=False)["ratio"] == pytest.approx(S.cs_ratio_limit(0.05), rel=1e-12)
+    res = S.brownian_limit(0.05, reps=2000, chunk=1000, du=2e-3)
+    # intersecting over time stops earlier and the coverage at the stop stays above 1 - alpha
+    assert 1.4 < res["ratio"] < 1.7 and res["coverage"] > 0.95 and res["not_stopped"] == 0
+
+
 def test_betting_oracle_tends_to_limit():
     z, p = S.Gaussian().z_law(3.0, k=1000)
     mu = float(np.sum(p * z))
@@ -214,7 +222,7 @@ def test_betting_bounds_are_conservative_and_tight():
     """Grid bounds with interpolation contain the exact capital-process bounds and are close to them."""
     rng = np.random.default_rng(8)
     z = rng.beta(0.6, 4.0, (3, 600))
-    st = S.Setup(d=0.02, alpha=0.05, block=600, bet_grid=96, bet_span=5.0, intersect=False)
+    st = S.Setup(d=0.02, alpha=0.05, block=600, bet_grid=48, bet_span=5.0, intersect=False)
     cs = S._CS(st, z[:, :40], bets="bet", init="pilot", dz=np.full(3, 0.02))
     lu, ll = cs._gro_bets(np.arange(3), cs.zhat.copy())
     cs.update(z[:, 40:], np.arange(3))
@@ -226,8 +234,8 @@ def test_betting_bounds_are_conservative_and_tight():
         from scipy.optimize import brentq
         u_exact = brentq(f_up, cs.grid[i, 0], cs.grid[i, -1])
         l_exact = brentq(f_lo, cs.grid[i, 0], cs.grid[i, -1])
-        assert cs.U[i] >= u_exact - 1e-12 and cs.U[i] <= u_exact * 1.002
-        assert cs.L[i] <= l_exact + 1e-12 and cs.L[i] >= l_exact * 0.998
+        assert cs.U[i] >= u_exact - 1e-12 and cs.U[i] <= u_exact * 1.0005
+        assert cs.L[i] <= l_exact + 1e-12 and cs.L[i] >= l_exact * 0.9995
 
 
 def test_confidence_sequences_cover_at_all_times():
