@@ -1,0 +1,61 @@
+{
+  "session": "2026-11-02",
+  "dry_run": true,
+  "config_sha256": "a25d76147b4807a7c66e2b93caaefb1be64485dd05217ae928ff08f4ccb6dfa4",
+  "config": {
+    "data": "Nifty 50 one-minute bars, public GitHub mirror (avmonitor.data.load_nifty), cleaned as in E7 load_clean",
+    "profile": {
+      "kind": "E7 session_profile",
+      "lookback_sessions": 20,
+      "smooth_minutes": 5,
+      "profile_data_from": "2026-08-01"
+    },
+    "monitor": {
+      "cls": "VolatilityMonitor",
+      "threshold_A": 7500.0,
+      "c": 3.0,
+      "cal_len": 750,
+      "null_band": 0.25,
+      "baseline": "plugin",
+      "c_down": null,
+      "recalibrate_after_alarm": true
+    },
+    "stream_from": "2026-10-01",
+    "steps_per_session": 375,
+    "reported": [
+      "alarms in the target session (time, direction, baseline scale)",
+      "state at 09:15 and share of the session monitored",
+      "session robust volatility / baseline scale at the open (or first monitored minute)",
+      "rest-of-session robust volatility / alarm baseline, per alarm",
+      "SHA-256 of the data files used"
+    ]
+  },
+  "returns_in_session": 360,
+  "state_at_open": "monitoring",
+  "share_of_session_monitored": 0.392,
+  "first_monitored_minute": "09:15",
+  "session_robust_vol_over_open_baseline": 0.7694910290781035,
+  "alarms_in_session": 1,
+  "alarms": [
+    {
+      "time_ist": "2026-11-02 11:42",
+      "direction": "down",
+      "baseline_scale": 0.0003019370981635765,
+      "rest_of_session_minutes": 213,
+      "rest_of_session_ratio": 0.8355644074708537
+    }
+  ],
+  "alarms_in_stream_before_session": 5,
+  "stream_sessions": 21,
+  "data_files": {
+    "NIFTY50_1min_2026-08.csv": "156c91df4181ec6bd2430f35472131277d62c4d10fbc0a82aca78ebb872d3ac2",
+    "NIFTY50_1min_2026-09.csv": "489c95b84e7f9fb7e90c80cd09e9410949c8f0eb5e48508c4fe7ccd0d15bd93a",
+    "NIFTY50_1min_2026-10.csv": "86ddc06c9d448eb3867600a408386509d5628d25114a6d9faaef83018314cbf3",
+    "NIFTY50_1min_2026-11.csv": "cae6630c752c8f45b868e432dd823c35148b37c9da8ccec81a847d5fcfd8f4f0"
+  },
+  "cleaning": {
+    "sessions": 63,
+    "frozen_sessions_dropped": [],
+    "flagged_returns": 865
+  }
+}
