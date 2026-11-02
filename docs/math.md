@@ -140,7 +140,143 @@ For a bet on `Y` with conditional mean `μ` and variance `v`, the expected log-g
 
 ### 5.6 What is not covered by the proofs
 
-1. **Estimated baseline.** The theorems assume the true `m₀`. In practice `m₀` comes from a calibration window. If the estimate is too low, the increase detector is anti-conservative. E4d measures the effect: with 390 calibration steps the one-day false alarm rate was 5.4% (bound 5%), with 1440 or more it was at most 2.4%. A margin of one standard error removes the excess. A fully rigorous treatment would use a confidence sequence for `m₀` (Shekhar and Ramdas 2024).
+1. **Estimated baseline.** The theorems assume the true `m₀`. In practice `m₀` comes from a calibration window. If the estimate is too low, the increase detector is anti-conservative. E4d measures the effect: with 390 calibration steps the one-day false alarm rate was 5.4% (bound 5%), with 1440 or more it was at most 2.4%. A margin of one standard error removes the excess. A fully rigorous treatment would use a confidence sequence for `m₀` (Shekhar and Ramdas 2024). Section 6 does this: with a confidence-sequence baseline (`baseline="cs"`) the guarantee becomes P(false alarm within m steps) ≤ δ + m / A, proved with the baseline estimated from the data.
 2. **Volatility that drifts inside a regime.** The null asks the conditional truncated variance never to exceed the baseline. Slow stochastic volatility violates this by design, so the detector rightly alarms (E4a: about 25% per day for a log-volatility standard deviation of 0.15). The "null band" `H₀↑: E[Y_t | F_{t-1}] ≤ 1 + b` restores control at the cost of detecting only changes larger than about b (E4c).
 3. **Intraday seasonality.** Real returns are deseasonalised by a predictable intraday profile (`data.intraday_scale`). Errors in that profile act like a small time-varying violation of the null and are absorbed by the band.
 4. **Interpretation.** An alarm means the truncated variance moved. Mapping that to a change in σ requires a fixed innovation shape (section 5.1). A change in the tail shape alone, with σ unchanged, can also trigger an alarm.
+
+## 6. Keeping the guarantee with an estimated baseline
+
+Section 5 assumes the true baseline `m₀`. This section proves a guarantee that holds when the baseline is *estimated* from a calibration window, at the price of a small failure probability δ that the user chooses:
+
+> If there is no change, P(any false alarm within m monitored steps) ≤ δ + m / A.
+
+The idea in one sentence: replace the point estimate of `m₀` by a *confidence bound* that is valid at every sample size at once (a *confidence sequence*), so that the increase detector bets against a value that is, with probability at least 1 - δ, not below the truth, and the decrease detector against a value that is not above it. Code: `src/avmonitor/confseq.py`, `VolatilityMonitor(baseline="cs")` and `detectors.calibrate(..., baseline="cs")`. Experiment: E8 (`docs/report_parts/E8.md`).
+
+### 6.1 Set-up
+
+* Returns `r₁, r₂, ...` and the information up to time t, `F_t = σ(r₁, ..., r_t)`.
+* **Sample split.** The first `n_τ` returns of the calibration window fix the truncation level, `τ = c × scaled MAD(r₁, ..., r_{n_τ})`. So τ is known at time `n_τ` (it is `F_{n_τ}`-measurable). For `t > n_τ` put `X_t = min(r_t², τ²) ∈ [0, τ²]` and `Z_t = X_t / τ² ∈ [0, 1]`. Both are known at time t (they are *adapted*). Section 6.4 explains why the split is needed.
+* `μ_t = E[X_t | F_{t-1}]` is the conditional truncated variance and `ν_t = μ_t / τ²`.
+* **End of calibration.** T is a *stopping time* with `T > n_τ`: the decision to stop at t uses only data up to t. Examples: T = cal_len, or the adaptive rule of 6.6.
+* **Monitoring** starts at T + 1 and uses the same τ.
+
+### 6.2 A confidence sequence for the mean of a bounded variable
+
+**Lemma 6.1.** Let `a > 0` and `λ ≥ 0` with `λ a < 1`, and put `ψ_a(λ) = (-log(1 - λa) - λa) / a²` (which is ≥ 0). Then for every `ξ ≥ -a`,
+
+`log(1 + λξ) ≥ λξ - ψ_a(λ) ξ²`, equivalently `exp(λξ - ψ_a(λ) ξ²) ≤ 1 + λξ`.
+
+*Proof.* For `x > -1`, Taylor's formula with integral remainder for `log(1 + x)` gives `log(1 + x) - x = x² φ(x)` with `φ(x) = -∫₀¹ (1 - s) / (1 + s x)² ds`. For each `s ∈ [0, 1]` the function `x ↦ 1 / (1 + s x)²` is nonincreasing on `(-1, ∞)`, so φ is nondecreasing. Put `x = λξ ≥ -λa > -1`. Then `log(1 + λξ) - λξ = (λξ)² φ(λξ) ≥ (λξ)² φ(-λa)`, and `φ(-λa) = (log(1 - λa) + λa) / (λa)²`, so the right side equals `ξ² (log(1 - λa) + λa) / a² = -ψ_a(λ) ξ²`. (For λ = 0 both sides are 0.) ∎
+
+With a = 1 this is the inequality of Fan, Grama and Liu (2015) that underlies the empirical Bernstein confidence sequences of Howard et al. (2021) and Waudby-Smith and Ramdas (2024). The version with a general a follows by rescaling.
+
+**Construction.** Index the observations of the sequence by `i = 1, 2, ...` (global time `n_τ + i`). In this subsection `F_{i-1}` means the information before the i-th observation (global time `n_τ + i - 1`), and `ν_i = E[Z_i | F_{i-1}]`. Fix error levels `δ_u, δ_l ∈ (0, 1)` and a cap `c ∈ (0, 1)`. Choose, using only data before step i (*predictably*):
+
+* a centre `ẑ_{i-1} ∈ (0, 1)`,
+* one-sided ranges `a↑_i = 1 - ẑ_{i-1}` and `a↓_i = ẑ_{i-1}`, so that `ẑ_{i-1} - Z_i ≥ -a↑_i` and `Z_i - ẑ_{i-1} ≥ -a↓_i` always hold,
+* bets `λ↑_i, λ↓_i > 0` with `λ↑_i a↑_i ≤ c` and `λ↓_i a↓_i ≤ c`.
+
+Put `e_i = (Z_i - ẑ_{i-1})²`, `ψ↑_i = ψ_{a↑_i}(λ↑_i)`, `ψ↓_i = ψ_{a↓_i}(λ↓_i)` and
+
+* `U_t = [Σ_{i≤t} λ↑_i Z_i + log(1/δ_u) + Σ_{i≤t} ψ↑_i e_i] / Σ_{i≤t} λ↑_i`,
+* `L_t = [Σ_{i≤t} λ↓_i Z_i - log(1/δ_l) - Σ_{i≤t} ψ↓_i e_i] / Σ_{i≤t} λ↓_i`.
+
+They estimate bet-weighted averages of the conditional means:
+
+`ν̄↑_t = Σ_{i≤t} λ↑_i ν_i / Σ_{i≤t} λ↑_i` and `ν̄↓_t = Σ_{i≤t} λ↓_i ν_i / Σ_{i≤t} λ↓_i`.
+
+**Theorem 6.2 (time-uniform coverage).** Without any assumption on the dependence between observations or on how `ν_i` varies over time,
+
+`P(ν̄↑_t ≥ U_t for some t ≥ 1) ≤ δ_u` and `P(ν̄↓_t ≤ L_t for some t ≥ 1) ≤ δ_l`.
+
+*Proof.* Upper bound. Let `K_0 = 1` and `K_t = Π_{i≤t} exp(λ↑_i (ν_i - Z_i) - ψ↑_i e_i)`. Write `ν_i - Z_i = ξ_i + (ν_i - ẑ_{i-1})` with `ξ_i = ẑ_{i-1} - Z_i ≥ -a↑_i`, and note `e_i = ξ_i²`. Lemma 6.1 gives
+
+`E[K_t / K_{t-1} | F_{t-1}] ≤ E[1 + λ↑_t ξ_t | F_{t-1}] · exp(λ↑_t (ν_t - ẑ_{t-1})) = (1 - y) e^y ≤ 1`, where `y = λ↑_t (ν_t - ẑ_{t-1})`,
+
+because `E[ξ_t | F_{t-1}] = ẑ_{t-1} - ν_t` and `(1 - y) e^y ≤ 1` for every real y (the maximum is at y = 0). So K is a nonnegative supermartingale with `K_0 = 1`. Ville's inequality gives `P(K_t ≥ 1/δ_u for some t) ≤ δ_u`. Taking logarithms, `K_t ≥ 1/δ_u` is the event `Σ λ↑_i ν_i ≥ Σ λ↑_i Z_i + Σ ψ↑_i e_i + log(1/δ_u)`, that is `ν̄↑_t ≥ U_t`.
+Lower bound. The same argument with `K'_t = Π_{i≤t} exp(λ↓_i (Z_i - ν_i) - ψ↓_i e_i)`, `ξ_i = Z_i - ẑ_{i-1} ≥ -a↓_i`, and `(1 + y) e^{-y} ≤ 1`. ∎
+
+**Corollary 6.3 (a constant level).** If `ν_i ≥ ν*` for every i, for a constant ν* (or one known when the sequence starts), then `P(U_t ≤ ν* for some t) ≤ δ_u`. If `ν_i ≤ ν**` for every i, then `P(L_t ≥ ν** for some t) ≤ δ_l`. In particular a constant conditional mean ν satisfies `P(ν ∉ (L_t, U_t) for some t) ≤ δ_u + δ_l`.
+
+*Proof.* `ν̄↑_t` is an average of the `ν_i`, so `ν̄↑_t ≥ ν*`, and `U_t ≤ ν*` implies `ν̄↑_t ≥ U_t`. The lower case is symmetric. ∎
+
+Since `0 ≤ ν̄ ≤ 1`, the clipped bounds `min(U_t, 1)` and `max(L_t, 0)` still satisfy `ν̄↑_t ≤ min(U_t, 1)` and `ν̄↓_t ≥ max(L_t, 0)` on the same events. In the units of X: `Ū_t = τ² min(U_t, 1)`, `L̄_t = τ² max(L_t, 0)`, `μ̄↑_t = τ² ν̄↑_t` and `μ̄↓_t = τ² ν̄↓_t`.
+
+**Remarks.**
+
+1. *Relation to the literature.* With `a↑ = a↓ = 1` these are the predictable plug-in empirical Bernstein (PrPl-EB) bounds of Waudby-Smith and Ramdas (2024, Theorem 2), written with `e_i (-log(1 - λ) - λ)` in place of their `v_i ψ_E(λ)`. Using the one-sided ranges lets the lower bound use bets up to `c / ẑ` instead of c. For a truncated squared normal return `ẑ ≈ 0.11`, so the cap rises from 0.75 to about 7, and the cap no longer binds for the lower bound. The upper bound gains a little (`c / (1 - ẑ)`). The weighted-average form for time-varying means comes from the same proof. We prove it here and make no claim that it is new.
+2. *Any predictable choice is valid.* The code uses the choices of Waudby-Smith and Ramdas: `ẑ_t = (1/2 + Σ_{i≤t} Z_i) / (t + 1)`, `σ̂²_t = (1/4 + Σ_{i≤t} (Z_i - ẑ_i)²) / (t + 1)`, and `λ_t = min(√(2 log(1/δ) / (d_t σ̂²_{t-1})), c / a_t)` with c = 0.75 and either `d_t = n_plan` (the bound is tightest near a planned sample size) or `d_t = t log(1 + t)` (their time-uniform schedule). Validity does not depend on these choices; they only decide where the bound is tight.
+3. *Width.* When the cap does not bind, the half-width near `n_plan` is about `√(2 σ_Z² log(1/δ) / n)`, the empirical Bernstein rate. The truncated squared return is a hard case: its standard deviation is about 1.4 times its mean, and its range is about 6.5 standard deviations (normal returns, c = 3). E8 (Q8d) compares the bound with the best that any betting bound can achieve for the true law. The comparison is in the report; the summary is that most of the width is the price of a finite-sample guarantee for this skewed variable, not a weakness of this particular bound.
+
+### 6.3 The false alarm guarantee with an estimated baseline
+
+**Monitoring rule.** At time T set `m↑ = (1 + b) Ū_T` and `m↓ = (1 - b) L̄_T`, where `b ∈ [0, 1)` is the null band, fixed in advance. For `t > T`:
+
+* the increase statistic uses factors `f↑_t = 1 + λ↑ (X_t / m↑ - 1)` with bets λ↑ from a fixed grid in `[0, 1)`;
+* if `L̄_T > 0` and `B = τ² / m↓ > 1`, the decrease statistic uses `f↓_t = 1 + λ↓ (1 - X_t / m↓)` with bets λ↓ from a grid of fractions of `1 / (B - 1)`, fixed at time T. Otherwise the decrease statistic is 0 for the whole segment. (A smaller lower bound means a larger B and therefore smaller admissible bets, so an uncertain baseline costs the decrease side power, and a lower bound of 0 switches it off.)
+* Both statistics are the Shiryaev-Roberts recursions of 5.4, started at 0 at time T. A missing return leaves them unchanged.
+* Two-sided alarm: the first `t > T` with `max(M↑_t, M↓_t) ≥ 2A`. One-sided use: one statistic at level A.
+
+**Null hypothesis "no change".** In terms of the calibration averages `μ̄↑_T`, `μ̄↓_T` of 6.2:
+
+* (H↑) `μ_t ≤ (1 + b) μ̄↑_T` for every `t > T`;
+* (H↓) `μ_t ≥ (1 - b) μ̄↓_T` for every `t > T`.
+
+Nothing is assumed about the calibration window beyond `0 ≤ X ≤ τ²`.
+
+**Theorem 6.4.** Let `δ = δ_u + δ_l`.
+
+1. Under (H↑) and (H↓), for every integer `m ≥ 1`, `P(an alarm at one of the times T + 1, ..., T + m) ≤ δ + m / A`. (More precisely `≤ P(Gᶜ) + P(G) m / A ≤ δ + (1 - δ) m / A` for m < A, with G defined in the proof.)
+2. Under (H↑) and (H↓), the expected number of monitored steps before the first alarm is at least `(1 - δ) A`.
+3. One side alone, at level A: under (H↑) the increase side alone has `P(alarm within m) ≤ δ_u + m / A`; under (H↓) the decrease side alone has `≤ δ_l + m / A`.
+
+*Proof.* Let `G↑ = {ν̄↑_T < U_T}`, `G↓ = {ν̄↓_T > L_T}` and `G = G↑ ∩ G↓`. These events are known at time T.
+
+*Step 1: the bounds hold at the random time T.* Apply Theorem 6.2 to the observations after `n_τ` (τ is fixed when they start). The theorem bounds the chance that the bound fails at *some* t, and `G↑ᶜ` is contained in that event whatever T is. So `P(G↑ᶜ) ≤ δ_u`, `P(G↓ᶜ) ≤ δ_l` and `P(Gᶜ) ≤ δ`.
+
+*Step 2: on G both statistics are e-detectors.* Let `t > T`. On G, (H↑) and the clipping remark give `μ_t ≤ (1 + b) μ̄↑_T ≤ (1 + b) Ū_T = m↑`, so `E[f↑_t | F_{t-1}] = 1 + λ↑ (μ_t / m↑ - 1) ≤ 1`, and `f↑_t ≥ 1 - λ↑ > 0`. If the decrease side is on, (H↓) gives `μ_t ≥ (1 - b) μ̄↓_T > (1 - b) L̄_T = m↓`, so `E[f↓_t | F_{t-1}] ≤ 1`, and `f↓_t ≥ 1 - λ↓ (B - 1) > 0` because `X_t ≤ τ²`. The bets are fixed at time T, so they are predictable. As in Lemma 1 of 5.4, the average `M_t = (M↑_t + M↓_t) / 2` (each `M` itself an average over its grid) satisfies `E[M_t | F_{t-1}] ≤ M_{t-1} + 1` on `G ∩ {t > T}`; on a missing return `M_t = M_{t-1}`. If the decrease side is off, `M↓ = 0` and the same holds.
+
+*Step 3: Ville's inequality after a random start.* Fix s and let `E_s = G ∩ {T = s}`, an event known at time s. For `s ≤ t ≤ s + m` put `S_t = 1_{E_s} (M_t + m - (t - s))`, with `M_s = 0`. Because `E_s` is known at time `t - 1`, Step 2 gives `E[S_t | F_{t-1}] ≤ S_{t-1}`. Also `S ≥ 0` and `S_s = m 1_{E_s}`. Ville's inequality (here Doob's maximal inequality for a nonnegative supermartingale on a finite horizon) gives `P(max_{s<t≤s+m} S_t ≥ A) ≤ E[S_s] / A = m P(E_s) / A`. An alarm needs `max(M↑, M↓) ≥ 2A`, which implies `M ≥ A` and hence `S ≥ A`. Summing over s: `P(G and an alarm within m steps) ≤ m P(G) / A`. (If `T = ∞` there is no monitoring and no alarm.)
+
+*Step 4.* `P(alarm within m) ≤ P(Gᶜ) + m P(G) / A ≤ δ + m / A`. The function `p ↦ p + (1 - p) m / A` is increasing when `m < A`, which gives the sharper form.
+
+*Part 2.* Let `τ_A` be the first `t > T` with `M_t ≥ A`; the actual alarm comes no earlier. With `E_s` as above and `n ≥ 1`, `N = min(τ_A, s + n)` is a bounded stopping time, and `1_{E_s} (M_t - (t - s))`, `t ≥ s`, is a supermartingale by Step 2. Optional stopping gives `E[1_{E_s} (M_N - (N - s))] ≤ 0`, so `E[1_{E_s} (N - s)] ≥ E[1_{E_s} M_N] ≥ A P(E_s ∩ {τ_A ≤ s + n})`. Letting `n → ∞` (monotone convergence) gives `E[1_{E_s} (τ_A - s)] ≥ A P(E_s ∩ {τ_A < ∞})`; if `τ_A = ∞` with positive probability on `E_s`, the left side is infinite. Either way `E[1_{E_s} (τ_A - s)] ≥ A P(E_s)`. Summing over s: `E[τ_A - T] ≥ E[1_G (τ_A - T)] ≥ A P(G) ≥ (1 - δ) A`.
+
+*Part 3.* The same proof with one statistic, level A, and only `G↑` (or `G↓`). ∎
+
+**Corollary 6.5 (constant conditional law).** Suppose that, from step `n_τ + 1` until the change, the conditional law of `r_t` given `F_{t-1}` is one fixed law P₀ (for example i.i.d. returns, possibly with jumps and fat tails). Let `m(s) = E_{P₀}[min(r², s²)]`. Because τ is fixed at time `n_τ`, `μ_t = m(τ)` for every `t > n_τ` before the change, so `μ̄↑_T = μ̄↓_T = m(τ)` and (H↑), (H↓) hold with b = 0. Hence, with no change, **P(false alarm within m monitored steps) ≤ δ + m / A with the baseline estimated from the data.** More generally, if `r_t = σ_t ε_t` with i.i.d. innovations independent of the past and a predictable `σ_t` (5.1), then `μ_t = g_τ(σ_t)` with `g_τ` nondecreasing. If `σ_t = σ₀` during calibration, then `σ_t ≤ σ₀` afterwards implies (H↑) and `σ_t ≥ σ₀` afterwards implies (H↓). ∎
+
+**Choosing A and δ.** For a target α for one monitored "day" of m steps, choose `δ < α` and `A = m / (α - δ)`. E8 uses δ = 0.01 and α = 5%: `A = 390 / 0.04 = 9750` for a 390-step day (instead of 7800) and `A = 1440 / 0.04 = 36000` for a 1440-minute crypto day (instead of 28800). The larger A costs little, because the delay grows like log A (`log 9750 / log 7800 ≈ 1.025`). The main cost is the wider baseline (6.2, remark 3). In the two-sided monitor δ is split equally, `δ_u = δ_l = δ / 2`.
+
+### 6.4 Subtle point (a): τ comes from the same calibration data
+
+In the plug-in calibration, τ is c × MAD of the *whole* window. Then `X_i = min(r_i², τ²)` for a return i in that window depends, through τ, on returns that come after i. So `X_i` is not adapted, and the process K in Theorem 6.2 need not be a supermartingale. The plug-in mean is still a consistent estimate, but no finite-sample statement follows. Three valid fixes:
+
+1. **Sample splitting (implemented).** τ from the first `n_τ` returns (default: 25% of the window), the confidence sequence on the rest. Needs nothing beyond 6.1. Cost: the sequence sees only 75% of the window, so the width grows by about `√(4/3) ≈ 1.15`. τ need not be precise: any τ known at `n_τ` keeps validity, it only changes power. With `n_τ = 98` (a 390-step window) the scaled MAD has a relative standard error of about 12% under normal returns.
+2. **A grid of truncation levels with a union bound.** Fix levels `τ_1 < ... < τ_K` before calibration (for example multiples of a rough scale known in advance). Run K sequences, each at level δ / K, on the whole window. At the end pick τ by any rule, for example the grid point nearest c × MAD of the whole window. All K bounds hold at once with probability at least 1 - δ, so the chosen one does too. Cost: `log(K/δ)` in place of `log(1/δ)` (K = 20, δ = 0.01: 7.6 against 4.6, so about 29% wider). Not implemented.
+3. **A predictable running τ_t** (for example c × MAD of `r_1, ..., r_{t-1}`, as in E3). Then `X_t = min(r_t², τ_t²)` is adapted, and Theorem 6.2 covers the average of `E[min(r_t², τ_t²) | F_{t-1}]`, a mean whose truncation level keeps changing, while monitoring uses one level. Under a constant conditional law (Corollary 6.5) `m(s)` is nondecreasing in s, so the comparison works in one direction only: the increase side must monitor with a level at most `min_i τ_i`, and the decrease side with a level at least `max_i τ_i`. This is valid under the constant-law assumption but not under (H↑), (H↓) alone. Not implemented.
+
+### 6.5 Subtle point (b): what "no change" means when volatility clusters
+
+* Theorem 6.2 needs neither stationarity nor independence. Under volatility clustering (GARCH, stochastic volatility) it still covers `μ̄_T`, the bet-weighted average of the conditional truncated variances *within the calibration window*. By contrast, `margin_z` uses the i.i.d. standard error, which is too small when squared returns are positively autocorrelated, so it has no guarantee there.
+* The monitoring null (H↑) then says: *the conditional truncated variance never rises above (1 + b) times its calibration-window average.* With clustering, `μ_t` moves all the time, so with b = 0, (H↑) fails whenever volatility rises above its calibration average, even if nothing structural happened. Alarms at those moments are not false alarms in the sense of Theorem 6.4. They are correct rejections of a null that is too strict for clustered data. The confidence sequence protects against *estimation error*; it cannot protect against this *model mismatch*.
+* The remedy is the band b: "within a factor 1 ± b of the calibration average". Theorem 6.4 holds for any b fixed in advance, but whether (H↑) and (H↓) hold for a given b on real data is an empirical question (E4c; the GARCH experiment of E9). A longer calibration window that spans several clustering cycles also makes the calibration average closer to the long-run level.
+* The target is weighted by the bets. With `d_t = n_plan`, `λ_i` is proportional to `1 / σ̂_{i-1}` until the cap binds, so the weights are close to uniform after the first few dozen observations. With the time-uniform schedule they decrease like `1 / √(i log i)`, which puts more weight on early calibration data. The weighting matters only when `μ_i` drifts within the window.
+
+### 6.6 Subtle point (c): a calibration length chosen from the data
+
+Theorem 6.2 bounds the chance that the bound fails at *any* t. The event "the bound holds at every t" is contained in "the bound holds at T" for every random T. So Theorem 6.4 holds for every stopping rule. The monitor offers one (`target_rel_width = w`): stop at the first `t ≥ cal_len` with relative width `(Ū_t - L̄_t) / X̄_t ≤ w` (`X̄_t` is the plain mean of the sequence part), or at `cal_max`.
+
+This would not be justified with a fixed-n interval `I_n`, one with `P(μ ∈ I_n) ≥ 1 - δ` for each fixed n. Such intervals say nothing about `I_T` at a data-dependent T. For example, the normal-approximation interval checked at every n excludes the true mean at some n with probability one (law of the iterated logarithm), so a rule that waits for a favourable look will get one. The width rule is milder (it waits for a small width, which depends on the data mostly through the variance estimate), but a fixed-n interval still gives no proof for it. The time-uniform sequence pays for this freedom with a wider bound at any single n than a fixed-n interval with the same δ (6.2, remark 3; E8, Q8d).
+
+The planned size `n_plan` may be any value fixed before the sequence starts, even one computed from the first `n_τ` returns, because the bets need only be predictable.
+
+### 6.7 Status
+
+* **Proved here:** Lemma 6.1; Theorem 6.2 and Corollary 6.3 (given Ville's inequality); Theorem 6.4, parts 1 to 3 (given Theorem 6.2, Ville's inequality and optional stopping at bounded stopping times); Corollary 6.5.
+* **Cited:** Ville's inequality (Ville 1939; a modern statement is in Howard et al. 2020); the predictable plug-in empirical Bernstein construction and its bet schedule (Waudby-Smith and Ramdas 2024, Theorem 2); the inequality of Lemma 6.1 for a = 1 (Fan, Grama and Liu 2015), which is also the basis of the empirical Bernstein confidence sequences in Howard et al. (2021); e-detectors (Shin, Ramdas and Rinaldo 2024).
+* **Checked numerically:** coverage on bounded i.i.d. data and with time-varying means (`tests/test_confseq.py`); false alarm rates, bound failures, delays and adaptive lengths (E8).
+* **Assumed, not proved:** (H↑) and (H↓) on real data (6.5); the deseasonalising profile is treated as known (5.6, item 3); missing returns are skipped, which is valid when, given the past, whether a return is missing says nothing about its size (the conditional means in (H↑), (H↓) are then the same with or without conditioning on "observed"). No bound on the detection delay is proved; delays are measured in E8.
+
+**References for this section.** Fan, X., Grama, I. and Liu, Q. (2015). Exponential inequalities for martingales with applications. *Electronic Journal of Probability* 20, paper 1, 1 to 22. doi:10.1214/EJP.v20-3496. Howard, S. R., Ramdas, A., McAuliffe, J. and Sekhon, J. (2020). Time-uniform Chernoff bounds via nonnegative supermartingales. *Probability Surveys* 17, 257 to 317. doi:10.1214/18-PS321. Howard, S. R., Ramdas, A., McAuliffe, J. and Sekhon, J. (2021). Time-uniform, nonparametric, nonasymptotic confidence sequences. *Annals of Statistics* 49(2), 1055 to 1080. doi:10.1214/20-AOS1991. Shin, J., Ramdas, A. and Rinaldo, A. (2024). E-detectors: a nonparametric framework for sequential change detection. *New England Journal of Statistics in Data Science* 2(2), 229 to 260. doi:10.51387/23-NEJSDS51. Ville, J. (1939). *Étude critique de la notion de collectif.* Thèse, Paris (numdam.org/item/THESE_1939__218__1_0). Waudby-Smith, I. and Ramdas, A. (2024). Estimating means of bounded random variables by betting. *JRSS B* 86(1), 1 to 27. doi:10.1093/jrsssb/qkad009.
