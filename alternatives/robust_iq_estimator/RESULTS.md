@@ -1,22 +1,22 @@
 # Results: robust local plug-in estimator of integrated quarticity (A5)
 
-Every number below comes from `run_experiment.py` (seeds fixed in the code) and is stored in `results/`. Labels: **[SYNTHETIC]** for simulations and closed-form theory, **[REAL]** for Binance one-minute data. Estimator labels are defined in `README.md`, section 5. "Relative bias" and "relative RMSE" are `estimate / true IQ - 1` averaged over simulated days (RMSE: root mean square). The true IQ is the exact integral of the simulated volatility path.
+Every number below comes from `run_experiment.py` (seeds fixed in the code) and is stored in `results/`. Labels: **[SYNTHETIC]** for simulations and closed-form theory, **[REAL]** for Binance one-minute data. Estimator labels are defined in `README.md`, section 5. RK and RK-k are this repository's version of the paper's kernel estimator (normalised weights, scaled MAD, c = 3, h = 30), so every comparison is with that version, not with the formula as printed. PI-LU and PI-NN are proposals for discussion: they are more efficient or less biased in our simulations, which is not the same as having improved the published estimator. "Relative bias" and "relative RMSE" are `estimate / true IQ - 1` averaged over simulated days (RMSE: root mean square). The true IQ is the exact integral of the simulated volatility path.
 
 ## Summary
 
-1. **Efficiency [SYNTHETIC].** Squaring a local variance instead of averaging local fourth powers lowers the asymptotic variance from 10.7 (RQ, and every RQ-type estimator, including Bapat's averaged kernel) to `8 (k + 3) / (k + 2)` times `int sigma^8`, which is 8.2 for k = 38, close to the efficient bound 8. MedRQ (14.2), MinRQ (18.5) and TPQ (13.6) are much less efficient.
-2. **Consistency [SYNTHETIC].** Bapat's rule (3 times one daily MAD) is inconsistent: with stochastic volatility and an intraday pattern its bias does not shrink with n (minus 14% at n = 23,400 even after the kappa correction), and its RMSE falls at rate `n^-0.1` instead of `n^-0.5`. All estimators with a **local** scale converge at the `sqrt(n)` rate (slopes minus 0.50 to minus 0.68).
-3. **Jumps [SYNTHETIC].** Dropping with the growing cut-off `sqrt(2 log n)` (PI-LU) leaves no residual from detected jumps; clipping (Bapat's choice) leaves `O(1/n)` per jump, which is 18% to 28% of IQ at n = 390 with four jumps a day. PI-LU has the lowest RMSE of all 15 estimators in the jump scenarios at n = 390 and 1440 (0.163 to 0.217 at n = 390) and confidence intervals with 93% to 97% coverage in every one of 18 cells.
+1. **Efficiency [SYNTHETIC].** Under constant volatility, squaring a local variance gives an asymptotic variance of `8 (k + 3) / (k + 2)` times `int sigma^8`: 8.20 for k = 38 (8.46 simulated, efficiency 0.95), close to the efficient bound 8. The gain is large against untruncated RQ (10.67, efficiency 0.74), TPQ (13.6), MedRQ (14.2) and MinRQ (18.5). It is modest against the paper's kernel with the kappa correction: that estimator is a truncated RQ with edge weights, and truncation already lowers its variance, to 8.19 with an oracle cut-off (closed form, efficiency 0.98) and 9.26 with the estimated daily MAD (simulated, efficiency 0.86).
+2. **Consistency [SYNTHETIC].** With a fixed c and one daily MAD, the kernel estimator converges to `kappa_4(c)` times IQ under constant volatility (minus 3.6% with the scaled MAD, minus 29.5% with the raw MAD), a known constant that the kappa correction removes. When volatility moves within the day, the corrected estimator keeps a bias that does not shrink with n: minus 0.6% to minus 1.1% in our moderate design S1, and minus 11% at n = 23,400 in the strong design S5 (minus 14% without the correction), where its RMSE falls like `n^-0.14` instead of `n^-0.5`. This setting lies outside the conditions of the paper's Theorem 1, which assumes a threshold that shrinks more slowly than the returns; a multiple of the MAD shrinks at the same rate. All estimators with a **local** scale converge at the `sqrt(n)` rate (slopes minus 0.48 to minus 0.68).
+3. **Jumps [SYNTHETIC].** Dropping with the growing cut-off `sqrt(2 log n)` (PI-LU) leaves no residual from detected jumps; clipping (the paper's choice) leaves `O(1/n)` per jump, which is 18% to 28% of IQ at n = 390 with four jumps a day (closed form, a = 3). PI-LU has the lowest RMSE of the 15 estimators in 6 of the 8 jump cells at n = 390 and 1440. In S2 and S6 at n = 390 the paper's kernel and PI-G3 are slightly better (S2: RK 0.156, PI-G3 0.158, PI-LU 0.165; S6: PI-G3 0.191, RK-k 0.197, RK 0.198, PI-LU 0.217), because their downward truncation bias offsets the upward jump bias. PI-LU's 95% intervals cover 93% to 97% in every one of 18 cells.
 4. **Cross-validation [SYNTHETIC].** Eq. (17) as printed picks the smallest bandwidth on offer in 58% to 97% of simulated days, for scale reasons alone (its expected value is minimised at h = 5 under constant volatility). The corrected target tracks the oracle spot-optimal bandwidth, but that bandwidth is too long for the *integrated* quantity, and no CV variant can see volatility bursts of a few minutes.
-5. **Real data [REAL].** On Binance BTCUSDT and DOGEUSDT (July to December 2025) the MAD-truncated estimators are 0.33 to 0.44 times MedRQ at one minute; the local plug-ins (PI-LU, PI-L3, KPI-L3) reach 0.66 to 0.73, and the neighbour-guarded PI-NN 0.95 to 0.96 (Spearman 0.97 with MedRQ).
-6. **Why the gap [REAL + SYNTHETIC], the main new finding.** Large one-minute crypto returns are not isolated jumps: 44% to 65% of them have a neighbour beyond 2 local standard deviations, and squared standardised returns stay autocorrelated for about 5 to 10 minutes. A two-factor volatility model with a fast factor (half-life 3 minutes, sd 0.75 in log variance) calibrated to these diagnostics reproduces the real estimator ratios (for example PI-LU / MedRQ 0.68 simulated against 0.66 to 0.69 real; PI-NN 0.95 against 0.95 to 0.96; MedRQ 1-minute / 5-minute 1.41 against 1.33 to 1.45). In that model **every estimator that truncates against a scale estimated over hours underestimates IQ by 26% to 59% at one minute**, Bapat's included; PI-NN is the best robust estimator (RMSE 0.26 to 0.28 at n = 1440 against 0.28 to 1.63 for TPQ, MedRQ and MinRQ).
-7. **No single winner.** With isolated jumps and smooth volatility, PI-LU is best; with volatility bursts, PI-NN is best; PI-NN pays for its burst robustness with a larger error from undetected jumps at n = 390 (RMSE 0.32 against 0.18 for PI-LU in S3).
+5. **Real data [REAL].** On Binance BTCUSDT and DOGEUSDT (July to December 2025) the estimators with one daily MAD threshold (RK, RK-k, PI-G3) are 0.33 to 0.46 times MedRQ at one minute (RK alone 0.33 to 0.42, that is 2.4 to 3.0 times lower); the local plug-ins (PI-LU, PI-L3, KPI-L3) are 0.66 to 0.73, and the neighbour-guarded PI-NN 0.95 to 0.96 (Spearman 0.97 with MedRQ). The true IQ is unknown on real data, so these are ratios between estimators, not errors.
+6. **A possible explanation of the gap [REAL + SYNTHETIC].** Large one-minute crypto returns are mostly not isolated: 44% to 65% of them have a neighbour beyond 2 local standard deviations, against 8.9% expected by chance for independent Gaussian returns, and squared standardised returns stay autocorrelated for about 5 to 10 minutes. That many apparent jumps are short bursts of volatility is already documented for equities and currencies (Christensen, Oomen and Podolskij 2014; Bajgrowicz, Scaillet and Treccani 2016). What this prototype adds is the consequence for truncated IQ estimators. A two-factor volatility model with a fast factor (half-life 3 minutes, sd 0.75 in log variance) calibrated to these diagnostics reproduces the real estimator ratios (for example PI-LU / MedRQ 0.68 simulated against 0.66 to 0.69 real; PI-NN 0.95 against 0.95 to 0.96; MedRQ 1-minute / 5-minute 1.41 against 1.33 to 1.45). If that model is right, **every estimator that truncates against a scale estimated over hours is biased down by about 35% to 59% at one minute (31% to 56% with jumps)**; for our version of the paper's kernel the figure is 56% to 59% at every n. PI-NN has the lowest RMSE among the robust estimators in five of the six model cells (0.26 to 0.28 at n = 1440 against 0.28 to 1.63 for TPQ, MedRQ and MinRQ; at n = 1440 without jumps it leads TPQ only by 0.277 to 0.280, and at n = 390 with jumps TRQ-M is slightly lower, 0.352 against 0.360).
+7. **No single winner.** With isolated jumps and smooth volatility, PI-LU does best; with volatility bursts, PI-NN does best in our calibrated model; PI-NN pays for its burst robustness with a larger error from undetected jumps at n = 390 (RMSE 0.32 against 0.18 for PI-LU in S3).
 
 ## Q1. Efficiency and constants [SYNTHETIC]
 
 Constant volatility, n = 1440, 8000 simulated days (`results/q1_avar.csv`). AVAR is `n Var(estimate)` in units of `int sigma^8` (T = 1). Simulation standard errors are about 1.6% of each value.
 
-| Estimator | AVAR closed form | AVAR simulated | Efficiency `8 / AVAR` |
+| Estimator | AVAR closed form | AVAR simulated | Efficiency `8 / AVAR` (simulated AVAR where there is one) |
 |---|---|---|---|
 | Efficient bound | 8 | | 1 |
 | RQ | 10.67 | 10.81 | 0.74 |
@@ -25,9 +25,10 @@ Constant volatility, n = 1440, 8000 simulated days (`results/q1_avar.csv`). AVAR
 | MedRQ | | 14.24 | 0.56 |
 | MinRQ | | 18.50 | 0.43 |
 | TRQ-M (Mancini threshold) | 10.67 | 10.61 | 0.75 |
-| RK-k (Bapat, normalised, kappa-corrected) | 8.19 (oracle cut-off) | 9.26 | 0.86 |
+| RK (paper's kernel, our normalised version, no kappa correction) | | 8.60 | biased, mean 0.964 of IQ |
+| RK-k (same, kappa-corrected) | 8.19 (oracle cut-off: efficiency 0.98) | 9.26 | 0.86 |
 | TRQ-U (fourth powers, local threshold) | 10.67 | 10.52 | 0.76 |
-| PI-LU (k = 38) | 8.20 | 8.46 | 0.95 |
+| PI-LU (k = 38) | 8.20 (efficiency 0.976) | 8.46 | 0.95 |
 | PI-L3 (k = 38) | 8.20 | 8.43 | 0.95 |
 | KPI-L3 (kernel plug-in, h = 30) | | 8.53 | 0.94 |
 | PI-NN (k = 6) | 9.00 | 9.17 | 0.87 |
@@ -35,7 +36,7 @@ Constant volatility, n = 1440, 8000 simulated days (`results/q1_avar.csv`). AVAR
 | Block plug-in, no truncation, k = 2, 5, 10, 20, 40, 160 | 10.00, 9.14, 8.67, 8.36, 8.19, 8.05 | 10.07, 9.32, 8.83, 8.49, 8.31, 8.17 | 0.79 to 0.98 |
 | Block plug-in, clip at 3 times the TRUE sigma (oracle), k = 38 | 7.79 | 7.91 | above 1, only because it uses the unknown sigma |
 
-The simulated values sit about 1% above the closed forms throughout, within two simulation standard errors. The averaged kernel of the paper is RQ in disguise (`docs/math.md`, section 4), so its AVAR is 32/3 before truncation; clipping at three scaled MADs reduces the variance but adds bias.
+The simulated values range from 1.2% below the closed form (TPQ, 13.48 against 13.65) to 3.2% above it (PI-LU, 8.46 against 8.20), all within two simulation standard errors; the feasible PI-LU and PI-L3 sit highest, as expected from their estimated scale (README section 2.5). RK-k is not comparable with its closed form, which is for the oracle cut-off. The averaged kernel of the paper is a truncated RQ with edge weights (`docs/math.md`, section 4). Without truncation its AVAR would be 32/3; clipping at three standard deviations with the kappa correction lowers it to 8.19 with an oracle cut-off and to 9.26 with the estimated daily MAD. So under constant volatility PI-LU (0.95 simulated) is somewhat more efficient than the corrected kernel (0.86) and about as efficient as the kernel's oracle version (0.976 against 0.977 in closed form).
 
 **Truncation constants** (`results/q1_truncation_constants.csv`). Expected number of diffusive returns beyond the cut-off per day:
 
@@ -46,7 +47,7 @@ The simulated values sit about 1% above the closed forms throughout, within two 
 | `sqrt(2 log n)`, n = 390 / 1440 / 23,400 | 3.45 / 3.81 / 4.49 | 0.22 (n = 390) | 0.17 (n = 23,400) | 0.990 / 0.997 / 1.000 |
 | Mancini `4 n^0.01` (TRQ-M) | 4.25 to 4.42 | 0.0085 | 0.23 | 0.999 to 1.000 |
 
-The fixed rules truncate a fixed share of returns at every n, so their bias cannot vanish. The universal rule truncates fewer than one diffusive return per day at every n, and the count tends to zero.
+The fixed rules truncate a fixed share of returns at every n, so their bias cannot vanish. The universal rule truncates fewer than one diffusive return per day at every n: 0.22, 0.20 and 0.17 per day at n = 390, 1440 and 23,400 (n times `p_beyond` in the CSV). The count tends to zero only like `1 / sqrt(pi log n)`, but the relative bias it causes is `O(sqrt(log n) / n)`.
 
 **Jump residuals** (`results/q1_jump_residuals.csv`), in units of `sigma^4 delta` per jump:
 
@@ -80,7 +81,7 @@ Log-OU stochastic volatility (vol of vol 0.5, or 1 with an intraday U-shape of a
 
 | Estimator | bias 390 | bias 1440 | bias 23,400 | RMSE 390 | RMSE 1440 | RMSE 23,400 | slope |
 |---|---|---|---|---|---|---|---|
-| RK (Bapat, normalised) | -0.209 | -0.159 | -0.144 | 0.256 | 0.184 | 0.156 | -0.11 |
+| RK (paper's kernel, our normalised version) | -0.209 | -0.159 | -0.144 | 0.256 | 0.184 | 0.156 | -0.11 |
 | RK-k (kappa-corrected) | -0.179 | -0.128 | -0.112 | 0.236 | 0.160 | 0.128 | -0.14 |
 | PI-G3 (plug-in, daily threshold) | -0.069 | -0.061 | -0.055 | 0.178 | 0.109 | 0.069 | -0.22 |
 | TRQ-M (Mancini, daily BV scale) | -0.038 | -0.028 | -0.024 | 0.183 | 0.104 | 0.041 | -0.36 |
@@ -108,12 +109,12 @@ Log-OU stochastic volatility (vol of vol 0.5, or 1 with an intraday U-shape of a
 | PI-NN | 0.140 | 0.035 | -0.001 | 0.320 | 0.121 | 0.019 | -0.68 |
 
 **Reading.**
-* The daily-scale rules (RK, RK-k, PI-G3, and to a lesser degree TRQ-M) keep a bias that does not shrink with n under stochastic volatility and an intraday pattern. The kappa correction fixes the constant-volatility bias (S1: RK minus 4.5% at every n, RK-k minus 0.6% to minus 1.1%) but not this one. This is the inconsistency predicted in README section 2.5.
+* The kappa correction removes the constant part of the bias of the daily-scale kernel (`kappa_4(3) = 0.964`; in S1, RK is minus 4.2% to minus 4.7% at every n and RK-k minus 0.6% to minus 1.1%). What remains depends on how much volatility moves within the day. In S5 the daily-scale rules (RK, RK-k, PI-G3, and to a lesser degree TRQ-M) keep a bias that does not shrink with n (RK-k minus 11% at n = 23,400), as README section 2.5 predicts for a single daily scale.
 * Every local-scale estimator converges at the `sqrt(n)` rate, whatever the clip or drop choice.
 * With jumps, the clipping estimators converge faster than `sqrt(n)` (slopes minus 0.6 to minus 0.7) because the residual of a clipped jump shrinks like `1/n`; at n = 390 and 1440 that residual dominates (PI-L3 plus 13.6% at n = 390). Dropping (PI-LU) removes it.
 * MedRQ breaks down in S3 at n = 23,400 (RMSE 4.4): with four jumps among 23,400 returns, a few simulated days put two jumps next to each other and the median of three adjacent returns is then a jump. Its median error is 0.000 there (`median_rel_err` in the CSV), so this is a rare-event failure, not a bias. MinRQ has the same weakness at n = 390 to 1440 in S4 and S6.
 * The finite-sample correction matters at practical n: without it PI-LU is 9.2% too high in S1 at n = 390 and still 1.3% at n = 23,400.
-* RK in S3 has the smallest RMSE at n = 1440 among the inconsistent estimators only because two biases cancel (clipped jumps push up, clipping of diffusive returns pushes down); at n = 23,400 the downward one remains (minus 4.3%).
+* RK in S3 has the smallest RMSE at n = 1440 among the daily-scale estimators only because two biases cancel (clipped jumps push up, clipping of diffusive returns pushes down); at n = 23,400 the downward one remains (minus 4.3%).
 
 ## Q3. Bandwidth and block length [SYNTHETIC]
 
@@ -142,7 +143,7 @@ At the oracle spot-optimal bandwidth the printed choice h = 5 has 6 to 22 times 
 | 100 | 0.332 | 0.344 | 0.125 | 0.084 |
 | 150 | 0.413 | 0.396 | 0.158 | 0.086 |
 
-When volatility moves (S5), long windows bias the squared local variance down (Jensen) and the averaged kernel loses its first h returns, which are the busy opening of the day. So for IQ, the corrected CV (median h = 50 to 100 in S5) oversmooths: KPI-L3 at the corrected-CV choice has RMSE 0.250 at n = 390, against 0.201 at the printed choice and 0.198 at h = 10. The printed criterion is right here by accident. For the *integrated* quantity the bandwidth should undersmooth the spot one.
+When volatility moves (S5), long windows bias the squared local variance down (Jensen) and the averaged kernel loses its first h returns, which are the busy opening of the day. So for IQ, the corrected CV (median h = 50 to 100 in S5) oversmooths: KPI-L3 at the corrected-CV choice has RMSE 0.250 at n = 390, against 0.201 at the printed choice and 0.198 at h = 10. The printed criterion's choice works well here, but because of its scale term rather than by design. For the *integrated* quantity the bandwidth should undersmooth the spot one.
 
 **Block length of PI-LU** (`results/q3_block_length.csv`), relative RMSE (bias in brackets):
 
@@ -201,7 +202,7 @@ Relative RMSE, 500 days per cell (bias and standard deviation in `results/q2_q4_
 
 **n = 23,400**: all local estimators are at 0.018 to 0.026 in every scenario; RK 0.046 to 0.156, RK-k 0.021 to 0.128, PI-G3 up to 0.069 and TRQ-M up to 0.041 (the S5 and S6 columns), TPQ up to 0.58 (S4) and MedRQ 4.38 in S3 (adjacent jumps).
 
-PI-LU is best or within 0.01 of the best in 10 of the 12 cells at n = 390 and 1440. PI-G3 and RK do well at n = 390 in S6 (0.191, 0.198) because the downward bias from the daily scale cancels the upward bias from the jumps; at n = 23,400 both are biased (minus 5% and minus 14%).
+PI-LU is best or within 0.01 of the best in 11 of the 12 cells at n = 390 and 1440; the exception is S6 at n = 390 (0.217 against 0.191). There PI-G3, RK-k and RK do well (0.191, 0.197, 0.198) because the downward bias from the daily scale offsets the upward bias from the jumps; at n = 23,400 they are biased by minus 5%, minus 10% and minus 14%.
 
 **95% confidence intervals** (`results/q4_coverage.csv`), coverage of the true IQ, 500 days per cell:
 
@@ -228,7 +229,7 @@ With 500 days the simulation standard error of a coverage near 0.95 is about 0.0
 | TPQ | 0.99 | 1.03 | 1.01 | 1.03 | 0.13 | 0.13 | 0.987 | 0.987 | 1.02 | 1.06 |
 | MinRQ | 1.03 | 1.05 | 1.00 | 1.00 | 0.09 | 0.10 | 0.995 | 0.994 | 1.02 | 1.04 |
 | TRQ-M | 0.63 | 0.66 | 0.65 | 0.68 | 0.46 | 0.41 | 0.927 | 0.890 | 0.82 | 0.82 |
-| RK (Bapat, normalised) | 0.33 | 0.42 | 0.33 | 0.40 | 1.10 | 0.86 | 0.865 | 0.814 | 0.56 | 0.64 |
+| RK (paper's kernel, our normalised version) | 0.33 | 0.42 | 0.33 | 0.40 | 1.10 | 0.86 | 0.865 | 0.814 | 0.56 | 0.64 |
 | RK-k | 0.35 | 0.44 | 0.34 | 0.42 | 1.06 | 0.82 | 0.865 | 0.814 | 0.58 | 0.66 |
 | PI-G3 | 0.38 | 0.46 | 0.39 | 0.46 | 0.97 | 0.77 | 0.879 | 0.837 | 0.62 | 0.71 |
 | TRQ-U | 0.76 | 0.80 | 0.79 | 0.77 | 0.28 | 0.24 | 0.928 | 0.887 | 0.83 | 0.86 |
@@ -238,7 +239,7 @@ With 500 days the simulation standard error of a coverage near 0.95 is about 0.0
 | KPI-L3 | 0.72 | 0.73 | 0.75 | 0.74 | 0.33 | 0.31 | 0.941 | 0.911 | 0.80 | 0.83 |
 | **PI-NN** | **0.95** | **0.96** | **0.95** | **0.97** | **0.16** | **0.17** | **0.975** | **0.965** | **0.98** | **1.02** |
 
-**Answer to the question asked.** Yes: every local-scale estimator agrees with MedRQ and MinRQ day by day much better than the MAD-truncated ones (median ratio 0.66 to 0.80 against 0.33 to 0.46; absolute log ratio 0.24 to 0.41 against 0.77 to 1.10; higher rank correlation). The E5 finding (MAD-truncated estimators 3 to 7 times lower, on Bitstamp) is reproduced on Binance (2.3 to 3.0 times lower at the median). But the local plug-ins with a two-hour scale window still sit 20% to 34% below MedRQ, and only PI-NN closes the gap.
+**Answer to the question asked.** Yes: every local-scale estimator agrees with MedRQ and MinRQ day by day much better than the estimators with one daily MAD threshold (median ratio 0.66 to 0.80 against 0.33 to 0.46; absolute log ratio 0.24 to 0.41 against 0.77 to 1.10; higher rank correlation). The direction of the E5 finding on Bitstamp (MAD-truncated estimators 3 to 7 times lower than the nearest-neighbour ones) is reproduced on Binance, with a smaller factor: RK and RK-k are 2.3 to 3.0 times lower than MedRQ at the median. Which estimator is closer to the truth cannot be read off real data. The local plug-ins with a two-hour scale window still sit 20% to 34% below MedRQ, and only PI-NN closes the gap; Q6 asks which side of the gap a plausible model supports.
 
 **Diagnostics** (`results/q5_real_diagnostics.csv`). Returns divided by their local scale have a median daily kurtosis of 6.3 (BTC) and 5.2 (DOGE), 3.7 and 3.5 even after trimming at `sqrt(2 log n)` (2.98 for a trimmed normal). 1.5% and 1.1% of returns lie beyond 3 local sd (0.27% for a normal) and 0.62% and 0.42% beyond 3.81 (0.014%). Zero returns: 2.4% and 2.6% of minutes.
 
@@ -255,9 +256,10 @@ With 500 days the simulation standard error of a coverage near 0.95 is about 0.0
 | BTCUSDT | 0.114 | 0.034 | 0.014 | 3.69 | 1.46% | 65% of 5024 |
 | DOGEUSDT | 0.099 | 0.026 | 0.002 | 3.53 | 1.08% | 44% of 1253 |
 | Model without a fast factor [SYNTHETIC] | -0.008 | -0.006 | -0.010 | 2.93 | 0.21% | 0% of 16 |
+| Chance level, independent Gaussian returns (closed form) | 0 | 0 | 0 | 2.98 | 0.27% | 8.9% |
 | Calibrated fast factor (sd 0.75, half-life 3 min) [SYNTHETIC] | 0.120 | 0.032 | -0.005 | 3.68 | 1.25% | 41% of 606 |
 
-Isolated jumps would leave squared returns uncorrelated and give exceedances ordinary neighbours. Instead, large moves come in bursts that fade within about 5 to 10 minutes. The calibration grid (fast-factor sd 0.5, 0.75, 1; half-life 1, 3, 10 minutes; 100 days each) picked sd 0.75 and half-life 3 minutes as closest to the average of the two coins.
+Isolated jumps would leave squared returns uncorrelated and give exceedances ordinary neighbours: the chance that at least one of the two neighbours of a return lies beyond 2 sd is `1 - 0.9545^2 = 8.9%` for independent Gaussian returns. The 0 of 16 of the model without a fast factor is consistent with that (1.4 expected); the real 44% to 65% of 1253 to 5024 exceedances is far above it. Large moves come in bursts that fade within about 5 to 10 minutes. This agrees with the high-frequency literature: Christensen, Oomen and Podolskij (2014) find with tick data on equities and currencies that lower-frequency jump measures attribute bursts of volatility to the jump component, and Bajgrowicz, Scaillet and Treccani (2016) find that most news produces bursts of volatility rather than jumps (both read from their abstracts only). The calibration grid (fast-factor sd 0.5, 0.75, 1; half-life 1, 3, 10 minutes; 100 days each) picked sd 0.75 and half-life 3 minutes as closest to the average of the two coins.
 
 **The calibrated model reproduces the real estimator gaps [SYNTHETIC vs REAL]** (`results/q6_fastvol_frequency.csv`, n = 1440, 300 days):
 
@@ -274,7 +276,7 @@ Isolated jumps would leave squared returns uncorrelated and give exceedances ord
 
 The ratios of the local estimators to MedRQ match to within 0.03, the frequency ratios of the fourth-power estimators to within 0.1. The daily-scale estimators are lower on real data than in the model (RK 0.33 to 0.42 against 0.53), which suggests a stronger intraday pattern or slow volatility in the real data than in the model. In the model, the 5-minute estimates are far below the truth (median 5-minute MedRQ / IQ = 0.57), so agreement with a 5-minute benchmark is not evidence of accuracy.
 
-**Who is right in that model [SYNTHETIC]** (`results/q6_fastvol_estimators.csv`, 300 days per cell; median relative error, then RMSE):
+**Which estimators recover IQ in that model [SYNTHETIC]** (`results/q6_fastvol_estimators.csv`, 300 days per cell; median relative error, then RMSE):
 
 | Estimator | median err 390 / 1440 / 23,400 | RMSE 390 / 1440 / 23,400 | with jumps: median err | with jumps: RMSE |
 |---|---|---|---|---|
@@ -288,37 +290,37 @@ The ratios of the local estimators to MedRQ match to within 0.03, the frequency 
 | PI-L3 | -0.45 / -0.44 / -0.29 | 0.46 / 0.44 / 0.30 | -0.38 / -0.41 / -0.29 | 0.41 / 0.41 / 0.30 |
 | PI-LU | -0.49 / -0.47 / -0.26 | 0.49 / 0.46 / 0.27 | -0.47 / -0.44 / -0.27 | 0.48 / 0.44 / 0.27 |
 | KPI-L3 | -0.51 / -0.44 / -0.20 | 0.52 / 0.44 / 0.21 | -0.45 / -0.41 / -0.20 | 0.46 / 0.41 / 0.21 |
-| **PI-NN** | -0.36 / -0.23 / -0.04 | **0.39 / 0.28 / 0.07** | -0.30 / -0.20 / -0.05 | **0.36 / 0.26 / 0.07** |
+| **PI-NN** | -0.36 / -0.23 / -0.04 | **0.39 / 0.28 / 0.07** | -0.30 / -0.20 / -0.05 | 0.36 / **0.26 / 0.07** |
 
 Figure: `results/fig3_fastvol_bias.png`.
 
 **Reading.**
-* Volatility bursts of a few minutes are part of `sigma_t`, so they are part of IQ. Any estimator that truncates against a scale estimated over hours removes them as if they were jumps, and any long block averages them away. In this model that costs Bapat's estimator 56% to 59% of IQ at every n, and the local plug-ins PI-L3, PI-LU and KPI-L3 20% to 51%. Their bias shrinks only slowly with n, because their windows are fixed multiples of `sqrt(n)` returns, which is still 28 minutes at n = 23,400.
+* Volatility bursts of a few minutes are part of `sigma_t`, so they are part of IQ. Any estimator that truncates against a scale estimated over hours removes them as if they were jumps, and any long block averages them away. In that model our version of the paper's kernel (RK, RK-k) misses 56% to 59% of IQ at every n (median error), and the local plug-ins PI-L3, PI-LU and KPI-L3 20% to 51%. Their bias shrinks only slowly with n, because their windows are fixed multiples of `sqrt(n)` returns, which is still 28 minutes at n = 23,400.
 * The fourth-power nearest-neighbour estimators (MedRQ, MinRQ, TPQ) keep bursts because a large return inside a burst has large neighbours. But they break down when jumps are added (RMSE 0.51 to 1.63 at n = 1440).
-* PI-NN combines the two ideas. Its neighbour guard keeps bursts and its threshold still removes isolated jumps. It has the lowest RMSE of all robust estimators at every n, with and without jumps. Its block-length table (`results/q6_fastvol_block_length.csv`) shows the guard is what matters: at n = 1440 and k = 5 the bias is minus 19% with the guard against minus 34% without it.
-* At one-minute sampling every estimator is still biased down by 9% to 40% in this model, because some burst variation lies within a single minute. Only finer sampling resolves it (n = 23,400: PI-NN minus 4%, MedRQ minus 2%).
+* PI-NN combines the two ideas. Its neighbour guard keeps bursts and its threshold still removes isolated jumps. It has the lowest RMSE of the robust estimators in five of the six cells; at n = 1440 without jumps it is nearly tied with TPQ (0.277 against 0.280), and at n = 390 with jumps TRQ-M is slightly lower (0.352 against 0.360). Its block-length table (`results/q6_fastvol_block_length.csv`) shows the guard is what matters: at n = 1440 and k = 5 the bias is minus 19% with the guard against minus 34% without it.
+* At one-minute sampling every estimator is still biased down in this model, even those that truncate nothing or keep bursts (median error at n = 1440: RQ minus 9%, MedRQ, MinRQ and TPQ minus 20%, PI-NN minus 23%), because some burst variation lies within a single minute. Only finer sampling resolves it (n = 23,400: PI-NN minus 4%, MedRQ minus 2%).
 
 ## Negative results and caveats
 
 * **The first proposal (PI-LU) is not the best on real-data-like data.** Q6 shows that its scale window and block length are too long for minute-scale volatility bursts. PI-NN was designed after seeing Q5 and Q6, and its settings (six neighbours, `k = n^(1/4)`) were chosen in an exploratory run on the burst model and on S3 and S4 with other seeds (iteration 3). Its numbers in Q4 to Q6 are therefore not strictly out of sample.
-* **PI-NN is weaker than PI-LU with isolated jumps at small n** (S3, n = 390: RMSE 0.320 against 0.179; S6: 0.375 against 0.217). The noisy six-neighbour scale sometimes lets a jump through, and short blocks amplify it (`2 b^2 + b^4 / (k + 2)`). Its eighth-power estimate is not robust (bias 1.65 in S3 at n = 390), so its intervals rely on a fragile ingredient. Coverage was still 0.936 to 0.966 in the grid.
-* **The burst interpretation is a model, not a proof.** The two-factor model matches seven diagnostics and the estimator ratios, but small jumps that cluster with trading activity, or microstructure effects, could produce similar signatures. The global-scale estimators fit worse (RK 0.53 in the model against 0.33 to 0.42 real).
-* **Cross-validation, corrected or not, targets the spot quantity.** It oversmooths for IQ when volatility moves, and it cannot see minute-scale bursts. The printed criterion's preference for the smallest h is a scale artefact, and its good IQ performance in S5 is an accident.
+* **PI-NN is weaker than PI-LU with isolated jumps at small n** (S3, n = 390: RMSE 0.320 against 0.179; S6: 0.375 against 0.217). The noisy six-neighbour scale sometimes lets a jump through, and short blocks amplify it (`2 b^2 + b^4 / (k + 2)`). Its eighth-power estimate is not robust (bias 1.65 in S3 at n = 390), so its intervals rely on a fragile ingredient. Coverage was still 0.932 to 0.966 in the grid (plain intervals).
+* **The burst interpretation is a model, not a proof.** The two-factor model matches seven diagnostics and the estimator ratios, but small jumps that cluster with trading activity, or microstructure effects, could produce similar signatures. Christensen, Oomen and Podolskij (2014) also report that some tick-level jumps are induced by microstructure. The global-scale estimators fit worse (RK 0.53 in the model against 0.33 to 0.42 real).
+* **Cross-validation, corrected or not, targets the spot quantity.** It oversmooths for IQ when volatility moves, and it cannot see minute-scale bursts. The printed criterion's preference for the smallest h comes from its scale term, and its good IQ performance in S5 is a side effect of that, not of the criterion's design.
 * **The fixed cut-off with a local scale (PI-L3) is consistent in the model but relies on local Gaussianity.** On real data, where local kurtosis is 5 to 6, its Gaussian correction does not undo the truncation.
 * **No central limit theorem is proved** for the feasible estimators. The coverage results are numerical evidence only.
 * One venue (Binance), two coins, six months. No microstructure noise in the simulations.
 
 ## Ranking (novelty, validity, relevance, feasibility, interest)
 
-**Novelty: moderate.** The plug-in principle and its efficiency (Jacod and Rosenbaum 2013), locally Gaussian block corrections (Mykland and Zhang 2009), vanishing thresholds (Mancini 2009) and their optimal order (Figueroa-Lopez and Nisen 2013), nearest-neighbour truncation (Andersen, Dobrev and Schaumburg 2012) and kernel plug-ins (Figueroa-Lopez, Pang and Wu 2025) are all known. Our web searches (snippets only, not exhaustive) found none of the following:
+**Novelty: moderate.** The plug-in principle and its efficiency (Jacod and Rosenbaum 2013), locally Gaussian block corrections (Mykland and Zhang 2009), vanishing thresholds (Mancini 2009) and their optimal order (Figueroa-Lopez and Nisen 2013), nearest-neighbour truncation (Andersen, Dobrev and Schaumburg 2012) and kernel plug-ins (Figueroa-Lopez, Pang and Wu 2025) are all known. That apparent jumps at lower frequencies are often bursts of volatility is documented by Christensen, Oomen and Podolskij (2014) and Bajgrowicz, Scaillet and Treccani (2016). Our web searches (snippets only, not exhaustive) found none of the following:
 * exact finite-sample corrections for clipped or dropped block estimators of any power of volatility, via cumulants;
-* the analysis of Bapat's MAD rule (inconsistent with a daily scale, consistent with a local scale and a correction or a `sqrt(2 log n)` cut-off);
+* a statement of when the MAD rule recovers IQ: a known constant under constant volatility, removed by the kappa correction; a bias that does not shrink with one daily scale when volatility moves within the day; consistency with a local scale and a correction, or with a `sqrt(2 log n)` cut-off;
 * the clipped and undetected jump residuals of plug-in against fourth-power estimators (`b^2` against `b^4`);
-* the closed-form scale artefact in the paper's cross-validation;
+* the closed-form scale artefact in the cross-validation criterion as printed;
 * the neighbour-guarded threshold;
-* above all, the empirical diagnosis that large one-minute crypto returns are clustered and that every scale-truncated estimator, Bapat's included, removes a third to a half of IQ as a result.
+* the consequence of volatility bursts for truncated IQ estimators on one-minute crypto data: scale-truncated estimators come out at 0.33 to 0.73 times the nearest-neighbour ones, and a model calibrated to the clustering reproduces those ratios.
 
-Each piece alone is incremental; together they make a coherent estimation paper.
+Each piece alone is incremental; together they could make a coherent estimation paper.
 
 **Validity: good for what is claimed.** The elementary propositions are proved and checked to three digits by simulation. Consistency and the `sqrt(n)` rate are shown numerically over three frequencies and six designs. Coverage is 93% to 97%. The CLT for the feasible estimators is not proved. PI-NN's settings were chosen after looking at the data.
 
@@ -326,6 +328,6 @@ Each piece alone is incremental; together they make a coherent estimation paper.
 
 **Feasibility: high.** The code exists and runs in about 10 minutes. A paper needs a CLT for the local-threshold plug-in, which should follow from Jacod and Rosenbaum (2013) with a data-driven threshold, plus a careful treatment of the neighbour guard. That is a few months of work for a statistician who works on estimation.
 
-**Likely interest to the paper's author: high.** It keeps his central idea (robust-scale truncation plus local smoothing), shows exactly when it is consistent and how to make it efficient, answers both of his future-work items (data-driven bandwidth, higher powers of volatility), and supplies a real-data finding that changes how truncated estimators should be used on crypto minute data. The sensitive part is that it shows the published estimator is inconsistent and about three times too low on real data. Framed as "what the MAD idea needs to become efficient and consistent", it is a natural joint follow-up.
+**Likely interest to the paper's author: high.** It keeps the author's central idea (robust-scale truncation plus local smoothing), states conditions under which it recovers IQ, proposes for discussion an aggregation that is somewhat more efficient in our simulations (0.95 against 0.86 for the corrected kernel under constant volatility), touches both future-work items of the paper (data-driven bandwidth, higher powers of volatility), and adds a real-data observation on how truncated estimators behave on crypto minute data. Two points need care in a conversation: our kernel results are for our normalised, scaled-MAD version, not the formula as printed; and on real data we only measure ratios between estimators (RK is 0.33 to 0.42 times MedRQ), so "too low" holds only if the burst model is right. Framed as questions ("what does the MAD idea need when volatility moves within the day?"), it is a natural basis for a joint follow-up.
 
-**Overall ranking among the estimation directions: first.** PI-LU is the clean, provable contribution for the classical model. PI-NN plus the burst diagnosis is the more interesting and more novel contribution for real data, but needs more theory.
+**Overall ranking among the estimation directions: first.** PI-LU is the clean, provable proposal for the classical model. PI-NN plus the burst consequence is the more interesting one for real data, but needs more theory and an out-of-sample check.
