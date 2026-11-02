@@ -349,7 +349,8 @@ def q14f():
     rows_null, rows_delay = [], []
     reps, chunk = (400, 200) if SMOKE else (4000, 1000)
     pre, n = RT.AWAKE_PRE, 5 * DAY
-    for li, law in enumerate(LAWS):
+    sub = OPTS.get("sub", "all")
+    for li, law in enumerate(LAWS if sub in ("all", "null") else ()):
         t0 = time.time()
         acc = {"awake-A": [], "awake-B": []}
         for j in range(reps // chunk):
@@ -370,7 +371,7 @@ def q14f():
     # delay after a restart: standard protocol (calibrate 1440 steps after every alarm) against awake monitors
     reps = 200 if SMOKE else 1000
     cal, n_tot = 1440, 1440 + 2500
-    for li, law in enumerate(("gaussian", "student_t3")):
+    for li, law in enumerate(("gaussian", "student_t3") if sub in ("all", "delay") else ()):
         for ni, nu in enumerate((30, 120, 360)):
             t0 = time.time()
             for ri, ratio in enumerate((2.0, 1.5, 0.5, 1 / 1.5)):
@@ -399,10 +400,12 @@ def q14f():
     a = pd.DataFrame(rows_null)
     b = pd.DataFrame(rows_delay)
     sfx = "_smoke" if SMOKE else ""
-    a.to_csv(OUT / f"e14f_awake_null{sfx}.csv", index=False)
-    b.to_csv(OUT / f"e14f_awake_delay{sfx}.csv", index=False)
-    print(a.pivot_table(index=["law", "horizon"], columns="method", values="false_alarm_rate").round(4).to_string())
-    print(b.pivot_table(index=["law", "change_after_restart", "sd_ratio"], columns="method", values="median_delay").round(0).to_string())
+    if len(a):
+        a.to_csv(OUT / f"e14f_awake_null{sfx}.csv", index=False)
+        print(a.pivot_table(index=["law", "horizon"], columns="method", values="false_alarm_rate").round(4).to_string())
+    if len(b):
+        b.to_csv(OUT / f"e14f_awake_delay{sfx}.csv", index=False)
+        print(b.pivot_table(index=["law", "change_after_restart", "sd_ratio"], columns="method", values="median_delay").round(0).to_string())
     return a, b
 
 
