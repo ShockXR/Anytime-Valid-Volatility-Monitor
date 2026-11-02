@@ -16,7 +16,7 @@ uniformly over time:
 The increase detector then bets against ``E[X] <= U_T`` and the decrease
 detector against ``E[X] >= L_T``, where ``T`` is the end of calibration. If
 there is no change, the chance of any false alarm within m monitored steps is
-at most ``delta_upper + delta_lower + m / A`` (``docs/math.md``, Theorem 6.3).
+at most ``delta_upper + delta_lower + m / A`` (``docs/math.md``, Theorem 6.4).
 Because the bounds hold at every t simultaneously, ``T`` may be chosen from
 the data, for example "stop calibrating once the bounds are tight enough".
 
@@ -27,8 +27,9 @@ Ramdas (2024, JRSS B 86(1), 1 to 27, doi:10.1093/jrsssb/qkad009, Theorem 2),
 with one change: the bet cap uses the one-sided range of the centred variable
 (``a_t`` below) instead of the full range, which allows much larger bets for
 the lower bound of a right-skewed variable such as a truncated squared return.
-With ``a_t = 1`` the formulas reduce exactly to theirs. Validity is proved in
-full in ``docs/math.md``, 6.2, using only Ville's inequality.
+With ``a_t = 1`` and ``delta_upper = delta_lower = alpha / 2`` the two bounds are
+exactly their two-sided interval at level ``alpha``. Validity is proved in full
+in ``docs/math.md``, 6.2, using only Ville's inequality.
 
 For ``Z_i = X_i / B`` in ``[0, 1]`` (``B`` = the known bound, ``tau^2`` here):
 
@@ -81,6 +82,16 @@ def _psi_coef_scalar(x: float) -> float:
     return (-math.log1p(-x) - x) / (x * x)
 
 
+def _check_params(delta_upper, delta_lower, n_plan, c):
+    if not 0 < c < 1:
+        raise ValueError("c must lie in (0, 1)")
+    for d in (delta_upper, delta_lower):
+        if not 0 < d < 1:
+            raise ValueError("delta must lie in (0, 1)")
+    if n_plan is not None and not (math.isfinite(n_plan) and n_plan > 0):
+        raise ValueError("n_plan must be a positive number or None")
+
+
 # ----------------------------------------------------------------------------
 # Vectorised confidence sequence
 # ----------------------------------------------------------------------------
@@ -128,11 +139,7 @@ def eb_confseq(
 
     Returns ``ConfSeq`` with arrays of shape (reps, n) (or (1, n) for 1-d input).
     """
-    if not 0 < c < 1:
-        raise ValueError("c must lie in (0, 1)")
-    for d in (delta_upper, delta_lower):
-        if not 0 < d < 1:
-            raise ValueError("delta must lie in (0, 1)")
+    _check_params(delta_upper, delta_lower, n_plan, c)
     x = np.atleast_2d(np.asarray(x, float))
     reps, n = x.shape
     B = np.asarray(bound, float)
@@ -179,10 +186,9 @@ class StreamingEBConfSeq:
 
     def __init__(self, bound: float, delta_upper: float = 0.005, delta_lower: float = 0.005,
                  n_plan: float | None = None, c: float = 0.75):
-        if not bound > 0:
+        if not (math.isfinite(bound) and bound > 0):
             raise ValueError("bound must be positive")
-        if not 0 < c < 1:
-            raise ValueError("c must lie in (0, 1)")
+        _check_params(delta_upper, delta_lower, n_plan, c)
         self.bound = float(bound)
         self.log_u = math.log(1.0 / delta_upper)
         self.log_l = math.log(1.0 / delta_lower)
@@ -321,6 +327,8 @@ def width_stopping_time(cs: ConfSeq, target: float, n_min: int = 1, n_max: int |
 
     Rows that never reach the target stop at ``n_max`` (default: the last column).
     """
+    if n_min < 1:
+        raise ValueError("n_min must be at least 1")
     w = cs.rel_width()
     reps, n = w.shape
     n_max = n if n_max is None else min(n_max, n)

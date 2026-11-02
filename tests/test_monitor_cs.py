@@ -11,7 +11,7 @@ from dataclasses import dataclass
 import numpy as np
 import pytest
 
-from avmonitor.confseq import cs_baseline
+from avmonitor.confseq import cs_baseline, eb_confseq
 from avmonitor.detectors import DEFAULT_DOWN_FRACTIONS, DEFAULT_UP_GRID
 from avmonitor.monitor import GaussianLRMonitor, VolatilityMonitor
 from avmonitor.robust import MAD_NORMAL_SCALE
@@ -350,3 +350,48 @@ def test_recalibration_bound_on_alarm_count():
         monitored += m
         bound += (0.02 + m / 100.0) / (1 - 0.02)
     assert monitored > 50000 and alarms <= bound
+
+
+def test_cs_path_skips_missing_returns():
+    """Review M6: in cs mode a missing return (NaN) is skipped everywhere; it is never read as a zero return."""
+    rng = np.random.default_rng(47)
+    r = rng.standard_normal(4000)
+    r[2500:] *= 2.0
+    miss = rng.random(r.size) < 0.05
+    r_nan = np.where(miss, np.nan, r)
+    mon = VolatilityMonitor(threshold=200.0, cal_len=800, baseline="cs", delta=0.02)
+    mon.run(r_nan[:800])
+    seg = mon.segments[0]
+    assert mon.calibrated and seg["cal_len"] == 800 and seg["n_tau"] == 200
+    # tau uses the finite returns of the first part only
+    tau_part, cs_part = r_nan[:200], r_nan[200:800]
+    scale = np.median(np.abs(tau_part[np.isfinite(tau_part)])) * MAD_NORMAL_SCALE
+    np.testing.assert_allclose(seg["tau2"], (3.0 * scale) ** 2, rtol=1e-12)
+    # the confidence sequence sees the finite returns of the second part only
+    x = np.minimum(cs_part[np.isfinite(cs_part)] ** 2, seg["tau2"])
+    assert mon._cs.t == x.size < 600
+    cs = eb_confseq(x, seg["tau2"], delta_upper=0.01, delta_lower=0.01, n_plan=600)
+    np.testing.assert_allclose([seg["upper"], seg["lower"], seg["m0"]],
+                               [cs.upper[0, -1], cs.lower[0, -1], cs.mean[0, -1]], rtol=1e-9)
+    zero = VolatilityMonitor(threshold=200.0, cal_len=800, baseline="cs", delta=0.02)
+    zero.run(np.nan_to_num(r_nan[:800]))  # zero filling would have lowered the baseline
+    assert zero.segments[0]["m0"] < seg["m0"]
+    # monitoring: a NaN step returns None and leaves both statistics unchanged
+    probe = VolatilityMonitor(threshold=200.0, cal_len=800, baseline="cs", delta=0.02)
+    probe.run(r_nan[:800])
+    probe.update(0.3)
+    assert probe.update(np.nan) is None
+    t0, up0, dn0 = probe.t, probe.S_up.copy(), probe.S_dn.copy()
+    assert probe.update(np.nan) is None and probe.t == t0 + 1
+    np.testing.assert_array_equal(probe.S_up, up0)
+    np.testing.assert_array_equal(probe.S_dn, dn0)
+    # up to the first alarm, the run with missing monitoring returns equals the run with them deleted
+    mon.run(r_nan[800:])
+    keep = np.concatenate([np.ones(800, bool), ~miss[800:]])
+    dropped = VolatilityMonitor(threshold=200.0, cal_len=800, baseline="cs", delta=0.02)
+    dropped.run(r_nan[keep])
+    orig_index = np.flatnonzero(keep)
+    assert mon.events and dropped.events
+    e1, e2 = mon.events[0], dropped.events[0]
+    assert (e1.index, e1.direction, e1.monitored_since) == (orig_index[e2.index], e2.direction, e2.monitored_since)
+    assert e1.stat == e2.stat and e1.baseline_scale == e2.baseline_scale

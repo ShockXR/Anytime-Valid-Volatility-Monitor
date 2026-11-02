@@ -122,6 +122,18 @@ def test_input_checks():
         eb_confseq([0.5], 1.0, c=1.0)
     with pytest.raises(ValueError):
         StreamingEBConfSeq(1.0).update(2.0)
+    # added after the self-check of review round 1: a non-positive n_plan gave NaN bets,
+    # the streaming class did not check delta, and n_min = 0 masked every column but the last
+    for kw in (dict(n_plan=0), dict(n_plan=-5.0), dict(n_plan=np.nan)):
+        with pytest.raises(ValueError):
+            eb_confseq([0.5], 1.0, **kw)
+        with pytest.raises(ValueError):
+            StreamingEBConfSeq(1.0, **kw)
+    for kw in (dict(delta_upper=0.0), dict(delta_lower=1.0)):
+        with pytest.raises(ValueError):
+            StreamingEBConfSeq(1.0, **kw)
+    with pytest.raises(ValueError):
+        width_stopping_time(eb_confseq([0.5, 0.4], 1.0), 0.5, n_min=0)
 
 
 def test_cs_baseline_split_and_stopping():
