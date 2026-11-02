@@ -1,14 +1,14 @@
 # Anytime-Valid Volatility Monitor
 
-**An online monitor that flags volatility regime breaks in high-frequency returns, with false-alarm guarantees that hold no matter how often you check it.** It combines jump- and noise-robust realized measures with e-detectors, a nonparametric framework for sequential change detection.
+**An online monitor that flags volatility regime breaks in high-frequency returns, with false-alarm guarantees that hold no matter how often you check it.** It combines the jump-robust truncation of Bapat (2026) with e-detectors, a nonparametric framework for sequential change detection. The guarantee is proved for a known baseline and for the confidence-sequence baseline (`docs/math.md`, section 6); with the default plug-in baseline it holds approximately (E4d, E4e).
 
-> Status: working prototype (November 2026). Estimators, detectors, a streaming monitor, 26 tests, simulation studies and a first real-data run on Bitstamp BTC/USD are in place. Start with [`PITCH_BAPAT.md`](PITCH_BAPAT.md) for the short version.
+> Status: working prototype (November 2026). Estimators, detectors, a streaming monitor, about 120 tests, simulation studies and a first real-data run on Bitstamp BTC/USD are in place. Start with [`PITCH_BAPAT.md`](PITCH_BAPAT.md) for the short version.
 
 ## Key results so far
 
 * **The detector keeps its promise when returns are messy [synthetic].** With jumps or fat-tailed returns, Gaussian likelihood-ratio and CUSUM detectors raise a false alarm within a day on 70% to 97% of paths. The robust e-detector stays at 0.3% to 2.3%, inside its 5% guarantee, and still detects a 50% volatility increase in a median of 36 to 49 steps ([experiment report](docs/experiment_report.md), E4).
-* **Truncation is what makes "volatility went down" detectable.** Without an upper bound on the monitored statistic, no nonparametric e-test can detect a decrease ([math notes](docs/math.md), 5.3).
-* **Alarms on real data mean something [real].** On Bitstamp BTC/USD one-minute bars (July to December 2025), 81% of increase alarms and 90% of decrease alarms are followed by a day of volatility in the flagged direction, against 50% at random times (E5).
+* **Why a bounded statistic is needed.** A fall in the variance itself cannot be detected by any nonparametric e-test ([math notes](docs/math.md), 5.3, a one-sided form of Bahadur and Savage 1956), so a detector must monitor a bounded functional of the returns. Truncation at c × MAD gives one with a direct volatility meaning: if the shape of the innovations is fixed, the truncated variance falls exactly when σ falls.
+* **Alarms on real data [real].** On Bitstamp BTC/USD one-minute bars (July to December 2025), 81% of increase alarms and 90% of decrease alarms are followed by a day of volatility in the flagged direction, against 50% at random times (E5). Volatility clustering explains much of the increase figure (a naive trailing-window rule scores about the same), so rate-matched and forecast-based comparisons follow in E6 and E10.
 * **Reproducing the paper.** The printed kernel formulas are not on the integrated-quarticity scale, and the c × MAD truncation leaves a bias that does not shrink with n. Both have one-line fixes. The published tables are consistent with the printed formulas ([estimator investigation](docs/estimator_issues.md)).
 
 ## Motivation
@@ -42,8 +42,8 @@ This project joins the two into one online monitor and adds a simple risk switch
 
 | Source | Use | Access |
 | --- | --- | --- |
-| Crypto 1-minute bars (BTC, ETH, XRP, SOL, DOGE) | Comparable with the empirical setting of Bapat (2026) | Free exchange APIs |
-| Nifty 50 1-minute bars | Indian market application | Free or low cost vendors |
+| Crypto 1-minute bars (BTC, ETH, XRP, SOL, DOGE) | Comparable with the empirical setting of Bapat (2026) | Binance spot data via a public GitHub archive (exchange APIs are blocked here), see `data/README.md` |
+| Nifty 50 1-minute bars | Indian market application | Public GitHub archive, April 2017 to October 2026 |
 | India VIX daily | Check of detected regimes | Free from NSE |
 
 Raw data is not committed. See [`data/README.md`](data/README.md).
@@ -81,7 +81,7 @@ Raw data is not committed. See [`data/README.md`](data/README.md).
 python -m venv .venv
 source .venv/bin/activate        # Windows: .venv\Scripts\activate
 pip install -e ".[dev]"
-python -m pytest -q              # 26 tests
+python -m pytest -q              # all tests
 python experiments/demo.py       # 2-minute synthetic demo, saves results/figures/demo_monitor.png
 python experiments/e04_detection.py
 ```
