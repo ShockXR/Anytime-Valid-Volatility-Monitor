@@ -1,6 +1,6 @@
 # Detection delay theory for the betting e-detector
 
-`docs/math.md` (section 5) proves that the detector rarely raises false alarms. This document is the other half of a sequential detection theory: how fast the detector reacts to a real change, how the bets should be chosen, what robustness costs compared with the best parametric method, why the false alarm bound looks loose, and whether the detector is optimal as false alarms become rare. Every number comes from `experiments/e11_delay_theory.py` (outputs `results/e11*.csv`, all **[SYNTHETIC]**), and the helper functions are in `src/avmonitor/design.py`. The experiment write-up is `docs/report_parts/E11.md`.
+`docs/math.md` (section 5) proves that the detector rarely raises false alarms. This document is the other half of a sequential detection theory: how fast the detector reacts to a real change, how the bets should be chosen, what robustness costs compared with the best parametric method, why the false alarm bound looks loose, and whether the detector is optimal as false alarms become rare. Every number comes from `experiments/e11_delay_theory.py` (outputs `results/e11*.csv`, all **[SYNTHETIC]**), except the test of a separate decrease clip in section 6.3, which comes from `experiments/e11f_split_c.py` (outputs `results/e11f_split_c_synthetic.csv` **[SYNTHETIC]** and `results/e11f_split_c_real.csv` **[REAL]**). The helper functions are in `src/avmonitor/design.py`. The experiment write-up is `docs/report_parts/E11.md`.
 
 Each claim carries one of four labels:
 
@@ -15,8 +15,8 @@ Each claim carries one of four labels:
 * **A proved, non-asymptotic delay bound.** For every alarm level, every change time and every pre-change history, the expected delay is at most `min_k (log(A / w_k) + overshoot_k) / g_k`, where `w_k` is the weight of bet k. In the simulations it is 1.3 to 2.7 times the true delay.
 * **The price of robustness is a ratio of information numbers.** The Gaussian likelihood ratio detector (the best method when returns are exactly normal) grows at the Kullback-Leibler divergence KL; the robust detector grows at `g ≤ KL`. The ratio `KL / g` splits into three proved factors: information lost by truncating, information lost by betting only on the mean (the price of making no distributional assumption), and the cost of a finite grid of bets. On clean Gaussian data with c = 3 the total is 1.16, 1.37 and 1.95 for standard deviation ratios 1.25, 1.5 and 2. This explains the 10% to 70% delay penalty of E4: the simulated penalties against the Gaussian likelihood ratio mixture of E4 are 1.14, 1.35 and 1.73. The largest factor is the nonparametric one, not truncation.
 * **Truncation sets a speed limit for decreases.** No bet that is valid for every return distribution with the same truncated variance can earn more than `log(B / (B - 1)) ≈ 1/B` nats of evidence in one step against a decrease, where `B = τ² / m₀ ≈ c²`. This cap applies to every valid bet, not only to our grid. With c = 3 and A = 7800, a Shiryaev-Roberts e-detector built from such bets needs at least 58 steps to alarm even when volatility collapses to zero (64 at the two-sided level 2A), and the default five-bet decrease grid needs 73 (79), because it spreads its weight over smaller bets (Corollary 4). This is why E4's decrease delays are slow, and why a smaller c (about 1.5 to 2) on the decrease side should cut them by a quarter to a half. E11f confirms this for continuous return laws; with prices rounded to a tick the effect depends on the tick size and can reverse for a small fall (section 6.3).
-* **Better bets help a little, and only if the tails are known.** Bets tuned on Gaussian data (increase bets 0.25 and 0.5; decrease bets at 0.9 and 0.99 of the largest admissible bet) are up to 18% faster than the default grid on Gaussian or jump data, but under Student t3 data they are up to 55% slower than the default, and one decrease case has negative growth. A design pooled over four tail shapes (increase bets 0.16 and 0.39; decrease bets at 0.5 and 0.85 of the largest admissible bet; equal weights) is at least as fast as the default in all 48 validation cases inside the design range, by 0.4% to 10.5% (median 5%), but up to 17% slower for small increases (sd ratio 1.1) under fat tails. The default grid is already within 26% of the best single bet everywhere (section 7).
-* **The false alarm bound is not loose, the default detector is.** The one-day false alarm rate of the default two-sided detector is about one fifth of the bound `m / A`. One fifth of the gap is overshoot (the statistic jumps past A); the rest is expected wealth that sits on paths that never alarm, mostly held by the decrease side and the smallest increase bets, which cannot build wealth within a day. An adversarial but legitimate null distribution reaches 95% of the bound at one day for a single bet of size 0.5 (computed exactly by dynamic programming), so a sharper threshold that is provable for every null distribution does not exist for single bets; for the default mixture it would need a new argument (section 8).
+* **Better bets help a little, and only if the tails are known.** Bets tuned on Gaussian data (increase bets 0.25 and 0.5; decrease bets at 0.9 and 0.99 of the largest admissible bet) are up to 18% faster than the default grid on Gaussian or jump data, but under Student t3 data they are up to 55% slower than the default, and one decrease case has negative growth. A design pooled over four tail shapes (increase bets 0.16 and 0.39; decrease bets at 0.5 and 0.85 of the largest admissible bet; equal weights) is at least as fast as the default in all 48 validation cases inside the design range, by 0.4% to 10.5% (median 5%), but up to 17% slower for small increases (sd ratio 1.1) under fat tails. The default grid is already within 26% of the best single bet everywhere inside the design range, and within 36% at sd ratio 3, the largest change tried (section 7).
+* **The false alarm bound is not loose, the default detector is.** The one-day false alarm rate of the default two-sided detector is about one fifth of the bound `m / A`. One fifth of the gap is overshoot (the statistic jumps past A); the rest is expected wealth that sits on paths that never alarm, mostly held by the decrease side and the smallest increase bets, which cannot build wealth within a day. An adversarial but legitimate null distribution reaches 95% of the bound at one day for a single bet of size 0.5 (a lower bound on the worst case, computed by dynamic programming), so a sharper threshold that is provable for every null distribution does not exist for single bets; for the default mixture it would need a new argument (section 8).
 * **Asymptotic optimality (tracker B73).** As A grows, the worst-case delay of a fixed grid divided by `log A / KL_inf` tends to the constant `KL_inf / g_grid` (1.00 to 1.08 for the default grid in our cases), where `log A / KL_inf` is, to first order, the lower bound for any detector that is valid over the whole nonparametric null. So the default grid is first-order optimal only for changes whose best bet is one of its bets. A grid refined with about `√(log A)` bets, or a continuous mixture over the bet, is first-order optimal: we prove that the delay is at most `(log A + ½ log log A + O(1)) / KL_inf` (refined grid) or at most `(log A + log log A + O(1)) / KL_inf` (continuous mixture; `½ log log A` by a heuristic). These are upper bounds; the matching lower bound is proved to first order only. First-order optimality for bounded means is already known (Ram and Ramdas 2026); what is added here is the refinement rate and the constants for this detector, and we make no claim of priority for the first-order result. Numerically the asymptotic regime arrives very slowly: even the oracle bet is 5% to 24% *faster* than `log A / KL_inf` at A = 10^8, and the second-order formula explains this to within 0.024. The robust detector keeps `KL_inf / KL` = 53% to 88% of the asymptotic speed of the Gaussian likelihood ratio detector for increases (sd ratio 2 to 1.25) and 28% to 80% for decreases (sd ratio 0.5 to 0.8) (section 9).
 
 ## 1. Set-up and notation
@@ -43,11 +43,11 @@ Each claim carries one of four labels:
 | 1.1 | 1.202 | 0.102 | 0.0093 | 0.074 | 0.94 | 0.10 | 1.00 |
 | 1.25 | 1.524 | 0.241 | 0.0514 | 0.123 | 0.80 | 0.20 | 0.98 |
 | 1.5 | 2.082 | 0.423 | 0.1645 | 0.145 | 0.64 | 0.35 | 0.98 |
-| 2 | 3.130 | 0.643 | 0.4302 | 0.145 | 0.49 | 0.50 | 0.96 |
+| 2 | 3.129 | 0.643 | 0.4302 | 0.145 | 0.49 | 0.50 | 0.96 |
 
-Over all nine increase cases of `results/e11a_delay.csv` (three models), the plug-in aGRAPA bet is too small by a factor of 1.4 to 4.4 and keeps only 49% to 94% of the growth, even when the mean and variance are known exactly. This is one reason why the quarticity-based adaptive bet did not help in E4 (Q4c), on top of the noise in estimating them and the cap at half the largest bet. For decreases the bias has the opposite sign: `U = 1 - Y` has a long left tail, the quadratic rule asks for a bet beyond `λ_max` and is clipped to `0.999 λ_max`. On Gaussian data at sd ratios 0.5 to 0.8 this costs at most 1%, because the oracle bet sits at the edge anyway (0.992 to 0.99999 of `λ_max`); but at sd ratio 0.9 it keeps only 39% of the growth, with the jump model at sd ratio 0.8 47%, and under Student t5 data at sd ratio 0.8 its growth is negative. A bet at the edge loses `log(1 - λ/λ_max)` at every capped return. The fixed default grid reaches 96% to 100% of the optimal growth for increases in this range.
+Over the ten increase cases of `results/e11a_delay.csv` (three models at sd ratios 1.25, 1.5 and 2, plus Gaussian at 1.1), the plug-in aGRAPA bet is too small by a factor of 1.4 to 4.4 and keeps only 49% to 94% of the growth (1.7 to 4.4 and 49% to 86% without the Gaussian case at 1.1), even when the mean and variance are known exactly. This is one reason why the quarticity-based adaptive bet did not help in E4 (Q4c), on top of the noise in estimating them and the cap at half the largest bet. For decreases the bias has the opposite sign: `U = 1 - Y` has a long left tail, the quadratic rule asks for a bet beyond `λ_max` and is clipped to `0.999 λ_max`. On Gaussian data at sd ratios 0.5 to 0.8 this costs at most 1%, because the oracle bet sits at the edge anyway (0.992 to 0.99999 of `λ_max`); but at sd ratio 0.9 it keeps only 39% of the growth, with the jump model at sd ratio 0.8 47%, and under Student t5 data at sd ratio 0.8 its growth is negative. A bet at the edge loses `log(1 - λ/λ_max)` at every capped return. The fixed default grid reaches 96% to 100% of the optimal growth for increases in this range.
 
-**Growth of a mixture.** [STANDARD] With fixed weights, `(1/n) log M_n → g_grid := max_k g(λ_k)` almost surely on post-change data (strong law of large numbers for each `log L^{(1,k)}_n`, and `log M_n` lies between `max_k (log w_k + log L^{(1,k)}_n)` and that plus `log(Kn)`; the proof of Theorem 3a below gives the details).
+**Growth of a mixture.** [STANDARD] With fixed weights, `(1/n) log M_n → g_grid := max_k g(λ_k)` almost surely on post-change data (strong law of large numbers for each `log L^{(j,k)}_n`, together with `max_k (log w_k + log L^{(1,k)}_n) ≤ log M_n ≤ log n + max_{j,k} log L^{(j,k)}_n`: the SR sum also contains products that start after step 1, so the upper bound must take the maximum over start times j too; the proof of Theorem 3a below gives the details).
 
 ## 3. What limits the growth
 
@@ -154,12 +154,12 @@ The memory term is the reason the first-order formula fails: for a 25% increase 
 | Gaussian | 1.25 | 0.0502 | 179 | 233 | 122 | 109 | 107 | 98 | 100 |
 | Gaussian | 1.5 | 0.161 | 56 | 75 | 48 | 42 | 42 | 39 | 40 |
 | Gaussian | 2 | 0.413 | 22 | 30 | 23 | 18.4 | 18.7 | 18 | 18 |
-| Jumps | 1.25 | 0.0473 | 190 | 248 | 128 | 115 | 115 | 105 | 114 |
+| Jumps | 1.25 | 0.0473 | 190 | 247 | 128 | 115 | 115 | 105 | 114 |
 | Jumps | 2 | 0.401 | 22 | 31 | 23 | 18.9 | 19.2 | 18 | 19 |
 | Student t5 | 1.25 | 0.0320 | 280 | 362 | 178 | 158 | 159 | 144 | 141 |
 | Student t5 | 2 | 0.309 | 29 | 39 | 29 | 24.1 | 24.0 | 24 | 25 |
 | Gaussian | 0.9 (down) | 0.0101 | 886 | 1054 | 434 | 389 | 392 | 342 | |
-| Gaussian | 0.8 (down) | 0.0340 | 264 | 314 | 195 | 157 | 156 | 143 | 151 |
+| Gaussian | 0.8 (down) | 0.0340 | 264 | 314 | 194 | 157 | 156 | 143 | 151 |
 | Gaussian | 0.67 (down) | 0.0598 | 150 | 179 | 124 | 99 | 99 | 86 | 91 |
 | Gaussian | 0.5 (down) | 0.0839 | 107 | 127 | 93 | 74 | 74 | 62 | 67 |
 
@@ -187,7 +187,7 @@ The memory term is the reason the first-order formula fails: for a 25% increase 
 | 2 | 0.807 | 0.638 | 0.430 | 0.413 | 1.27 | 1.48 | 1.04 | 1.95 |
 | 3 | 2.90 | 1.56 | 0.861 | 0.747 | 1.86 | 1.81 | 1.15 | 3.89 |
 | 0.9 (down) | 0.0104 | 0.0103 | 0.0101 | 0.0101 | 1.00 | 1.02 | 1.00 | 1.02 |
-| 0.8 (down) | 0.0431 | 0.0431 | 0.0346 | 0.0340 | 1.00 | 1.25 | 1.02 | 1.27 |
+| 0.8 (down) | 0.0431 | 0.0431 | 0.0346 | 0.0340 | 1.00 | 1.24 | 1.02 | 1.27 |
 | 0.67 (down) | 0.125 | 0.125 | 0.063 | 0.060 | 1.00 | 2.00 | 1.05 | 2.09 |
 | 0.5 (down) | 0.318 | 0.318 | 0.088 | 0.084 | 1.00 | 3.61 | 1.05 | 3.79 |
 
@@ -205,10 +205,10 @@ The memory term is the reason the first-order formula fails: for a 25% increase 
 | Robust, default grid | 121.1 | 48.1 | 23.0 | 193.9 | 124.0 | 93.1 |
 | **Penalty: grid / LR mixture** | **1.14** | **1.35** | **1.73** | 1.48 | 2.19 | 3.45 |
 | Prediction `KL / g_grid` (first order) | 1.16 | 1.37 | 1.95 | 1.27 | 2.09 | 3.79 |
-| Penalty: oracle bet / LR oracle | 1.09 | 1.21 | 1.49 | 1.24 | 1.86 | 3.08 |
+| Penalty: oracle bet / LR oracle | 1.09 | 1.21 | 1.48 | 1.24 | 1.86 | 3.08 |
 | Prediction, second-order delays | 1.10 | 1.23 | 1.52 | 1.24 | 1.86 | 3.07 |
 
-E4 reported median penalties of about 1.12, 1.35 and 1.7 for increases (robust grid against the Gaussian LR mixture). **Yes, the information ratio explains them:** `KL / g_grid` predicts 1.16, 1.37 and 1.95, and the second-order formula, applied to both detectors, predicts the oracle-against-oracle penalty to within 0.03 in all six cases. The first-order ratio overstates the penalty for large changes because the memory and overshoot terms are of similar size for both detectors and dilute the ratio.
+E4 reported median penalties of about 1.12, 1.35 and 1.7 for increases (robust grid against the Gaussian LR mixture). **Yes, the information ratio explains them:** `KL / g_grid` predicts 1.16, 1.37 and 1.95, and the second-order formula, applied to both detectors, predicts the oracle-against-oracle penalty to within 0.04 in all six cases (the largest difference, 0.035, is at sd ratio 2). The first-order ratio overstates the penalty for large changes because the memory and overshoot terms are of similar size for both detectors and dilute the ratio.
 
 ### 6.3 The truncation constant c
 
@@ -218,7 +218,7 @@ E4 reported median penalties of about 1.12, 1.35 and 1.7 for increases (robust g
 |---|---|---|---|---|---|---|---|
 | 2 | 4.6% | 143 / 59 / 30 | 0.0400 | 0.013 | 11 | 143 / 70 / 47 | 36 (29) |
 | 3 | 0.27% | 121 / 48 / 23 | 0.0473 | 0.035 | 7 | 194 / 124 / 93 | 73 (58) |
-| 4 | 0.006% | 118 / 46 / 21 | 0.0458 | 0.074 | 5 | 299 / 204 / 156 | 122 (96) |
+| 4 | 0.006% | 118 / 46 / 21 | 0.0458 | 0.074 | 5 | 299 / 203 / 156 | 122 (96) |
 | 5 | 0.00006% | 117 / 45 / 21 | 0.0420 | 0.112 | 5 | 427 / 297 / 229 | 180 (141) |
 | none | 0 | 117 / 45 / 21 | 0.0135 | 0.39 | 1 | not possible | |
 
@@ -232,7 +232,7 @@ E4 reported median penalties of about 1.12, 1.35 and 1.7 for increases (robust g
 
 ### 6.4 Plain-language summary
 
-On clean normal data the robust detector with the default bets takes 14% to 73% longer than the Gaussian likelihood ratio detector of E4 to detect an increase of 25% to 100% in standard deviation (section 6.2). Measured on a log scale, about 60% of that gap (59% to 66%) is the cost of making no assumption about the shape of the return distribution, 20% to 36% is the cost of clipping large returns, and the remaining 6% to 13% is the cost of not knowing the size of the change in advance. In exchange, the robust detector keeps its false alarm guarantee when returns have jumps or fat tails, where the parametric detector raises a false alarm on almost every path (E4). For decreases the price is higher, because clipping caps how much evidence one step can provide. A tighter clip on the decrease side recovers part of it on continuous data (E11f: a quarter to a half of the delay for Gaussian data); with prices rounded to a coarse tick the gain depends on the tick size and can turn into a loss for small falls.
+On clean normal data the robust detector with the default bets takes 14% to 73% longer than the Gaussian likelihood ratio detector of E4 to detect an increase of 25% to 100% in standard deviation (section 6.2). The first-order prediction of that gap, `KL / g_grid` (section 6.1), splits on a log scale as follows: about 60% (59% to 68%) is the cost of making no assumption about the shape of the return distribution, 19% to 35% is the cost of clipping large returns, and the remaining 6% to 16% is the cost of not knowing the size of the change in advance (sd ratios 1.25 to 2). This splits the prediction, not the simulated penalty. In exchange, the robust detector keeps its false alarm guarantee when returns have jumps or fat tails, where the parametric detector raises a false alarm on almost every path (E4). For decreases the price is higher, because clipping caps how much evidence one step can provide. A tighter clip on the decrease side recovers part of it on continuous data (E11f: a quarter to a half of the delay for Gaussian data); with prices rounded to a coarse tick the gain depends on the tick size and can turn into a loss for small falls.
 
 ## 7. Choosing the bets
 
@@ -320,7 +320,7 @@ All three factors are at most 1. The bound `m / A` is attained only if the detec
 
 ### 8.3 Is the bound sharp?
 
-* **At m = A, exactly.** [PROVED] The constant law `Y ≡ 1` is in H; under it every bet pays `f = 1`, `M_t = t` and the alarm comes at step A exactly. So `P(T_A ≤ A) = 1 = A / A` and the average run length is exactly A: neither guarantee can be improved for any grid.
+* **At m = A, exactly, for each side alone or for a one-sided detector at level A.** [PROVED] The constant law `Y ≡ 1` is in H; under it every bet pays `f = 1`, `M_t = t` and the alarm comes at step A exactly. So `P(T_A ≤ A) = 1 = A / A` and the average run length is exactly A: neither guarantee can be improved for any grid. The two-sided rule alarms when one side reaches 2A, so under this law it alarms at step 2A, and this argument does not show that the two-sided bound is sharp.
 * **At one day, for a single bet, almost.** [NUMERICAL, rigorous lower bound up to discretisation] Dynamic programming over the whole nonparametric null (at each step the adversary picks any law with `E[U] ≤ 0`; two-point laws suffice by the concave envelope argument of Lemma 2a) gives the worst-case false alarm probability within m steps as a fraction of `m / A`:
 
 | Bet | m = 98 | m = 390 | m = 1950 | m = 3900 |
@@ -470,7 +470,7 @@ At these small growth rates (`KL_inf` = 0.0031 and 0.0077 per step, 98% and 96% 
 | Continuous mixture: `½ log log A` | HEURISTIC (Laplace) | section 9.2 |
 | Second-order delay `(log A + κ - ζ) / g`, Brownian ζ | HEURISTIC, checked to 3% (A = 7800) and 0.024 in ratio (A ≥ 10^4) | sections 4.3, 5, 9.3 |
 | False alarm identity with three factors (exact null) | PROVED | section 8.1 |
-| Bound attained at m = A; average run length bound sharp | PROVED | section 8.3 |
+| Bound attained at m = A; average run length bound sharp (one side alone, or a one-sided detector at level A) | PROVED | section 8.3 |
 | Worst null reaches 85% to 95% of `m / A` at one day for single bets | NUMERICAL (dynamic programming lower bound) | section 8.3 |
 | Price-of-robustness values, c recommendations, bet designs, E10 cross-check | NUMERICAL | sections 6, 7, 9 |
 
