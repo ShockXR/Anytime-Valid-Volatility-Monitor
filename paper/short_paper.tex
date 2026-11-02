@@ -1591,15 +1591,15 @@ methods}\label{comparison-with-published-change-point-methods}}
 
 E13 compares the e-detector with two published methods {[}SYNTHETIC{]}.
 The first is a nonparametric test for volatility jumps in the spirit of
-Bibinger, Jirak and Vetter (2017): it compares the realised variance of
-the \(k\) returns before each candidate time with that of the \(k\)
-returns after it, standardises the difference and takes the maximum; we
-use a jump-robust version that drops returns above 4 times a local
-bipower scale, offline on a fixed window and online as a rolling test
-with \(k = 120\). This implementation is our reconstruction from the
-published idea and was not checked against the paper's equations, whose
-full text we could not reach; every conclusion below therefore uses
-critical values calibrated by simulation, not the asymptotic Gumbel
+Bibinger, Jirak and Vetter (2017), BJV below: it compares the realised
+variance of the \(k\) returns before each candidate time with that of
+the \(k\) returns after it, standardises the difference and takes the
+maximum; we use a jump-robust version that drops returns above 4 times a
+local bipower scale, offline on a fixed window and online as a rolling
+test with \(k = 120\). This implementation is our reconstruction from
+the published idea and was not checked against the paper's equations,
+whose full text we could not reach; every conclusion below therefore
+uses critical values calibrated by simulation, not the asymptotic Gumbel
 constants. The second is Bayesian online change-point detection (BOCPD;
 Adams and MacKay 2007) with Gaussian returns inside a regime and a
 conjugate prior on the variance, run on raw returns and, as our
