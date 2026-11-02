@@ -22,8 +22,15 @@ Research questions
         decomposition of P(false alarm within m) into stopping, uncrossed-mass and overshoot factors,
         and the exact worst case over the whole nonparametric null for a single bet (dynamic
         programming), to separate what is provable from what is only empirical.
+  Q11e (parts E, E2; tracker B73). Does the delay attain the nonparametric lower bound
+        log(A) / KL_inf as A grows? delay / (log A / KL_inf) for A = 10^2 to 10^8 under Gaussian,
+        Student t3 and jump post-change laws, increases and decreases, for the oracle bet, the
+        default grid, a fine (continuous) mixture and the designed grids; second-order reading of
+        the gap; KL_inf / KL as the share of the likelihood ratio detector's speed that is kept.
 
-Usage: python experiments/e11_delay_theory.py [A|B|C|D ...]   (default: all parts)
+Parts: A (Q11a), B (Q11b), C, C2, C3, C4, C4V (Q11c: Gaussian design, variants, validation,
+design pooled over tail shapes, its validation), D, D2 (Q11d), E, E2 (Q11e), FIG (figures).
+Usage: python experiments/e11_delay_theory.py [PART ...]   (default: all parts)
 """
 
 from __future__ import annotations
@@ -518,6 +525,145 @@ def part_c3():
 
 
 # ----------------------------------------------------------------------------
+# Part C4: bet design pooled over tail shapes (added after C3 and E showed that the Gaussian-tuned
+# grids lose speed under Student t3 and t5 data)
+# ----------------------------------------------------------------------------
+
+POOL_MODELS = {**MODELS, "student t3": G.ReturnModel("student_t", df=3.0)}
+GAUSS_TUNED_UP = FINAL_UP
+GAUSS_TUNED_DOWN_FRACTIONS = FINAL_DOWN_FRACTIONS
+
+
+def _pooled(direction, rhos):
+    out = []
+    for nm, mdl in POOL_MODELS.items():
+        tau, m0 = G.baseline(mdl, 3.0)
+        laws = [G.y_law(mdl, r, tau, m0) for r in rhos]
+        scale = G.lam_max("down", tau**2 / m0) if direction == "down" else 1.0
+        out.append((nm, scale, laws, G.oracle_delays(A, laws, direction)))
+    return out
+
+
+def pooled_ratio(spec, w, pooled, direction):
+    """Worst predicted delay / oracle delay over all models and change sizes. ``spec`` is the
+    grid of bets (increase) or of fractions of each model's largest admissible bet (decrease)."""
+    per = [G.design_ratio(A, np.asarray(spec) * s, w, laws, direction, oracle=orc)[0] for _, s, laws, orc in pooled]
+    return max(per), per
+
+
+def optimise_pooled(pooled, K, direction, cap):
+    from scipy import optimize
+
+    lattice = np.geomspace(0.02 * cap, cap, 30)
+    best_v, best = np.inf, None
+    w = np.full(K, 1.0 / K)
+    for i, lo in enumerate(lattice):
+        for hi in lattice[i:]:
+            if (K == 1) != (hi == lo):
+                continue
+            spec = np.geomspace(lo, hi, K) if K > 1 else np.array([lo])
+            v = pooled_ratio(spec, w, pooled, direction)[0]
+            if v < best_v:
+                best_v, best = v, spec
+
+    def obj(z):
+        return pooled_ratio(np.sort(cap / (1.0 + np.exp(-z))), w, pooled, direction)[0]
+
+    start = np.minimum(best, cap * (1 - 1e-6))
+    res = optimize.minimize(obj, np.log(start / (cap - start)), method="Nelder-Mead",
+                            options={"maxiter": 1500, "xatol": 1e-4, "fatol": 1e-6})
+    if res.fun < best_v:
+        best_v, best = float(res.fun), np.sort(cap / (1.0 + np.exp(-res.x)))
+    return best, w, best_v
+
+
+def part_c4():
+    """Design step (formulas only, no simulation). Pre-registered rule: among the candidates, pick
+    the smallest predicted worst ratio over the pooled models (Gaussian, jumps, t5, t3) and change
+    sizes (sd ratio 1.2 to 2 up, 0.5 to 0.85 down); designs within 1% of the best count as ties and
+    the one with fewer bets wins; optimised bets are then rounded to two digits (increase) or to
+    the nearest 0.05 (decrease fractions) and the rounded grid is the one validated in part C4V."""
+    rows, chosen = [], {}
+    for direction, rhos, cap in (("up", np.linspace(*UP_RANGE, 9), 0.95), ("down", np.linspace(*DOWN_RANGE, 8), 0.99)):
+        pooled = _pooled(direction, rhos)
+        if direction == "up":
+            cands = {"default": (np.asarray(DEFAULT_UP_GRID), np.full(6, 1 / 6)),
+                     "Gaussian-tuned (0.25, 0.5)": GAUSS_TUNED_UP,
+                     "(0.1, 0.25, 0.5)": (np.array([0.1, 0.25, 0.5]), np.full(3, 1 / 3))}
+        else:
+            cands = {"default": (np.asarray(DEFAULT_DOWN_FRACTIONS), np.full(5, 0.2)),
+                     "Gaussian-tuned (0.9, 0.99)": GAUSS_TUNED_DOWN_FRACTIONS,
+                     "(0.5, 0.75, 0.95)": (np.array([0.5, 0.75, 0.95]), np.full(3, 1 / 3))}
+        for K in (1, 2, 3, 4):
+            spec, w, v = optimise_pooled(pooled, K, direction, cap)
+            cands[f"pooled optimum K={K}"] = (spec, w)
+            step = 100.0 if direction == "up" else 20.0
+            rounded = np.unique(np.clip(np.round(spec * step) / step, 1 / step, cap))
+            cands[f"pooled optimum K={K}, rounded"] = (rounded, np.full(len(rounded), 1 / len(rounded)))
+            print(direction, K, np.round(spec, 4), round(v, 4), flush=True)
+        for name, (spec, w) in cands.items():
+            v, per = pooled_ratio(spec, w, pooled, direction)
+            rows.append(dict(direction=direction, design=name, K=len(spec), bets=" ".join(f"{x:.4f}" for x in spec),
+                             weights=" ".join(f"{x:.3f}" for x in w), pred_worst_pooled=v,
+                             **{f"pred_worst_{nm}": p for (nm, _, _, _), p in zip(pooled, per)}))
+        df = pd.DataFrame([r for r in rows if r["direction"] == direction])
+        ok = df[df.design.str.endswith("rounded") | ~df.design.str.startswith("pooled")]
+        best = ok.pred_worst_pooled.min()
+        pick = ok[ok.pred_worst_pooled <= best * 1.01].sort_values(["K", "pred_worst_pooled"]).iloc[0]
+        chosen[direction] = (pick.design, pick.bets)
+    df = pd.DataFrame(rows)
+    df["chosen"] = [chosen[d][0] == n for d, n in zip(df.direction, df.design)]
+    df.to_csv(OUT / "e11c4_pooled_design.csv", index=False)
+    print(df.round(3).to_string())
+    print("chosen:", chosen)
+    return df
+
+
+# chosen by the design step of part C4 (see results/e11c4_pooled_design.csv); validated in part C4V
+ROBUST_UP = (np.array([0.16, 0.39]), np.array([0.5, 0.5]))
+ROBUST_DOWN_FRACTIONS = (np.array([0.5, 0.85]), np.array([0.5, 0.5]))
+
+
+def part_c4v():
+    """Fresh-seed validation of the pooled (robust) grids against the default and the Gaussian-tuned
+    grids, all four models, change at step 1 and at step 501, 2000 paths per cell."""
+    rng = np.random.default_rng(SEED + 12)
+    rows = []
+    for nm, mdl in POOL_MODELS.items():
+        tau, m0 = G.baseline(mdl, 3.0)
+        B = tau**2 / m0
+        lm = G.lam_max("down", B)
+        for direction, rhos in (("up", (1.1, 1.2, 1.5, 2.0, 3.0)), ("down", (0.4, 0.5, 0.67, 0.85, 0.9))):
+            dets = {"default": default_grid(direction, B)}
+            if direction == "up":
+                dets["Gaussian-tuned"] = GAUSS_TUNED_UP
+                dets["robust"] = ROBUST_UP
+            else:
+                dets["Gaussian-tuned"] = (GAUSS_TUNED_DOWN_FRACTIONS[0] * lm, GAUSS_TUNED_DOWN_FRACTIONS[1])
+                dets["robust"] = (ROBUST_DOWN_FRACTIONS[0] * lm, ROBUST_DOWN_FRACTIONS[1])
+            for rho in rhos:
+                law = G.y_law(mdl, rho, tau, m0)
+                lam_o, g_o = G.best_bet(law, direction)
+                inside = bool(UP_RANGE[0] <= rho <= UP_RANGE[1]) if direction == "up" else bool(DOWN_RANGE[0] <= rho <= DOWN_RANGE[1])
+                for nu in (0, 500):
+                    seed = int(rng.integers(1 << 31))
+                    d_or = mean_delay(mdl, rho, tau, m0, [lam_o], [1.0], direction, 2000, np.random.default_rng(seed), nu)
+                    for det, (gr, w) in dets.items():
+                        d = mean_delay(mdl, rho, tau, m0, gr, w, direction, 2000, np.random.default_rng(seed), nu)
+                        rows.append(dict(scenario=nm, direction=direction, ratio=rho, in_design_range=inside, nu=nu,
+                                         detector=det, mean_delay=d[0], se=d[1], missing=d[2], false_alarm_before=d[3],
+                                         oracle_delay=d_or[0], ratio_to_oracle=d[0] / d_or[0],
+                                         growth_best=float(G.growth_rate(np.asarray(gr), law, direction).max()),
+                                         kl_inf=g_o))
+            print(nm, direction, "done", flush=True)
+    df = pd.DataFrame(rows)
+    df.to_csv(OUT / "e11c4_robust_validation.csv", index=False)
+    print(df.pivot_table(index=["scenario", "direction", "ratio", "nu"], columns="detector",
+                         values="ratio_to_oracle").round(3).to_string())
+    return df
+
+
+# ----------------------------------------------------------------------------
 # Part D: why the false alarm bound is conservative
 # ----------------------------------------------------------------------------
 
@@ -747,8 +893,10 @@ def part_e():
             cont = (np.arange(100) + 0.5) / 100 * cap  # fine uniform grid: a discretised continuous mixture
             dets = {"oracle bet": ([lam_o], [1.0]), "default grid": (grid0, w0),
                     "continuous mixture (100 bets, uniform on (0, cap))": (cont, np.full(100, 0.01)),
-                    "recommended grid": FINAL_UP if direction == "up" else (FINAL_DOWN_FRACTIONS[0] * lm,
-                                                                           FINAL_DOWN_FRACTIONS[1])}
+                    "Gaussian-tuned grid": FINAL_UP if direction == "up" else (FINAL_DOWN_FRACTIONS[0] * lm,
+                                                                              FINAL_DOWN_FRACTIONS[1]),
+                    "robust grid": ROBUST_UP if direction == "up" else (ROBUST_DOWN_FRACTIONS[0] * lm,
+                                                                        ROBUST_DOWN_FRACTIONS[1])}
             g_grid = float(G.growth_rate(grid0, law, direction).max())
             horizon = int(min(6000, 2.5 * np.log(A_LIST[-1]) / (0.8 * g_grid) + 50))
             y = G.sample_y(mdl, rho, tau, m0, (1000, horizon), rng)
@@ -768,6 +916,74 @@ def part_e():
     df.to_csv(OUT / "e11e_asymptotic_optimality.csv", index=False)
     piv = df.pivot_table(index=["scenario", "direction", "ratio", "detector"], columns="A", values="delay_over_bound").round(3)
     print(piv.to_string())
+    return df
+
+
+def part_e2():
+    """Second-order reading of part E, and a cross-check with E10 (Q10e).
+
+    1. For every part-E cell, Monte Carlo renewal constants (kappa, zeta) of the oracle bet give the
+       predicted ratio delay / (log A / KL_inf) = 1 + (kappa - zeta) / log A, compared with the
+       simulated ratio; and the excess of the continuous mixture and of the default grid over the
+       oracle bet in nats, (delay - oracle delay) * KL_inf, which theory says grows like
+       (1/2) log log A + O(1) (mixture, interior optimum) or linearly in log A (fixed grid that
+       misses the optimum).
+    2. E10 observed delays of about 0.6 times the step at which the cumulative KL reaches ln A. In an
+       i.i.d. Gaussian version of E10's steady state (variance ratio s1/s0 at t = 3000 from
+       results/e10e_transient.csv, true baseline, increase side, c = 3, A = 28,800), compare
+       ln A / KL with the second-order prediction and with simulated mean and median delays."""
+    rng = np.random.default_rng(SEED + 14)
+    e = pd.read_csv(OUT / "e11e_asymptotic_optimality.csv")
+    models = {"gaussian": MODELS["gaussian"], "student t3": G.ReturnModel("student_t", df=3.0), "jumps": MODELS["jumps"]}
+    mix = "continuous mixture (100 bets, uniform on (0, cap))"
+    rows = []
+    for (nm, direction, rho), grp in e.groupby(["scenario", "direction", "ratio"], sort=False):
+        mdl = models[nm]
+        tau, m0 = G.baseline(mdl, 3.0)
+        lam_o = float(grp.lam_oracle.iloc[0])
+        kl_inf = float(grp.kl_inf.iloc[0])
+        rc = G.renewal_constants(lam_o, draw_fn(mdl, rho, tau, m0), direction, 4000, rng=rng)
+        piv = grp.pivot_table(index="A", columns="detector", values="mean_delay")
+        for a_, r in piv.iterrows():
+            la = np.log(a_)
+            rows.append(dict(scenario=nm, direction=direction, ratio=rho, A=a_, kappa=rc["kappa"], zeta=rc["zeta"],
+                             zeta_se=rc["zeta_se"], oracle_ratio_simulated=r["oracle bet"] / (la / kl_inf),
+                             oracle_ratio_second_order=max(la + rc["kappa"] - rc["zeta"], 0.0) / la,
+                             mixture_excess_nats=(r[mix] - r["oracle bet"]) * kl_inf,
+                             default_excess_nats=(r["default grid"] - r["oracle bet"]) * kl_inf,
+                             half_loglog_A=0.5 * np.log(la)))
+        print(nm, direction, rho, "renewal constants done", flush=True)
+    df = pd.DataFrame(rows)
+    df.to_csv(OUT / "e11e2_second_order_check.csv", index=False)
+    print(df.round(3).to_string())
+
+    tr = pd.read_csv(OUT / "e10e_transient.csv")
+    A10 = 28800.0
+    model = MODELS["gaussian"]
+    tau, m0 = G.baseline(model, 3.0)
+    xs = []
+    for k in (2.0, 4.0):
+        q = float(tr[(tr.break_kind == "scale") & (tr.k == k)].mean_ratio_t3000.iloc[0])
+        rho = float(np.sqrt(q))
+        law = G.y_law(model, rho, tau, m0)
+        lam_o, kl_inf = G.best_bet(law, "up")
+        kl = float(G.kl_gaussian_scale(rho))
+        _, s2 = G.log_factor_moments(lam_o, law, "up")
+        rc = G.renewal_constants(lam_o, draw_fn(model, rho, tau, m0), "up", 3000, rng=rng)
+        grid0, w0 = default_grid("up", tau**2 / m0)
+        g_grid = float(G.growth_rate(grid0, law, "up").max())
+        horizon = int(6 * np.log(A10) / g_grid)
+        for det, (gr, w) in (("oracle bet", ([lam_o], [1.0])), ("default grid", (grid0, w0))):
+            d, fa, miss = simulate_delays(model, rho, tau, m0, gr, w, "up", A10, 0, 1000, horizon, rng, batch=250)
+            xs.append(dict(k=k, variance_ratio=q, sd_ratio=rho, detector=det, kl=kl, kl_inf=kl_inf,
+                           lnA_over_kl=np.log(A10) / kl, lnA_over_kl_inf=np.log(A10) / kl_inf,
+                           second_order_oracle=G.delay_second_order(A10, 1.0, kl_inf, rc["kappa"], rc["zeta"]),
+                           zeta=rc["zeta"], zeta_brownian=G.zeta_brownian(kl_inf, s2), kappa=rc["kappa"],
+                           mean_delay=d.mean(), median_delay=float(np.median(d)), se=d.std(ddof=1) / np.sqrt(d.size),
+                           missing=miss, mean_over_lnA_kl=d.mean() / (np.log(A10) / kl),
+                           median_over_lnA_kl=float(np.median(d)) / (np.log(A10) / kl)))
+            print(xs[-1], flush=True)
+    pd.DataFrame(xs).to_csv(OUT / "e11e2_e10_crosscheck.csv", index=False)
     return df
 
 
@@ -862,8 +1078,35 @@ def part_fig():
     fig.savefig(FIG / "e11_false_alarm_slack.png", dpi=140)
     plt.close(fig)
 
+    # 4. first-order optimality as A grows (tracker B73)
+    e = pd.read_csv(OUT / "e11e_asymptotic_optimality.csv")
+    e2 = pd.read_csv(OUT / "e11e2_second_order_check.csv")
+    cells = [("up", 1.25), ("up", 1.5), ("up", 2.0), ("down", 0.8), ("down", 0.5)]
+    fig, axes = plt.subplots(1, 5, figsize=(12.5, 3.4), sharey=True)
+    mix = "continuous mixture (100 bets, uniform on (0, cap))"
+    for ax, (direction, rho) in zip(axes, cells):
+        sub = e[(e.scenario == "gaussian") & (e.direction == direction) & np.isclose(e.ratio, rho)]
+        pr = e2[(e2.scenario == "gaussian") & (e2.direction == direction) & np.isclose(e2.ratio, rho)].sort_values("A")
+        for (det, lab), col in zip((("oracle bet", "oracle bet"), (mix, "fine mixture"), ("default grid", "default grid")), SERIES):
+            s_ = sub[sub.detector == det].sort_values("A")
+            ax.plot(s_.A, s_.delay_over_bound, color=col, lw=2, marker="o", ms=4, label=lab)
+        ax.plot(pr.A, pr.oracle_ratio_second_order, color=SERIES[0], lw=1.5, ls="--", label="oracle, second-order formula")
+        ax.axhline(1.0, color=INK, lw=1)
+        ax.set_xscale("log")
+        ax.set_ylim(0, 1.25)
+        ax.set_title(f"{'increase' if direction == 'up' else 'decrease'}, sd ratio {rho:g}", fontsize=9, color=INK, loc="left")
+        ax.set_xlabel("alarm level A", color=INK, fontsize=8.5)
+        _style(ax)
+    axes[0].set_ylabel("mean delay / (log A / KL_inf)", color=INK, fontsize=9)
+    axes[0].legend(fontsize=7.5, frameon=False, loc="lower right")
+    fig.suptitle("E11e: delay relative to the nonparametric lower bound log(A)/KL_inf, Gaussian data, change at step 1 (synthetic)",
+                 fontsize=9.5, color=INK, x=0.01, ha="left")
+    fig.tight_layout()
+    fig.savefig(FIG / "e11_asymptotic_optimality.png", dpi=140)
+    plt.close(fig)
 
-PARTS = {"A": part_a, "B": part_b, "C": part_c, "C2": part_c2, "C3": part_c3, "D": part_d, "D2": part_d2, "E": part_e, "FIG": part_fig}
+
+PARTS = {"A": part_a, "B": part_b, "C": part_c, "C2": part_c2, "C3": part_c3, "C4": part_c4, "C4V": part_c4v, "D": part_d, "D2": part_d2, "E": part_e, "E2": part_e2, "FIG": part_fig}
 
 if __name__ == "__main__":
     which = sys.argv[1:] or list(PARTS)
