@@ -93,3 +93,38 @@ def test_block_stream_keeps_false_alarm_bound_and_overlap_does_not_matter_for_th
     res = betting_edetector(xb, m0, "up", threshold=A)
     m = xb.shape[1]
     assert (res.alarm >= 0).mean() <= m / A + 0.03
+
+
+def test_mbv_block_variance_matches_exact_weights_and_estimates_are_unbiased():
+    rng = np.random.default_rng(5)
+    n, gamma = 23400, 1.0
+    r, s = _noisy_paths(60, n, 1.0, gamma, rng)
+    e = P.mbv_estimates(r, c1=0.5, c2=1.0)
+    yb = P.mbv_block_averages(r, e["K"], e["block"])
+    expected = e["sig_w"] * s**2 + e["noise_w"] * (gamma * s) ** 2
+    assert abs(np.mean(yb**2) / expected - 1) < 0.04
+    # the exact weights agree with the asymptotic constants to a few percent
+    assert abs(e["sig_w"] / (e["nu1"] * np.sqrt(n)) - 1) < 0.03
+    assert abs(e["noise_w"] * np.sqrt(n) / e["nu2"] - 1) < 0.03
+    assert abs(e["iv"].mean() - 1.0) < 0.06
+    assert abs(e["iq"].mean() - 1.0) < 0.15
+    cover = np.mean(np.abs(e["iv"] - 1.0) <= 1.96 * e["iv_se"])
+    assert cover > 0.8
+
+
+def test_multipower_estimators_keep_a_jump_bias_that_dropping_removes():
+    rng = np.random.default_rng(6)
+    n, gamma = 23400, 2.0
+    r, s = _noisy_paths(40, n, 1.0, gamma, rng, jump=100.0)
+    mp = P.preavg_multipower_estimates(r, 60)
+    mbv = P.mbv_estimates(r, 0.5, 1.0)
+    drop = P.preavg_estimates(r, 60, c=3.0, mode="drop")
+    plain = P.preavg_estimates(r, 60, c=None)
+    assert abs(mp["iv"].mean() - 1.0) < 0.1  # bipower is nearly jump robust
+    assert abs(drop["iq"].mean() - 1.0) < 0.1
+    # a 100 sd jump keeps |J|^{4/3} in every product it enters: a visible but bounded bias
+    assert 1.0 < mp["iq"].mean() < plain["iq"].mean()
+    assert 1.0 < mbv["iq"].mean() < plain["iq"].mean()
+    # k* = 6 gamma / v (delay formula), floored at 4: 4 gamma for the default target v = 1.5
+    assert P.rule_of_thumb_k(0.0) == 4 and P.rule_of_thumb_k(2.0) == 8 and P.rule_of_thumb_k(4.0, 2.0) == 12
+    assert abs(P.block_noise_share(60, 2.0) - 12 * 4 / 3600) < 2e-3

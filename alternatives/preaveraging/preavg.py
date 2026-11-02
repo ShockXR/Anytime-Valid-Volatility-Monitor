@@ -301,3 +301,185 @@ def monitor_stream(r, k: int, step: int, c: float = 3.0, tau=None):
         tau = c * np.median(np.abs(rbar), axis=-1, keepdims=True) * MAD_NORMAL_SCALE
     tau = np.asarray(tau, float)
     return np.minimum(rbar**2, tau**2), tau**2
+
+
+def block_noise_share(k: int, gamma: float) -> float:
+    """``rho_k = psi1_k gamma^2 / (psi2_k k^2)``: noise variance over signal variance in one pre-averaged block.
+
+    The mean of the block monitor's statistic after a sd change by ``v`` is
+    about ``(v^2 + rho_k) / (1 + rho_k)`` times its baseline, so ``rho_k`` is the
+    dilution of the change. With ``psi1 = 1`` and ``psi2 = 1/12`` it is
+    ``12 gamma^2 / k^2``.
+    """
+    psi1, psi2 = psi_constants(k)
+    return psi1 * gamma**2 / (psi2 * k**2)
+
+
+def rule_of_thumb_k(gamma: float, sd_ratio: float = 1.5, k_min: int = 4) -> int:
+    """Block size that minimises the block monitor's delay for a sd change by ``sd_ratio``: ``6 gamma / sd_ratio``.
+
+    Derivation (Gaussian blocks, truncation ignored). After the sd changes by
+    ``v`` the block statistic ``Y = Z / m0`` has mean ``(v^2 + rho_k) / (1 + rho_k)``
+    and standard deviation ``sqrt(2) (v^2 + rho_k) / (1 + rho_k)``, so the
+    betting e-detector grows per block by about ``snr^2 / 2`` with
+    ``snr = (v^2 - 1) / (sqrt(2) (v^2 + rho_k))``. The delay in seconds is about
+    ``k x 2 log(A) / snr^2``, proportional to ``k (v^2 + rho_k)^2`` with
+    ``rho_k = 12 gamma^2 / k^2``; its derivative in ``k`` vanishes where
+    ``rho_k = v^2 / 3``, that is ``k = 6 gamma / v``. The curve is flat near the
+    optimum (within 10% for ``k`` between ``k* / 1.5`` and ``1.5 k*``), so the
+    default target ``v = 1.5`` (``k = 4 gamma``) serves changes of any size.
+    ``gamma`` is the noise-to-signal ratio per raw return, estimated from
+    ``noise_variance`` divided by the diffusive return variance
+    ``mean(r^2) - 2 omega^2``. Q6 of ``run_benchmark.py`` checks the location of
+    the minimum against simulated delays.
+    """
+    return max(k_min, int(np.ceil(6.0 * gamma / sd_ratio)))
+
+
+# ----------------------------------------------------------------------------
+# Benchmarks: modulated bipower variation (Podolskij and Vetter 2009) and
+# pre-averaged multipower variation
+# ----------------------------------------------------------------------------
+#
+# Podolskij and Vetter (2009, Bernoulli 15(3), 634 to 658; arXiv 0909.0827)
+# average the K-step increments ``Y_{i+K} - Y_i`` inside blocks of ``L + K - 1``
+# returns (``K = c1 sqrt(n)``, block length ``c2 sqrt(n)`` observations, so
+# ``L = (c2 - c1) sqrt(n)`` increments per block) and form bipower or multipower
+# sums of consecutive block averages. The block average ``Ybar_m`` is a
+# triangular-trapezoid weighted sum of the returns in the block, so its
+# variance is ``n^{-1/2} (nu1 sigma^2 + nu2 omega^2)`` with
+#
+#     nu1 = c1^2 (3 c2 - 4 c1) / (3 (c2 - c1)^2),   nu2 = 2 c1 / (c2 - c1)^2,
+#
+# for ``c2 >= 2 c1`` (derived here from the weights: the return ``j`` of the
+# block is covered by ``min(j, K, L + K - j)`` increments; the noise part is the
+# difference of two averages of ``K`` noise terms). These constants are checked
+# by simulation in the tests, not against the printed paper, because the
+# journal, arXiv and repository hosts could not be reached from this
+# environment; equation numbers are therefore not quoted. Powers below 2
+# (bipower 1, 1 for variance, tripower 4/3 for quarticity) make the sums robust
+# to finite-activity jumps because a jump enters exactly one block average.
+
+
+def _mu(p: float) -> float:
+    from scipy.special import gamma as G
+
+    return 2 ** (p / 2) * G((p + 1) / 2) / np.sqrt(np.pi)
+
+
+def mbv_constants(c1: float, c2: float) -> tuple[float, float]:
+    """``(nu1, nu2)`` for block length ``c2 sqrt(n)`` and increment length ``c1 sqrt(n)``, ``c2 >= 2 c1``."""
+    if c2 < 2 * c1:
+        raise ValueError("the closed form needs c2 >= 2 c1")
+    nu1 = c1**2 * (3 * c2 - 4 * c1) / (3 * (c2 - c1) ** 2)
+    nu2 = 2 * c1 / (c2 - c1) ** 2
+    return nu1, nu2
+
+
+def mbv_block_averages(r, K: int, block: int) -> np.ndarray:
+    """Block averages of ``K``-step increments: ``Ybar_m = mean over i in block m of (Y_{i+K} - Y_i)``.
+
+    ``r`` are returns (last axis). Block ``m`` holds observations
+    ``m block, ..., (m + 1) block`` and averages the ``L = block - K + 1``
+    increments that start inside it. Blocks share only the boundary price.
+    """
+    r = np.asarray(r, float)
+    n = r.shape[-1]
+    cs = np.concatenate([np.zeros(r.shape[:-1] + (1,)), np.cumsum(r, axis=-1)], axis=-1)  # prices Y_0..Y_n
+    M = n // block
+    L = block - K + 1
+    if L < 1:
+        raise ValueError("block must exceed K")
+    out = np.zeros(r.shape[:-1] + (M,))
+    for i in range(L):
+        starts = np.arange(M) * block + i
+        out += cs[..., starts + K] - cs[..., starts]
+    return out / L
+
+
+def mbv_block_weights(K: int, block: int) -> tuple[float, float]:
+    """Exact finite-sample factors: ``Var(Ybar_m) = sig_w sigma^2 delta + noise_w omega^2``.
+
+    Return ``j`` of the block (``j = 1, ..., block``) is covered by
+    ``min(j, K, L + K - j, L)`` of the ``L = block - K + 1`` increments, so
+    ``sig_w = sum_j cover_j^2 / L^2``; the noise part is the difference of two
+    averages of ``K`` noise terms, ``noise_w = 2 K / L^2`` (for ``L >= K``; in
+    general the exact count of boundary terms). Asymptotically
+    ``sig_w ~ nu1 sqrt(n)`` and ``noise_w ~ nu2 / sqrt(n)``.
+    """
+    L = block - K + 1
+    j = np.arange(1, block + 1)
+    cover = np.minimum(np.minimum(j, K), np.minimum(L + K - j, L))
+    sig_w = float(np.sum(cover.astype(float) ** 2)) / L**2
+    # noise weights: the noise term u_j enters increment i with +1 at j = i + K and -1 at j = i
+    w = np.zeros(block + 1)
+    for i in range(L):
+        w[i + K] += 1.0
+        w[i] -= 1.0
+    noise_w = float(np.sum(w**2)) / L**2
+    return sig_w, noise_w
+
+
+def mbv_estimates(r, c1: float = 0.5, c2: float = 1.0, T: float = 1.0, omega2=None, c: float | None = 3.0) -> dict:
+    """Modulated bipower (variance) and tripower (quarticity) estimates with noise correction.
+
+    With ``a = sig_w delta`` and ``b = noise_w omega^2`` from ``mbv_block_weights``
+    (so that ``Var(Ybar_m) = a sigma_m^2 + b``, which equals
+    ``n^{-1/2} (nu1 sigma^2 + nu2 omega^2)`` asymptotically):
+    ``mean_m |Ybar_m| |Ybar_{m+1}| / mu_1^2 -> a IV / T + b`` and
+    ``mean_m |Ybar_m Ybar_{m+1} Ybar_{m+2}|^{4/3} / mu_{4/3}^3 -> a^2 IQ / T + 2 a b IV / T + b^2``.
+    The dict holds ``iv``, ``iq``, ``iv_se`` (standard error from the independent
+    Gaussian block approximation, our derivation, not the paper's theorem),
+    the block sizes and the asymptotic constants. ``omega2`` defaults to
+    ``noise_variance(r, c)``.
+    """
+    r = np.asarray(r, float)
+    n = r.shape[-1]
+    s = np.sqrt(n)
+    K = max(1, int(round(c1 * s)))
+    block = max(2 * K, int(round(c2 * s)))
+    nu1, nu2 = mbv_constants(K / s, block / s)
+    sig_w, noise_w = mbv_block_weights(K, block)
+    om = noise_variance(r, c) if omega2 is None else np.asarray(omega2, float)
+    yb = mbv_block_averages(r, K, block)
+    M = yb.shape[-1]
+    ab = np.abs(yb)
+    a = sig_w * T / n
+    b = noise_w * om
+    bip = np.mean(ab[..., 1:] * ab[..., :-1], axis=-1) / _mu(1.0) ** 2  # a sigma^2 + b
+    iv = T * (bip - b) / a
+    p = 4.0 / 3.0
+    tri = np.mean(ab[..., 2:] ** p * ab[..., 1:-1] ** p * ab[..., :-2] ** p, axis=-1) / _mu(p) ** 3
+    iq = T * (tri - 2 * a * b * (iv / T) - b**2) / a**2
+    # CLT standard error for IV from independent Gaussian blocks: Var(sum |Ybar_m||Ybar_{m+1}|)
+    # = (M - 1) (mu_2^2 + 2 mu_2 mu_1^2 - 3 mu_1^4) mean(v_m^2), v_m^2 estimated by Ybar_m^2 Ybar_{m+1}^2.
+    theta = 1.0 + 2 * _mu(1.0) ** 2 - 3 * _mu(1.0) ** 4
+    v2 = np.mean(yb[..., 1:] ** 2 * yb[..., :-1] ** 2, axis=-1)
+    iv_se = T * np.sqrt(theta * v2 / (M - 1)) / (_mu(1.0) ** 2 * a)
+    return dict(iv=iv, iq=iq, iv_se=iv_se, K=K, block=block, nu1=nu1, nu2=nu2, sig_w=sig_w, noise_w=noise_w, omega2=om)
+
+
+def preavg_multipower_estimates(r, k: int, T: float = 1.0, omega2=None, c: float | None = 3.0) -> dict:
+    """Bipower and tripower variation of pre-averaged returns taken ``k`` apart, noise corrected.
+
+    ``rbar_i`` and ``rbar_{i+k}`` use disjoint returns, so for locally constant
+    volatility ``E|rbar_i rbar_{i+k}| = mu_1^2 k psi2 delta (sigma^2 + c)`` and
+    ``E|rbar_i rbar_{i+k} rbar_{i+2k}|^{4/3} = mu_{4/3}^3 (k psi2 delta)^2 (sigma^2 + c)^2``,
+    with the noise term ``c = omega^2 psi1 / (psi2 k^2 delta)``. Jumps enter
+    at most ``k - 1`` consecutive windows, so each product with a jump has at
+    least one jump-free factor (Podolskij and Vetter 2009 style robustness).
+    """
+    r = np.asarray(r, float)
+    n = r.shape[-1]
+    delta = T / n
+    psi1, psi2 = psi_constants(k)
+    om = noise_variance(r, c) if omega2 is None else np.asarray(omega2, float)
+    cn = om * psi1 / (psi2 * k**2 * delta)
+    a = np.abs(preaverage(r, k, 1))
+    s = k * psi2 * delta
+    bip = np.mean(a[..., k:] * a[..., :-k], axis=-1) / (_mu(1.0) ** 2 * s)  # sigma^2 + c
+    iv = T * (bip - cn)
+    p = 4.0 / 3.0
+    tri = np.mean(a[..., 2 * k :] ** p * a[..., k:-k] ** p * a[..., : -2 * k] ** p, axis=-1) / (_mu(p) ** 3 * s**2)
+    iq = T * (tri - 2 * cn * bip + cn**2)
+    return dict(iv=iv, iq=iq, omega2=om, c_noise=cn)

@@ -95,17 +95,93 @@ Dilution check: the mean of the raw monitor's normalised stream after a doubling
 
 * **Without noise the raw monitor is 8 to 45 times faster** than the block monitors (32 s against 259 s for `k = 10` and 1319 s for `k = 60` at a doubling), simply because it keeps every observation.
 * **Noise dilutes the raw monitor's signal** exactly as the formula predicts, so its delay grows 90 times between `gamma = 0` and 4 for a doubling, and a halving at `gamma = 4` is missed on 30% of days. The block monitors are almost unaffected up to `gamma = 2`.
-* **The crossover is at `gamma` of about 1 to 2.** With `k = 10` the block monitor is valid at every noise level (Q3) and from `gamma = 2` on it is also faster than the raw monitor (359 s against 449.5 s at a doubling), which by then has a 31% false alarm rate anyway. Between `gamma = 1` and 2 the raw monitor is still faster but no longer valid. The practical rule: estimate `gamma` from the first autocovariance; below about 0.5 use raw returns, above it use blocks with a small `k` (10 to 20) and the noise correction.
+* **The crossover is at `gamma` of about 1 to 2.** With `k = 10` the block monitor is valid at every noise level (Q3) and from `gamma = 2` on it is also faster than the raw monitor (359 s against 449.5 s at a doubling), which by then has a 31% false alarm rate anyway. Between `gamma = 1` and 2 the raw monitor is still faster but no longer valid. The practical rule (sharpened by Q6): estimate `gamma` from the first autocovariance; if it is clearly above zero the raw monitor is already invalid (8.5% at `gamma = 0.5`), so use blocks with `k = max(4, ceil(4 gamma))` and the noise correction. With `k = 4` the blocks detect a doubling in 127 s at `gamma = 0.5`, a factor 3 behind the invalid raw monitor rather than the factor 8 of `k = 10`.
 * **Smaller blocks are better for the monitor than the estimation-optimal `k = 60`** (`theta = 0.4`), since the monitor cares about the number of observations, not the `n^{1/4}` constant; `k = 10` is 5 times faster than `k = 60` and still valid, at the cost of a noise term that must be corrected for and that dilutes the signal at `gamma >= 2`.
+
+## Q5. Noise and jumps together: benchmark against Podolskij and Vetter (2009) [SYNTHETIC]
+
+`results/q5_benchmark_noise_jumps.csv`, `run_benchmark.py`. 200 paths per cell, log-OU stochastic volatility, `gamma` in `{0, 0.5, 1, 2}`, jumps per day x size in `{0, 2 x 25 sd, 2 x 100 sd, 8 x 25 sd, 8 x 100 sd}` (25 per-second sd is 0.16% of the price, 100 sd is 0.65%). The modulated bipower (variance) and tripower (quarticity) variation uses `K = 76`-step increments averaged over blocks of 153 observations (`c1 = 0.5`, `c2 = 1`, 152 blocks per day) with the noise correction through the exact block weights. "Ours" is pre-averaging (`k = 60`) then MAD drop with the noise correction.
+
+**Integrated quarticity, mean ratio to the truth (relative RMSE) [SYNTHETIC].**
+
+| cell | raw returns, MAD clip | pre-averaged, MAD drop (ours) | pre-averaged, MAD clip | modulated tripower (PV 2009) | pre-averaged tripower | pre-averaged, no truncation |
+|---|---|---|---|---|---|---|
+| no jumps, gamma = 0 | 0.99 (0.02) | 0.98 (0.11) | 0.99 (0.10) | 1.00 (0.30) | 1.00 (0.13) | 1.00 (0.12) |
+| no jumps, gamma = 0.5 | 2.22 (1.23) | 0.98 (0.12) | 0.99 (0.12) | 1.01 (0.33) | 1.00 (0.14) | 1.00 (0.12) |
+| no jumps, gamma = 1 | 8.91 (8.00) | 0.98 (0.11) | 0.99 (0.11) | 0.99 (0.33) | 1.00 (0.13) | 1.00 (0.12) |
+| no jumps, gamma = 2 | 80.9 (81.1) | 0.98 (0.11) | 0.99 (0.11) | 1.00 (0.30) | 1.00 (0.12) | 1.00 (0.11) |
+| 2 x 25 sd, gamma = 0 | 0.99 (0.02) | 0.99 (0.10) | 1.03 (0.11) | 1.12 (0.37) | 1.06 (0.15) | 2.20 (2.8) |
+| 2 x 25 sd, gamma = 1 | 8.98 (8.06) | 0.98 (0.11) | 1.03 (0.12) | 1.03 (0.34) | 1.04 (0.16) | 2.12 (2.8) |
+| 2 x 100 sd, gamma = 0 | 0.99 (0.02) | 0.99 (0.12) | 1.10 (0.19) | 1.63 (1.27) | 1.45 (0.86) | 269 (589) |
+| 2 x 100 sd, gamma = 1 | 9.09 (8.17) | 0.98 (0.11) | 1.09 (0.16) | 1.57 (1.73) | 1.56 (1.63) | 289 (690) |
+| 8 x 25 sd, gamma = 0 | 1.00 (0.02) | 1.02 (0.11) | 1.18 (0.24) | 1.27 (0.57) | 1.21 (0.33) | 5.57 (7.1) |
+| 8 x 25 sd, gamma = 1 | 9.13 (8.22) | 1.05 (0.12) | 1.22 (0.27) | 1.35 (0.65) | 1.25 (0.34) | 5.36 (6.5) |
+| 8 x 100 sd, gamma = 0 | 1.00 (0.02) | 1.00 (0.11) | 1.43 (0.49) | 4.94 (10.3) | 3.96 (7.8) | 973 (1414) |
+| 8 x 100 sd, gamma = 1 | 9.06 (8.14) | 1.01 (0.12) | 1.43 (0.49) | 5.76 (13.8) | 3.58 (4.8) | 1200 (1811) |
+| 8 x 100 sd, gamma = 2 | 81.2 (81.3) | 1.01 (0.12) | 1.43 (0.49) | 4.53 (6.9) | 3.77 (5.2) | 1013 (1604) |
+
+The cells not shown (`gamma = 0.5` and the remaining `gamma = 2` rows) are in the CSV and fall between their neighbours; the only outlier is modulated tripower at `8 x 100 sd, gamma = 0.5`: 13.7 (117), one path with a block product of extreme size.
+
+**Integrated variance [SYNTHETIC].** Ours: mean ratio 0.99 to 1.02 in all 20 cells, relative RMSE 0.047 to 0.061. Modulated bipower: 0.99 to 1.01 (RMSE 0.13 to 0.14) without jumps, 1.05 (0.14) with `2 x 25 sd`, 1.10 (0.19) with `8 x 25 sd`, 1.16 to 1.20 (0.31 to 0.33) with `2 x 100 sd`, 1.72 to 1.83 (0.94 to 1.27) with `8 x 100 sd`, at every noise level. Raw MAD clip: 1.50, 3.0, 9.0 at `gamma = 0.5, 1, 2`, jumps or not.
+
+**CLT interval for the modulated bipower variance (95%, standard error from the independent Gaussian block approximation) [SYNTHETIC].** Coverage without jumps 0.91, 0.935, 0.905, 0.955 at `gamma = 0, 0.5, 1, 2` (nominal 0.95, Monte Carlo sd 0.015); with `2 x 25 sd` 0.945 to 0.97; with `8 x 25 sd` 0.91 to 0.955; with `2 x 100 sd` 0.905 to 0.94; with `8 x 100 sd` 0.57 to 0.62 (the jump bias is outside the interval). Median relative half-width 0.26 without jumps, 0.61 to 0.67 with `8 x 100 sd`. Coverage is 1 to 4 points below nominal without jumps, which is the known small-sample effect of a Gaussian block approximation with 152 blocks and a `sqrt(n)`-dependent bias; the paper's own constants could not be checked (full text unreachable here), so the interval is ours.
+
+**Reading.**
+
+* **Without jumps all noise-robust estimators are unbiased, and the modulated multipower is the least precise:** relative RMSE 0.30 for quarticity and 0.13 to 0.14 for variance against 0.11 and 0.05 to 0.06 for pre-averaging then truncation, a factor 2.5 to 3. The reason is structural: `K = c1 sqrt(n)` block averaging reduces the day to 152 nearly independent numbers, while pre-averaging with `k = 60` keeps 23,341 overlapping ones, equivalent to about 390 independent blocks of `k` with a variance-reducing overlap; and powers below 2 (bipower, tripower) cost efficiency even without jumps.
+* **With jumps the multipower estimators are robust in the limit but not at `n = 23,400`.** A jump of size `J` enters one block average with weight close to 1, and the bipower / tripower products then keep `|J|` or `|J|^{4/3}` times the neighbouring block's average, which vanishes only as `n^{-1/4}`. Eight jumps of 100 sd (0.65% each, 5% of the day's variance) inflate the modulated tripower quarticity by a factor 4.5 to 5.8 and the modulated bipower variance by a factor 1.7 to 1.8, and the pre-averaged tripower by 3.6 to 4.0 and 1.5. Two jumps of 25 sd leave 3% to 12%. Truncation by dropping after pre-averaging removes all of this: ours is 0.98 to 1.05 across the whole grid.
+* **Clipping after pre-averaging is the worst of the truncation rules at many jumps** (1.43 at `8 x 100 sd`), confirming Q1, but still far better than any multipower rule.
+* **The raw MAD-clipped estimator is excellent against jumps and useless against noise** (1.00 with 8 jumps of 100 sd at `gamma = 0`; 2.2, 9, 81 at `gamma = 0.5, 1, 2`), which is the gap Bapat (2026) leaves and pre-averaging fills.
+* **Noise and jumps do not interact** for ours or for the multipower estimators: every column is flat in `gamma` within Monte Carlo error. The two problems are handled by two separate operations (pre-averaging for noise, truncation for jumps) and the operations compose.
+
+## Q6. The block size: delay against `k`, validity at small `k`, and a rule of thumb [SYNTHETIC]
+
+`results/q6_block_size.csv`, `results/fig3_block_size_rule.png`. Constant volatility, 200 paths per cell, two calibration days then one monitored day, blocks `k` in `{4, 6, 10, 14, 20, 30, 60}` (5850 to 390 blocks per day), `A = (n / k) / 0.05`, `gamma` in `{0.5, 1, 2, 4}`.
+
+**Median detection delay in seconds, sd x 2 at the start of the day [SYNTHETIC].**
+
+| gamma | k = 4 | 6 | 10 | 14 | 20 | 30 | 60 | best k observed | `k* = 6 gamma / v` |
+|---|---|---|---|---|---|---|---|---|---|
+| 0.5 | **127** | 179 | 269 | 370 | 479 | 749 | 1319 | 4 | 1.5 (floored to 4) |
+| 1 | **179** | 206 | 289 | 377 | 539 | 719 | 1439 | 4 | 3 (floored to 4) |
+| 2 | 405 | **332** | 354 | 419 | 539 | 764 | 1439 | 6 | 6 |
+| 4 | 2131 | 1154 | 689 | **615** | 659 | 869 | 1439 | 14 | 12 |
+
+**Median detection delay in seconds, sd x 1.5 [SYNTHETIC].**
+
+| gamma | k = 4 | 6 | 10 | 14 | 20 | 30 | 60 | best k observed | `k* = 6 gamma / v` |
+|---|---|---|---|---|---|---|---|---|---|
+| 0.5 | **299** | 398 | 589 | 790 | 999 | 1514 | 2879 | 4 | 2 (floored to 4) |
+| 1 | **459** | 485 | 614 | 783 | 1039 | 1499 | 2699 | 4 | 4 |
+| 2 | 1399 | 965 | **839** | 944 | 1089 | 1559 | 2699 | 10 | 8 |
+| 4 | 8751 | 4145 | 2329 | 1672 | **1539** | 1754 | 2669 | 20 | 16 |
+
+Every change was detected within the day in every cell except `gamma = 4`, `k = 4`, sd x 1.5 (97.5%).
+
+**One-day false alarm rate (bound 5%) [SYNTHETIC].** 28 cells (4 noise levels x 7 block sizes): 0.5% to 6.5%, mean 3.4%; four cells are above 5% by at most 1.5 points (6.5% at `gamma = 0.5, k = 10`; 5.5% and 6.0% elsewhere), as expected from a 5% rate measured on 200 paths (Monte Carlo sd 1.5 points). The guarantee holds down to `k = 4`, where the noise share of a block is 0.17 to 10.7 and the block statistic is far from Gaussian; nothing in the derivation needs Gaussian blocks.
+
+**Observed mean of the monitored value after the change against the dilution formula [SYNTHETIC].** For a doubling the untruncated formula `(4 + rho_k) / (1 + rho_k)` gives 1.26 at `gamma = 4, k = 4` (`rho_k = 10.7`) and the observed mean is 1.25; at `k = 60` the observed mean is 3.05 to 3.14, which is the truncated value of 4 (`4 kappa_2(1.5) / kappa_2(3) = 3.12`) rather than 4 itself.
+
+**Reading.**
+
+* **The delay is U-shaped in `k` with a minimum at `k* = 6 gamma / v`**, as the delay formula `D(k) proportional to k (v^2 + rho_k)^2` predicts (README, section 2): the observed minima are at 4, 4, 6, 14 for a doubling and 4, 4, 10, 20 for `x 1.5`, against 4, 4, 6, 12 and 4, 4, 8, 16 from the formula, within one grid step everywhere. Right of the minimum the delay grows in proportion to `k` (a factor 10 from `k = 4` to 60 at `gamma = 0.5`); left of it the noise dilution dominates (a factor 3.5 from `k = 14` down to 4 at `gamma = 4`).
+* **The rule of thumb `k = max(4, ceil(4 gamma))`** (target `v = 1.5`, `preavg.rule_of_thumb_k`) gives `k = 4, 4, 8, 16` at `gamma = 0.5, 1, 2, 4` and lands within 10% of the best observed delay in all 8 cells (interpolating between grid points: 343 s against 332 s at `gamma = 2` and 630 s against 615 s at `gamma = 4` for a doubling; 902 s against 839 s and 1628 s against 1539 s for `x 1.5`). The first rule tried, `k = 7 gamma` from capping the dilution at 0.25, was conservative by a factor 2 in `k` and cost 25% to 40% in delay; the derivation replaced it.
+* **At small noise the smallest block is best, and it is fast:** `k = 4` detects a doubling in 127 s at `gamma = 0.5` and 179 s at `gamma = 1`, against 43.5 s and 86.5 s for the raw monitor, which is invalid there (8.5% and 18% false alarms). So the price of validity under noise is a factor 2 to 3 in delay at `gamma <= 1`, not the factor 8 of the `k = 10` blocks reported in Q4.
+* **Delay cost of `k` on the right branch:** about `k / 4` times the `k = 4` delay, so `k = 60` costs a factor 10 over `k = 4` when the noise is small; this is why the estimation-optimal `theta = 0.4` is the wrong choice for monitoring.
 
 ## Answers to the questions
 
 1. **Breaking point of the plain truncated estimator:** about `gamma = 0.16` for a 10% bias in integrated quarticity (`(1 + 2 gamma^2)^2`), 0.22 for the local variance (`1 + 2 gamma^2`); a factor 2 at `gamma = 0.45`; the estimator is useless by `gamma = 1`. **Pre-averaging then truncation fixes both** at every noise level (mean ratio 0.99 to 1.00), with the noise correction for the fourth moment needed from `gamma` of about 2, and with "drop" rather than "clip" when there are jumps.
-2. **The monitor's false alarm rate:** on raw returns it rises from 5% to 41.5% per day as `gamma` goes from 0 to 4 (price noise breaks the conditional null); on overlapping pre-averaged returns it is 100%; on non-overlapping blocks it stays within the 5% bound at every `k` and `gamma`. The block version is justified because blocks use disjoint prices and are therefore independent under the model; it costs a factor `k` in observations, which `k = 10` to 20 keeps affordable.
+2. **The monitor's false alarm rate:** on raw returns it rises from 5% to 41.5% per day as `gamma` goes from 0 to 4 (price noise breaks the conditional null); on overlapping pre-averaged returns it is 100%; on non-overlapping blocks it stays within the 5% bound at every `k` and `gamma`. The block version is justified because blocks use disjoint prices and are therefore independent under the model (README, section 2, formal statement: no boundary term, since one return between blocks is skipped); it costs a factor `k` in observations, which `k = max(4, ceil(4 gamma))` keeps affordable.
+3. **Noise and jumps together (Q5):** pre-averaging then MAD drop is unbiased for integrated quarticity (0.98 to 1.05) and variance (0.99 to 1.02) over the whole grid of 4 noise levels x 5 jump settings, with relative RMSE 0.10 to 0.13 and 0.05 to 0.06. The modulated bipower / tripower variation of Podolskij and Vetter (2009) is unbiased without jumps but 2.5 to 3 times less precise (RMSE 0.30 and 0.13), and at `n = 23,400` it keeps a jump bias of `|J|^{4/3}` per affected product: a factor 4.5 to 5.8 in quarticity and 1.7 to 1.8 in variance with 8 jumps of 100 sd. Its CLT interval for variance covers 0.905 to 0.955 without jumps (nominal 0.95) and 0.57 to 0.62 with 8 large jumps.
+4. **Block size (Q6):** the delay is U-shaped in `k` with its minimum at `k* = 6 gamma / v` (derived from the growth rate of the bet and confirmed within one grid step at every noise level); the rule of thumb `k = max(4, ceil(4 gamma))` is within 10% of the best observed delay in all 8 cells, and the guarantee holds down to `k = 4` (28 cells, 0.5% to 6.5% false alarms).
 
 ## Negative results and failed attempts
 
 * Clipping (the paper's truncation) after pre-averaging has a jump bias that grows with `k`; it had to be replaced by dropping.
+* The multipower (bipower, tripower) estimators, modulated or pre-averaged, are not jump robust at `n = 23,400` in the sense that matters for quarticity: a 100 sd jump leaves a factor 1.5 (two jumps) to 5 (eight jumps). The asymptotic robustness holds only as `n^{-1/4}`.
+* The full text of Podolskij and Vetter (2009) could not be fetched (arxiv.org, projecteuclid.org, repec.econ.au.dk, eldorado.tu-dortmund.de unreachable from this environment), so the modulated bipower constants `nu1`, `nu2` and the CLT standard error are our own derivation, verified by simulation (`tests/test_preavg.py`), and no equation numbers are quoted.
+* The first rule of thumb for `k` (cap the block noise share at 0.25, `k = 7 gamma`) was ad hoc and Q6 showed it conservative by a factor 2; it was replaced by the minimiser of the delay formula, which fits the data.
 * The hypothesis that the raw-return monitor stays valid under price noise, which the main report's E4 supported at one noise level over one short day, is false over a full day at `gamma >= 0.5`.
 * A first unit test compared a calibration path and monitored paths simulated with different numbers of steps, so their per-step scales differed by `sqrt(10)` and the detector "false alarmed" on every path. The detector was right; the test was fixed.
 * A background watcher for the first run never exited because `pgrep -f` matched its own command line; the run itself had finished. No result was affected.
@@ -113,8 +189,8 @@ Dilution check: the mean of the raw monitor's normalised stream after a doubling
 ## Ranking
 
 * **Research novelty:** moderate to high. The composition (pre-average, drop, noise-correct, then bet on blocks) is new as a monitor, and the finding that MA(1) price noise breaks the e-detector's conditional null on raw returns is a correction to the main package's claims.
-* **Mathematical validity:** high for the estimator (unbiasedness verified to 1% across 14 cells) and for the block monitor (bound holds in 30 cells); the local-constancy derivation of the fourth-moment correction is heuristic and should be replaced by the exact pre-averaged quarticity of Jacod et al. (2009) in a paper.
-* **Practical relevance:** high at one-second sampling, where noise ratios of 0.2 to 2 are common; low at one minute for BTC (noise ratio well below the 0.16 breaking point).
-* **Feasibility:** high. About 250 lines, no new dependencies, five minutes to run.
-* **Demonstration value:** high. Both figures make the point in one glance (RMSE flat against a line that rises by a factor 1000; false alarms rising against flat).
+* **Mathematical validity:** high for the estimator (unbiasedness verified to about 1% across 14 cells of Q1 and within 5% across the 20 noise x jump cells of Q5) and for the block monitor (the conditional null and the guarantee are stated and proved for every `k >= 2` in the README, with no boundary term; the bound holds in 30 cells of Q3 and 28 of Q6); the local-constancy derivation of the fourth-moment correction is heuristic and should be replaced by the exact pre-averaged quarticity of Jacod et al. (2009) in a paper, and the delay formula behind `k*` ignores truncation.
+* **Practical relevance:** high at one-second sampling, where noise ratios of 0.2 to 2 are common; low at one minute for BTC (noise ratio well below the 0.16 breaking point). Against the published noise-and-jump estimator (Podolskij and Vetter 2009) the prototype is 2.5 to 3 times more precise and has no finite-sample jump bias.
+* **Feasibility:** high. About 450 lines including the benchmark, no new dependencies, five minutes for Q1 to Q4 and two minutes for Q5 and Q6.
+* **Demonstration value:** high. The three figures make the point in one glance (RMSE flat against a line that rises by a factor 1000; false alarms rising against flat; a U-shaped delay curve whose minimum a one-line formula predicts).
 * **Likely interest to a sequential-analysis and high-frequency econometrics researcher:** high. The overlap and MA(1) failures are exactly the kind of assumption that e-detector users must check, and the pre-averaged block monitor is a clean, provable fix.
