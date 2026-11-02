@@ -81,7 +81,12 @@ def cmd_run(a) -> int:
     start = pd.Timestamp(a.start)
     aw = argparse.Namespace(**vars(a))
     aw.start = (start - pd.Timedelta(days=warm_days)).strftime("%Y-%m-%d")
-    df_all = _load(aw)
+    try:
+        df_all = _load(aw)
+    except FileNotFoundError:
+        print(f"note: no data for the {warm_days}-day warm-up before {a.start} (use --download to fetch it); "
+              "the first days have no intraday scale and are skipped")
+        df_all = _load(a)
     s_all = intraday_scale(df_all["logret"], lookback_days=a.lookback_days)
     t0 = start.tz_localize(df_all.index.tz) if df_all.index.tz is not None and start.tz is None else start
     keep = df_all.index >= t0
