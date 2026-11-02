@@ -205,12 +205,13 @@ def betting_edetector(
             f = np.concatenate([f, (1.0 + lam_adapt[:, t] * g)[:, None]], axis=1)
             if lam_path is not None:
                 lam_path[t] = lam_adapt[0, t]
-        if kind == "SR":
-            S = f * (S + 1.0)
-        elif kind == "CUSUM":
-            S = f * np.maximum(S, 1.0)
-        else:
-            raise ValueError("kind must be 'SR' or 'CUSUM'")
+        with np.errstate(over="ignore"):
+            if kind == "SR":
+                S = f * (S + 1.0)
+            elif kind == "CUSUM":
+                S = f * np.maximum(S, 1.0)
+            else:
+                raise ValueError("kind must be 'SR' or 'CUSUM'")
         M = S @ weights
         if path is not None:
             path[t] = M[0]
@@ -255,7 +256,8 @@ def gaussian_lr_edetector(
     k = 0.5 * (1 - 1 / ratios**2)
     for t in range(n):
         f = np.exp(np.minimum(logc[None, :] + k[None, :] * z2[:, t : t + 1], 700.0))
-        S = f * (S + 1.0)
+        with np.errstate(over="ignore"):
+            S = f * (S + 1.0)
         M = S.mean(axis=1)
         hit = active & (M >= threshold)
         alarm[hit] = t + start

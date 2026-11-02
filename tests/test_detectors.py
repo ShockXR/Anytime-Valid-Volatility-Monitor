@@ -80,3 +80,21 @@ def test_calibrate_band():
     assert abs(b.scale - 1) < 0.05
     assert abs(b.m0_up / b.m0 - 1.2) < 1e-9
     assert abs(b.m0_down / b.m0 - 0.8) < 1e-9
+
+
+def test_streaming_monitor_matches_guarantee_and_detects():
+    from avmonitor.monitor import VolatilityMonitor
+
+    rng = np.random.default_rng(21)
+    # Null: 40 streams of 3000 steps, A = 3000 so P(any alarm in 1500 monitored steps) <= 0.5
+    alarms = 0
+    for _ in range(40):
+        mon = VolatilityMonitor(threshold=3000, cal_len=500)
+        mon.run(rng.standard_normal(2000))
+        alarms += len(mon.events) > 0
+    assert alarms / 40 <= 0.5 + 0.15
+    # Change: sd doubles after 1500 steps
+    mon = VolatilityMonitor(threshold=3000, cal_len=500)
+    ev = mon.run(np.concatenate([rng.standard_normal(1500), 2 * rng.standard_normal(1500)]))
+    ups = [e for e in ev if e.direction == "up" and e.index >= 1500]
+    assert ups and ups[0].index < 1700
