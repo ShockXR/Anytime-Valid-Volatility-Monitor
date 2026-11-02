@@ -32,3 +32,4 @@ To rerun: `pip install -r requirements.txt && pip install -e .`, then `python sc
 | ALT3 | Robust local IQ estimator | Squaring a local variance is 95% efficient against 74% for RQ-type estimators; one daily MAD stops converging when volatility moves within the day; on BTC and DOGE large returns come in bursts and scale-truncated estimators remove a third to a half of IQ. |
 | ALT4 | Correlation monitor | Sign concordance gives a valid correlation monitor that volatility changes cannot fool. |
 | ALT5 | Two-sample (rank) betting test | Ranks against a growing reference give an exactly valid detector for any return law and horizon (1.9% to 3.5% per day against 5%); ranks against a fixed reference fail like a plug-in baseline; 2.9 times faster for a change in tail shape, 4% to 19% slower for a scale change. |
+| ALT6 | Sequential fixed-accuracy estimation of volatility (classical purely sequential rules against anytime-valid confidence sequences) | In progress. |
