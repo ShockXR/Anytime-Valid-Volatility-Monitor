@@ -46,6 +46,7 @@ as short volatility clusters (README, section 2.5).
 from __future__ import annotations
 
 import bisect
+import functools
 import math
 from dataclasses import dataclass, field
 
@@ -162,11 +163,16 @@ class SequentialRanker:
 # ----------------------------------------------------------------------------
 
 
+@functools.lru_cache(maxsize=32)
+def _kappa2(a: float) -> float:
+    return truncated_moment_factor(a, power=2)
+
+
 def gauss_score(p, kind: str = "abs", a: float = 3.0):
     """``Y = min(z^2, a^2) / kappa_2(a)``, ``z`` the normal quantile matching ``p``. ``E_U[Y] = 1`` exactly."""
     p = np.asarray(p, float)
     z = -ndtri(p / 2.0) if kind == "abs" else -ndtri(p)
-    return np.minimum(z * z, a * a) / truncated_moment_factor(a, power=2)
+    return np.minimum(z * z, a * a) / _kappa2(float(a))
 
 
 def gauss_score_abs_dev(a: float = 3.0) -> float:
@@ -278,7 +284,8 @@ class RankBetCore:
                 self.S_h = f * (self.S_h + 1.0)
                 self.counts *= self.gam[None, :, None]
                 self.counts[rows, :, k] += 1.0
-        return self.family_stats().sum(axis=1)
+        return (self.w[0] * self.S_up.mean(axis=1) + self.w[1] * self.S_dn.mean(axis=1)
+                + self.w[2] * self.S_h.mean(axis=1))
 
 
 @dataclass

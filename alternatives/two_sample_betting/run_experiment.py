@@ -11,6 +11,10 @@ Research questions
   Q1b [SYNTHETIC] Volatility clustering (null broken for both designs): GARCH(1,1)
       with persistence 0.95 and 0.99. Share of days with a false alarm, with and
       without a null band.
+  Q1c [SYNTHETIC] Why the reference must grow. Ranking each new return against a
+      FIXED reference window (the "quantile bins learned from the reference"
+      design) gives p-values that are uniform one at a time but dependent; does
+      a learning bettor then break the false alarm guarantee over two weeks?
   Q2  [SYNTHETIC] Power. Median delay (with a distribution-free 95% interval)
       and detection share for variance increases and decreases, a change of
       tails at fixed variance (Gaussian to variance-matched Student t4 and t3),
@@ -18,6 +22,9 @@ Research questions
       with the law of |u| held fixed (only the signed score can see it).
   Q3  [SYNTHETIC] Does truncation matter when the statistic is a rank? Same
       detector on the score min(|u|, tau) with a fixed tau = 3 (ties above tau).
+  Q5  [SYNTHETIC] The repo's rigorous mean-based variant (VolatilityMonitor with
+      baseline="cs", a confidence sequence for the baseline, guarantee delta + m / A)
+      on the same paths as Q1 (Gaussian null) and five Q2 scenarios.
   Q4  [REAL] Binance BTCUSDT and ETHUSDT one-minute returns, 1 Jul to 31 Dec
       2025, divided by the predictable intraday profile of the main package.
       Alarm counts of the rank detector against the main monitor (band 0.25),
@@ -264,6 +271,47 @@ def part_q1b():
 
 
 # ----------------------------------------------------------------------------
+# Q1c. Why the reference must grow: ranks against a FIXED reference window
+# ----------------------------------------------------------------------------
+
+
+def pvalues_fixed_reference(s: np.ndarray, n_ref: int, rng) -> np.ndarray:
+    """p-values of s[:, n_ref:] ranked against the first n_ref values only (the reference never grows)."""
+    ref = np.sort(s[:, :n_ref], axis=1)
+    mon = s[:, n_ref:]
+    out = np.empty(mon.shape)
+    for i in range(s.shape[0]):
+        hi = np.searchsorted(ref[i], mon[i], side="right")
+        lo = np.searchsorted(ref[i], mon[i], side="left")
+        out[i] = (n_ref - hi + rng.random(mon.shape[1]) * (hi - lo + 1)) / (n_ref + 1)
+    return out
+
+
+def _q1c_job(args):
+    n_ref, seed, reps, days = args
+    rng = np.random.default_rng(seed)
+    r = S.draw(G, (reps, n_ref + days * DAY), rng)
+    rows = []
+    for label, fn in (("growing reference (conformal, exact)", R.pvalues_against_reference),
+                      ("fixed reference window (not a martingale)", pvalues_fixed_reference)):
+        p = fn(np.abs(r), n_ref, rng)
+        for det, cfg in (("RANK omnibus (abs), b 0", RANK_OMNI), ("RANK histogram only (abs), b 0", R.RankBetConfig(weights=(0.0, 0.0, 1.0)))):
+            alarm = R.run_rank_detector(p, A, cfg).alarm
+            rows.append(dict(reference=label, n_ref=n_ref, paths=reps, detector=det,
+                             **summarize_null(alarm, horizons=(DAY, 7 * DAY, days * DAY))))
+    return rows
+
+
+def part_q1c():
+    jobs = [(240, 150, 500, 14), (1440, 151, 500, 14)]
+    with Pool(2) as pool:
+        rows = [r for rr in pool.map(_q1c_job, jobs) for r in rr]
+    df = pd.DataFrame(rows)
+    df.to_csv(OUT / "q1c_fixed_reference.csv", index=False)
+    print(df.to_string())
+
+
+# ----------------------------------------------------------------------------
 # Q2. Power: variance, tails, jump intensity, skew
 # ----------------------------------------------------------------------------
 
@@ -340,6 +388,52 @@ def part_q3():
 
 
 # ----------------------------------------------------------------------------
+# Q5. The mean-based monitor made rigorous: confidence-sequence baseline on the same paths
+# ----------------------------------------------------------------------------
+
+
+def cs_first_alarm(r: np.ndarray) -> np.ndarray:
+    """First alarm (monitored step index) of VolatilityMonitor(baseline="cs") per path, -1 if none."""
+    from avmonitor.monitor import VolatilityMonitor
+
+    out = np.full(r.shape[0], -1)
+    for i, row in enumerate(r):
+        mon = VolatilityMonitor(threshold=A, cal_len=CAL, baseline="cs")
+        for t, x in enumerate(row):
+            ev = mon.update(x)
+            if ev is not None:
+                out[i] = ev.index - ev.monitored_since
+                break
+    return out
+
+
+def _q5_job(args):
+    kind, name, seed = args
+    rng = np.random.default_rng(seed)
+    if kind == "null":  # same paths as Q1 (same seed, drawn first)
+        r = S.draw(Q1_LAWS[name], (1000, CAL + 7 * DAY), rng)
+        return [dict(part="Q1 paths", scenario=name, detector="MAIN confidence-sequence baseline (delta 0.01), band 0",
+                     **summarize_null(cs_first_alarm(r), horizons=(DAY, 7 * DAY)))]
+    pre, post = Q2_SCENARIOS[name]  # same paths as Q2
+    r = S.change_paths(Q2_REPS, CAL, NU, POST, pre, post, rng)
+    return [dict(part="Q2 paths", scenario=name, detector="MAIN confidence-sequence baseline (delta 0.01), band 0",
+                 **summarize_change(cs_first_alarm(r), NU))]
+
+
+def part_q5():
+    q2names = list(Q2_SCENARIOS)
+    jobs = [("null", "Gaussian", 100)]
+    jobs += [("change", nm, 400 + q2names.index(nm)) for nm in (
+        "sd x1.25 (variance x1.56)", "sd x0.8 (variance x0.64)", "tails: Gaussian to t4, same variance",
+        "jumps: 0.2% to 1% per step, same variance", "skew: large moves 80% negative, same |u| law")]
+    with Pool(2) as pool:
+        rows = [r for rr in pool.map(_q5_job, jobs) for r in rr]
+    df = pd.DataFrame(rows)
+    df.to_csv(OUT / "q5_cs_baseline.csv", index=False)
+    print(df.to_string())
+
+
+# ----------------------------------------------------------------------------
 # Q4. Real data: Binance BTCUSDT and ETHUSDT, Jul to Dec 2025
 # ----------------------------------------------------------------------------
 
@@ -357,6 +451,14 @@ Q4_RANK = {
     "RANK omnibus (abs, nonzero only), b 0.25": (R.RankBetConfig(band=0.25), True),
     "RANK omnibus (signed), b 0.25": (R.RankBetConfig(kind="signed", band=0.25), False),
 }
+SHORT_REF = "RANK omnibus (abs), b 0.25, 120-minute reference"  # validity does not need a long reference
+
+
+def _monitored_share(segment_starts, events, n) -> float:
+    """Share of the n monitored-period minutes that a monitor spent monitoring (not calibrating)."""
+    ends = {e.monitored_since: e.index for e in events}
+    tot = sum((ends[s0] - s0 + 1) if s0 in ends else (n - s0) for s0 in segment_starts)
+    return tot / n
 REFERENCE_MAIN = "MAIN plug-in, band 0.25"
 
 
@@ -401,18 +503,20 @@ def _q4_job(coin: str):
 
     idx, u, i0, checks = q4_prepare(coin)
     x = u[i0:]
-    events = {}
+    events, monitored = {}, {}
     for band in (0.0, 0.25):
         mon = VolatilityMonitor(threshold=A, c=3.0, cal_len=CAL, null_band=band)
         ev = mon.run(x)
+        monitored[f"MAIN plug-in, band {band:g}"] = _monitored_share([sg["start"] for sg in mon.segments], ev, x.size)
         events[f"MAIN plug-in, band {band:g}"] = [dict(index=e.index + i0, monitored_since=e.monitored_since + i0,
                                                        cal_start=e.monitored_since + i0 - CAL, direction=e.direction,
                                                        share_up=np.nan, share_down=np.nan, share_hist=np.nan,
                                                        mean_p_recent=np.nan) for e in ev]
-    for name, (cfg, nonzero) in Q4_RANK.items():
-        mon = R.RankMonitor(threshold=A, cal_len=CAL, config=cfg, seed=4)
+    for name, (cfg, nonzero) in list(Q4_RANK.items()) + [(SHORT_REF, (R.RankBetConfig(band=0.25), False))]:
+        mon = R.RankMonitor(threshold=A, cal_len=120 if name == SHORT_REF else CAL, config=cfg, seed=4)
         xx = np.where(x == 0, np.nan, x) if nonzero else x
         ev = mon.run(xx)
+        monitored[name] = _monitored_share([sg["start"] for sg in mon.segments], ev, x.size)
         rows = []
         for e in ev:
             sh = np.array([e.share_up, e.share_down, e.share_hist])
@@ -420,7 +524,7 @@ def _q4_job(coin: str):
                              direction=("up", "down", "shape")[int(np.argmax(sh))], share_up=e.share_up,
                              share_down=e.share_down, share_hist=e.share_hist, mean_p_recent=e.mean_p_recent))
         events[name] = rows
-    return coin, idx, u, i0, checks, events
+    return coin, idx, u, i0, checks, events, monitored
 
 
 def part_q4():
@@ -428,7 +532,7 @@ def part_q4():
         results = pool.map(_q4_job, list(COINS))
     rng = np.random.default_rng(44)
     ev_rows, sum_rows, ctrl_rows = [], [], []
-    for coin, idx, u, i0, checks, events in results:
+    for coin, idx, u, i0, checks, events, monitored in results:
         n = u.size
         days = (n - i0) / DAY
         main_t = np.array([e["index"] for e in events[REFERENCE_MAIN]], int)
@@ -455,7 +559,8 @@ def part_q4():
                 dd = np.array([np.min(np.abs(main_t - x)) if main_t.size else np.inf for x in sh])
                 chance.append(np.mean(dd <= MATCH) if dd.size else np.nan)
             labels = [e["direction"] for e in evs]
-            sum_rows.append(dict(coin=coin, detector=det, days=days, alarms=t.size, alarms_per_day=t.size / days,
+            sum_rows.append(dict(coin=coin, detector=det, days=days, monitored_share=monitored[det], alarms=t.size,
+                                 alarms_per_day=t.size / days, alarms_per_monitored_day=t.size / (days * monitored[det]),
                                  up=labels.count("up"), down=labels.count("down"), shape=labels.count("shape"),
                                  matched_main25_within_60min=int(np.sum(dist <= MATCH)),
                                  matched_share=float(np.mean(dist <= MATCH)) if t.size else np.nan,
@@ -500,10 +605,91 @@ def part_q4():
 
 
 # ----------------------------------------------------------------------------
+# Figures
+# ----------------------------------------------------------------------------
+
+# Categorical slots 1 to 4 of the reference palette (fixed order), neutral grey for controls.
+COLORS = ["#2a78d6", "#eb6834", "#1baf7a", "#eda100"]
+INK, MUTED, GRID = "#0b0b0b", "#52514e", "#e4e3df"
+
+
+def _style(ax):
+    for side in ("top", "right"):
+        ax.spines[side].set_visible(False)
+    for side in ("left", "bottom"):
+        ax.spines[side].set_color(MUTED)
+    ax.tick_params(colors=MUTED, labelsize=8)
+    ax.grid(axis="x", color=GRID, linewidth=0.6)
+    ax.set_axisbelow(True)
+
+
+def part_figs():
+    import matplotlib
+
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    # Figure 1: median delays in Q2
+    d = pd.read_csv(OUT / "q2_power.csv")
+    dets = ["MAIN plug-in, band 0", "RANK scale only (abs), b 0", "RANK omnibus (abs), b 0", "RANK omnibus (signed), b 0"]
+    scen = list(dict.fromkeys(d.scenario))
+    fig, ax = plt.subplots(figsize=(8.5, 6.2))
+    h = 0.19
+    for j, det in enumerate(dets):
+        g = d[d.detector == det].set_index("scenario").loc[scen]
+        y = np.arange(len(scen)) + (j - 1.5) * h
+        med = g.median_delay.to_numpy()
+        lo = med - g.median_delay_lo.to_numpy()
+        hi = g.median_delay_hi.to_numpy() - med
+        ax.barh(y, med, height=h * 0.85, color=COLORS[j], label=det, edgecolor="white", linewidth=0.5)
+        ax.errorbar(med, y, xerr=[lo, hi], fmt="none", ecolor=INK, elinewidth=0.7, capsize=1.5)
+        for yy, top, det_share in zip(y, g.median_delay_hi.to_numpy(), g.detected.to_numpy()):
+            if det_share < 0.9:
+                ax.text(top * 1.06, yy, f"{det_share:.0%} detected", va="center", fontsize=6.5, color=MUTED)
+    ax.set_yticks(np.arange(len(scen)))
+    ax.set_yticklabels(scen, fontsize=8, color=INK)
+    ax.invert_yaxis()
+    ax.set_xscale("log")
+    ax.set_xlabel("median detection delay in steps (log scale), 95% interval; shorter is better", fontsize=8, color=MUTED)
+    ax.set_title("[SYNTHETIC] Q2: delay after a change, same alarm budget (A = 28,800)", fontsize=10, color=INK, loc="left")
+    ax.set_xlim(right=d.median_delay_hi.max() * 2.2)
+    _style(ax)
+    fig.legend(*ax.get_legend_handles_labels(), fontsize=7.5, frameon=False, loc="lower center", ncol=2)
+    fig.tight_layout(rect=(0, 0.07, 1, 1))
+    fig.savefig(OUT / "fig1_synthetic_delays.png", dpi=150)
+    plt.close(fig)
+
+    # Figure 2: what the real alarms look like
+    ev = pd.read_csv(OUT / "q4_real_events.csv")
+    ctrl = pd.read_csv(OUT / "q4_real_random_times.csv")
+    det = "RANK omnibus (abs), b 0.25"
+    fig, axes = plt.subplots(1, 2, figsize=(10, 4.4), sharey=True)
+    for ax, coin in zip(axes, COINS):
+        c = ctrl[ctrl.coin == coin]
+        ax.scatter(np.log2(c.scale_ratio), c.shape_ks, s=5, color="#b5b4ad", alpha=0.5, label="random times (control)",
+                   linewidths=0)
+        e = ev[(ev.coin == coin) & (ev.detector == det)]
+        for k, (lab, m) in enumerate((("rank alarm, main monitor also alarms within 60 min", e.matched_main25),
+                                      ("rank alarm only", ~e.matched_main25))):
+            ax.scatter(np.log2(e.scale_ratio[m]), e.shape_ks[m], s=16, color=COLORS[k], label=lab,
+                       edgecolors="white", linewidths=0.5)
+        ax.set_title(f"[REAL] {COINS[coin]}, Jul to Dec 2025", fontsize=10, color=INK, loc="left")
+        ax.set_xlabel("log2 robust scale ratio (240 min before alarm / calibration window)", fontsize=8, color=MUTED)
+        ax.axvline(0, color=MUTED, linewidth=0.6)
+        _style(ax)
+        ax.grid(axis="y", color=GRID, linewidth=0.6)
+    axes[0].set_ylabel("scale-free shape distance (KS of |u| / median |u|)", fontsize=8, color=MUTED)
+    axes[0].legend(fontsize=7, frameon=False, loc="upper left")
+    fig.tight_layout()
+    fig.savefig(OUT / "fig2_real_alarm_profiles.png", dpi=150)
+    plt.close(fig)
+
+
+# ----------------------------------------------------------------------------
 # Main
 # ----------------------------------------------------------------------------
 
-PARTS = {"pilot": part_pilot, "q1": part_q1, "q1b": part_q1b, "q2": part_q2, "q3": part_q3, "q4": part_q4}
+PARTS = {"pilot": part_pilot, "q1": part_q1, "q1b": part_q1b, "q1c": part_q1c, "q2": part_q2, "q3": part_q3, "q4": part_q4, "q5": part_q5, "figs": part_figs}
 
 if __name__ == "__main__":
     todo = sys.argv[1:] or [k for k in PARTS if k != "pilot"]
