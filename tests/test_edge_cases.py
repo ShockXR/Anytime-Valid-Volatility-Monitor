@@ -104,3 +104,25 @@ def test_ew_quantile_scale_strict_has_no_lookahead():
     r2[300:] *= 100.0
     b = ew_quantile_scale(r2, strict=True)
     np.testing.assert_array_equal(a[50:301], b[50:301])
+
+
+def test_betting_edetector_skips_nan_and_checks_upper_bound():
+    """Review m17: one NaN must not disable detection; x above the bound must raise for 'down'."""
+    import numpy as np
+    import pytest
+
+    from avmonitor import detectors as D
+
+    rng = np.random.default_rng(3)
+    r = rng.standard_normal(2000)
+    r[1000:] *= 3.0
+    base = D.calibrate(np.r_[r[:500], np.nan], 3.0)
+    assert np.isfinite(base.m0) and np.isfinite(base.tau)
+    x = np.minimum(r[500:] ** 2, base.tau**2)
+    x_nan = x.copy()
+    x_nan[0] = np.nan
+    a = D.betting_edetector(x, base.m0, "up", threshold=1000).alarm[0]
+    b = D.betting_edetector(x_nan, base.m0, "up", threshold=1000).alarm[0]
+    assert a >= 0 and b >= 0 and abs(a - b) <= 5
+    with pytest.raises(ValueError):
+        D.betting_edetector(x * 0 + base.tau**2 * 2, base.m0, "down", upper=base.tau**2, threshold=1000)

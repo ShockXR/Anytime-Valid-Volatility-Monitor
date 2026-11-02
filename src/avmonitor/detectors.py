@@ -94,6 +94,9 @@ def calibrate(
     if baseline != "plugin":
         raise ValueError("baseline must be 'plugin' or 'cs'")
     r_cal = np.asarray(r_cal, float)
+    r_cal = r_cal[np.isfinite(r_cal)]  # missing values are dropped (review m17), as in the cs branch
+    if r_cal.size < 2:
+        raise ValueError("calibration window has fewer than 2 finite returns")
     scale = float(np.median(np.abs(r_cal)) * MAD_NORMAL_SCALE)
     tau = max(c * scale, floor)
     x = np.minimum(r_cal**2, tau**2)
@@ -188,6 +191,11 @@ def betting_edetector(
         Weight of the adaptive bettor in the mixture (the grid shares the rest).
     start : int
         Monitoring starts at this index (earlier entries are ignored).
+
+    Missing values (NaN) in ``x`` are skipped: the bet factor is 1 at that step
+    (valid when missingness does not depend on the missing value, see
+    ``docs/math.md`` 5.6). Before November 2026 a single NaN silently disabled
+    the detector (independent review, m17).
     """
     x = np.atleast_2d(np.asarray(x, float))[:, start:]
     reps, n = x.shape
@@ -202,6 +210,8 @@ def betting_edetector(
         b = upper / m0
         if b <= 1:
             raise ValueError("upper bound must exceed m0")
+        if np.nanmax(x, initial=0.0) > upper * (1 + 1e-12):
+            raise ValueError("x exceeds the stated upper bound; a decrease bet factor would turn negative")
         lam_max = 1.0 / (b - 1.0)
         grid = lam_max * np.asarray(DEFAULT_DOWN_FRACTIONS if grid is None else grid, float)
         sign = -1.0
@@ -227,6 +237,7 @@ def betting_edetector(
     lam_path = np.empty(n) if (return_path and lam_adapt is not None) else None
     for t in range(n):
         g = sign * (y[:, t] - 1.0)  # gain per unit bet
+        g = np.where(np.isfinite(g), g, 0.0)  # missing value: no bet
         f = 1.0 + grid[None, :] * g[:, None]
         if lam_adapt is not None:
             f = np.concatenate([f, (1.0 + lam_adapt[:, t] * g)[:, None]], axis=1)

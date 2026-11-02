@@ -74,14 +74,14 @@ Fix a truncation level τ and a baseline `m₀ > 0` from a calibration window. F
 
 `X_t = min(r_t², τ²) ∈ [0, τ²]`, and `Y_t = X_t / m₀ ∈ [0, B]` with `B = τ² / m₀`.
 
-Let `F_t` be the information up to time t. The nulls are
+Let `F_t` be the information up to time t: the monitored returns up to t together with the calibration data. Everything the monitor uses (τ, m₀, the bets and the deseasonalising profile) must be known at the time it is used, that is adapted to this filtration (`data.intraday_scale` with its default `start="past"` satisfies this). The nulls are
 
 * for an increase: `H₀↑: E[Y_t | F_{t-1}] ≤ 1` for all t,
 * for a decrease: `H₀↓: E[Y_t | F_{t-1}] ≥ 1` for all t.
 
-These are nonparametric. They restrict only one conditional moment of the truncated squared return and allow any shape, any dependence and any jump process that keeps the moment on the null side.
+These are nonparametric. They restrict only one conditional moment of the truncated squared return and allow any shape, any dependence and any jump process that keeps the moment on the null side. "Any dependence" is a statement about the shape of the joint law, not a licence for any data: the *conditional* mean must stay on the null side at every step. Two common features of real data violate this even when the unconditional variance is constant. Persistent volatility clustering moves the conditional mean above and below m₀ (E9, E10). Price-level microstructure noise makes returns MA(1), so after a large return the next squared return has a higher conditional mean; the raw-return monitor then loses its guarantee (8.5% to 41.5% false alarms per day for noise-to-signal ratios 0.5 to 4 in the pre-averaging alternative, `docs/report_parts/ALT1.md`), and non-overlapping pre-averaged blocks restore it.
 
-**Link to volatility.** If `r_t = σ_t ε_t` and ε has a fixed distribution, then `min(σ² ε², τ²)` is nondecreasing in σ for every ε. So `E[Y_t | F_{t-1}]` is nondecreasing in `σ_t`, and `H₀↑` holds whenever `σ_t` stays at or below its calibration level. This monotonicity holds for every innovation distribution. Only the *size* of the change in `E[Y]` for a given change in σ depends on that distribution.
+**Link to volatility.** Suppose `r_t = σ_t ε_t`, where `σ_t` is known at time t - 1 and the innovation `ε_t` is independent of `(σ_t, F_{t-1})` with a fixed distribution. Then `min(σ² ε², τ²)` is nondecreasing in σ for every ε, so `E[Y_t | F_{t-1}]` is a nondecreasing function of `σ_t`, and `H₀↑` holds whenever `σ_t ≤ σ₀` almost surely, where σ₀ is the calibration level (and `H₀↓` whenever `σ_t ≥ σ₀`). This monotonicity holds for every innovation distribution; only the *size* of the change in `E[Y]` for a given change in σ depends on it. Without the independence (for example with a contemporaneous leverage effect, where the sign or size of ε_t is linked to σ_t), the conditional mean need not be monotone in σ.
 
 ### 5.2 Bets and test supermartingales
 
@@ -93,11 +93,13 @@ In both cases `L_t^{(j)} = Π_{s=j}^{t} f_s` (with `L_{j-1}^{(j)} = 1`) is a non
 
 ### 5.3 Why a decrease detector needs a bounded statistic
 
-**Claim.** Let `H` be the set of all distributions on `[0, ∞)` with mean at least 1. If `E: [0, ∞) → [0, ∞)` satisfies `E_P[E(Y)] ≤ 1` for every `P ∈ H` (an e-variable for H), then `E(y) ≤ 1` for every `y < 1`.
+**Claim.** Let `H` be the set of all distributions on `[0, ∞)` with mean at least 1. If `E: [0, ∞) → [0, ∞)` satisfies `E_P[E(Y)] ≤ 1` for every `P ∈ H` (an e-variable for H), then `E(y) ≤ 1` for every `y ≥ 0`. So no e-variable for H ever exceeds 1.
 
-*Proof.* Fix `y < 1` and `ε ∈ (0, 1)`. Pick `z` such that the two-point law `P_ε = (1 - ε) δ_y + ε δ_z` has mean exactly 1, that is `z = (1 - (1 - ε) y) / ε`. Then `P_ε ∈ H`, so `(1 - ε) E(y) + ε E(z) ≤ 1`. Since `E ≥ 0`, this gives `E(y) ≤ 1 / (1 - ε)`. Let ε go to 0. ∎
+*Proof.* Fix `y < 1` and `ε ∈ (0, 1)`. Pick `z` such that the two-point law `P_ε = (1 - ε) δ_y + ε δ_z` has mean exactly 1, that is `z = (1 - (1 - ε) y) / ε`. Then `P_ε ∈ H`, so `(1 - ε) E(y) + ε E(z) ≤ 1`. Since `E ≥ 0`, this gives `E(y) ≤ 1 / (1 - ε)`. Let ε go to 0. For `y ≥ 1` the point mass `δ_y` is itself in H, so `E(y) ≤ 1` directly. ∎
 
-So without an upper bound on the statistic, no nonparametric evidence against "variance has not fallen" can ever build up from small observations. Truncation supplies the bound `Y ≤ B`, and with it the bets in 5.2. This is the most direct link between Bapat's truncation and the detector: **clipping is what makes a robust detector of volatility decreases possible at all.** For increases, clipping is not needed for validity, but it bounds the effect of a single jump on the wealth (`f_t ≤ 1 + λ (B - 1)`), which is the betting version of the bounded influence of Theorem 3.
+This is a one-sided relative of the classical impossibility result of Bahadur and Savage (1956, Annals of Mathematical Statistics 27(4), 1115 to 1122): without restrictions on the tails, the mean cannot be tested. The asymmetry matters. The *increase* null "mean at most 1" on `[0, ∞)` does admit e-variables (`E(y) = y`), which is why the increase detector also works on raw r² (E4).
+
+So a fall in the variance itself cannot be detected by any nonparametric e-test, whatever statistic it computes. A detector of decreases must therefore change the target to a *bounded* functional of the returns. Truncation does exactly that: the truncated variance `E[min(r², τ²)]` is bounded and testable, and under the fixed-shape assumption of 5.1 it falls exactly when σ falls. This is the most direct link between Bapat's truncation and the detector. Truncation is not the only route (exceedance indicators `1{|r| > q}`, ranks or any bounded increasing transform of r² would also work; E14 studies a rank-based detector), but it is the one with a direct volatility meaning and a known bias (section 3). For increases, clipping is not needed for validity, but it bounds the effect of a single jump on the wealth (`f_t ≤ 1 + λ (B - 1)`), which is the betting version of the bounded influence of Theorem 3.
 
 ### 5.4 E-detectors and the false alarm guarantees
 
@@ -113,7 +115,7 @@ Following Shin, Ramdas and Rinaldo (2024), define the Shiryaev-Roberts type stat
 
 **Theorem A (average run length).** Under the null, `E[τ_A] ≥ A`.
 
-*Proof.* If `E[τ_A] = ∞` there is nothing to show. Otherwise, the increments of `M_t - t` are integrable on `{t ≤ τ_A}` and optional stopping applies to Lemma 1, giving `E[M_{τ_A}] ≤ E[τ_A]`. Since `M_{τ_A} ≥ A`, `A ≤ E[τ_A]`. ∎
+*Proof.* If `E[τ_A] = ∞` there is nothing to show. Otherwise write τ = τ_A. For every fixed t, the stopped process `M_{τ∧t} - (τ∧t)` is a supermartingale started at 0 (Lemma 1 and optional stopping at the bounded time τ∧t), so `E[M_{τ∧t}] ≤ E[τ∧t] ≤ E[τ]`. Since `E[τ] < ∞`, τ is finite almost surely, so `M_{τ∧t} → M_τ ≥ A` almost surely as t grows. M is nonnegative, so Fatou's lemma gives `A ≤ E[M_τ] ≤ liminf E[M_{τ∧t}] ≤ E[τ]`. ∎ (Corrected after the independent review; the earlier version appealed to integrable increments, which is not the right condition.)
 
 **Theorem B (false alarm within a horizon).** Under the null, for every integer m, `P(τ_A ≤ m) ≤ m / A`.
 
@@ -122,9 +124,11 @@ Following Shin, Ramdas and Rinaldo (2024), define the Shiryaev-Roberts type stat
 **Consequences used in the code.**
 
 * Choosing `A = 7800` for 390-step days gives at most a 5% chance of any false alarm per trading day. Choosing `A = 28800` does the same for 1440-minute crypto days.
-* `C_t ≤ M_t` at all times, so the CUSUM version alarms no earlier and inherits both guarantees. It is more conservative (E4: run length above 2.4 times A on average, with runs cut off at 20,000 steps).
-* An average of several M statistics (several fixed bets, or a fixed grid plus an adaptive bet) has the same recursion property. It is again an e-detector and inherits Theorems A and B.
-* Two-sided monitoring: `(M↑ + M↓) / 2` is an e-detector, and `max(M↑, M↓) ≥ 2A` implies `(M↑ + M↓) / 2 ≥ A`. Running each side at level `2A` therefore keeps both guarantees for the first alarm of either side.
+* `C_t ≤ M_t` at all times, so the CUSUM version alarms no earlier and inherits both guarantees. It is more conservative (E4a: average run length 2.31 to 2.40 times A, with runs cut off at 20,000 steps).
+* An average `M̄_t` of several M statistics (several fixed bets, or a fixed grid plus an adaptive bet) does not obey the recursion itself, but it satisfies `E[M̄_t | F_{t-1}] ≤ M̄_{t-1} + 1`, which is all Lemma 1 needs. It is again an e-detector and inherits Theorems A and B.
+* Two-sided monitoring: under the two-sided null `(1 - b) m₀ ≤ E[X_t | F_{t-1}] ≤ (1 + b) m₀`, `(M↑ + M↓) / 2` is an e-detector, and `max(M↑, M↓) ≥ 2A` implies `(M↑ + M↓) / 2 ≥ A`. Running each side at level `2A` therefore keeps both guarantees for the first alarm of either side.
+
+**Corollary C (restarts after alarms).** The monitor restarts after every alarm. Suppose the null holds in every segment relative to that segment's baseline (true baselines). Let `G_t` be the sum of the two-sided statistic `(M↑ + M↓)/2` at all past alarms, plus its current value, minus the number of monitored steps so far. G is a supermartingale with `G₀ = 0`, and every alarm adds at least A to the banked sum. Hence the expected number of false alarms in m monitored steps is at most `m / A`. Numerical check (E4e) [SYNTHETIC]: with A = 300, the true baseline gave 26.5 alarms per 10,000 monitored steps and the streaming monitor with plug-in recalibration on 390 steps gave 30.1, against the bound of 33.3. Section 6 (Corollary 6.6) gives the version with an estimated baseline. (Corollary C was suggested by the independent review.)
 
 *Status:* proved, assuming the null holds with the true `m₀`.
 
@@ -134,16 +138,17 @@ For a bet on `Y` with conditional mean `μ` and variance `v`, the expected log-g
 
 `λ* ≈ (μ - 1) / (v + (μ - 1)²)`
 
-(the aGRAPA approximation of Waudby-Smith and Ramdas 2024). Since `E[Y²] = E[r̃⁴] / m₀²`, the variance v is a *truncated local quarticity* (up to the factor 3 and the scale `m₀²`). The adaptive bettor in `detectors.betting_edetector(adaptive_h=...)` estimates μ and `E[Y²]` with the normalised one-sided Gaussian kernel of section 2, applied to data strictly before t, so `λ_t` is predictable and validity is untouched.
+(the aGRAPA approximation of Waudby-Smith and Ramdas 2024). Since `E[Y²] = E[r̃⁴] / m₀²`, the second moment of Y (which with μ gives v) is a *truncated local quarticity* (up to the factor 3 and the scale `m₀²`). The adaptive bettor in `detectors.betting_edetector(adaptive_h=...)` estimates μ and `E[Y²]` with the normalised one-sided Gaussian kernel of section 2, applied to data strictly before t, so `λ_t` is predictable and validity is untouched.
 
-*Status:* validity proved (any predictable bet works). Whether the adaptive bet improves detection is an empirical question. In E4 it did not improve on a fixed grid of bets by a meaningful margin.
+*Status:* validity proved (any predictable bet works). Whether the adaptive bet improves detection is an empirical question. In E4 it was slightly slower than a fixed grid of bets in 14 of 18 cells (by up to 9%).
 
 ### 5.6 What is not covered by the proofs
 
-1. **Estimated baseline.** The theorems assume the true `m₀`. In practice `m₀` comes from a calibration window. If the estimate is too low, the increase detector is anti-conservative. E4d measures the effect: with 390 calibration steps the one-day false alarm rate was 5.4% (bound 5%), with 1440 or more it was at most 2.4%. A margin of one standard error removes the excess. A fully rigorous treatment would use a confidence sequence for `m₀` (Shekhar and Ramdas 2024). Section 6 does this: with a confidence-sequence baseline (`baseline="cs"`) the guarantee becomes P(false alarm within m steps) ≤ δ + m / A, proved with the baseline estimated from the data.
-2. **Volatility that drifts inside a regime.** The null asks the conditional truncated variance never to exceed the baseline. Slow stochastic volatility violates this by design, so the detector rightly alarms (E4a: about 25% per day for a log-volatility standard deviation of 0.15). The "null band" `H₀↑: E[Y_t | F_{t-1}] ≤ 1 + b` restores control at the cost of detecting only changes larger than about b (E4c).
-3. **Intraday seasonality.** Real returns are deseasonalised by a predictable intraday profile (`data.intraday_scale`). Errors in that profile act like a small time-varying violation of the null and are absorbed by the band.
+1. **Estimated baseline.** The theorems assume the true `m₀`. In practice `m₀` comes from a calibration window. If the estimate is too low, the increase detector is anti-conservative. E4d and E4e measure the effect. The informative comparison is with the rate under the true baseline, not with the bound: with 390 calibration steps the one-day false alarm rate of the increase side was 4.6% to 5.1% against 1.6% to 1.8% with the true baseline (E4e; E8 found 4.5% to 4.9%), so the plug-in error roughly triples the rate and only the slack in Ville's inequality keeps it near the bound. With 1440 steps it was 2.0% to 2.8%. Over longer horizons the excess grows: in E10 (Q10b2), exactly i.i.d. standardised returns monitored for five days with a one-day plug-in baseline gave 44% false alarms against the 25% the theorem guarantees with the true baseline. A margin of one standard error removes most of the one-day excess. A fully rigorous treatment would use a confidence sequence for `m₀` (Shekhar and Ramdas 2024). Section 6 does this: with a confidence-sequence baseline (`baseline="cs"`) the guarantee becomes P(false alarm within m steps) ≤ δ + m / A, proved with the baseline estimated from the data.
+2. **Volatility that drifts inside a regime.** The null asks the conditional truncated variance never to exceed the baseline. Slow stochastic volatility violates this by design, so the detector rightly alarms (E4a: about 25% per day for a log-volatility standard deviation of 0.15). The "null band" `H₀↑: E[Y_t | F_{t-1}] ≤ 1 + b` reduces false alarms at the cost of detecting only changes larger than about b (E4c: from about 25% to 8.3% at b = 0.25 and 1.7% at b = 0.5). It restores the guarantee only if the conditional truncated variance stays inside the band, which slow log-normal drift does not do, and persistent GARCH clustering is not absorbed by any reasonable band (E9). Monitoring relative to a volatility forecast is the principled alternative (E10).
+3. **Intraday seasonality.** Real returns are deseasonalised by a predictable intraday profile (`data.intraday_scale`). Errors in that profile act like a small time-varying violation of the null. We expect a band to absorb small errors, but no experiment so far isolates this effect (E7 compares deseasonalisation choices on Nifty).
 4. **Interpretation.** An alarm means the truncated variance moved. Mapping that to a change in σ requires a fixed innovation shape (section 5.1). A change in the tail shape alone, with σ unchanged, can also trigger an alarm.
+5. **Missing returns.** The monitor skips a missing return. That amounts to a zero bet chosen after seeing that r_t is missing, which is valid if the null holds conditionally on the return being observed: missingness completely at random, or decided by the past (for example scheduled breaks). Missing returns must never be replaced by zeros, which look like evidence for a fall in volatility (review M6; fixed in E5 and E8). In the plug-in calibration, missing values in the window reduce the effective sample below `cal_len`.
 
 ## 6. Keeping the guarantee with an estimated baseline
 
