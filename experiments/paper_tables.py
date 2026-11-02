@@ -1,4 +1,9 @@
-"""Numbers transcribed from Bapat (2026), Tables 3, 4, 6, 7 and 8 (published results)."""
+"""Numbers transcribed from Bapat (2026), Tables 3 to 8 (published results, [PUBLISHED]).
+
+Tables 5 and 6 refer to 1-minute closes of five coins, 1 July to 31 December 2025;
+the paper does not name the exchange. The "true quarticity" behind the RMSE
+column of Table 6 is the assumed value 2.2e-6 stated in Section 5.
+"""
 
 # Table 7: (p_jump, sigma_J, h) -> (RMSE kernel, RMSE robust kernel)
 TABLE7 = {
@@ -40,3 +45,27 @@ TABLE4 = {
 TABLE6_BTC = {"RQ": 9.92e-7, "BPQ": 0.0262, "TPQ": 0.8801, "MinRQ": 4.93e-8, "MedRQ": 1.17e-7, "Kernel": 3.98e-11, "Robust kernel": 1.54e-13}
 # Table 5, BTC row
 TABLE5_BTC = {"min": -0.0298, "q1": -2.21e-4, "median": 0.0, "mean": -7.73e-7, "q3": 2.22e-4, "max": 0.0314}
+
+# Table 5, all five coins: summary of 1-minute log returns
+TABLE5_ALL = {
+    "BTC": {"min": -0.0298, "q1": -2.21e-4, "median": 0.0, "mean": -7.73e-7, "q3": 2.22e-4, "max": 0.0314},
+    "ETH": {"min": -0.0455, "q1": -3.59e-4, "median": 0.0, "mean": -6.70e-7, "q3": 3.63e-4, "max": 0.0274},
+    "XRP": {"min": -0.1240, "q1": -4.30e-4, "median": 0.0, "mean": -7.51e-7, "q3": 4.32e-4, "max": 0.1085},
+    "SOL": {"min": -0.0367, "q1": -3.64e-4, "median": 0.0, "mean": -8.20e-7, "q3": 3.71e-4, "max": 0.0331},
+    "DOGE": {"min": -0.0788, "q1": 0.0, "median": 0.0, "mean": -1.31e-6, "q3": 0.0, "max": 0.0944},
+}
+
+# Table 6, all five coins: estimator -> (quarticity estimate, "RMSE" against the assumed 2.2e-6)
+TABLE6_TRUE_QUARTICITY = 2.2e-6
+TABLE6_ALL = {
+    "BTC": {"RQ": (9.92e-7, 1.20e-6), "BPQ": (0.0262, 0.0263), "TPQ": (0.8801, 0.8801), "MinRQ": (4.93e-8, 2.15e-6),
+            "MedRQ": (1.17e-7, 2.22e-6), "Kernel": (3.98e-11, 2.20e-6), "Robust kernel": (1.54e-13, 2.12e-6)},
+    "ETH": {"RQ": (5.02e-6, 2.82e-6), "BPQ": (0.0736, 0.0736), "TPQ": (1.7840, 1.7840), "MinRQ": (9.43e-7, 1.25e-6),
+            "MedRQ": (1.97e-6, 2.25e-7), "Kernel": (2.01e-10, 2.19e-6), "Robust kernel": (1.12e-12, 2.12e-6)},
+    "XRP": {"RQ": (2.34e-4, 2.31e-4), "BPQ": (0.1181, 0.1181), "TPQ": (2.3716, 2.3716), "MinRQ": (9.59e-5, 9.37e-5),
+            "MedRQ": (1.77e-4, 1.75e-4), "Kernel": (9.42e-9, 2.19e-6), "Robust kernel": (2.00e-12, 2.12e-6)},
+    "SOL": {"RQ": (7.73e-6, 5.53e-6), "BPQ": (0.0922, 0.0922), "TPQ": (1.8713, 1.8713), "MinRQ": (1.35e-6, 8.46e-7),
+            "MedRQ": (2.64e-6, 4.43e-7), "Kernel": (3.10e-10, 2.19e-6), "Robust kernel": (1.21e-12, 2.20e-6)},
+    "DOGE": {"RQ": (6.66e-5, 6.44e-5), "BPQ": (9.54e-2, 9.54e-2), "TPQ": (1.1926, 1.1926), "MinRQ": (7.07e-6, 4.87e-6),
+             "MedRQ": (1.47e-5, 1.25e-5), "Kernel": (2.67e-9, 2.19e-6), "Robust kernel": (2.00e-12, 2.12e-6)},
+}
