@@ -1,0 +1,1791 @@
+time,direction,realised_over_forecast,symbol,monitor_input
+2025-07-03 12:45:00+00:00,up,0.8311532126364273,BTCUSDT,deseasonalised only (as E5)
+2025-07-04 21:49:00+00:00,down,0.3893631220243111,BTCUSDT,deseasonalised only (as E5)
+2025-07-06 05:51:00+00:00,down,1.4749484246996003,BTCUSDT,deseasonalised only (as E5)
+2025-07-07 16:52:00+00:00,up,1.0541592515325178,BTCUSDT,deseasonalised only (as E5)
+2025-07-09 00:23:00+00:00,down,1.6655916475634314,BTCUSDT,deseasonalised only (as E5)
+2025-07-10 21:24:00+00:00,up,1.553566594504447,BTCUSDT,deseasonalised only (as E5)
+2025-07-12 01:49:00+00:00,down,0.3438153189781978,BTCUSDT,deseasonalised only (as E5)
+2025-07-13 10:46:00+00:00,down,2.860517551484153,BTCUSDT,deseasonalised only (as E5)
+2025-07-15 01:52:00+00:00,up,1.7216371425501855,BTCUSDT,deseasonalised only (as E5)
+2025-07-16 08:20:00+00:00,down,0.883830058398694,BTCUSDT,deseasonalised only (as E5)
+2025-07-17 17:30:00+00:00,down,1.2141658523632592,BTCUSDT,deseasonalised only (as E5)
+2025-07-19 00:28:00+00:00,down,0.2680984390078392,BTCUSDT,deseasonalised only (as E5)
+2025-07-20 12:17:00+00:00,up,1.506150816238164,BTCUSDT,deseasonalised only (as E5)
+2025-07-22 01:52:00+00:00,up,1.5586320564391083,BTCUSDT,deseasonalised only (as E5)
+2025-07-24 02:34:00+00:00,down,1.069807105429908,BTCUSDT,deseasonalised only (as E5)
+2025-07-25 03:17:00+00:00,up,1.6263514766520535,BTCUSDT,deseasonalised only (as E5)
+2025-07-26 04:51:00+00:00,down,0.15112380070119047,BTCUSDT,deseasonalised only (as E5)
+2025-07-27 16:19:00+00:00,up,1.1487589951946968,BTCUSDT,deseasonalised only (as E5)
+2025-07-29 00:46:00+00:00,up,1.1544416492833036,BTCUSDT,deseasonalised only (as E5)
+2025-07-30 18:48:00+00:00,up,0.704359099077084,BTCUSDT,deseasonalised only (as E5)
+2025-07-31 20:31:00+00:00,up,3.179956562943155,BTCUSDT,deseasonalised only (as E5)
+2025-08-02 02:56:00+00:00,down,0.5380781393922965,BTCUSDT,deseasonalised only (as E5)
+2025-08-03 08:15:00+00:00,down,0.3896923447612021,BTCUSDT,deseasonalised only (as E5)
+2025-08-04 10:32:00+00:00,up,0.8570771448557923,BTCUSDT,deseasonalised only (as E5)
+2025-08-05 12:42:00+00:00,up,1.152123272801873,BTCUSDT,deseasonalised only (as E5)
+2025-08-06 19:15:00+00:00,down,0.7350858636349378,BTCUSDT,deseasonalised only (as E5)
+2025-08-08 01:10:00+00:00,up,0.4847371651649907,BTCUSDT,deseasonalised only (as E5)
+2025-08-09 02:56:00+00:00,down,0.7679399952861476,BTCUSDT,deseasonalised only (as E5)
+2025-08-10 03:26:00+00:00,up,1.9826258363653353,BTCUSDT,deseasonalised only (as E5)
+2025-08-11 11:49:00+00:00,up,1.1610351024087138,BTCUSDT,deseasonalised only (as E5)
+2025-08-13 14:19:00+00:00,up,2.3407365486490463,BTCUSDT,deseasonalised only (as E5)
+2025-08-15 02:34:00+00:00,down,0.5511881796333781,BTCUSDT,deseasonalised only (as E5)
+2025-08-16 09:26:00+00:00,down,0.22902657168372484,BTCUSDT,deseasonalised only (as E5)
+2025-08-17 15:53:00+00:00,down,1.7904550804352353,BTCUSDT,deseasonalised only (as E5)
+2025-08-19 04:16:00+00:00,up,1.1129195396815643,BTCUSDT,deseasonalised only (as E5)
+2025-08-21 21:19:00+00:00,up,1.1375021546808677,BTCUSDT,deseasonalised only (as E5)
+2025-08-23 08:59:00+00:00,down,0.2971423598897626,BTCUSDT,deseasonalised only (as E5)
+2025-08-24 11:01:00+00:00,up,5.196057785065396,BTCUSDT,deseasonalised only (as E5)
+2025-08-25 20:13:00+00:00,up,1.285576797018166,BTCUSDT,deseasonalised only (as E5)
+2025-08-27 01:44:00+00:00,down,0.9375669249748216,BTCUSDT,deseasonalised only (as E5)
+2025-08-28 10:21:00+00:00,down,0.6139084194475025,BTCUSDT,deseasonalised only (as E5)
+2025-08-29 14:20:00+00:00,up,0.5939025785028197,BTCUSDT,deseasonalised only (as E5)
+2025-08-30 16:28:00+00:00,down,0.3576038846732183,BTCUSDT,deseasonalised only (as E5)
+2025-08-31 22:44:00+00:00,up,2.189996932696336,BTCUSDT,deseasonalised only (as E5)
+2025-09-03 05:00:00+00:00,down,0.6612980035202219,BTCUSDT,deseasonalised only (as E5)
+2025-09-05 00:04:00+00:00,up,1.7183308255048761,BTCUSDT,deseasonalised only (as E5)
+2025-09-06 01:51:00+00:00,down,0.16464045623472068,BTCUSDT,deseasonalised only (as E5)
+2025-09-07 08:48:00+00:00,up,0.7031184910796727,BTCUSDT,deseasonalised only (as E5)
+2025-09-08 09:58:00+00:00,up,1.0567937673564787,BTCUSDT,deseasonalised only (as E5)
+2025-09-10 12:39:00+00:00,up,0.8524845156349964,BTCUSDT,deseasonalised only (as E5)
+2025-09-13 05:09:00+00:00,down,0.2999605381031858,BTCUSDT,deseasonalised only (as E5)
+2025-09-14 22:18:00+00:00,up,2.302061999331093,BTCUSDT,deseasonalised only (as E5)
+2025-09-16 15:31:00+00:00,down,1.1013461161343214,BTCUSDT,deseasonalised only (as E5)
+2025-09-17 18:04:00+00:00,up,2.019698410332,BTCUSDT,deseasonalised only (as E5)
+2025-09-19 02:18:00+00:00,down,0.4373858263857624,BTCUSDT,deseasonalised only (as E5)
+2025-09-20 05:48:00+00:00,down,0.1775095449617118,BTCUSDT,deseasonalised only (as E5)
+2025-09-21 17:16:00+00:00,up,5.769606882434472,BTCUSDT,deseasonalised only (as E5)
+2025-09-22 21:00:00+00:00,up,0.8544786234413049,BTCUSDT,deseasonalised only (as E5)
+2025-09-24 04:15:00+00:00,up,0.839219443835845,BTCUSDT,deseasonalised only (as E5)
+2025-09-25 04:42:00+00:00,up,1.9793639086439336,BTCUSDT,deseasonalised only (as E5)
+2025-09-26 23:56:00+00:00,down,0.16106793695347238,BTCUSDT,deseasonalised only (as E5)
+2025-09-28 01:04:00+00:00,up,0.6838303250849616,BTCUSDT,deseasonalised only (as E5)
+2025-09-29 08:31:00+00:00,up,1.0578421872774653,BTCUSDT,deseasonalised only (as E5)
+2025-09-30 10:21:00+00:00,up,1.6774324653341517,BTCUSDT,deseasonalised only (as E5)
+2025-10-02 00:13:00+00:00,up,0.962525445799801,BTCUSDT,deseasonalised only (as E5)
+2025-10-03 16:34:00+00:00,up,0.9430773573451803,BTCUSDT,deseasonalised only (as E5)
+2025-10-04 18:54:00+00:00,down,2.2688937811860783,BTCUSDT,deseasonalised only (as E5)
+2025-10-06 00:29:00+00:00,up,0.9563810960756236,BTCUSDT,deseasonalised only (as E5)
+2025-10-09 09:23:00+00:00,up,0.9001603844312681,BTCUSDT,deseasonalised only (as E5)
+2025-10-10 15:30:00+00:00,up,31.551957986537822,BTCUSDT,deseasonalised only (as E5)
+2025-10-11 16:57:00+00:00,down,0.2060672935092574,BTCUSDT,deseasonalised only (as E5)
+2025-10-12 21:36:00+00:00,up,0.3079556606284953,BTCUSDT,deseasonalised only (as E5)
+2025-10-14 02:22:00+00:00,down,0.6595987109529743,BTCUSDT,deseasonalised only (as E5)
+2025-10-15 20:12:00+00:00,down,1.1290376662760848,BTCUSDT,deseasonalised only (as E5)
+2025-10-17 04:06:00+00:00,down,1.14376865222349,BTCUSDT,deseasonalised only (as E5)
+2025-10-18 06:12:00+00:00,down,0.22824052312793622,BTCUSDT,deseasonalised only (as E5)
+2025-10-19 08:50:00+00:00,up,1.179765893096558,BTCUSDT,deseasonalised only (as E5)
+2025-10-21 05:11:00+00:00,up,2.4875316202839883,BTCUSDT,deseasonalised only (as E5)
+2025-10-23 03:29:00+00:00,down,0.5379087198139842,BTCUSDT,deseasonalised only (as E5)
+2025-10-25 02:05:00+00:00,down,0.20371284559502442,BTCUSDT,deseasonalised only (as E5)
+2025-10-26 09:37:00+00:00,up,2.0342853217817014,BTCUSDT,deseasonalised only (as E5)
+2025-10-28 10:42:00+00:00,down,1.2566300066431864,BTCUSDT,deseasonalised only (as E5)
+2025-10-29 18:39:00+00:00,up,1.7674680728972,BTCUSDT,deseasonalised only (as E5)
+2025-10-31 23:17:00+00:00,down,0.17062471396615683,BTCUSDT,deseasonalised only (as E5)
+2025-11-02 04:52:00+00:00,up,1.0564621277957746,BTCUSDT,deseasonalised only (as E5)
+2025-11-03 07:00:00+00:00,up,2.2468000005969517,BTCUSDT,deseasonalised only (as E5)
+2025-11-04 17:21:00+00:00,up,2.2803375925664335,BTCUSDT,deseasonalised only (as E5)
+2025-11-05 19:42:00+00:00,down,0.68451122158558,BTCUSDT,deseasonalised only (as E5)
+2025-11-07 13:10:00+00:00,up,0.6955386919956796,BTCUSDT,deseasonalised only (as E5)
+2025-11-08 15:55:00+00:00,down,0.3547725051760039,BTCUSDT,deseasonalised only (as E5)
+2025-11-09 19:31:00+00:00,up,1.1484677803009884,BTCUSDT,deseasonalised only (as E5)
+2025-11-11 02:13:00+00:00,up,0.9266624285482465,BTCUSDT,deseasonalised only (as E5)
+2025-11-12 07:14:00+00:00,down,1.5263425191728446,BTCUSDT,deseasonalised only (as E5)
+2025-11-13 18:17:00+00:00,up,3.3332044440229307,BTCUSDT,deseasonalised only (as E5)
+2025-11-15 04:55:00+00:00,down,0.32106219986736606,BTCUSDT,deseasonalised only (as E5)
+2025-11-16 18:11:00+00:00,up,1.2267256866296272,BTCUSDT,deseasonalised only (as E5)
+2025-11-17 20:37:00+00:00,up,1.2743334635468706,BTCUSDT,deseasonalised only (as E5)
+2025-11-19 15:14:00+00:00,down,1.1035348301121641,BTCUSDT,deseasonalised only (as E5)
+2025-11-20 17:09:00+00:00,up,3.6171474542135535,BTCUSDT,deseasonalised only (as E5)
+2025-11-22 01:53:00+00:00,down,0.30234883465805573,BTCUSDT,deseasonalised only (as E5)
+2025-11-24 07:03:00+00:00,up,0.6311869324984481,BTCUSDT,deseasonalised only (as E5)
+2025-11-27 09:04:00+00:00,down,0.5111522326561115,BTCUSDT,deseasonalised only (as E5)
+2025-11-28 14:28:00+00:00,up,0.5292380845218972,BTCUSDT,deseasonalised only (as E5)
+2025-11-30 02:52:00+00:00,down,1.4271351381228374,BTCUSDT,deseasonalised only (as E5)
+2025-12-01 03:41:00+00:00,up,2.2240219979519797,BTCUSDT,deseasonalised only (as E5)
+2025-12-02 07:45:00+00:00,down,1.3338454898941616,BTCUSDT,deseasonalised only (as E5)
+2025-12-03 14:21:00+00:00,up,0.8621061796271229,BTCUSDT,deseasonalised only (as E5)
+2025-12-04 19:26:00+00:00,up,0.8436813607435579,BTCUSDT,deseasonalised only (as E5)
+2025-12-06 04:01:00+00:00,down,0.3070836889791221,BTCUSDT,deseasonalised only (as E5)
+2025-12-07 14:35:00+00:00,up,1.7991899235354574,BTCUSDT,deseasonalised only (as E5)
+2025-12-09 22:01:00+00:00,up,1.3989212247413525,BTCUSDT,deseasonalised only (as E5)
+2025-12-11 02:49:00+00:00,up,0.8376874387721132,BTCUSDT,deseasonalised only (as E5)
+2025-12-12 09:08:00+00:00,down,0.42658675723760187,BTCUSDT,deseasonalised only (as E5)
+2025-12-13 15:27:00+00:00,down,0.5043542288040914,BTCUSDT,deseasonalised only (as E5)
+2025-12-14 17:13:00+00:00,up,1.802361792182265,BTCUSDT,deseasonalised only (as E5)
+2025-12-16 10:59:00+00:00,up,1.1822349572692517,BTCUSDT,deseasonalised only (as E5)
+2025-12-17 16:03:00+00:00,up,0.8841616465941675,BTCUSDT,deseasonalised only (as E5)
+2025-12-18 17:42:00+00:00,up,1.6116665580560865,BTCUSDT,deseasonalised only (as E5)
+2025-12-19 22:46:00+00:00,down,0.12695352815660182,BTCUSDT,deseasonalised only (as E5)
+2025-12-21 09:10:00+00:00,up,1.1962754426761981,BTCUSDT,deseasonalised only (as E5)
+2025-12-23 06:23:00+00:00,up,0.8270147178116157,BTCUSDT,deseasonalised only (as E5)
+2025-12-24 18:57:00+00:00,down,0.31516420721963334,BTCUSDT,deseasonalised only (as E5)
+2025-12-25 23:02:00+00:00,up,1.8486258069135482,BTCUSDT,deseasonalised only (as E5)
+2025-12-27 00:51:00+00:00,down,0.2250014992226654,BTCUSDT,deseasonalised only (as E5)
+2025-12-28 23:24:00+00:00,up,3.951060474960916,BTCUSDT,deseasonalised only (as E5)
+2025-12-30 01:42:00+00:00,down,0.9302860084403308,BTCUSDT,deseasonalised only (as E5)
+2025-07-03 13:04:00+00:00,up,0.773276157647856,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-07-05 14:41:00+00:00,down,0.25852130293359404,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-07-06 15:46:00+00:00,up,1.8897317832492264,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-07-09 19:46:00+00:00,up,1.4184178013600184,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-07-10 21:30:00+00:00,up,1.4844760336642597,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-07-12 03:01:00+00:00,down,0.36063862215354897,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-07-13 13:12:00+00:00,up,3.0038070593216677,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-07-14 16:33:00+00:00,down,1.5722517518104508,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-07-17 21:16:00+00:00,up,1.1442426284634264,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-07-19 07:23:00+00:00,down,0.28658386361548055,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-07-20 12:07:00+00:00,up,1.5060056226314296,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-07-22 14:51:00+00:00,down,0.6871627201138489,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-07-23 20:55:00+00:00,up,1.018558818622271,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-07-25 03:07:00+00:00,up,1.6786751780635714,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-07-26 05:44:00+00:00,down,0.1562323542827451,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-07-27 11:05:00+00:00,up,0.8799385245680823,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-07-30 19:18:00+00:00,up,0.6413503986629806,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-07-31 20:33:00+00:00,up,3.1359162884573557,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-08-02 02:16:00+00:00,down,0.5315833932788484,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-08-03 09:51:00+00:00,down,0.4509723118079336,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-08-05 08:37:00+00:00,up,1.2986586482112552,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-08-06 19:18:00+00:00,down,0.7372299860329208,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-08-08 01:19:00+00:00,up,0.4454206233757635,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-08-09 05:09:00+00:00,up,1.0770657699115158,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-08-10 17:05:00+00:00,down,2.1676697148028556,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-08-13 14:24:00+00:00,up,2.3221631005568533,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-08-14 18:02:00+00:00,down,0.6132719902971728,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-08-16 15:29:00+00:00,down,0.2212699823173161,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-08-17 23:19:00+00:00,up,2.1043916813328027,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-08-19 11:39:00+00:00,down,0.8797742794828929,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-08-20 14:53:00+00:00,up,0.91312478856773,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-08-21 21:03:00+00:00,up,1.2048188087226246,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-08-23 09:44:00+00:00,down,0.3102199700087632,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-08-24 11:02:00+00:00,up,5.1966033391111734,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-08-25 20:11:00+00:00,up,1.2996961620423928,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-08-28 04:09:00+00:00,down,0.4457812140607875,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-08-29 07:27:00+00:00,up,1.1061840080113872,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-08-30 15:27:00+00:00,down,0.3480662172478408,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-08-31 22:34:00+00:00,up,2.1777665039484964,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-09-02 07:17:00+00:00,down,1.0857487688533833,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-09-05 07:18:00+00:00,up,1.56585751338578,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-09-06 08:47:00+00:00,down,0.2016324155075199,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-09-07 19:10:00+00:00,up,1.1574040221828714,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-09-09 06:49:00+00:00,up,1.1255255089617109,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-09-10 16:27:00+00:00,down,0.8660979148285162,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-09-13 08:11:00+00:00,down,0.32377506139001283,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-09-14 22:19:00+00:00,up,2.2949119024067506,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-09-17 18:06:00+00:00,up,1.9413179605881703,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-09-20 03:23:00+00:00,down,0.1812528931610684,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-09-21 17:17:00+00:00,up,5.754741656562445,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-09-23 01:30:00+00:00,down,0.8177728854404483,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-09-24 04:12:00+00:00,up,0.8452758466653613,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-09-25 04:44:00+00:00,up,1.939392962206737,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-09-27 00:13:00+00:00,down,0.1609856023118991,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-09-28 00:56:00+00:00,up,0.6852733358855924,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-09-30 21:43:00+00:00,up,1.195832257895929,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-10-02 00:06:00+00:00,up,1.0031325047028292,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-10-03 16:31:00+00:00,up,0.9472021398743125,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-10-05 02:37:00+00:00,up,2.628836926623496,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-10-06 21:36:00+00:00,up,0.9577159194054847,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-10-09 08:41:00+00:00,up,0.9514350622047698,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-10-10 15:22:00+00:00,up,32.66861283229898,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-10-11 16:44:00+00:00,down,0.19886063115101896,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-10-12 21:16:00+00:00,up,0.32619071613004486,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-10-14 05:09:00+00:00,up,0.661488048871432,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-10-15 20:49:00+00:00,up,1.075287262404366,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-10-17 04:20:00+00:00,down,1.1505288528263056,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-10-18 14:10:00+00:00,down,0.49163708277904505,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-10-19 22:31:00+00:00,up,0.8981198108228573,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-10-21 05:16:00+00:00,up,2.458046634115536,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-10-22 09:15:00+00:00,down,0.9456630159917859,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-10-25 15:47:00+00:00,down,0.42668375157816374,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-10-26 22:01:00+00:00,up,2.1536356688982092,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-10-28 14:43:00+00:00,up,1.2789056287856417,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-10-29 18:38:00+00:00,up,2.1465139090478136,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-10-31 12:05:00+00:00,up,0.45770580332198946,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-11-02 04:43:00+00:00,up,1.0655894291655474,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-11-03 15:19:00+00:00,down,2.4476699371417983,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-11-04 18:38:00+00:00,up,1.9336204060019069,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-11-06 15:46:00+00:00,up,0.9990242115198915,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-11-08 09:42:00+00:00,down,0.315620238021252,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-11-09 19:29:00+00:00,up,1.1512904749737392,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-11-13 18:29:00+00:00,up,3.028320473357397,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-11-15 05:37:00+00:00,down,0.3257118467939382,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-11-16 11:32:00+00:00,up,1.0288076961719685,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-11-17 20:51:00+00:00,up,1.2370169719818354,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-11-19 21:32:00+00:00,up,1.1603264868884824,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-11-21 12:40:00+00:00,up,0.7464870612847655,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-11-22 17:50:00+00:00,down,0.3384735758860827,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-11-23 23:19:00+00:00,up,0.8849519571519989,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-11-26 18:46:00+00:00,up,0.669672006975061,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-11-28 09:00:00+00:00,up,0.8267287529972036,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-11-29 18:36:00+00:00,up,0.6061096692609662,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-11-30 23:53:00+00:00,up,3.982293926085539,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-12-02 06:41:00+00:00,down,1.2655972906642883,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-12-03 14:22:00+00:00,up,0.8590298241264119,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-12-04 19:26:00+00:00,up,0.8436813607435579,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-12-06 05:59:00+00:00,down,0.30543305327670806,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-12-07 07:39:00+00:00,up,1.7793323199350064,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-12-10 03:14:00+00:00,down,1.5877444633927607,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-12-11 07:57:00+00:00,down,0.8109650525126947,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-12-12 15:46:00+00:00,up,0.3200506466305309,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-12-14 10:25:00+00:00,up,1.956089612084763,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-12-15 15:35:00+00:00,up,1.9617581915915843,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-12-16 19:15:00+00:00,down,1.083462460920753,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-12-18 13:40:00+00:00,up,1.8591469813166654,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-12-19 23:10:00+00:00,down,0.12228315490455809,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-12-21 02:15:00+00:00,up,0.8696454483455767,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-12-23 06:55:00+00:00,up,0.7954217151564759,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-12-24 20:03:00+00:00,down,0.3251515047820761,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-12-25 22:59:00+00:00,up,1.8555996507599728,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-12-27 01:14:00+00:00,down,0.22891661565041352,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-12-28 19:34:00+00:00,up,3.7301899898863446,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-12-29 22:03:00+00:00,down,0.8283183968084501,BTCUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-07-03 12:50:00+00:00,up,0.8036776421861834,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-05 01:48:00+00:00,down,0.371389382743735,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-06 14:07:00+00:00,up,1.8558110247417958,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-08 22:49:00+00:00,down,1.589116080390365,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-10 21:27:00+00:00,up,1.5391000889176738,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-12 01:52:00+00:00,down,0.3447812694898059,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-13 13:16:00+00:00,up,3.000009295704304,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-14 19:24:00+00:00,down,1.7035048709996843,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-16 00:10:00+00:00,down,0.6250288204048616,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-17 01:52:00+00:00,up,1.146173878676162,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-19 00:31:00+00:00,down,0.2686676023074568,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-20 03:50:00+00:00,up,1.028774049708132,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-21 10:43:00+00:00,up,1.730775347368843,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-22 16:59:00+00:00,down,0.7094469307064549,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-24 04:14:00+00:00,up,1.29869583255498,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-25 05:08:00+00:00,up,1.1159260491089846,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-26 06:44:00+00:00,down,0.1603736571854558,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-27 16:03:00+00:00,up,1.1683443705430228,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-30 18:49:00+00:00,up,0.7012153916975896,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-31 20:20:00+00:00,up,3.1921283516292864,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-02 02:07:00+00:00,down,0.5302706211751264,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-03 08:45:00+00:00,down,0.41554777361819184,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-04 14:55:00+00:00,up,1.0655183402177457,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-06 05:39:00+00:00,up,0.7077718347775962,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-07 10:33:00+00:00,up,1.0490272417512367,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-08 23:16:00+00:00,down,0.6568984367834689,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-10 03:16:00+00:00,up,2.0295532306046593,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-14 12:52:00+00:00,up,0.7784181046613482,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-15 22:37:00+00:00,down,0.2719330142858735,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-17 05:15:00+00:00,up,0.8553232604509626,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-18 06:05:00+00:00,up,1.5976325617381202,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-19 12:39:00+00:00,down,0.9784998325808312,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-20 18:39:00+00:00,up,0.7568778736853649,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-21 21:03:00+00:00,up,1.2048188087226246,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-23 08:51:00+00:00,down,0.2962118113846145,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-24 10:54:00+00:00,up,5.24966091563389,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-25 20:16:00+00:00,up,1.2458603362369256,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-27 03:14:00+00:00,down,0.9513055542308697,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-28 10:48:00+00:00,down,0.624647931908749,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-29 14:26:00+00:00,up,0.5726303186775188,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-30 16:54:00+00:00,down,0.36598259923740606,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-31 22:33:00+00:00,up,2.169710849244004,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-09-02 07:29:00+00:00,down,1.0988865074531216,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-09-04 00:09:00+00:00,down,0.9397613276394494,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-09-05 07:18:00+00:00,up,1.56585751338578,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-09-06 08:39:00+00:00,down,0.19900251113647832,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-09-07 09:59:00+00:00,up,0.7572890027395588,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-09-09 06:22:00+00:00,up,1.1723997565660411,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-09-10 13:01:00+00:00,up,0.8073110258430531,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-09-13 06:46:00+00:00,down,0.3116358053199033,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-09-14 22:12:00+00:00,up,2.2995790687252953,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-09-16 00:54:00+00:00,down,1.070538716930126,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-09-17 18:04:00+00:00,up,2.019698410332,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-09-19 02:59:00+00:00,down,0.4340967381650786,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-09-20 06:52:00+00:00,down,0.1878194956812882,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-09-21 17:18:00+00:00,up,5.756768361020584,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-09-23 01:21:00+00:00,down,0.814413140722635,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-09-24 04:12:00+00:00,up,0.8452758466653613,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-09-25 04:36:00+00:00,up,1.9908958527319178,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-09-26 17:00:00+00:00,down,0.35716132025275393,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-09-27 19:22:00+00:00,down,0.2672099814930341,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-09-28 20:58:00+00:00,up,1.564960328576054,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-09-30 21:34:00+00:00,up,1.3624581658970294,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-02 00:11:00+00:00,up,0.9694383142726094,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-03 16:32:00+00:00,up,0.9460642296662881,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-04 20:01:00+00:00,down,2.354096945504134,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-06 00:30:00+00:00,up,0.9471709471085712,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-07 15:57:00+00:00,up,1.1347845462579857,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-09 00:54:00+00:00,down,0.9984498023540983,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-10 15:30:00+00:00,up,31.551957986537822,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-11 16:41:00+00:00,down,0.19440390564853668,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-12 21:29:00+00:00,up,0.3196312720738141,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-14 05:12:00+00:00,up,0.6462260507329246,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-15 20:49:00+00:00,up,1.075287262404366,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-17 04:15:00+00:00,down,1.1479259653447316,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-18 06:30:00+00:00,down,0.22937010123197457,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-19 08:45:00+00:00,up,1.1788308588396486,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-21 04:18:00+00:00,up,2.5953791057666162,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-22 08:32:00+00:00,down,0.9251459420653025,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-25 02:06:00+00:00,down,0.20362325129572156,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-26 09:35:00+00:00,up,2.0441509725447045,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-28 10:58:00+00:00,down,1.2794918517763014,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-29 18:39:00+00:00,up,1.7674680728972,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-31 23:23:00+00:00,down,0.17132066145673366,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-02 04:46:00+00:00,up,1.0648574153408188,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-03 15:41:00+00:00,up,2.03971151022562,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-04 18:41:00+00:00,up,1.8918705510514777,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-05 22:30:00+00:00,down,0.7461187941001919,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-07 13:09:00+00:00,up,0.7095671280629553,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-08 16:18:00+00:00,down,0.3628682668797134,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-09 19:18:00+00:00,up,1.156396157519355,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-11 02:16:00+00:00,up,0.9177768950739273,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-13 03:31:00+00:00,up,2.2313472673487533,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-14 04:42:00+00:00,up,1.7690726934268988,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-15 08:17:00+00:00,down,0.30773733370433143,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-16 12:37:00+00:00,up,1.0264048456253223,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-17 20:26:00+00:00,up,1.2942047079416845,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-20 17:13:00+00:00,up,3.560279407735918,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-21 22:29:00+00:00,down,0.33177488065966293,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-23 23:13:00+00:00,up,0.910613915807229,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-25 06:35:00+00:00,down,0.6809550904498406,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-26 18:23:00+00:00,up,0.7085121615831762,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-29 02:20:00+00:00,down,0.4016051945203831,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-30 08:50:00+00:00,up,1.8349240883656268,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-01 13:02:00+00:00,up,1.6431351613582004,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-04 19:35:00+00:00,up,0.8151011567854212,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-06 04:39:00+00:00,down,0.30990409490975007,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-07 07:49:00+00:00,up,1.7860637879789356,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-09 22:11:00+00:00,up,1.3800758199376322,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-11 10:56:00+00:00,down,0.8348375672824653,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-12 15:50:00+00:00,up,0.30079311137221265,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-13 18:28:00+00:00,down,0.6092187476896971,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-14 22:40:00+00:00,up,2.085281372790186,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-16 13:59:00+00:00,up,0.9653211095062854,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-17 16:03:00+00:00,up,0.8841616465941675,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-18 17:42:00+00:00,up,1.6116665580560865,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-19 22:42:00+00:00,down,0.12647894397516068,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-21 02:47:00+00:00,up,0.895779143982016,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-22 08:29:00+00:00,up,1.056255519887418,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-24 13:57:00+00:00,down,0.39028625412573137,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-25 23:00:00+00:00,up,1.8496731335174237,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-27 00:51:00+00:00,down,0.2250014992226654,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-28 19:35:00+00:00,up,3.7346749031276776,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-29 22:02:00+00:00,down,0.8188048558658018,BTCUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-02 17:55:00+00:00,up,1.412762828494974,ETHUSDT,deseasonalised only (as E5)
+2025-07-03 20:57:00+00:00,down,0.6302476727010404,ETHUSDT,deseasonalised only (as E5)
+2025-07-05 13:45:00+00:00,down,0.3907359400739363,ETHUSDT,deseasonalised only (as E5)
+2025-07-06 14:42:00+00:00,up,1.8039280129081552,ETHUSDT,deseasonalised only (as E5)
+2025-07-09 00:45:00+00:00,down,1.9290672884361022,ETHUSDT,deseasonalised only (as E5)
+2025-07-10 21:28:00+00:00,up,2.0392906929286596,ETHUSDT,deseasonalised only (as E5)
+2025-07-12 01:33:00+00:00,down,0.3508291326462673,ETHUSDT,deseasonalised only (as E5)
+2025-07-14 02:52:00+00:00,up,1.6804496330721466,ETHUSDT,deseasonalised only (as E5)
+2025-07-15 03:22:00+00:00,up,1.4181146261917894,ETHUSDT,deseasonalised only (as E5)
+2025-07-16 12:25:00+00:00,down,1.7200384599713259,ETHUSDT,deseasonalised only (as E5)
+2025-07-19 09:56:00+00:00,down,0.6264009120246784,ETHUSDT,deseasonalised only (as E5)
+2025-07-20 22:23:00+00:00,up,1.0113973195471015,ETHUSDT,deseasonalised only (as E5)
+2025-07-22 04:38:00+00:00,up,1.013808080752387,ETHUSDT,deseasonalised only (as E5)
+2025-07-23 21:41:00+00:00,up,1.100498378797015,ETHUSDT,deseasonalised only (as E5)
+2025-07-25 03:21:00+00:00,up,1.1001601629520419,ETHUSDT,deseasonalised only (as E5)
+2025-07-26 05:48:00+00:00,down,0.3426898572946136,ETHUSDT,deseasonalised only (as E5)
+2025-07-27 10:52:00+00:00,up,0.8136335922310072,ETHUSDT,deseasonalised only (as E5)
+2025-07-29 01:07:00+00:00,up,1.1401815722239568,ETHUSDT,deseasonalised only (as E5)
+2025-07-30 19:04:00+00:00,up,0.6356544423848707,ETHUSDT,deseasonalised only (as E5)
+2025-07-31 20:47:00+00:00,up,2.367046311412519,ETHUSDT,deseasonalised only (as E5)
+2025-08-02 03:36:00+00:00,down,0.8374045026128365,ETHUSDT,deseasonalised only (as E5)
+2025-08-03 06:57:00+00:00,down,0.45051753202917477,ETHUSDT,deseasonalised only (as E5)
+2025-08-04 14:06:00+00:00,up,1.0160318114403581,ETHUSDT,deseasonalised only (as E5)
+2025-08-06 05:49:00+00:00,up,0.6204630464255194,ETHUSDT,deseasonalised only (as E5)
+2025-08-07 10:39:00+00:00,up,1.174950349045934,ETHUSDT,deseasonalised only (as E5)
+2025-08-09 00:32:00+00:00,down,1.4727027404523145,ETHUSDT,deseasonalised only (as E5)
+2025-08-10 03:29:00+00:00,up,0.7477293182202048,ETHUSDT,deseasonalised only (as E5)
+2025-08-11 12:10:00+00:00,up,1.1286993156762501,ETHUSDT,deseasonalised only (as E5)
+2025-08-12 12:42:00+00:00,up,1.1844392974838884,ETHUSDT,deseasonalised only (as E5)
+2025-08-14 12:40:00+00:00,up,1.2873365076598478,ETHUSDT,deseasonalised only (as E5)
+2025-08-16 07:27:00+00:00,down,0.41380273203904056,ETHUSDT,deseasonalised only (as E5)
+2025-08-17 09:16:00+00:00,up,1.3444554027888638,ETHUSDT,deseasonalised only (as E5)
+2025-08-18 09:41:00+00:00,up,0.9422136879772277,ETHUSDT,deseasonalised only (as E5)
+2025-08-20 12:01:00+00:00,up,1.0541304951067703,ETHUSDT,deseasonalised only (as E5)
+2025-08-22 14:14:00+00:00,up,1.1797294258252704,ETHUSDT,deseasonalised only (as E5)
+2025-08-23 16:40:00+00:00,down,0.34782905712804113,ETHUSDT,deseasonalised only (as E5)
+2025-08-24 17:55:00+00:00,up,2.352027529293848,ETHUSDT,deseasonalised only (as E5)
+2025-08-25 20:33:00+00:00,up,1.2632082706605032,ETHUSDT,deseasonalised only (as E5)
+2025-08-27 03:06:00+00:00,down,1.0058541861747714,ETHUSDT,deseasonalised only (as E5)
+2025-08-30 09:56:00+00:00,down,0.37368163092229356,ETHUSDT,deseasonalised only (as E5)
+2025-08-31 23:49:00+00:00,up,1.3762144506857792,ETHUSDT,deseasonalised only (as E5)
+2025-09-03 20:56:00+00:00,down,0.7803678224198074,ETHUSDT,deseasonalised only (as E5)
+2025-09-05 12:41:00+00:00,up,0.7683592610371474,ETHUSDT,deseasonalised only (as E5)
+2025-09-06 14:47:00+00:00,down,0.35887650862046017,ETHUSDT,deseasonalised only (as E5)
+2025-09-07 23:25:00+00:00,up,1.3127246512978394,ETHUSDT,deseasonalised only (as E5)
+2025-09-09 06:58:00+00:00,up,0.9028817721626465,ETHUSDT,deseasonalised only (as E5)
+2025-09-10 19:41:00+00:00,up,1.8931479168167626,ETHUSDT,deseasonalised only (as E5)
+2025-09-12 22:32:00+00:00,up,0.6858109239615932,ETHUSDT,deseasonalised only (as E5)
+2025-09-15 07:44:00+00:00,up,1.1718807713464368,ETHUSDT,deseasonalised only (as E5)
+2025-09-17 14:12:00+00:00,down,2.756383084769687,ETHUSDT,deseasonalised only (as E5)
+2025-09-18 22:15:00+00:00,down,0.5621064869103158,ETHUSDT,deseasonalised only (as E5)
+2025-09-20 03:38:00+00:00,down,0.2915146946294055,ETHUSDT,deseasonalised only (as E5)
+2025-09-21 09:45:00+00:00,up,7.252087943212093,ETHUSDT,deseasonalised only (as E5)
+2025-09-23 03:20:00+00:00,up,0.5043293719535751,ETHUSDT,deseasonalised only (as E5)
+2025-09-24 04:08:00+00:00,up,0.8738558432187126,ETHUSDT,deseasonalised only (as E5)
+2025-09-25 04:24:00+00:00,up,2.6347651933413156,ETHUSDT,deseasonalised only (as E5)
+2025-09-26 19:14:00+00:00,down,0.2647152917487556,ETHUSDT,deseasonalised only (as E5)
+2025-09-28 22:19:00+00:00,up,0.8978520234034686,ETHUSDT,deseasonalised only (as E5)
+2025-09-30 21:32:00+00:00,up,1.2978949014801706,ETHUSDT,deseasonalised only (as E5)
+2025-10-02 00:15:00+00:00,up,0.8311989802700138,ETHUSDT,deseasonalised only (as E5)
+2025-10-03 16:50:00+00:00,up,0.8060299661902135,ETHUSDT,deseasonalised only (as E5)
+2025-10-04 23:41:00+00:00,down,1.3265036373953518,ETHUSDT,deseasonalised only (as E5)
+2025-10-07 14:11:00+00:00,up,1.4240466044312365,ETHUSDT,deseasonalised only (as E5)
+2025-10-08 23:53:00+00:00,down,1.2231789772657875,ETHUSDT,deseasonalised only (as E5)
+2025-10-10 15:23:00+00:00,up,21.415097751963163,ETHUSDT,deseasonalised only (as E5)
+2025-10-11 17:13:00+00:00,down,0.3709997097214258,ETHUSDT,deseasonalised only (as E5)
+2025-10-12 21:34:00+00:00,up,0.45797444926787545,ETHUSDT,deseasonalised only (as E5)
+2025-10-14 00:50:00+00:00,down,0.9735332257379391,ETHUSDT,deseasonalised only (as E5)
+2025-10-15 08:17:00+00:00,down,0.6263684983615613,ETHUSDT,deseasonalised only (as E5)
+2025-10-16 16:41:00+00:00,up,1.1564881725090097,ETHUSDT,deseasonalised only (as E5)
+2025-10-17 22:18:00+00:00,down,0.2855027428536922,ETHUSDT,deseasonalised only (as E5)
+2025-10-19 09:10:00+00:00,up,0.6943473236855761,ETHUSDT,deseasonalised only (as E5)
+2025-10-21 05:16:00+00:00,up,1.551698225677124,ETHUSDT,deseasonalised only (as E5)
+2025-10-22 11:19:00+00:00,up,1.0438501332157957,ETHUSDT,deseasonalised only (as E5)
+2025-10-24 11:27:00+00:00,down,0.5827185578276304,ETHUSDT,deseasonalised only (as E5)
+2025-10-25 15:22:00+00:00,down,0.6356471645874486,ETHUSDT,deseasonalised only (as E5)
+2025-10-26 22:07:00+00:00,up,1.3267827539238475,ETHUSDT,deseasonalised only (as E5)
+2025-10-28 12:43:00+00:00,down,1.1911181989149262,ETHUSDT,deseasonalised only (as E5)
+2025-10-29 18:43:00+00:00,up,1.1893953351183018,ETHUSDT,deseasonalised only (as E5)
+2025-10-31 07:48:00+00:00,down,0.5302352018934036,ETHUSDT,deseasonalised only (as E5)
+2025-11-01 11:20:00+00:00,down,0.27069794121108876,ETHUSDT,deseasonalised only (as E5)
+2025-11-02 23:13:00+00:00,up,3.5526643322758265,ETHUSDT,deseasonalised only (as E5)
+2025-11-04 05:48:00+00:00,up,4.1968172241150885,ETHUSDT,deseasonalised only (as E5)
+2025-11-05 11:08:00+00:00,down,0.353526744047991,ETHUSDT,deseasonalised only (as E5)
+2025-11-06 16:55:00+00:00,up,0.8366026332764395,ETHUSDT,deseasonalised only (as E5)
+2025-11-08 01:52:00+00:00,down,0.3578976668919265,ETHUSDT,deseasonalised only (as E5)
+2025-11-09 23:12:00+00:00,up,0.9188471254308378,ETHUSDT,deseasonalised only (as E5)
+2025-11-11 01:59:00+00:00,up,1.1743905063067175,ETHUSDT,deseasonalised only (as E5)
+2025-11-13 03:38:00+00:00,up,2.0307297140573053,ETHUSDT,deseasonalised only (as E5)
+2025-11-14 04:46:00+00:00,up,1.5171966573941291,ETHUSDT,deseasonalised only (as E5)
+2025-11-15 07:17:00+00:00,down,0.2650811533018835,ETHUSDT,deseasonalised only (as E5)
+2025-11-16 16:42:00+00:00,up,1.414961736206017,ETHUSDT,deseasonalised only (as E5)
+2025-11-17 20:15:00+00:00,up,1.255902057560851,ETHUSDT,deseasonalised only (as E5)
+2025-11-18 23:19:00+00:00,down,0.8870293415854471,ETHUSDT,deseasonalised only (as E5)
+2025-11-21 00:01:00+00:00,up,2.081998757691522,ETHUSDT,deseasonalised only (as E5)
+2025-11-22 02:32:00+00:00,down,0.3507867810543472,ETHUSDT,deseasonalised only (as E5)
+2025-11-24 02:34:00+00:00,up,0.9785526316294378,ETHUSDT,deseasonalised only (as E5)
+2025-11-26 03:14:00+00:00,down,0.7112399816793877,ETHUSDT,deseasonalised only (as E5)
+2025-11-27 17:01:00+00:00,down,0.8549602749501893,ETHUSDT,deseasonalised only (as E5)
+2025-11-29 03:19:00+00:00,down,0.5712319692217358,ETHUSDT,deseasonalised only (as E5)
+2025-12-01 00:03:00+00:00,up,3.339465776721688,ETHUSDT,deseasonalised only (as E5)
+2025-12-02 06:58:00+00:00,down,0.9691386573601404,ETHUSDT,deseasonalised only (as E5)
+2025-12-03 14:17:00+00:00,up,1.2585588456178793,ETHUSDT,deseasonalised only (as E5)
+2025-12-04 19:29:00+00:00,up,1.0135728919754083,ETHUSDT,deseasonalised only (as E5)
+2025-12-06 02:20:00+00:00,down,0.31380587633887336,ETHUSDT,deseasonalised only (as E5)
+2025-12-07 14:27:00+00:00,up,2.0266654151077277,ETHUSDT,deseasonalised only (as E5)
+2025-12-09 20:39:00+00:00,up,1.4679253055187504,ETHUSDT,deseasonalised only (as E5)
+2025-12-11 03:06:00+00:00,up,0.7484834500173798,ETHUSDT,deseasonalised only (as E5)
+2025-12-12 12:29:00+00:00,down,0.5195544770193409,ETHUSDT,deseasonalised only (as E5)
+2025-12-13 17:01:00+00:00,down,0.6790298830889309,ETHUSDT,deseasonalised only (as E5)
+2025-12-14 22:51:00+00:00,up,1.8099417688723685,ETHUSDT,deseasonalised only (as E5)
+2025-12-16 14:05:00+00:00,up,0.6610547793949053,ETHUSDT,deseasonalised only (as E5)
+2025-12-17 15:06:00+00:00,up,0.9614166784074244,ETHUSDT,deseasonalised only (as E5)
+2025-12-18 17:17:00+00:00,up,1.667390706173887,ETHUSDT,deseasonalised only (as E5)
+2025-12-19 21:51:00+00:00,down,0.13673838802499913,ETHUSDT,deseasonalised only (as E5)
+2025-12-21 09:35:00+00:00,up,1.2255849867372315,ETHUSDT,deseasonalised only (as E5)
+2025-12-24 18:48:00+00:00,down,0.3195679211761715,ETHUSDT,deseasonalised only (as E5)
+2025-12-25 22:57:00+00:00,up,1.487445170198538,ETHUSDT,deseasonalised only (as E5)
+2025-12-27 00:54:00+00:00,down,0.32453032978892626,ETHUSDT,deseasonalised only (as E5)
+2025-12-28 06:48:00+00:00,up,1.5733211190795455,ETHUSDT,deseasonalised only (as E5)
+2025-12-29 07:21:00+00:00,up,1.4939474912333506,ETHUSDT,deseasonalised only (as E5)
+2025-12-30 08:33:00+00:00,up,0.5790853054453822,ETHUSDT,deseasonalised only (as E5)
+2025-07-03 19:17:00+00:00,down,0.6055870038702935,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-07-06 14:08:00+00:00,up,1.7943956399097736,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-07-09 12:31:00+00:00,up,1.7663891879028295,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-07-10 21:30:00+00:00,up,2.0244706210130015,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-07-12 02:33:00+00:00,down,0.35633239789735005,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-07-13 13:03:00+00:00,up,1.5500469851383092,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-07-14 22:21:00+00:00,down,1.5092715275355926,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-07-19 10:15:00+00:00,down,0.6350976498431069,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-07-20 22:26:00+00:00,up,1.0006484663708881,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-07-22 03:35:00+00:00,up,1.058267619655433,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-07-23 21:37:00+00:00,up,1.1368775184709272,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-07-25 18:27:00+00:00,down,0.3334019684057493,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-07-26 22:26:00+00:00,up,0.6039560302131635,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-07-30 19:05:00+00:00,up,0.6066269894079408,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-07-31 20:43:00+00:00,up,2.3716857734912455,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-08-02 02:41:00+00:00,down,0.8199477546056617,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-08-03 06:39:00+00:00,down,0.4404996974016064,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-08-05 08:39:00+00:00,up,1.2159034338696766,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-08-06 20:52:00+00:00,down,0.8896567453373628,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-08-08 14:16:00+00:00,up,1.2667218632068653,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-08-09 23:04:00+00:00,up,0.8161908728720074,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-08-11 03:16:00+00:00,up,1.1527306685882344,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-08-12 12:42:00+00:00,up,1.1844392974838884,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-08-14 12:40:00+00:00,up,1.2873365076598478,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-08-16 10:23:00+00:00,up,0.3888008188821207,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-08-18 01:51:00+00:00,up,1.738757246982983,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-08-19 04:19:00+00:00,up,0.9602376454124859,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-08-20 11:54:00+00:00,up,1.0785843043471488,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-08-22 14:14:00+00:00,up,1.1797294258252704,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-08-23 18:13:00+00:00,down,0.4266379428087377,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-08-24 19:37:00+00:00,up,1.8672795837427614,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-08-25 20:33:00+00:00,up,1.2632082706605032,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-08-28 07:54:00+00:00,down,0.6140548773370378,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-08-30 16:59:00+00:00,down,0.43773435268322836,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-08-31 23:30:00+00:00,up,1.3735057614828048,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-09-03 21:13:00+00:00,down,0.7856172484698407,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-09-05 14:53:00+00:00,up,0.5028429115536209,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-09-06 16:26:00+00:00,up,0.3246984210493752,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-09-07 23:06:00+00:00,up,1.3545689814113997,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-09-09 19:18:00+00:00,down,1.076644089297021,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-09-11 12:35:00+00:00,up,0.6114272455940989,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-09-12 14:49:00+00:00,up,0.9711807603157636,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-09-14 11:54:00+00:00,up,1.189790886217408,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-09-16 00:10:00+00:00,down,0.7891622156537279,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-09-17 18:07:00+00:00,up,1.0579554074277362,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-09-19 04:01:00+00:00,up,0.48777036072416535,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-09-20 14:10:00+00:00,down,0.4025271870591124,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-09-21 22:12:00+00:00,up,9.256026945998107,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-09-24 03:30:00+00:00,up,0.8780403569052455,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-09-25 04:19:00+00:00,up,2.6587041517271013,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-09-27 01:06:00+00:00,down,0.23563667813694894,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-09-28 13:18:00+00:00,up,0.8876561713033365,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-10-01 08:40:00+00:00,up,1.1996724704551287,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-10-03 16:46:00+00:00,up,0.8158087133030771,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-10-05 02:40:00+00:00,up,1.501456546504061,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-10-07 15:10:00+00:00,up,1.248183625970082,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-10-09 08:37:00+00:00,up,1.0340631428647402,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-10-10 15:21:00+00:00,up,21.516135677818326,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-10-11 17:22:00+00:00,down,0.3732567051509097,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-10-12 21:33:00+00:00,up,0.4612124909983196,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-10-14 05:45:00+00:00,up,0.9793393916533139,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-10-16 17:00:00+00:00,up,1.1216072166866793,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-10-17 23:26:00+00:00,down,0.2769883933366319,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-10-19 03:55:00+00:00,up,0.9082939076410012,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-10-21 05:03:00+00:00,up,1.5729154327138801,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-10-23 02:15:00+00:00,down,0.48512912383257073,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-10-25 16:47:00+00:00,down,0.6712884740909291,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-10-26 20:14:00+00:00,down,1.7274645824594972,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-10-28 20:20:00+00:00,up,2.4729941768441233,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-10-29 22:36:00+00:00,down,0.9169220357539726,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-10-31 17:36:00+00:00,up,0.34247452268013767,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-11-02 03:02:00+00:00,up,0.7921951847114467,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-11-03 15:42:00+00:00,up,2.5633170720800287,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-11-04 18:34:00+00:00,up,2.5724419496335207,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-11-06 16:24:00+00:00,up,0.871246134554805,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-11-08 01:47:00+00:00,down,0.3574199140276167,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-11-09 03:44:00+00:00,up,0.7463909518089956,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-11-13 10:53:00+00:00,down,2.5898568617371915,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-11-14 18:24:00+00:00,down,0.4603296867803877,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-11-16 02:09:00+00:00,up,1.1227815836586728,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-11-17 05:17:00+00:00,down,1.2997593711871682,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-11-18 19:00:00+00:00,down,0.641126422373508,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-11-19 21:32:00+00:00,up,0.9380779401167583,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-11-21 00:05:00+00:00,up,2.034719182730768,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-11-22 03:12:00+00:00,down,0.3539964122319622,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-11-23 22:37:00+00:00,up,1.1821318702616763,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-11-26 03:18:00+00:00,down,0.7164792049518363,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-11-29 02:54:00+00:00,down,0.5538667722777546,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-11-30 23:38:00+00:00,up,3.5069818518132285,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-12-02 05:33:00+00:00,down,0.9230846884364216,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-12-03 14:17:00+00:00,up,1.2585588456178793,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-12-04 19:26:00+00:00,up,1.0229674009176528,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-12-06 02:02:00+00:00,down,0.31415393631201194,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-12-07 09:53:00+00:00,up,2.261623179036949,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-12-10 02:31:00+00:00,down,1.532798807031418,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-12-11 11:54:00+00:00,down,0.7294536711608796,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-12-12 15:46:00+00:00,up,0.4292447116618748,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-12-14 10:30:00+00:00,up,2.046576887037288,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-12-16 18:29:00+00:00,down,0.840516024626871,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-12-18 13:37:00+00:00,up,2.057535975704261,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-12-19 22:21:00+00:00,down,0.13276814846117926,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-12-21 01:58:00+00:00,up,0.713620241796611,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-12-24 19:00:00+00:00,down,0.3211156468573876,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-12-25 22:55:00+00:00,up,1.4884469871364017,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-12-27 01:32:00+00:00,down,0.340348035133071,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-12-28 09:52:00+00:00,up,2.4286924957016685,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-12-29 16:13:00+00:00,down,0.9378793859335602,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-12-31 11:44:00+00:00,up,0.7545744249188873,ETHUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-07-03 12:45:00+00:00,up,0.6872198704621362,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-05 15:00:00+00:00,down,0.473459012219208,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-06 21:41:00+00:00,up,1.4949731937198274,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-08 23:32:00+00:00,down,1.8684743914977688,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-10 21:31:00+00:00,up,2.0220167311138253,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-12 01:28:00+00:00,down,0.34999613896519405,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-13 13:12:00+00:00,up,1.5453555574114972,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-14 23:09:00+00:00,down,1.6364031675011894,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-16 11:20:00+00:00,down,1.6402129934592886,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-17 19:13:00+00:00,down,1.5729611066603817,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-19 05:28:00+00:00,down,0.5618073457340023,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-20 22:22:00+00:00,up,1.0143569995976092,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-22 04:33:00+00:00,up,1.0189443935930373,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-23 21:38:00+00:00,up,1.1150779156869117,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-25 05:19:00+00:00,up,0.8745031771517939,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-26 07:51:00+00:00,down,0.3659877421122469,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-27 10:50:00+00:00,up,0.8158976323989432,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-29 01:08:00+00:00,up,1.1378450848210941,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-30 19:04:00+00:00,up,0.6356544423848707,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-31 20:35:00+00:00,up,2.370423093112866,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-02 02:50:00+00:00,down,0.8210408191949193,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-03 06:32:00+00:00,down,0.43905479083307725,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-04 14:02:00+00:00,up,1.019382295952705,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-06 05:51:00+00:00,up,0.6143871985861507,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-07 10:32:00+00:00,up,1.2007407240056058,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-09 00:26:00+00:00,down,1.4694077497816342,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-10 03:30:00+00:00,up,0.7459080335229749,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-11 12:04:00+00:00,up,1.133179460876892,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-12 12:42:00+00:00,up,1.1844392974838884,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-14 12:40:00+00:00,up,1.2873365076598478,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-16 08:34:00+00:00,down,0.4110716234001179,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-17 09:12:00+00:00,up,1.3449023955356978,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-18 09:45:00+00:00,up,0.9345915130977989,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-20 12:01:00+00:00,up,1.0541304951067703,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-22 14:14:00+00:00,up,1.1797294258252704,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-23 16:51:00+00:00,down,0.35178799981776177,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-24 17:48:00+00:00,up,2.3517438070060237,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-25 20:35:00+00:00,up,1.2546504043025595,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-28 04:38:00+00:00,down,0.5126276010438029,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-29 07:13:00+00:00,up,1.1424148567450843,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-30 11:43:00+00:00,down,0.4116391898259127,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-31 23:22:00+00:00,up,1.388657827478328,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-09-03 20:19:00+00:00,down,0.7661432637524355,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-09-05 12:41:00+00:00,up,0.7683592610371474,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-09-07 03:07:00+00:00,down,0.4671718702061863,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-09-08 04:04:00+00:00,up,1.152590867563447,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-09-09 06:57:00+00:00,up,0.9079209975101047,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-09-11 07:08:00+00:00,up,1.8987391396457078,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-09-12 22:30:00+00:00,up,0.6864941458300077,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-09-15 06:55:00+00:00,up,1.2376703964966942,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-09-17 18:06:00+00:00,up,1.0646408519281632,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-09-19 03:18:00+00:00,down,0.568367483330975,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-09-20 07:32:00+00:00,down,0.3090930881001507,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-09-21 09:41:00+00:00,up,7.25241881427415,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-09-22 15:42:00+00:00,down,0.44459880119439305,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-09-24 03:32:00+00:00,up,0.8885238503489566,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-09-25 04:14:00+00:00,up,2.7571781244714537,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-09-26 18:32:00+00:00,down,0.27109452425135366,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-09-28 20:54:00+00:00,up,1.1159150951955719,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-09-30 21:32:00+00:00,up,1.2978949014801706,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-02 00:15:00+00:00,up,0.8311989802700138,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-03 16:48:00+00:00,up,0.8123652757675661,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-05 01:51:00+00:00,down,1.5555085695069544,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-07 14:31:00+00:00,up,1.3980957762861943,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-08 23:51:00+00:00,down,1.221253957724407,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-10 15:23:00+00:00,up,21.415097751963163,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-11 16:51:00+00:00,down,0.3636369289578709,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-12 21:29:00+00:00,up,0.4711910982328382,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-14 06:23:00+00:00,up,0.9673402997837509,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-16 04:37:00+00:00,down,0.9635341249357237,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-17 06:54:00+00:00,up,0.9643174727775712,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-18 12:04:00+00:00,down,0.47609873519719476,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-19 22:30:00+00:00,up,0.7640660420660764,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-21 04:33:00+00:00,up,1.5966302749815406,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-23 02:28:00+00:00,down,0.48946775182889446,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-25 03:43:00+00:00,down,0.2753453444083106,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-26 09:30:00+00:00,up,1.790266397638782,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-28 20:22:00+00:00,up,2.4691150479754245,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-30 03:08:00+00:00,down,0.9483152112746118,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-31 11:37:00+00:00,down,0.5244375003241225,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-01 14:12:00+00:00,down,0.32245926985879686,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-02 23:08:00+00:00,up,3.5489123443016553,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-04 06:15:00+00:00,up,3.687779419252857,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-05 08:21:00+00:00,down,0.37490702519221814,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-06 16:07:00+00:00,up,0.8679785677858256,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-08 03:24:00+00:00,down,0.3595459520787415,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-09 14:46:00+00:00,up,0.7813147131540816,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-11 01:29:00+00:00,up,1.2372447170278014,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-13 18:25:00+00:00,up,2.5769612744752437,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-15 03:00:00+00:00,down,0.25224115867741814,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-16 11:42:00+00:00,up,1.2378317317346548,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-17 19:40:00+00:00,up,1.3240909988669851,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-18 22:45:00+00:00,down,0.8605677475331165,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-20 17:21:00+00:00,up,2.2888607507316014,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-22 00:00:00+00:00,down,0.3378185607683381,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-23 23:06:00+00:00,up,1.1766975369869783,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-26 03:27:00+00:00,down,0.7199807929313106,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-27 19:04:00+00:00,down,0.9227457662593735,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-29 03:15:00+00:00,down,0.5610485217593222,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-30 23:44:00+00:00,up,3.473374290418002,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-02 04:52:00+00:00,down,0.9013487336994506,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-03 14:17:00+00:00,up,1.2585588456178793,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-04 19:29:00+00:00,up,1.0135728919754083,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-06 02:15:00+00:00,down,0.31340887740404455,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-07 14:04:00+00:00,up,2.482151400324359,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-09 00:17:00+00:00,down,1.236373633678365,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-10 07:31:00+00:00,down,1.814932845325144,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-11 12:03:00+00:00,down,0.7332294791979183,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-12 15:50:00+00:00,up,0.4061896351859528,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-13 19:26:00+00:00,down,0.7809305203080915,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-14 23:03:00+00:00,up,1.777333474316964,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-16 14:09:00+00:00,up,0.6479189781565434,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-17 15:06:00+00:00,up,0.9614166784074244,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-18 17:17:00+00:00,up,1.667390706173887,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-19 21:40:00+00:00,down,0.13638313914710626,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-21 02:27:00+00:00,up,0.8148359460293252,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-22 04:39:00+00:00,up,0.895878734912989,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-24 19:02:00+00:00,down,0.3213860359805572,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-25 22:55:00+00:00,up,1.4884469871364017,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-27 00:57:00+00:00,down,0.3256209363626684,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-28 05:56:00+00:00,up,1.5188869763921862,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-29 07:25:00+00:00,up,1.4711296386186363,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-31 00:58:00+00:00,down,0.5362939445355828,ETHUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-02 11:13:00+00:00,down,1.6172903865635837,XRPUSDT,deseasonalised only (as E5)
+2025-07-03 12:39:00+00:00,up,0.6183206510871729,XRPUSDT,deseasonalised only (as E5)
+2025-07-04 21:22:00+00:00,down,0.2756158735574941,XRPUSDT,deseasonalised only (as E5)
+2025-07-06 08:50:00+00:00,up,1.3686968947955063,XRPUSDT,deseasonalised only (as E5)
+2025-07-07 14:04:00+00:00,up,1.6597404701900087,XRPUSDT,deseasonalised only (as E5)
+2025-07-08 21:09:00+00:00,down,1.4079470228468087,XRPUSDT,deseasonalised only (as E5)
+2025-07-10 08:11:00+00:00,up,2.109599803821901,XRPUSDT,deseasonalised only (as E5)
+2025-07-11 10:35:00+00:00,up,4.23951305603531,XRPUSDT,deseasonalised only (as E5)
+2025-07-12 14:56:00+00:00,down,0.5940048166540318,XRPUSDT,deseasonalised only (as E5)
+2025-07-14 03:21:00+00:00,up,1.6617186198201823,XRPUSDT,deseasonalised only (as E5)
+2025-07-15 17:14:00+00:00,down,0.40188134622091115,XRPUSDT,deseasonalised only (as E5)
+2025-07-16 18:52:00+00:00,up,1.8833265635248495,XRPUSDT,deseasonalised only (as E5)
+2025-07-17 20:35:00+00:00,up,1.9366166010937764,XRPUSDT,deseasonalised only (as E5)
+2025-07-19 05:51:00+00:00,down,0.3067684053465924,XRPUSDT,deseasonalised only (as E5)
+2025-07-20 09:11:00+00:00,up,0.7701284402810574,XRPUSDT,deseasonalised only (as E5)
+2025-07-22 02:52:00+00:00,up,0.9967678016643302,XRPUSDT,deseasonalised only (as E5)
+2025-07-23 07:16:00+00:00,down,3.5753343121705936,XRPUSDT,deseasonalised only (as E5)
+2025-07-24 17:55:00+00:00,down,0.8914990365661228,XRPUSDT,deseasonalised only (as E5)
+2025-07-25 20:45:00+00:00,down,0.17226691644093403,XRPUSDT,deseasonalised only (as E5)
+2025-07-27 22:42:00+00:00,up,1.058395314279541,XRPUSDT,deseasonalised only (as E5)
+2025-07-29 03:08:00+00:00,up,0.7447289984144674,XRPUSDT,deseasonalised only (as E5)
+2025-07-30 19:04:00+00:00,up,0.5729862952868574,XRPUSDT,deseasonalised only (as E5)
+2025-07-31 23:03:00+00:00,up,2.710350284028476,XRPUSDT,deseasonalised only (as E5)
+2025-08-02 02:48:00+00:00,down,0.9119395635681334,XRPUSDT,deseasonalised only (as E5)
+2025-08-03 07:33:00+00:00,down,0.4468807477892327,XRPUSDT,deseasonalised only (as E5)
+2025-08-05 12:42:00+00:00,up,0.9151440392485992,XRPUSDT,deseasonalised only (as E5)
+2025-08-06 19:23:00+00:00,down,0.5250803088669551,XRPUSDT,deseasonalised only (as E5)
+2025-08-07 20:22:00+00:00,up,2.960035176489286,XRPUSDT,deseasonalised only (as E5)
+2025-08-08 22:50:00+00:00,down,0.469379167187578,XRPUSDT,deseasonalised only (as E5)
+2025-08-10 07:46:00+00:00,up,0.6976757278192441,XRPUSDT,deseasonalised only (as E5)
+2025-08-11 08:24:00+00:00,up,1.4353568266002306,XRPUSDT,deseasonalised only (as E5)
+2025-08-13 20:57:00+00:00,down,2.0589956360256783,XRPUSDT,deseasonalised only (as E5)
+2025-08-15 02:47:00+00:00,down,0.6450084492361622,XRPUSDT,deseasonalised only (as E5)
+2025-08-16 17:11:00+00:00,down,0.2422945431499505,XRPUSDT,deseasonalised only (as E5)
+2025-08-17 19:32:00+00:00,up,1.6537942882405967,XRPUSDT,deseasonalised only (as E5)
+2025-08-19 04:13:00+00:00,up,1.080885809133245,XRPUSDT,deseasonalised only (as E5)
+2025-08-21 01:38:00+00:00,down,0.8189270252772637,XRPUSDT,deseasonalised only (as E5)
+2025-08-22 14:08:00+00:00,up,1.3343712633781435,XRPUSDT,deseasonalised only (as E5)
+2025-08-23 16:25:00+00:00,down,0.4156588281938974,XRPUSDT,deseasonalised only (as E5)
+2025-08-24 19:16:00+00:00,up,1.9139317305330126,XRPUSDT,deseasonalised only (as E5)
+2025-08-25 20:15:00+00:00,up,1.2236632799843403,XRPUSDT,deseasonalised only (as E5)
+2025-08-27 03:12:00+00:00,down,0.8563774852254015,XRPUSDT,deseasonalised only (as E5)
+2025-08-28 11:48:00+00:00,down,0.5931148182970267,XRPUSDT,deseasonalised only (as E5)
+2025-08-29 14:17:00+00:00,up,0.8315880932607177,XRPUSDT,deseasonalised only (as E5)
+2025-08-30 18:01:00+00:00,down,0.3955836976011902,XRPUSDT,deseasonalised only (as E5)
+2025-08-31 23:35:00+00:00,up,2.525502411184269,XRPUSDT,deseasonalised only (as E5)
+2025-09-02 05:58:00+00:00,down,0.8835022940255811,XRPUSDT,deseasonalised only (as E5)
+2025-09-03 20:09:00+00:00,down,0.6102264738931426,XRPUSDT,deseasonalised only (as E5)
+2025-09-05 14:26:00+00:00,up,0.5315877665083031,XRPUSDT,deseasonalised only (as E5)
+2025-09-06 17:38:00+00:00,down,0.48722846612571946,XRPUSDT,deseasonalised only (as E5)
+2025-09-07 18:54:00+00:00,up,1.857150639246351,XRPUSDT,deseasonalised only (as E5)
+2025-09-09 19:55:00+00:00,down,0.7873983918964924,XRPUSDT,deseasonalised only (as E5)
+2025-09-11 09:40:00+00:00,up,2.6534542950959987,XRPUSDT,deseasonalised only (as E5)
+2025-09-12 20:57:00+00:00,up,1.0987098859116469,XRPUSDT,deseasonalised only (as E5)
+2025-09-14 00:38:00+00:00,down,0.7660715570914257,XRPUSDT,deseasonalised only (as E5)
+2025-09-15 06:57:00+00:00,up,1.749970717492586,XRPUSDT,deseasonalised only (as E5)
+2025-09-16 19:42:00+00:00,down,1.1408766203147176,XRPUSDT,deseasonalised only (as E5)
+2025-09-17 20:36:00+00:00,up,0.9008449522834385,XRPUSDT,deseasonalised only (as E5)
+2025-09-19 03:10:00+00:00,down,0.586082981655048,XRPUSDT,deseasonalised only (as E5)
+2025-09-20 07:22:00+00:00,down,0.38183895826454023,XRPUSDT,deseasonalised only (as E5)
+2025-09-21 09:50:00+00:00,up,10.75379646481154,XRPUSDT,deseasonalised only (as E5)
+2025-09-23 03:48:00+00:00,up,0.3985150369863694,XRPUSDT,deseasonalised only (as E5)
+2025-09-24 04:30:00+00:00,up,0.5746293359232049,XRPUSDT,deseasonalised only (as E5)
+2025-09-25 05:04:00+00:00,up,1.1832303064162073,XRPUSDT,deseasonalised only (as E5)
+2025-09-27 00:41:00+00:00,down,0.287642064040728,XRPUSDT,deseasonalised only (as E5)
+2025-09-28 22:34:00+00:00,up,0.9892641595886219,XRPUSDT,deseasonalised only (as E5)
+2025-10-01 04:32:00+00:00,up,1.122856343360121,XRPUSDT,deseasonalised only (as E5)
+2025-10-02 16:26:00+00:00,up,1.3562304361800068,XRPUSDT,deseasonalised only (as E5)
+2025-10-03 17:16:00+00:00,up,0.49820530846324323,XRPUSDT,deseasonalised only (as E5)
+2025-10-04 20:24:00+00:00,down,1.0131474150126605,XRPUSDT,deseasonalised only (as E5)
+2025-10-06 00:38:00+00:00,up,0.8159567695761004,XRPUSDT,deseasonalised only (as E5)
+2025-10-07 15:03:00+00:00,up,1.2117267258484825,XRPUSDT,deseasonalised only (as E5)
+2025-10-10 15:24:00+00:00,up,266.9467031533684,XRPUSDT,deseasonalised only (as E5)
+2025-10-11 16:53:00+00:00,down,0.05109325674353594,XRPUSDT,deseasonalised only (as E5)
+2025-10-13 21:26:00+00:00,down,0.1750228161387129,XRPUSDT,deseasonalised only (as E5)
+2025-10-15 00:05:00+00:00,down,0.17428015148019432,XRPUSDT,deseasonalised only (as E5)
+2025-10-16 16:48:00+00:00,up,0.9342496405221807,XRPUSDT,deseasonalised only (as E5)
+2025-10-17 20:40:00+00:00,down,0.20155063194252557,XRPUSDT,deseasonalised only (as E5)
+2025-10-19 09:47:00+00:00,up,0.5331272986048614,XRPUSDT,deseasonalised only (as E5)
+2025-10-20 19:58:00+00:00,up,0.8799106488308229,XRPUSDT,deseasonalised only (as E5)
+2025-10-21 23:49:00+00:00,up,0.9266829711764053,XRPUSDT,deseasonalised only (as E5)
+2025-10-23 02:59:00+00:00,down,0.48098760833724497,XRPUSDT,deseasonalised only (as E5)
+2025-10-24 13:04:00+00:00,up,1.0154806658390751,XRPUSDT,deseasonalised only (as E5)
+2025-10-25 17:30:00+00:00,down,0.712471535530426,XRPUSDT,deseasonalised only (as E5)
+2025-10-26 22:25:00+00:00,up,1.3141426341122113,XRPUSDT,deseasonalised only (as E5)
+2025-10-28 12:58:00+00:00,down,1.318848666779845,XRPUSDT,deseasonalised only (as E5)
+2025-10-29 18:43:00+00:00,up,1.370953926102525,XRPUSDT,deseasonalised only (as E5)
+2025-10-31 01:16:00+00:00,down,0.5498546062506808,XRPUSDT,deseasonalised only (as E5)
+2025-11-01 07:02:00+00:00,down,0.26797491748144747,XRPUSDT,deseasonalised only (as E5)
+2025-11-02 11:52:00+00:00,up,1.3106357160844095,XRPUSDT,deseasonalised only (as E5)
+2025-11-03 15:39:00+00:00,up,2.261122461562416,XRPUSDT,deseasonalised only (as E5)
+2025-11-04 18:32:00+00:00,up,2.3001391664574666,XRPUSDT,deseasonalised only (as E5)
+2025-11-06 06:24:00+00:00,down,0.5089208044367691,XRPUSDT,deseasonalised only (as E5)
+2025-11-07 11:46:00+00:00,up,0.912385476429989,XRPUSDT,deseasonalised only (as E5)
+2025-11-08 16:15:00+00:00,down,0.38535238158448054,XRPUSDT,deseasonalised only (as E5)
+2025-11-09 23:05:00+00:00,up,1.6356936333519245,XRPUSDT,deseasonalised only (as E5)
+2025-11-11 11:47:00+00:00,down,0.5849051885442144,XRPUSDT,deseasonalised only (as E5)
+2025-11-12 16:07:00+00:00,up,1.5973966964343798,XRPUSDT,deseasonalised only (as E5)
+2025-11-13 19:25:00+00:00,up,1.8082151860248568,XRPUSDT,deseasonalised only (as E5)
+2025-11-15 03:19:00+00:00,down,0.4185865906933562,XRPUSDT,deseasonalised only (as E5)
+2025-11-16 18:12:00+00:00,up,1.2559010701391706,XRPUSDT,deseasonalised only (as E5)
+2025-11-17 20:39:00+00:00,up,1.2876703839132961,XRPUSDT,deseasonalised only (as E5)
+2025-11-18 23:31:00+00:00,down,0.7881642474075141,XRPUSDT,deseasonalised only (as E5)
+2025-11-20 16:40:00+00:00,up,2.7666567440084733,XRPUSDT,deseasonalised only (as E5)
+2025-11-22 02:58:00+00:00,down,0.5253928147298441,XRPUSDT,deseasonalised only (as E5)
+2025-11-24 02:33:00+00:00,up,1.1198967267052469,XRPUSDT,deseasonalised only (as E5)
+2025-11-26 01:51:00+00:00,down,0.5227691407682226,XRPUSDT,deseasonalised only (as E5)
+2025-11-27 16:08:00+00:00,down,0.8895651760671882,XRPUSDT,deseasonalised only (as E5)
+2025-11-29 02:10:00+00:00,down,0.5804226053586594,XRPUSDT,deseasonalised only (as E5)
+2025-11-30 16:15:00+00:00,down,2.215406902788523,XRPUSDT,deseasonalised only (as E5)
+2025-12-03 14:00:00+00:00,down,0.7619999316668677,XRPUSDT,deseasonalised only (as E5)
+2025-12-04 19:28:00+00:00,up,0.9299345910132922,XRPUSDT,deseasonalised only (as E5)
+2025-12-06 03:24:00+00:00,down,0.38908865586984126,XRPUSDT,deseasonalised only (as E5)
+2025-12-07 03:50:00+00:00,up,1.7519714630353507,XRPUSDT,deseasonalised only (as E5)
+2025-12-09 22:13:00+00:00,up,1.2557059482984017,XRPUSDT,deseasonalised only (as E5)
+2025-12-12 10:45:00+00:00,down,0.7074676939334884,XRPUSDT,deseasonalised only (as E5)
+2025-12-13 16:18:00+00:00,down,0.4535588435545481,XRPUSDT,deseasonalised only (as E5)
+2025-12-14 23:16:00+00:00,up,2.0329969888315174,XRPUSDT,deseasonalised only (as E5)
+2025-12-16 03:34:00+00:00,up,1.425381676202635,XRPUSDT,deseasonalised only (as E5)
+2025-12-17 16:36:00+00:00,up,1.0180557312455154,XRPUSDT,deseasonalised only (as E5)
+2025-12-18 17:42:00+00:00,up,1.567169406400472,XRPUSDT,deseasonalised only (as E5)
+2025-12-19 22:41:00+00:00,down,0.38498247998128593,XRPUSDT,deseasonalised only (as E5)
+2025-12-21 13:48:00+00:00,up,0.7455987298863265,XRPUSDT,deseasonalised only (as E5)
+2025-12-24 21:03:00+00:00,down,0.5235162033168345,XRPUSDT,deseasonalised only (as E5)
+2025-12-25 22:59:00+00:00,up,1.6820919403323031,XRPUSDT,deseasonalised only (as E5)
+2025-12-27 00:59:00+00:00,down,0.40075469194831387,XRPUSDT,deseasonalised only (as E5)
+2025-12-29 00:36:00+00:00,up,1.7989205722239539,XRPUSDT,deseasonalised only (as E5)
+2025-12-30 13:45:00+00:00,down,0.5950112413689209,XRPUSDT,deseasonalised only (as E5)
+2025-07-02 16:41:00+00:00,up,1.7102514651827345,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-07-03 19:06:00+00:00,down,0.4389676633073035,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-07-06 06:19:00+00:00,up,1.3683446697673034,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-07-07 14:18:00+00:00,up,1.5561661786205738,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-07-09 11:33:00+00:00,up,1.3302274307539,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-07-10 21:43:00+00:00,up,5.079873974881243,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-07-12 06:35:00+00:00,down,0.652581090475536,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-07-14 01:47:00+00:00,up,1.554670940185548,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-07-15 03:17:00+00:00,up,0.7455940004712093,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-07-16 17:37:00+00:00,up,1.8809236071991842,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-07-18 12:25:00+00:00,down,0.6639100788027552,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-07-20 04:36:00+00:00,up,0.706551063722885,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-07-22 02:55:00+00:00,up,0.958690703517468,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-07-23 12:58:00+00:00,up,3.891348701961219,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-07-24 15:51:00+00:00,down,0.8646152524950832,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-07-25 22:01:00+00:00,down,0.1684318791951931,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-07-26 22:34:00+00:00,up,0.42704672358329876,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-07-28 00:53:00+00:00,up,1.1313668767455682,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-07-29 09:04:00+00:00,down,0.7921128401612566,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-07-30 19:06:00+00:00,up,0.5567802601021632,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-07-31 22:06:00+00:00,up,2.5577981708528688,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-08-02 02:24:00+00:00,down,0.899146150446622,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-08-03 06:57:00+00:00,down,0.44170937829383894,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-08-05 08:15:00+00:00,up,0.967006834166586,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-08-06 19:34:00+00:00,down,0.5265283362650693,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-08-07 21:32:00+00:00,up,2.6529380614641327,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-08-09 01:47:00+00:00,down,0.5100581854938899,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-08-10 08:05:00+00:00,up,0.6599485408194703,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-08-11 08:31:00+00:00,up,1.3981481012288868,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-08-13 13:49:00+00:00,up,1.9470171406352081,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-08-14 16:41:00+00:00,down,0.6068643432157271,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-08-16 10:08:00+00:00,up,0.32467124492093774,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-08-17 16:16:00+00:00,up,1.4463082891676897,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-08-19 11:31:00+00:00,down,1.003825329855859,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-08-22 14:12:00+00:00,up,1.3144818213127878,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-08-23 18:31:00+00:00,down,0.472854990464332,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-08-24 19:35:00+00:00,up,1.5765141514720744,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-08-25 20:14:00+00:00,up,1.232803157119566,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-08-28 12:02:00+00:00,down,0.5971807095982907,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-08-31 23:38:00+00:00,up,2.5042512699482815,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-09-02 04:30:00+00:00,down,0.8846919978026709,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-09-04 05:17:00+00:00,up,0.6892864270010995,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-09-05 15:02:00+00:00,up,0.4402906335927996,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-09-07 10:09:00+00:00,up,1.781684258100188,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-09-08 16:22:00+00:00,down,1.2188942185688683,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-09-11 09:35:00+00:00,up,2.6731505872400447,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-09-12 20:20:00+00:00,up,1.2265839497718714,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-09-14 00:09:00+00:00,down,0.7458019142744942,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-09-15 06:56:00+00:00,up,1.7537115628619704,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-09-17 17:43:00+00:00,up,2.514219252105551,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-09-21 09:46:00+00:00,up,10.773243806491372,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-09-22 11:31:00+00:00,down,0.38434510439172176,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-09-23 16:55:00+00:00,up,0.5107937769878561,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-09-25 04:58:00+00:00,up,1.2254995468769931,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-09-27 01:03:00+00:00,down,0.29263818484809184,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-09-28 09:21:00+00:00,up,0.7665533454638127,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-10-01 04:34:00+00:00,up,1.106811394918151,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-10-02 16:26:00+00:00,up,1.3562304361800068,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-10-03 17:17:00+00:00,up,0.49576437708453314,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-10-05 02:38:00+00:00,up,1.3386253644334631,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-10-07 15:09:00+00:00,up,1.0928204481453208,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-10-09 08:30:00+00:00,up,1.1582333454976674,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-10-10 15:27:00+00:00,up,264.0270902054594,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-10-11 16:35:00+00:00,down,0.047814119148459434,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-10-12 18:44:00+00:00,up,0.09165765431733885,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-10-14 05:45:00+00:00,up,0.20521183918208516,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-10-15 20:47:00+00:00,up,0.48869330359804175,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-10-17 05:34:00+00:00,down,0.7481924700999373,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-10-19 08:33:00+00:00,up,0.580144542213107,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-10-20 19:58:00+00:00,up,0.8799106488308229,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-10-22 04:55:00+00:00,down,0.9385614416127567,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-10-23 12:19:00+00:00,up,0.5673201924825604,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-10-24 13:52:00+00:00,up,0.9600295641533461,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-10-25 17:56:00+00:00,down,0.7195817305426879,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-10-26 22:23:00+00:00,up,1.3235081769750028,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-10-28 11:39:00+00:00,down,1.2978760366898574,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-10-29 18:42:00+00:00,up,1.4113581375971098,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-10-31 17:00:00+00:00,up,0.3698408737824377,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-11-02 08:26:00+00:00,up,1.3258686855345463,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-11-03 14:40:00+00:00,down,3.849444912961969,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-11-04 18:42:00+00:00,up,2.14523502954333,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-11-06 02:55:00+00:00,up,0.5164920998750361,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-11-07 11:29:00+00:00,up,0.9329593865197574,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-11-08 20:33:00+00:00,down,0.44122468494198874,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-11-09 23:05:00+00:00,up,1.6356936333519245,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-11-11 12:00:00+00:00,down,0.5862047717702762,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-11-12 15:14:00+00:00,up,1.6083886529752318,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-11-14 19:53:00+00:00,down,0.4801574153447957,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-11-16 01:56:00+00:00,up,0.9617350093664004,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-11-17 07:01:00+00:00,down,1.7278689090145576,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-11-18 18:33:00+00:00,down,0.5465668655277645,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-11-20 16:29:00+00:00,up,2.7825195778419554,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-11-22 01:34:00+00:00,down,0.49516065655282787,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-11-23 02:05:00+00:00,up,0.6256587708576615,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-11-28 09:11:00+00:00,up,0.8817570605259687,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-11-29 12:06:00+00:00,up,0.5597423312848337,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-11-30 23:39:00+00:00,up,3.0992601279462724,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-12-02 06:58:00+00:00,down,1.0214024723040926,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-12-04 19:32:00+00:00,up,0.9239257248509892,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-12-06 05:28:00+00:00,down,0.43747769290552124,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-12-07 15:12:00+00:00,up,1.787018435693547,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-12-10 03:25:00+00:00,down,1.4662129110120352,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-12-11 07:54:00+00:00,down,0.6279942880778442,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-12-12 16:01:00+00:00,up,0.5380258838948943,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-12-14 10:32:00+00:00,up,1.5408079191630024,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-12-15 15:48:00+00:00,up,2.1053194253329317,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-12-16 19:03:00+00:00,down,0.8925323668521927,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-12-18 14:15:00+00:00,up,1.6733110367923827,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-12-19 23:47:00+00:00,down,0.3997745541552321,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-12-21 02:04:00+00:00,up,0.6853912996749761,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-12-25 23:00:00+00:00,up,1.6734238546300069,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-12-27 01:30:00+00:00,down,0.4144112453858318,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-12-29 00:08:00+00:00,up,1.8343463317408755,XRPUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-07-02 12:11:00+00:00,down,1.6854032145817064,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-03 12:40:00+00:00,up,0.5933845064077297,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-04 16:31:00+00:00,up,0.2770249162796199,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-06 06:24:00+00:00,up,1.3695282286471107,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-07 14:10:00+00:00,up,1.6179737744146312,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-08 21:37:00+00:00,down,1.4530935288016928,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-10 21:42:00+00:00,up,5.06857235849764,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-12 06:27:00+00:00,down,0.6553012445327938,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-14 02:49:00+00:00,up,1.584358861362836,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-15 03:18:00+00:00,up,0.7366983480590107,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-16 11:48:00+00:00,down,1.650697977051596,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-17 21:36:00+00:00,up,1.7606454715817015,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-19 06:06:00+00:00,down,0.30653856138881147,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-20 09:07:00+00:00,up,0.7742995191592675,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-22 02:38:00+00:00,up,1.0258302285287642,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-23 08:54:00+00:00,down,3.9209029058935636,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-24 14:02:00+00:00,down,0.8481780709771385,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-25 19:14:00+00:00,down,0.17941583785082424,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-26 22:42:00+00:00,up,0.4290687672493326,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-27 23:27:00+00:00,up,1.1117773183498465,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-30 19:12:00+00:00,up,0.5334402474169971,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-31 22:06:00+00:00,up,2.5577981708528688,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-02 02:25:00+00:00,down,0.8996830186440656,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-03 07:14:00+00:00,down,0.4471377628807107,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-04 14:15:00+00:00,up,0.6912156104501884,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-06 05:40:00+00:00,up,0.5534698007119216,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-07 10:37:00+00:00,up,2.6762338438820166,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-08 18:34:00+00:00,down,0.43543342774992116,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-09 22:35:00+00:00,up,0.9111490935728757,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-11 08:21:00+00:00,up,1.4548185159868199,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-14 12:40:00+00:00,up,0.8384087259526876,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-16 03:01:00+00:00,down,0.3780230825655832,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-17 14:11:00+00:00,down,1.2848319788016964,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-18 17:49:00+00:00,up,1.2196476575020971,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-21 01:13:00+00:00,down,0.8083584896039543,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-22 14:08:00+00:00,up,1.3343712633781435,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-23 16:32:00+00:00,down,0.41878365774444665,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-24 19:04:00+00:00,up,1.8814602387260877,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-25 20:11:00+00:00,up,1.2917152904815226,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-27 03:40:00+00:00,down,0.8649954757170756,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-28 12:09:00+00:00,down,0.5988506877879941,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-29 14:18:00+00:00,up,0.828998725651614,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-30 19:59:00+00:00,down,0.406000254988002,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-31 23:08:00+00:00,up,2.55388457201454,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-09-02 04:17:00+00:00,down,0.8837282982581165,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-09-03 21:13:00+00:00,down,0.6289828884993905,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-09-05 13:11:00+00:00,up,0.6132408242090973,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-09-06 15:34:00+00:00,down,0.4021139611047936,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-09-07 16:05:00+00:00,up,1.906950865217998,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-09-08 23:40:00+00:00,down,1.1587875934924023,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-09-11 09:47:00+00:00,up,2.6022998240724937,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-09-12 20:55:00+00:00,up,1.1169227415022545,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-09-14 00:38:00+00:00,down,0.7660715570914257,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-09-15 06:56:00+00:00,up,1.7537115628619704,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-09-16 22:23:00+00:00,down,1.3867348405586755,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-09-17 23:09:00+00:00,up,0.660457469286905,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-09-20 06:54:00+00:00,down,0.3742192971220529,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-09-21 09:46:00+00:00,up,10.773243806491372,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-09-22 12:01:00+00:00,down,0.3835480041582897,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-09-24 03:33:00+00:00,up,0.6519161904554472,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-09-25 04:49:00+00:00,up,1.2468100133654463,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-09-27 00:33:00+00:00,down,0.2769474520876124,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-09-28 09:16:00+00:00,up,0.7724016835581025,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-09-29 14:19:00+00:00,up,0.8253931898004746,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-01 04:23:00+00:00,up,1.139447617408065,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-02 16:26:00+00:00,up,1.3562304361800068,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-03 17:16:00+00:00,up,0.49820530846324323,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-05 02:52:00+00:00,up,1.3254713321361278,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-07 15:09:00+00:00,up,1.0928204481453208,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-09 08:41:00+00:00,up,1.1407899698859383,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-10 15:27:00+00:00,up,264.0270902054594,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-11 16:28:00+00:00,down,0.04755410107760099,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-12 22:11:00+00:00,up,0.09092659120069554,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-14 06:34:00+00:00,up,0.20243247736151485,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-15 20:40:00+00:00,up,0.4856853123803785,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-17 06:54:00+00:00,up,0.6606394398105445,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-18 15:37:00+00:00,down,0.34424595962601373,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-20 00:33:00+00:00,up,0.7388080490206862,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-21 04:48:00+00:00,up,0.9428192830472543,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-23 02:23:00+00:00,down,0.4677760705142144,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-24 12:52:00+00:00,up,1.0228909622474935,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-25 17:32:00+00:00,down,0.7129956734088897,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-26 22:23:00+00:00,up,1.3235081769750028,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-28 11:21:00+00:00,down,1.2841237715504321,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-29 18:43:00+00:00,up,1.370953926102525,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-31 01:21:00+00:00,down,0.5513486457841349,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-01 11:58:00+00:00,down,0.3995958396831949,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-02 15:09:00+00:00,up,1.374668665890619,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-03 15:40:00+00:00,up,2.247614846268821,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-04 18:44:00+00:00,up,2.1101716105196586,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-06 08:54:00+00:00,down,0.5043317889584925,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-07 11:30:00+00:00,up,0.9299996536329788,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-08 16:51:00+00:00,down,0.3911520811953237,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-09 23:04:00+00:00,up,1.637536891137815,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-11 11:29:00+00:00,down,0.5801027207728419,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-12 15:14:00+00:00,up,1.6083886529752318,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-14 04:55:00+00:00,up,1.2581098957516346,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-15 14:08:00+00:00,down,0.511185103130974,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-16 18:11:00+00:00,up,1.2885608014581251,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-18 03:34:00+00:00,up,0.8156761179193601,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-19 06:04:00+00:00,up,0.8082581095410964,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-20 16:30:00+00:00,up,2.780957406477928,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-22 01:04:00+00:00,down,0.49568788785025003,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-23 02:54:00+00:00,up,0.6463746923382435,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-24 18:03:00+00:00,up,0.7409403049261875,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-26 05:43:00+00:00,down,0.5633064902033811,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-28 08:59:00+00:00,up,0.9126718720822948,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-29 12:19:00+00:00,up,0.5007142665065009,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-30 23:49:00+00:00,up,3.0824459036065974,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-02 05:26:00+00:00,down,0.9816385267957378,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-04 19:33:00+00:00,up,0.9123125612967374,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-06 04:06:00+00:00,down,0.42144001572938605,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-07 10:46:00+00:00,up,2.023084354187382,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-08 23:57:00+00:00,down,1.1773549876246916,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-10 06:09:00+00:00,down,1.5511299510293208,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-11 11:05:00+00:00,down,0.6421615297576487,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-12 16:10:00+00:00,up,0.5181488697354254,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-13 20:11:00+00:00,down,0.5577025916503088,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-14 23:16:00+00:00,up,2.0329969888315174,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-16 11:28:00+00:00,up,1.1683826355203346,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-17 16:23:00+00:00,up,1.0554101992885787,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-18 19:45:00+00:00,up,1.4104469637659391,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-19 23:16:00+00:00,down,0.3915231041816329,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-21 02:28:00+00:00,up,0.7157136896639101,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-23 07:01:00+00:00,up,0.8452751856748428,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-24 21:44:00+00:00,down,0.5304649738725763,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-25 22:59:00+00:00,up,1.6820919403323031,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-27 00:59:00+00:00,down,0.40075469194831387,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-28 21:59:00+00:00,up,1.8531416502159084,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-30 01:40:00+00:00,down,0.782928275502225,XRPUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-03 12:40:00+00:00,up,0.8221603984259472,SOLUSDT,deseasonalised only (as E5)
+2025-07-04 21:25:00+00:00,down,0.4266129570306855,SOLUSDT,deseasonalised only (as E5)
+2025-07-06 13:56:00+00:00,up,1.2813260885577438,SOLUSDT,deseasonalised only (as E5)
+2025-07-09 05:46:00+00:00,up,1.225398114490842,SOLUSDT,deseasonalised only (as E5)
+2025-07-10 21:27:00+00:00,up,1.6463613115868232,SOLUSDT,deseasonalised only (as E5)
+2025-07-12 03:21:00+00:00,down,0.5632345562846748,SOLUSDT,deseasonalised only (as E5)
+2025-07-14 03:21:00+00:00,up,1.6796070752765906,SOLUSDT,deseasonalised only (as E5)
+2025-07-15 18:45:00+00:00,up,0.9169162248498772,SOLUSDT,deseasonalised only (as E5)
+2025-07-17 01:22:00+00:00,up,1.9019218477927555,SOLUSDT,deseasonalised only (as E5)
+2025-07-19 04:20:00+00:00,down,0.5314284242161915,SOLUSDT,deseasonalised only (as E5)
+2025-07-20 09:21:00+00:00,up,1.4628244624339948,SOLUSDT,deseasonalised only (as E5)
+2025-07-22 01:08:00+00:00,up,2.229830968562694,SOLUSDT,deseasonalised only (as E5)
+2025-07-23 04:12:00+00:00,down,0.8851848028512875,SOLUSDT,deseasonalised only (as E5)
+2025-07-24 05:25:00+00:00,up,1.2567756358362585,SOLUSDT,deseasonalised only (as E5)
+2025-07-25 18:27:00+00:00,down,0.21223028941179137,SOLUSDT,deseasonalised only (as E5)
+2025-07-27 17:04:00+00:00,up,1.123610750890298,SOLUSDT,deseasonalised only (as E5)
+2025-07-28 20:54:00+00:00,up,1.1363423612115084,SOLUSDT,deseasonalised only (as E5)
+2025-07-30 19:06:00+00:00,up,0.6057797541950982,SOLUSDT,deseasonalised only (as E5)
+2025-07-31 20:38:00+00:00,up,2.240893797419318,SOLUSDT,deseasonalised only (as E5)
+2025-08-02 02:10:00+00:00,down,0.7041222621741694,SOLUSDT,deseasonalised only (as E5)
+2025-08-03 06:15:00+00:00,down,0.3941489623538952,SOLUSDT,deseasonalised only (as E5)
+2025-08-04 08:42:00+00:00,up,0.9919910370821803,SOLUSDT,deseasonalised only (as E5)
+2025-08-05 10:39:00+00:00,up,1.1539303471055466,SOLUSDT,deseasonalised only (as E5)
+2025-08-06 21:19:00+00:00,down,0.636780773995159,SOLUSDT,deseasonalised only (as E5)
+2025-08-08 00:37:00+00:00,up,0.8973770404456578,SOLUSDT,deseasonalised only (as E5)
+2025-08-09 05:16:00+00:00,up,1.0377783978691244,SOLUSDT,deseasonalised only (as E5)
+2025-08-10 08:08:00+00:00,up,0.9291502878297211,SOLUSDT,deseasonalised only (as E5)
+2025-08-11 12:04:00+00:00,up,0.9726222477266113,SOLUSDT,deseasonalised only (as E5)
+2025-08-12 13:04:00+00:00,up,1.8014382827196105,SOLUSDT,deseasonalised only (as E5)
+2025-08-14 05:05:00+00:00,up,2.0985187066961415,SOLUSDT,deseasonalised only (as E5)
+2025-08-15 11:27:00+00:00,down,0.7503388712645218,SOLUSDT,deseasonalised only (as E5)
+2025-08-16 16:48:00+00:00,down,0.3463596454644316,SOLUSDT,deseasonalised only (as E5)
+2025-08-18 01:44:00+00:00,up,1.1020091969944226,SOLUSDT,deseasonalised only (as E5)
+2025-08-19 04:19:00+00:00,up,0.922899783500202,SOLUSDT,deseasonalised only (as E5)
+2025-08-22 09:12:00+00:00,down,1.8832084360072172,SOLUSDT,deseasonalised only (as E5)
+2025-08-23 13:32:00+00:00,down,0.661453734651396,SOLUSDT,deseasonalised only (as E5)
+2025-08-24 19:36:00+00:00,up,2.2662745646905487,SOLUSDT,deseasonalised only (as E5)
+2025-08-25 20:59:00+00:00,up,0.8468079079231047,SOLUSDT,deseasonalised only (as E5)
+2025-08-27 20:14:00+00:00,up,1.4592629085384632,SOLUSDT,deseasonalised only (as E5)
+2025-08-29 07:27:00+00:00,up,1.0558550849299826,SOLUSDT,deseasonalised only (as E5)
+2025-08-30 12:18:00+00:00,down,0.3571289934294154,SOLUSDT,deseasonalised only (as E5)
+2025-09-01 00:43:00+00:00,up,1.0764269540476932,SOLUSDT,deseasonalised only (as E5)
+2025-09-03 18:50:00+00:00,down,0.5496913172873208,SOLUSDT,deseasonalised only (as E5)
+2025-09-05 12:44:00+00:00,up,0.7330604826134625,SOLUSDT,deseasonalised only (as E5)
+2025-09-06 15:23:00+00:00,down,0.2950516508961342,SOLUSDT,deseasonalised only (as E5)
+2025-09-07 21:09:00+00:00,up,1.9326340341287556,SOLUSDT,deseasonalised only (as E5)
+2025-09-11 12:31:00+00:00,up,0.9760473909137973,SOLUSDT,deseasonalised only (as E5)
+2025-09-13 09:37:00+00:00,down,0.9122165005076569,SOLUSDT,deseasonalised only (as E5)
+2025-09-14 21:11:00+00:00,up,1.7202554726779213,SOLUSDT,deseasonalised only (as E5)
+2025-09-16 02:45:00+00:00,down,0.6289197895201479,SOLUSDT,deseasonalised only (as E5)
+2025-09-17 18:00:00+00:00,up,1.1938324676473355,SOLUSDT,deseasonalised only (as E5)
+2025-09-19 00:57:00+00:00,down,0.574236730314445,SOLUSDT,deseasonalised only (as E5)
+2025-09-20 05:29:00+00:00,down,0.3538177797082015,SOLUSDT,deseasonalised only (as E5)
+2025-09-21 09:51:00+00:00,up,5.966776787192418,SOLUSDT,deseasonalised only (as E5)
+2025-09-23 03:14:00+00:00,up,0.6981030602661267,SOLUSDT,deseasonalised only (as E5)
+2025-09-24 03:31:00+00:00,up,0.9487812382205993,SOLUSDT,deseasonalised only (as E5)
+2025-09-25 04:31:00+00:00,up,1.6436093160954757,SOLUSDT,deseasonalised only (as E5)
+2025-09-27 01:30:00+00:00,down,0.27197296928718656,SOLUSDT,deseasonalised only (as E5)
+2025-09-28 20:49:00+00:00,up,0.8860604599110518,SOLUSDT,deseasonalised only (as E5)
+2025-09-30 21:31:00+00:00,up,1.057526094033521,SOLUSDT,deseasonalised only (as E5)
+2025-10-02 05:39:00+00:00,up,0.9557918189240591,SOLUSDT,deseasonalised only (as E5)
+2025-10-03 17:00:00+00:00,up,0.6832204552785596,SOLUSDT,deseasonalised only (as E5)
+2025-10-04 19:58:00+00:00,down,0.9759239429707609,SOLUSDT,deseasonalised only (as E5)
+2025-10-06 00:31:00+00:00,up,0.9967844984910095,SOLUSDT,deseasonalised only (as E5)
+2025-10-08 14:34:00+00:00,up,1.2026950349711887,SOLUSDT,deseasonalised only (as E5)
+2025-10-10 15:23:00+00:00,up,19.2025368091806,SOLUSDT,deseasonalised only (as E5)
+2025-10-11 17:07:00+00:00,down,0.3646656422449208,SOLUSDT,deseasonalised only (as E5)
+2025-10-12 22:39:00+00:00,up,0.4572212375689595,SOLUSDT,deseasonalised only (as E5)
+2025-10-14 06:44:00+00:00,up,0.9961520740390232,SOLUSDT,deseasonalised only (as E5)
+2025-10-15 20:08:00+00:00,down,1.2070823500085195,SOLUSDT,deseasonalised only (as E5)
+2025-10-17 07:06:00+00:00,up,0.799049245347941,SOLUSDT,deseasonalised only (as E5)
+2025-10-18 10:29:00+00:00,down,0.35034698729484287,SOLUSDT,deseasonalised only (as E5)
+2025-10-20 01:17:00+00:00,up,0.7663647073268527,SOLUSDT,deseasonalised only (as E5)
+2025-10-21 05:10:00+00:00,up,1.2260576347785817,SOLUSDT,deseasonalised only (as E5)
+2025-10-22 09:57:00+00:00,down,1.323780218298557,SOLUSDT,deseasonalised only (as E5)
+2025-10-24 07:20:00+00:00,down,0.6001869821362373,SOLUSDT,deseasonalised only (as E5)
+2025-10-25 16:13:00+00:00,down,0.4712291086551173,SOLUSDT,deseasonalised only (as E5)
+2025-10-26 22:11:00+00:00,up,1.2882004142952324,SOLUSDT,deseasonalised only (as E5)
+2025-10-28 20:07:00+00:00,up,2.4545788846048993,SOLUSDT,deseasonalised only (as E5)
+2025-10-30 04:28:00+00:00,up,1.0706435168176383,SOLUSDT,deseasonalised only (as E5)
+2025-10-31 08:01:00+00:00,down,0.4577405309063377,SOLUSDT,deseasonalised only (as E5)
+2025-11-01 12:09:00+00:00,down,0.3783567721796067,SOLUSDT,deseasonalised only (as E5)
+2025-11-02 23:09:00+00:00,up,3.761995339147922,SOLUSDT,deseasonalised only (as E5)
+2025-11-04 05:36:00+00:00,up,3.2811674489501255,SOLUSDT,deseasonalised only (as E5)
+2025-11-05 11:09:00+00:00,down,0.32745586017024775,SOLUSDT,deseasonalised only (as E5)
+2025-11-06 18:48:00+00:00,up,0.9156844760613367,SOLUSDT,deseasonalised only (as E5)
+2025-11-08 02:28:00+00:00,down,0.3561527450794246,SOLUSDT,deseasonalised only (as E5)
+2025-11-09 23:20:00+00:00,up,0.9615567997347958,SOLUSDT,deseasonalised only (as E5)
+2025-11-11 02:05:00+00:00,up,1.0398672857489915,SOLUSDT,deseasonalised only (as E5)
+2025-11-13 03:37:00+00:00,up,1.6113810836709774,SOLUSDT,deseasonalised only (as E5)
+2025-11-14 04:46:00+00:00,up,1.4416709672431955,SOLUSDT,deseasonalised only (as E5)
+2025-11-15 07:37:00+00:00,down,0.3819325094362748,SOLUSDT,deseasonalised only (as E5)
+2025-11-16 13:06:00+00:00,up,0.9945484181239215,SOLUSDT,deseasonalised only (as E5)
+2025-11-17 15:08:00+00:00,up,1.7391451777932423,SOLUSDT,deseasonalised only (as E5)
+2025-11-18 18:58:00+00:00,down,0.6231691425180003,SOLUSDT,deseasonalised only (as E5)
+2025-11-19 21:35:00+00:00,up,1.1116359067817583,SOLUSDT,deseasonalised only (as E5)
+2025-11-21 07:37:00+00:00,up,1.3366198252393864,SOLUSDT,deseasonalised only (as E5)
+2025-11-22 14:45:00+00:00,down,0.3433573238503254,SOLUSDT,deseasonalised only (as E5)
+2025-11-24 00:51:00+00:00,up,0.9491457880026917,SOLUSDT,deseasonalised only (as E5)
+2025-11-25 05:04:00+00:00,down,0.7340471489396606,SOLUSDT,deseasonalised only (as E5)
+2025-11-26 18:37:00+00:00,up,0.5106806568465506,SOLUSDT,deseasonalised only (as E5)
+2025-11-28 09:15:00+00:00,up,0.8155197475817125,SOLUSDT,deseasonalised only (as E5)
+2025-11-29 14:05:00+00:00,down,0.6199144030845408,SOLUSDT,deseasonalised only (as E5)
+2025-11-30 23:53:00+00:00,up,2.6049206485725764,SOLUSDT,deseasonalised only (as E5)
+2025-12-03 00:29:00+00:00,down,1.246009439028846,SOLUSDT,deseasonalised only (as E5)
+2025-12-04 19:34:00+00:00,up,0.9229977190163468,SOLUSDT,deseasonalised only (as E5)
+2025-12-06 00:47:00+00:00,down,0.4045762209429518,SOLUSDT,deseasonalised only (as E5)
+2025-12-07 14:26:00+00:00,up,1.9529218752068562,SOLUSDT,deseasonalised only (as E5)
+2025-12-09 13:23:00+00:00,down,1.3616565015656623,SOLUSDT,deseasonalised only (as E5)
+2025-12-10 19:08:00+00:00,up,1.6604565192210314,SOLUSDT,deseasonalised only (as E5)
+2025-12-12 04:24:00+00:00,down,0.6125191642764252,SOLUSDT,deseasonalised only (as E5)
+2025-12-13 06:56:00+00:00,down,0.2857163495811711,SOLUSDT,deseasonalised only (as E5)
+2025-12-14 10:24:00+00:00,up,1.385381909701833,SOLUSDT,deseasonalised only (as E5)
+2025-12-15 14:38:00+00:00,up,1.727478026335099,SOLUSDT,deseasonalised only (as E5)
+2025-12-16 20:17:00+00:00,down,1.0002089733589519,SOLUSDT,deseasonalised only (as E5)
+2025-12-18 17:28:00+00:00,up,1.7542685817072743,SOLUSDT,deseasonalised only (as E5)
+2025-12-19 21:51:00+00:00,down,0.14977095695129503,SOLUSDT,deseasonalised only (as E5)
+2025-12-21 09:10:00+00:00,up,1.087006888634662,SOLUSDT,deseasonalised only (as E5)
+2025-12-24 20:10:00+00:00,down,0.366861918017994,SOLUSDT,deseasonalised only (as E5)
+2025-12-25 23:02:00+00:00,up,1.9941535698016246,SOLUSDT,deseasonalised only (as E5)
+2025-12-27 00:58:00+00:00,down,0.4558523354408457,SOLUSDT,deseasonalised only (as E5)
+2025-12-29 00:23:00+00:00,up,3.2144893481197436,SOLUSDT,deseasonalised only (as E5)
+2025-12-31 05:26:00+00:00,down,0.7262271381084836,SOLUSDT,deseasonalised only (as E5)
+2025-07-02 14:27:00+00:00,up,1.2530953869539523,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-07-03 18:51:00+00:00,down,0.7946049353111633,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-07-06 13:45:00+00:00,up,1.2970203510256961,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-07-09 05:46:00+00:00,up,1.225398114490842,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-07-10 21:45:00+00:00,up,1.597768394954263,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-07-12 03:27:00+00:00,down,0.5660430680133767,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-07-13 22:23:00+00:00,up,1.6310330423654529,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-07-15 03:13:00+00:00,up,1.1311845475603655,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-07-16 16:11:00+00:00,up,1.9099111802959712,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-07-19 04:15:00+00:00,down,0.526494434184978,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-07-20 09:20:00+00:00,up,1.470650245198414,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-07-22 01:19:00+00:00,up,2.1284029559354005,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-07-23 21:37:00+00:00,up,1.0138689791713744,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-07-25 03:04:00+00:00,up,0.7596944953817465,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-07-27 12:18:00+00:00,up,0.9513190374860703,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-07-30 17:10:00+00:00,down,0.8160560314394988,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-07-31 17:44:00+00:00,up,2.035781023743474,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-08-02 01:30:00+00:00,down,0.6902017335602226,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-08-03 05:31:00+00:00,down,0.3797988403972423,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-08-04 08:40:00+00:00,up,0.9946444117417912,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-08-06 21:25:00+00:00,down,0.6414696402729417,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-08-08 01:13:00+00:00,up,0.8183954017264706,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-08-09 05:04:00+00:00,up,1.0698845272443087,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-08-10 16:09:00+00:00,down,1.0865664453651065,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-08-13 03:32:00+00:00,up,1.5395111507699393,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-08-14 12:51:00+00:00,up,1.0024873416071898,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-08-17 02:22:00+00:00,up,0.6128273712110796,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-08-22 14:09:00+00:00,up,1.5134431415451601,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-08-23 17:32:00+00:00,down,0.7748765050578743,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-08-24 19:37:00+00:00,up,2.0650536244760196,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-08-25 20:38:00+00:00,up,0.9164557265988004,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-08-27 04:07:00+00:00,up,1.4560910428101557,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-08-29 07:26:00+00:00,up,1.0643982942656176,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-08-31 11:08:00+00:00,up,0.7489045849258417,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-09-01 15:30:00+00:00,down,0.9574659830783926,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-09-06 00:52:00+00:00,down,0.24498115227433306,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-09-07 09:12:00+00:00,up,0.8935375716996888,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-09-08 10:22:00+00:00,up,1.39940040729826,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-09-11 12:30:00+00:00,up,1.094658723996105,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-09-12 22:37:00+00:00,up,0.5965044077649903,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-09-14 02:02:00+00:00,up,1.272243413228447,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-09-15 07:48:00+00:00,up,1.2154374829109402,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-09-17 17:57:00+00:00,up,2.169713776210042,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-09-19 07:02:00+00:00,up,0.4683597143327899,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-09-20 15:34:00+00:00,up,0.4470928597151693,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-09-21 23:09:00+00:00,up,7.271797698579863,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-09-23 03:18:00+00:00,up,0.6914365342322787,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-09-24 03:31:00+00:00,up,0.9487812382205993,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-09-25 04:31:00+00:00,up,1.6436093160954757,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-09-27 02:56:00+00:00,down,0.2765847166474262,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-09-28 09:10:00+00:00,up,0.6320488194741051,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-09-30 22:06:00+00:00,up,1.0138795519770902,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-10-02 05:38:00+00:00,up,0.960670234793639,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-10-03 17:01:00+00:00,up,0.5873168902646109,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-10-05 02:45:00+00:00,up,1.2008070823755173,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-10-09 08:40:00+00:00,up,0.9760844442011691,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-10-10 15:18:00+00:00,up,19.80142269319275,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-10-11 17:03:00+00:00,down,0.3631261293929254,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-10-12 21:42:00+00:00,up,0.5022536131329977,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-10-14 05:10:00+00:00,up,1.0608806896748348,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-10-15 20:47:00+00:00,up,1.1580518813138128,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-10-17 06:54:00+00:00,up,0.8278565497552397,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-10-19 08:31:00+00:00,up,0.6758204839953262,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-10-21 05:15:00+00:00,up,1.2158039844439543,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-10-22 10:11:00+00:00,down,1.328241193722388,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-10-24 23:33:00+00:00,down,0.32826538299430436,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-10-26 09:30:00+00:00,up,1.3240209450947724,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-10-28 20:40:00+00:00,up,2.0893353341856966,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-10-29 22:59:00+00:00,down,1.2075624387020882,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-11-02 05:19:00+00:00,up,1.198051603768224,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-11-03 13:53:00+00:00,down,3.1412198825430235,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-11-04 17:32:00+00:00,up,2.1946278518897424,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-11-06 18:55:00+00:00,up,0.9136749579994098,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-11-08 01:53:00+00:00,down,0.3564800110246798,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-11-09 03:47:00+00:00,up,0.7110064520934919,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-11-11 14:54:00+00:00,down,0.809435516961486,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-11-13 18:22:00+00:00,up,2.6003141537926355,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-11-15 03:15:00+00:00,down,0.3593512544130191,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-11-16 12:18:00+00:00,up,1.0284591973538943,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-11-18 03:32:00+00:00,up,0.8285935201113441,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-11-19 21:22:00+00:00,up,1.1289679404833475,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-11-21 07:45:00+00:00,up,1.2953737761664654,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-11-22 18:52:00+00:00,down,0.4032937942660782,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-11-24 00:47:00+00:00,up,0.9609340463538163,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-11-26 18:48:00+00:00,up,0.4896623349992696,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-11-28 09:01:00+00:00,up,0.8481660497092286,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-11-30 23:54:00+00:00,up,2.5985988198648524,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-12-03 00:00:00+00:00,down,1.2375920116647403,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-12-04 19:28:00+00:00,up,0.9695711658783769,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-12-06 00:50:00+00:00,down,0.40586118930606047,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-12-07 14:18:00+00:00,up,2.174022768831709,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-12-09 16:33:00+00:00,up,1.0877537829377482,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-12-10 19:01:00+00:00,up,1.7651529403175803,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-12-12 06:17:00+00:00,up,0.5215254961786397,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-12-14 10:23:00+00:00,up,1.399093654758037,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-12-15 15:31:00+00:00,up,1.5861234672543905,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-12-16 19:20:00+00:00,down,0.9714784965490203,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-12-18 14:16:00+00:00,up,1.950565578344482,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-12-19 22:52:00+00:00,down,0.1440338915921841,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-12-21 02:07:00+00:00,up,0.7964473692565255,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-12-24 19:57:00+00:00,down,0.3650251927100345,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-12-25 23:01:00+00:00,up,1.9971708879208547,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-12-27 01:28:00+00:00,down,0.4722556437134723,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-12-28 23:51:00+00:00,up,3.428119917099282,SOLUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-07-02 15:11:00+00:00,up,1.2121380299731346,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-03 19:00:00+00:00,down,0.798271294774678,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-05 14:30:00+00:00,down,0.4569322159978568,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-06 16:59:00+00:00,up,1.358297170049549,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-09 05:46:00+00:00,up,1.225398114490842,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-10 21:30:00+00:00,up,1.6393583954647548,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-12 03:11:00+00:00,down,0.5585170851091183,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-13 23:21:00+00:00,up,1.6036332249471468,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-15 03:13:00+00:00,up,1.1311845475603655,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-16 16:28:00+00:00,up,1.8685754250237472,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-17 19:41:00+00:00,down,1.5724662177528548,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-19 04:15:00+00:00,down,0.526494434184978,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-20 09:16:00+00:00,up,1.4746805707917554,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-22 01:17:00+00:00,up,2.1752214201173268,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-23 04:19:00+00:00,down,0.8874154161225457,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-24 05:26:00+00:00,up,1.2533209087099244,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-25 18:04:00+00:00,down,0.21319643965348078,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-27 10:58:00+00:00,up,0.9319265945399466,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-28 20:52:00+00:00,up,1.1462271222248526,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-30 19:07:00+00:00,up,0.593441325606917,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-31 20:30:00+00:00,up,2.2678038893226455,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-02 01:40:00+00:00,down,0.6912216500737973,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-03 06:04:00+00:00,down,0.390479487946422,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-04 08:33:00+00:00,up,0.9975946918270759,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-05 10:40:00+00:00,up,1.1523307264909048,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-06 22:16:00+00:00,down,0.6873887553941463,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-08 00:38:00+00:00,up,0.8849086030729229,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-09 05:10:00+00:00,up,1.0508515000166527,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-10 17:04:00+00:00,down,1.1373455909349297,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-13 02:44:00+00:00,up,1.5864657236892887,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-14 12:46:00+00:00,up,1.0297714057994631,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-16 16:59:00+00:00,down,0.34824512158899845,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-17 19:12:00+00:00,up,1.0105021122309257,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-19 04:19:00+00:00,up,0.922899783500202,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-22 14:09:00+00:00,up,1.5134431415451601,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-23 16:49:00+00:00,down,0.7482201910938739,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-24 19:36:00+00:00,up,2.2662745646905487,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-26 05:25:00+00:00,down,0.7758501570742461,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-27 19:07:00+00:00,up,1.6192790377311477,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-29 07:27:00+00:00,up,1.0558550849299826,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-30 15:52:00+00:00,down,0.3216608974392741,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-31 23:38:00+00:00,up,1.113411653229149,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-09-03 19:29:00+00:00,down,0.5578262352194393,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-09-05 12:44:00+00:00,up,0.7330604826134625,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-09-07 06:18:00+00:00,down,0.7710590288670405,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-09-08 10:07:00+00:00,up,1.5542642482289268,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-09-11 02:55:00+00:00,down,1.9228611790776473,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-09-13 09:17:00+00:00,down,0.9021334289261229,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-09-14 21:11:00+00:00,up,1.7202554726779213,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-09-16 02:14:00+00:00,down,0.6246448615307277,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-09-17 17:59:00+00:00,up,1.5822613097069482,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-09-19 03:01:00+00:00,down,0.5847286226984985,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-09-20 07:34:00+00:00,down,0.37896355120695535,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-09-21 09:46:00+00:00,up,5.950394530742223,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-09-22 14:39:00+00:00,down,0.545863314303277,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-09-24 03:30:00+00:00,up,0.9584151023004333,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-09-25 04:25:00+00:00,up,1.6562647814834541,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-09-26 20:38:00+00:00,down,0.3177650365531295,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-09-27 23:19:00+00:00,up,0.5310697779323496,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-09-29 13:45:00+00:00,up,0.9592223867518335,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-09-30 21:32:00+00:00,up,1.0532272551058846,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-02 05:39:00+00:00,up,0.9557918189240591,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-03 17:01:00+00:00,up,0.5873168902646109,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-05 02:49:00+00:00,up,1.2072675167134428,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-09 08:36:00+00:00,up,0.9993450623392841,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-10 15:21:00+00:00,up,19.329989824909394,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-11 16:47:00+00:00,down,0.3574564142873034,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-12 21:39:00+00:00,up,0.5035575220333909,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-14 05:41:00+00:00,up,1.0360549155324923,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-15 20:50:00+00:00,up,1.1466818143550945,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-17 07:03:00+00:00,up,0.8155818856110016,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-18 13:44:00+00:00,down,0.3586338698020427,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-20 00:40:00+00:00,up,0.7867347400307916,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-21 05:03:00+00:00,up,1.2381225078004456,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-22 09:34:00+00:00,down,1.316632391401047,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-24 07:36:00+00:00,down,0.6045629111196001,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-25 17:53:00+00:00,down,0.5026120310158962,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-26 22:08:00+00:00,up,1.2954929466303353,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-28 20:21:00+00:00,up,2.373545799502042,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-30 04:31:00+00:00,up,1.028980836767592,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-31 10:28:00+00:00,down,0.4458658739790758,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-02 23:00:00+00:00,up,3.792416083478069,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-04 06:14:00+00:00,up,3.013680649022245,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-05 10:16:00+00:00,down,0.3227532461839929,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-06 15:29:00+00:00,up,0.8653809210645952,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-08 10:32:00+00:00,down,0.34155978758697375,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-09 15:04:00+00:00,up,0.874460296233833,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-11 02:05:00+00:00,up,1.0398672857489915,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-13 03:37:00+00:00,up,1.6113810836709774,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-14 04:49:00+00:00,up,1.42766917855357,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-15 07:48:00+00:00,down,0.38397560757743576,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-16 12:22:00+00:00,up,1.0194783969122818,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-17 15:08:00+00:00,up,1.7391451777932423,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-18 18:44:00+00:00,down,0.6182167732439041,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-19 21:34:00+00:00,up,1.119432056255456,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-21 07:40:00+00:00,up,1.3171714513082393,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-22 15:09:00+00:00,down,0.3479640071455823,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-23 23:11:00+00:00,up,0.9997499293213932,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-25 05:47:00+00:00,down,0.7349425175552304,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-26 18:33:00+00:00,up,0.5214926462473785,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-28 09:03:00+00:00,up,0.8444995860900886,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-29 14:42:00+00:00,down,0.6351018245853531,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-30 23:49:00+00:00,up,2.920046685513281,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-02 07:06:00+00:00,down,1.1931245794313101,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-03 14:21:00+00:00,up,1.0285296346338235,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-04 19:28:00+00:00,up,0.9695711658783769,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-06 00:47:00+00:00,down,0.4045762209429518,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-07 14:09:00+00:00,up,2.18187115619192,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-09 09:56:00+00:00,down,1.2318699426965067,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-10 19:07:00+00:00,up,1.6664737641001426,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-12 04:48:00+00:00,down,0.614533692743177,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-13 08:11:00+00:00,down,0.298039537925561,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-14 10:24:00+00:00,up,1.385381909701833,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-15 15:05:00+00:00,up,1.6737968549158335,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-16 18:29:00+00:00,down,0.9507202015692579,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-18 14:35:00+00:00,up,1.933312684851459,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-19 21:07:00+00:00,down,0.15038808302709972,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-21 02:46:00+00:00,up,0.823744496947182,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-23 06:56:00+00:00,up,0.9297666899472148,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-24 20:21:00+00:00,down,0.36844998444238425,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-25 23:01:00+00:00,up,1.9971708879208547,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-27 00:58:00+00:00,down,0.4558523354408457,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-28 23:50:00+00:00,up,3.439423513397465,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-31 07:17:00+00:00,down,0.7869344013900108,SOLUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-02 16:42:00+00:00,up,1.9661950468865574,DOGEUSDT,deseasonalised only (as E5)
+2025-07-03 18:53:00+00:00,down,0.6267169104333534,DOGEUSDT,deseasonalised only (as E5)
+2025-07-05 14:39:00+00:00,down,0.7168371222430538,DOGEUSDT,deseasonalised only (as E5)
+2025-07-06 18:55:00+00:00,up,1.9646126745697134,DOGEUSDT,deseasonalised only (as E5)
+2025-07-08 19:04:00+00:00,down,0.8651735524516522,DOGEUSDT,deseasonalised only (as E5)
+2025-07-09 19:52:00+00:00,up,2.7736692822860713,DOGEUSDT,deseasonalised only (as E5)
+2025-07-10 21:27:00+00:00,up,2.773037668889617,DOGEUSDT,deseasonalised only (as E5)
+2025-07-12 14:49:00+00:00,down,0.4640036190460739,DOGEUSDT,deseasonalised only (as E5)
+2025-07-13 23:29:00+00:00,up,1.2999055222759575,DOGEUSDT,deseasonalised only (as E5)
+2025-07-15 03:51:00+00:00,up,0.8744140441214372,DOGEUSDT,deseasonalised only (as E5)
+2025-07-16 21:25:00+00:00,up,1.9286954301002988,DOGEUSDT,deseasonalised only (as E5)
+2025-07-18 01:25:00+00:00,up,1.8542951512779784,DOGEUSDT,deseasonalised only (as E5)
+2025-07-19 04:42:00+00:00,up,0.7642574892944632,DOGEUSDT,deseasonalised only (as E5)
+2025-07-20 11:03:00+00:00,down,1.539325227183552,DOGEUSDT,deseasonalised only (as E5)
+2025-07-21 23:13:00+00:00,down,0.8544101813094455,DOGEUSDT,deseasonalised only (as E5)
+2025-07-23 04:54:00+00:00,down,1.0147030835352235,DOGEUSDT,deseasonalised only (as E5)
+2025-07-24 05:58:00+00:00,up,1.2942136123971266,DOGEUSDT,deseasonalised only (as E5)
+2025-07-25 19:56:00+00:00,down,0.24297194780048825,DOGEUSDT,deseasonalised only (as E5)
+2025-07-27 18:20:00+00:00,up,0.9785773397683807,DOGEUSDT,deseasonalised only (as E5)
+2025-07-30 11:52:00+00:00,up,0.8969386113702462,DOGEUSDT,deseasonalised only (as E5)
+2025-07-31 23:00:00+00:00,up,2.125574352738303,DOGEUSDT,deseasonalised only (as E5)
+2025-08-02 02:27:00+00:00,down,0.8489838792874631,DOGEUSDT,deseasonalised only (as E5)
+2025-08-03 04:58:00+00:00,down,0.2671916036303532,DOGEUSDT,deseasonalised only (as E5)
+2025-08-04 06:53:00+00:00,up,0.6664066479740527,DOGEUSDT,deseasonalised only (as E5)
+2025-08-05 10:41:00+00:00,up,0.9785168221018272,DOGEUSDT,deseasonalised only (as E5)
+2025-08-06 19:47:00+00:00,down,0.5752016856801137,DOGEUSDT,deseasonalised only (as E5)
+2025-08-07 21:53:00+00:00,up,1.4379370448804143,DOGEUSDT,deseasonalised only (as E5)
+2025-08-09 06:07:00+00:00,up,1.2887749846625678,DOGEUSDT,deseasonalised only (as E5)
+2025-08-10 08:10:00+00:00,up,0.7085633134934628,DOGEUSDT,deseasonalised only (as E5)
+2025-08-11 11:50:00+00:00,up,1.0380745279496681,DOGEUSDT,deseasonalised only (as E5)
+2025-08-12 12:56:00+00:00,up,1.3110927225416231,DOGEUSDT,deseasonalised only (as E5)
+2025-08-14 03:02:00+00:00,up,1.977941390215085,DOGEUSDT,deseasonalised only (as E5)
+2025-08-16 07:18:00+00:00,down,0.4518124752143531,DOGEUSDT,deseasonalised only (as E5)
+2025-08-17 14:23:00+00:00,down,1.067456508568544,DOGEUSDT,deseasonalised only (as E5)
+2025-08-19 04:36:00+00:00,up,0.7919219805862692,DOGEUSDT,deseasonalised only (as E5)
+2025-08-22 14:16:00+00:00,up,1.2331324213414825,DOGEUSDT,deseasonalised only (as E5)
+2025-08-23 16:49:00+00:00,down,0.4384473164944835,DOGEUSDT,deseasonalised only (as E5)
+2025-08-24 18:47:00+00:00,up,2.6817676107813027,DOGEUSDT,deseasonalised only (as E5)
+2025-08-25 20:33:00+00:00,up,0.9211854317209177,DOGEUSDT,deseasonalised only (as E5)
+2025-08-27 01:13:00+00:00,down,1.0747509549165233,DOGEUSDT,deseasonalised only (as E5)
+2025-08-28 13:02:00+00:00,down,0.7891102142659313,DOGEUSDT,deseasonalised only (as E5)
+2025-08-30 07:14:00+00:00,down,0.30965176739930234,DOGEUSDT,deseasonalised only (as E5)
+2025-08-31 23:21:00+00:00,up,2.1404684040490434,DOGEUSDT,deseasonalised only (as E5)
+2025-09-02 07:30:00+00:00,down,1.0057891847785727,DOGEUSDT,deseasonalised only (as E5)
+2025-09-03 19:41:00+00:00,down,0.570196232923551,DOGEUSDT,deseasonalised only (as E5)
+2025-09-05 12:43:00+00:00,up,0.9062439567362429,DOGEUSDT,deseasonalised only (as E5)
+2025-09-06 14:45:00+00:00,down,0.5500331815818931,DOGEUSDT,deseasonalised only (as E5)
+2025-09-07 22:40:00+00:00,up,2.5606779277047,DOGEUSDT,deseasonalised only (as E5)
+2025-09-09 12:27:00+00:00,up,0.9875018225131836,DOGEUSDT,deseasonalised only (as E5)
+2025-09-11 03:43:00+00:00,up,2.0997491837443167,DOGEUSDT,deseasonalised only (as E5)
+2025-09-12 16:35:00+00:00,up,2.097699273982047,DOGEUSDT,deseasonalised only (as E5)
+2025-09-13 17:10:00+00:00,up,0.8612494622222637,DOGEUSDT,deseasonalised only (as E5)
+2025-09-15 07:40:00+00:00,up,0.8115682617602378,DOGEUSDT,deseasonalised only (as E5)
+2025-09-17 11:34:00+00:00,down,2.132614395894365,DOGEUSDT,deseasonalised only (as E5)
+2025-09-18 21:11:00+00:00,down,0.4747150663515402,DOGEUSDT,deseasonalised only (as E5)
+2025-09-20 02:01:00+00:00,down,0.30652472592014657,DOGEUSDT,deseasonalised only (as E5)
+2025-09-21 11:11:00+00:00,up,4.666033402595777,DOGEUSDT,deseasonalised only (as E5)
+2025-09-23 03:48:00+00:00,up,0.6292867012537945,DOGEUSDT,deseasonalised only (as E5)
+2025-09-24 04:21:00+00:00,up,0.6532046233183062,DOGEUSDT,deseasonalised only (as E5)
+2025-09-25 05:01:00+00:00,up,1.295235944576618,DOGEUSDT,deseasonalised only (as E5)
+2025-09-26 23:33:00+00:00,down,0.24210446486734769,DOGEUSDT,deseasonalised only (as E5)
+2025-09-28 09:07:00+00:00,up,0.6724494988619547,DOGEUSDT,deseasonalised only (as E5)
+2025-09-29 14:20:00+00:00,up,1.057093929683586,DOGEUSDT,deseasonalised only (as E5)
+2025-10-01 08:36:00+00:00,up,1.5408929768842186,DOGEUSDT,deseasonalised only (as E5)
+2025-10-03 12:19:00+00:00,down,1.3661456005773633,DOGEUSDT,deseasonalised only (as E5)
+2025-10-04 19:04:00+00:00,down,1.2060854379074155,DOGEUSDT,deseasonalised only (as E5)
+2025-10-06 19:07:00+00:00,up,1.072649346039303,DOGEUSDT,deseasonalised only (as E5)
+2025-10-09 08:37:00+00:00,up,0.9595950142414226,DOGEUSDT,deseasonalised only (as E5)
+2025-10-10 15:30:00+00:00,up,178.00202913332964,DOGEUSDT,deseasonalised only (as E5)
+2025-10-11 17:04:00+00:00,down,0.04824643054639579,DOGEUSDT,deseasonalised only (as E5)
+2025-10-12 22:25:00+00:00,up,0.08698272136369693,DOGEUSDT,deseasonalised only (as E5)
+2025-10-14 06:57:00+00:00,up,0.16308746993157885,DOGEUSDT,deseasonalised only (as E5)
+2025-10-15 20:50:00+00:00,up,0.4891890285225473,DOGEUSDT,deseasonalised only (as E5)
+2025-10-17 04:20:00+00:00,down,0.545802931460072,DOGEUSDT,deseasonalised only (as E5)
+2025-10-18 06:55:00+00:00,down,0.1890877968892094,DOGEUSDT,deseasonalised only (as E5)
+2025-10-19 08:53:00+00:00,up,0.6674053486094254,DOGEUSDT,deseasonalised only (as E5)
+2025-10-21 09:50:00+00:00,down,1.3056689184519492,DOGEUSDT,deseasonalised only (as E5)
+2025-10-22 21:38:00+00:00,up,0.4609037181962291,DOGEUSDT,deseasonalised only (as E5)
+2025-10-24 19:50:00+00:00,down,0.2623033221218632,DOGEUSDT,deseasonalised only (as E5)
+2025-10-26 09:36:00+00:00,up,1.721282751035159,DOGEUSDT,deseasonalised only (as E5)
+2025-10-28 19:51:00+00:00,up,4.044989748416608,DOGEUSDT,deseasonalised only (as E5)
+2025-10-30 04:28:00+00:00,up,0.7876378709018284,DOGEUSDT,deseasonalised only (as E5)
+2025-10-31 07:29:00+00:00,down,0.3404378849786161,DOGEUSDT,deseasonalised only (as E5)
+2025-11-01 12:02:00+00:00,down,0.28968483812282825,DOGEUSDT,deseasonalised only (as E5)
+2025-11-02 22:59:00+00:00,up,5.082260461636951,DOGEUSDT,deseasonalised only (as E5)
+2025-11-04 05:57:00+00:00,up,3.219402016683078,DOGEUSDT,deseasonalised only (as E5)
+2025-11-05 07:55:00+00:00,down,0.2857861663701691,DOGEUSDT,deseasonalised only (as E5)
+2025-11-07 02:00:00+00:00,up,0.8942182552895847,DOGEUSDT,deseasonalised only (as E5)
+2025-11-08 17:39:00+00:00,down,0.42867452453665145,DOGEUSDT,deseasonalised only (as E5)
+2025-11-10 01:06:00+00:00,up,1.0475826518220397,DOGEUSDT,deseasonalised only (as E5)
+2025-11-11 02:04:00+00:00,up,0.8190392635413449,DOGEUSDT,deseasonalised only (as E5)
+2025-11-12 07:29:00+00:00,down,1.1399833877656032,DOGEUSDT,deseasonalised only (as E5)
+2025-11-13 13:18:00+00:00,down,2.5122581993916158,DOGEUSDT,deseasonalised only (as E5)
+2025-11-14 18:55:00+00:00,down,0.5714315696170365,DOGEUSDT,deseasonalised only (as E5)
+2025-11-16 08:42:00+00:00,down,1.0798172631275622,DOGEUSDT,deseasonalised only (as E5)
+2025-11-17 13:03:00+00:00,down,2.029444991353657,DOGEUSDT,deseasonalised only (as E5)
+2025-11-18 18:02:00+00:00,down,0.5899590749133441,DOGEUSDT,deseasonalised only (as E5)
+2025-11-19 20:51:00+00:00,up,1.0385826369406843,DOGEUSDT,deseasonalised only (as E5)
+2025-11-21 03:01:00+00:00,up,2.916768325195678,DOGEUSDT,deseasonalised only (as E5)
+2025-11-22 16:20:00+00:00,down,0.3019262815080433,DOGEUSDT,deseasonalised only (as E5)
+2025-11-24 02:34:00+00:00,up,0.730693832057188,DOGEUSDT,deseasonalised only (as E5)
+2025-11-26 04:51:00+00:00,down,0.6152400621584813,DOGEUSDT,deseasonalised only (as E5)
+2025-11-27 17:49:00+00:00,down,0.9787778509342111,DOGEUSDT,deseasonalised only (as E5)
+2025-11-29 02:28:00+00:00,down,0.44510911142952797,DOGEUSDT,deseasonalised only (as E5)
+2025-11-30 23:49:00+00:00,up,2.754015169398299,DOGEUSDT,deseasonalised only (as E5)
+2025-12-02 07:18:00+00:00,down,1.0871012160005105,DOGEUSDT,deseasonalised only (as E5)
+2025-12-03 14:41:00+00:00,up,0.7348603599116469,DOGEUSDT,deseasonalised only (as E5)
+2025-12-04 19:26:00+00:00,up,0.9546927179728167,DOGEUSDT,deseasonalised only (as E5)
+2025-12-06 01:12:00+00:00,down,0.44349001961410645,DOGEUSDT,deseasonalised only (as E5)
+2025-12-07 14:27:00+00:00,up,1.8653184438211476,DOGEUSDT,deseasonalised only (as E5)
+2025-12-09 16:35:00+00:00,up,1.0519429983341377,DOGEUSDT,deseasonalised only (as E5)
+2025-12-10 18:57:00+00:00,up,1.8620744923388717,DOGEUSDT,deseasonalised only (as E5)
+2025-12-12 04:46:00+00:00,down,0.5172824713741623,DOGEUSDT,deseasonalised only (as E5)
+2025-12-13 16:33:00+00:00,down,0.5335054842314799,DOGEUSDT,deseasonalised only (as E5)
+2025-12-14 23:03:00+00:00,up,1.933253142063923,DOGEUSDT,deseasonalised only (as E5)
+2025-12-16 10:49:00+00:00,up,0.8773817735989797,DOGEUSDT,deseasonalised only (as E5)
+2025-12-17 15:11:00+00:00,up,1.347477983975464,DOGEUSDT,deseasonalised only (as E5)
+2025-12-18 17:24:00+00:00,up,1.568113639462356,DOGEUSDT,deseasonalised only (as E5)
+2025-12-19 22:57:00+00:00,down,0.21937831898697807,DOGEUSDT,deseasonalised only (as E5)
+2025-12-21 08:48:00+00:00,up,1.3037404325455364,DOGEUSDT,deseasonalised only (as E5)
+2025-12-24 19:20:00+00:00,down,0.47960645529282453,DOGEUSDT,deseasonalised only (as E5)
+2025-12-25 22:56:00+00:00,up,1.4253515315073637,DOGEUSDT,deseasonalised only (as E5)
+2025-12-27 01:16:00+00:00,down,0.5295950556177622,DOGEUSDT,deseasonalised only (as E5)
+2025-12-29 00:40:00+00:00,up,1.9412081880149652,DOGEUSDT,deseasonalised only (as E5)
+2025-12-30 18:39:00+00:00,down,1.1636382226665687,DOGEUSDT,deseasonalised only (as E5)
+2025-07-02 16:43:00+00:00,up,1.9614875053457583,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-07-03 18:44:00+00:00,down,0.6227320215103156,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-07-06 11:56:00+00:00,up,2.5904094089939558,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-07-08 22:28:00+00:00,down,2.7078374954786097,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-07-10 01:13:00+00:00,down,0.9938685254012528,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-07-11 15:31:00+00:00,up,1.5221413364929715,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-07-13 22:23:00+00:00,up,1.3487667153862364,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-07-15 03:54:00+00:00,up,0.8618898217473114,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-07-16 21:25:00+00:00,up,1.9286954301002988,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-07-19 14:40:00+00:00,down,0.4624947904790021,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-07-20 16:26:00+00:00,up,1.7340854007400432,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-07-21 23:30:00+00:00,down,0.8578393773316733,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-07-23 13:39:00+00:00,up,1.5865232095713198,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-07-24 20:03:00+00:00,down,0.9895173490251397,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-07-26 01:13:00+00:00,down,0.23502737808508986,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-07-27 05:43:00+00:00,up,0.739859807621595,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-07-31 00:17:00+00:00,down,0.6649015705055809,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-08-02 02:14:00+00:00,down,0.8435464997864619,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-08-03 04:46:00+00:00,down,0.2676681093097276,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-08-04 06:36:00+00:00,up,0.6743187544049216,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-08-06 20:14:00+00:00,down,0.6400006298638816,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-08-07 23:02:00+00:00,up,1.3365405999649738,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-08-09 06:01:00+00:00,up,1.3071488656190218,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-08-10 17:05:00+00:00,down,0.9810268577878138,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-08-13 13:35:00+00:00,down,2.0998637816311128,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-08-14 15:52:00+00:00,down,0.6707584188301081,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-08-16 10:21:00+00:00,up,0.4153208460080058,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-08-17 15:47:00+00:00,up,1.065588562922427,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-08-20 06:57:00+00:00,down,0.9196659227228056,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-08-22 14:17:00+00:00,up,1.1497430531616946,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-08-23 19:19:00+00:00,down,0.5931562342610506,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-08-24 19:38:00+00:00,up,1.6773732769493037,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-08-25 20:22:00+00:00,up,0.9983101468353875,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-08-27 04:06:00+00:00,up,1.0782239258482451,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-08-29 07:33:00+00:00,up,1.0276341003225447,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-08-31 11:19:00+00:00,up,1.3250734909613784,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-09-01 15:08:00+00:00,down,1.2189993408520434,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-09-05 12:45:00+00:00,up,0.901616547763838,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-09-06 22:26:00+00:00,up,0.7267042303101658,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-09-07 22:52:00+00:00,up,2.3626161648262194,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-09-10 03:00:00+00:00,down,0.8694224653702973,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-09-11 03:32:00+00:00,up,2.124033197705092,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-09-12 16:30:00+00:00,up,2.1046491518801034,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-09-13 20:33:00+00:00,down,0.7278417406930433,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-09-15 06:40:00+00:00,up,0.9548191680578955,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-09-17 17:46:00+00:00,up,2.346229954594772,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-09-19 06:58:00+00:00,up,0.3942601292035797,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-09-21 09:47:00+00:00,up,4.623771113833219,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-09-22 11:55:00+00:00,down,0.4394918552504275,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-09-23 17:46:00+00:00,up,0.8076822219742056,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-09-25 04:54:00+00:00,up,1.3306507038653212,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-09-27 00:34:00+00:00,down,0.2526234239414225,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-09-28 08:46:00+00:00,up,0.6737540118972138,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-10-01 08:34:00+00:00,up,1.5568312109882656,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-10-03 11:48:00+00:00,down,1.3577281146394626,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-10-05 03:00:00+00:00,up,1.6264043316282526,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-10-09 08:45:00+00:00,up,0.9458718056500977,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-10-10 15:31:00+00:00,up,176.20993734378854,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-10-11 16:41:00+00:00,down,0.04411188102846347,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-10-12 20:37:00+00:00,up,0.09742174502481939,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-10-14 06:47:00+00:00,up,0.17859521616514062,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-10-15 20:37:00+00:00,up,0.4916280141642027,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-10-17 03:58:00+00:00,down,0.5403439126831752,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-10-19 08:54:00+00:00,up,0.6666169586380732,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-10-21 04:53:00+00:00,up,1.0819268543104048,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-10-22 09:17:00+00:00,down,1.244204658432359,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-10-26 09:38:00+00:00,up,1.720787402404869,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-10-28 20:12:00+00:00,up,3.848466855836155,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-10-29 22:23:00+00:00,down,0.8536692860795341,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-10-31 17:30:00+00:00,up,0.2760204840890381,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-11-02 05:04:00+00:00,up,1.0412936851293624,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-11-03 13:49:00+00:00,down,4.2766564976149635,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-11-04 14:52:00+00:00,up,2.382142719190356,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-11-06 17:37:00+00:00,up,0.7905220112292005,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-11-07 22:15:00+00:00,down,0.6686412842412212,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-11-09 03:44:00+00:00,up,0.604477296487677,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-11-12 15:38:00+00:00,up,1.2153736314619514,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-11-13 18:34:00+00:00,up,2.2059156589309423,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-11-15 03:25:00+00:00,down,0.31507606732081367,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-11-16 11:41:00+00:00,up,1.0459431463823377,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-11-17 14:46:00+00:00,up,1.7872660764991546,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-11-18 18:45:00+00:00,down,0.6285272749992735,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-11-20 16:28:00+00:00,up,3.484650807730342,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-11-22 02:37:00+00:00,down,0.6932024545575869,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-11-23 23:28:00+00:00,up,0.8413876837248382,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-11-29 01:13:00+00:00,down,0.4345665168320607,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-11-30 22:34:00+00:00,up,2.908820496757793,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-12-02 08:01:00+00:00,down,1.1143848883318666,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-12-04 19:29:00+00:00,up,0.9371353669337047,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-12-06 00:47:00+00:00,down,0.4366833088060872,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-12-07 08:18:00+00:00,up,1.9035235468650518,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-12-10 08:57:00+00:00,down,2.0146425699328105,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-12-11 12:10:00+00:00,down,0.5713708322182127,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-12-12 15:47:00+00:00,up,0.43994555988944706,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-12-14 10:23:00+00:00,up,1.6504403091942048,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-12-15 15:41:00+00:00,up,1.6872805210350328,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-12-16 19:44:00+00:00,down,0.9595231667479408,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-12-18 14:17:00+00:00,up,1.7634333676044347,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-12-19 23:36:00+00:00,down,0.2211114380010846,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-12-21 02:29:00+00:00,up,1.0258659399189018,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-12-24 19:41:00+00:00,down,0.48544902704036164,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-12-25 22:58:00+00:00,up,1.4086563977119986,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-12-27 15:56:00+00:00,down,0.6320706829354437,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-12-29 00:35:00+00:00,up,1.9621264968041312,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-12-30 08:22:00+00:00,up,0.6506919502330217,DOGEUSDT,"divided by EWMA forecast, half-life 360 min"
+2025-07-02 16:42:00+00:00,up,1.9661950468865574,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-03 18:43:00+00:00,down,0.622439147415676,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-05 16:12:00+00:00,down,0.8007673268574617,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-06 21:40:00+00:00,up,1.9362413779180538,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-08 18:46:00+00:00,down,0.84643927095848,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-09 19:47:00+00:00,up,2.821333876124887,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-10 21:27:00+00:00,up,2.773037668889617,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-12 03:45:00+00:00,down,0.6306379747944875,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-13 23:29:00+00:00,up,1.2999055222759575,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-15 03:51:00+00:00,up,0.8744140441214372,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-16 21:24:00+00:00,up,1.921835527424362,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-19 14:25:00+00:00,down,0.46243579074277036,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-20 16:40:00+00:00,up,1.7280103940321085,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-21 23:08:00+00:00,down,0.8521057714428498,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-23 20:37:00+00:00,up,1.3816977662157188,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-25 19:18:00+00:00,down,0.24838589478599224,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-26 22:42:00+00:00,up,0.5081424700573022,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-28 04:42:00+00:00,up,1.0605098834622382,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-30 11:55:00+00:00,up,0.8897557048433821,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-07-31 17:31:00+00:00,up,1.8010724153182116,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-02 02:13:00+00:00,down,0.843146101696529,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-03 04:44:00+00:00,down,0.26698834130202825,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-04 06:41:00+00:00,up,0.6671715353113499,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-05 10:39:00+00:00,up,0.9860697522014416,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-06 19:58:00+00:00,down,0.6257803589980983,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-07 21:54:00+00:00,up,1.43207763776839,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-10 16:05:00+00:00,down,0.9475328954287005,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-12 13:22:00+00:00,up,1.2759207626159472,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-14 03:04:00+00:00,up,1.9739497703905557,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-16 06:42:00+00:00,down,0.45258373022515946,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-17 15:55:00+00:00,up,1.0475280729479994,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-19 04:20:00+00:00,up,0.8094763701160864,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-20 15:03:00+00:00,up,0.8204718274060618,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-22 14:15:00+00:00,up,1.2587169806027514,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-23 16:58:00+00:00,down,0.4414861786152706,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-24 18:38:00+00:00,up,2.725771699466119,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-25 20:32:00+00:00,up,0.9566353500548622,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-27 03:27:00+00:00,down,1.1207632161116676,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-28 12:27:00+00:00,down,0.6289331701380843,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-30 07:28:00+00:00,down,0.3117501932898363,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-08-31 11:02:00+00:00,up,1.3234452466165916,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-09-03 17:07:00+00:00,down,0.5426097250877535,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-09-05 12:38:00+00:00,up,0.9117466665121937,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-09-06 14:58:00+00:00,down,0.561963086705765,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-09-07 22:37:00+00:00,up,2.574647110105593,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-09-09 22:49:00+00:00,down,0.8907397075817066,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-09-11 03:32:00+00:00,up,2.124033197705092,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-09-12 16:37:00+00:00,up,2.0949143234758574,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-09-13 22:38:00+00:00,down,0.7581722298910711,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-09-15 07:36:00+00:00,up,0.8589352758986831,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-09-17 17:51:00+00:00,up,2.3163596414332375,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-09-19 00:31:00+00:00,down,0.4811439253663667,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-09-21 17:33:00+00:00,up,5.145986088736677,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-09-22 22:28:00+00:00,down,0.5730165015142691,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-09-24 03:33:00+00:00,up,0.7311468095955901,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-09-25 04:49:00+00:00,up,1.3478313550819256,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-09-26 23:25:00+00:00,down,0.24144899738666215,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-09-28 08:46:00+00:00,up,0.6737540118972138,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-09-29 14:17:00+00:00,up,1.0626338634249497,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-01 08:34:00+00:00,up,1.5568312109882656,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-03 10:50:00+00:00,down,1.3275652099716444,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-04 19:29:00+00:00,down,1.2526228131102448,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-07 14:10:00+00:00,up,1.122897957327381,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-09 08:45:00+00:00,up,0.9458718056500977,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-10 15:30:00+00:00,up,178.00202913332964,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-11 16:30:00+00:00,down,0.043229686696770825,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-12 21:05:00+00:00,up,0.09627747461145074,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-14 06:49:00+00:00,up,0.16786658653740497,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-15 20:36:00+00:00,up,0.491976171607,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-17 06:52:00+00:00,up,0.485781391101097,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-18 13:31:00+00:00,down,0.37733587208896296,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-20 01:05:00+00:00,up,0.5497192692598114,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-21 04:40:00+00:00,up,1.1102485756116354,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-22 10:48:00+00:00,down,1.2654982294578987,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-24 07:41:00+00:00,down,0.4910636819049215,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-25 17:45:00+00:00,down,0.6189419490699352,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-26 22:04:00+00:00,up,1.2778886337676738,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-28 20:12:00+00:00,up,3.848466855836155,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-30 03:27:00+00:00,down,0.9309835246456649,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-10-31 09:40:00+00:00,down,0.33573808934175475,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-01 13:31:00+00:00,down,0.3134511386297973,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-02 15:02:00+00:00,up,1.7757131518064857,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-03 15:49:00+00:00,up,1.5565035691646363,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-04 18:42:00+00:00,up,1.801366840830174,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-05 21:36:00+00:00,down,0.3675383569249192,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-07 01:51:00+00:00,up,0.9075959767864589,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-08 17:52:00+00:00,down,0.43185031923786715,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-10 00:57:00+00:00,up,1.058946928468583,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-11 02:05:00+00:00,up,0.8167838213193438,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-12 15:38:00+00:00,up,1.2153736314619514,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-13 18:23:00+00:00,up,2.2263265761058135,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-15 02:44:00+00:00,down,0.30729091880735837,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-16 11:47:00+00:00,up,1.0421571934386007,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-17 14:53:00+00:00,up,1.7438280818594158,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-18 18:02:00+00:00,down,0.5899590749133441,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-19 20:47:00+00:00,up,1.0425650748885573,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-21 03:09:00+00:00,up,2.800612818817163,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-22 16:12:00+00:00,down,0.3008863411721511,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-24 00:46:00+00:00,up,0.8261296198527077,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-27 19:01:00+00:00,down,1.0688869685499824,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-29 02:13:00+00:00,down,0.4411169160538011,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-11-30 09:18:00+00:00,up,1.710472692495142,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-01 13:04:00+00:00,up,1.1077155683299047,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-02 15:36:00+00:00,up,1.1122604934127671,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-04 19:30:00+00:00,up,0.9345060438979289,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-06 01:10:00+00:00,down,0.44277018174232996,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-07 13:49:00+00:00,up,2.096159483402892,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-10 08:06:00+00:00,down,1.9835149477096266,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-11 10:46:00+00:00,down,0.5599800649349947,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-12 15:51:00+00:00,up,0.4286630386989044,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-14 10:25:00+00:00,up,1.6421746563187656,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-15 15:30:00+00:00,up,1.71184012265357,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-16 19:19:00+00:00,down,0.93070693046256,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-18 14:14:00+00:00,up,1.7833185962381506,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-19 22:51:00+00:00,down,0.21889391847735012,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-21 08:40:00+00:00,up,1.3437006975854788,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-24 19:28:00+00:00,down,0.4824430632425104,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-25 22:55:00+00:00,up,1.4276658101417035,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-27 01:21:00+00:00,down,0.5309364409834169,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-29 00:30:00+00:00,up,1.9996612064511972,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
+2025-12-30 18:31:00+00:00,down,1.160358886270536,DOGEUSDT,"divided by EWMA forecast, half-life 1440 min"
