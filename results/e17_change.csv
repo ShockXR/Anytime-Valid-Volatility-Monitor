@@ -1,0 +1,551 @@
+law,change,kind,size,duration,monitor,paths,false_alarm_before,detected,wrong_direction,median_delay,q25_delay,q75_delay,mean_delay
+gaussian,sd x1.25,shift,1.25,,1 min,2000,0.0005,0.9995,0.0,134.0,91.0,186.0,144.9959979989995
+gaussian,sd x1.25,shift,1.25,,5 min,2000,0.0,0.984,0.0,508.0,336.75,728.0,559.9461382113822
+gaussian,sd x1.25,shift,1.25,,15 min,2000,0.0,0.572,0.0,893.0,623.0,1178.0,886.4965034965035
+gaussian,sd x1.25,shift,1.25,,"average, equal",2000,0.0005,0.9995,0.0,138.0,93.0,191.0,149.57728864432215
+gaussian,sd x1.25,shift,1.25,,"average, balanced",2000,0.0005,0.9995,0.0,153.0,108.0,213.0,166.89094547273638
+gaussian,sd x1.25,shift,1.25,,"average, sqrt",2000,0.0005,0.9995,0.0,143.0,98.0,197.0,155.09154577288643
+gaussian,sd x1.25,shift,1.25,,"average, balanced, plain every minute (no proof at this level)",2000,0.0005,0.9995,0.0,153.0,108.0,212.0,166.72836418209104
+gaussian,sd x1.25,shift,1.25,,"max, balanced",2000,0.0005,0.9995,0.0,153.0,108.0,213.0,167.29564782391196
+gaussian,sd x1.25,shift,1.25,,"average 5 and 15, balanced",2000,0.0,0.9755,0.0,563.0,378.0,813.0,610.1886212198872
+gaussian,sd x1.5,shift,1.5,,1 min,2000,0.001,0.999,0.0,48.0,35.0,65.0,51.96146146146146
+gaussian,sd x1.5,shift,1.5,,5 min,2000,0.0005,0.9995,0.0,198.0,143.0,273.0,216.9344672336168
+gaussian,sd x1.5,shift,1.5,,15 min,2000,0.0,0.9895,0.0,518.0,368.0,728.0,569.6700353713996
+gaussian,sd x1.5,shift,1.5,,"average, equal",2000,0.001,0.999,0.0,49.0,36.0,67.0,53.247247247247245
+gaussian,sd x1.5,shift,1.5,,"average, balanced",2000,0.0005,0.9995,0.0,55.0,41.0,74.0,58.71385692846423
+gaussian,sd x1.5,shift,1.5,,"average, sqrt",2000,0.001,0.999,0.0,52.0,38.0,69.0,55.368868868868866
+gaussian,sd x1.5,shift,1.5,,"average, balanced, plain every minute (no proof at this level)",2000,0.0005,0.9995,0.0,55.0,41.0,74.0,58.68584292146073
+gaussian,sd x1.5,shift,1.5,,"max, balanced",2000,0.0005,0.9995,0.0,55.0,41.0,74.0,58.78489244622311
+gaussian,sd x1.5,shift,1.5,,"average 5 and 15, balanced",2000,0.0,1.0,0.0,218.0,153.0,303.0,237.265
+gaussian,sd x2,shift,2.0,,1 min,2000,0.0005,0.9995,0.0,23.0,17.0,30.0,24.155577788894448
+gaussian,sd x2,shift,2.0,,5 min,2000,0.0,1.0,0.0,93.0,73.0,123.0,101.82
+gaussian,sd x2,shift,2.0,,15 min,2000,0.0,1.0,0.0,248.0,188.0,323.0,273.0575
+gaussian,sd x2,shift,2.0,,"average, equal",2000,0.0005,0.9995,0.0,23.0,18.0,30.0,24.77688844422211
+gaussian,sd x2,shift,2.0,,"average, balanced",2000,0.0,1.0,0.0,26.0,20.0,33.0,27.0795
+gaussian,sd x2,shift,2.0,,"average, sqrt",2000,0.0005,0.9995,0.0,24.0,18.0,31.0,25.550775387693847
+gaussian,sd x2,shift,2.0,,"average, balanced, plain every minute (no proof at this level)",2000,0.0,1.0,0.0,26.0,20.0,33.0,27.0725
+gaussian,sd x2,shift,2.0,,"max, balanced",2000,0.0,1.0,0.0,26.0,20.0,33.0,27.1035
+gaussian,sd x2,shift,2.0,,"average 5 and 15, balanced",2000,0.0,1.0,0.0,103.0,78.0,133.0,110.2
+gaussian,sd x0.8,shift,0.8,,1 min,2000,0.0015,0.9985,0.0,209.0,175.0,247.0,214.442663995994
+gaussian,sd x0.8,shift,0.8,,5 min,2000,0.0,0.9785,0.0,868.0,733.0,1018.0,889.895758814512
+gaussian,sd x0.8,shift,0.8,,15 min,2000,0.0,0.006,0.0,1395.5,1350.5,1433.0,1381.75
+gaussian,sd x0.8,shift,0.8,,"average, equal",2000,0.001,0.999,0.0,216.0,182.0,256.0,221.8858858858859
+gaussian,sd x0.8,shift,0.8,,"average, balanced",2000,0.0,1.0,0.0,243.0,207.0,285.25,249.073
+gaussian,sd x0.8,shift,0.8,,"average, sqrt",2000,0.0,1.0,0.0,225.0,190.0,266.0,231.434
+gaussian,sd x0.8,shift,0.8,,"average, balanced, plain every minute (no proof at this level)",2000,0.0,1.0,0.0,243.0,206.0,285.0,248.819
+gaussian,sd x0.8,shift,0.8,,"max, balanced",2000,0.0,1.0,0.0,243.0,207.0,285.25,249.205
+gaussian,sd x0.8,shift,0.8,,"average 5 and 15, balanced",2000,0.0,0.943,0.0,958.0,823.0,1116.75,975.2773064687169
+gaussian,sd x0.667,shift,0.6666666666666666,,1 min,2000,0.0015,0.9985,0.0,126.0,112.0,139.0,125.03855783675513
+gaussian,sd x0.667,shift,0.6666666666666666,,5 min,2000,0.0,1.0,0.0,538.0,493.0,598.0,546.5125
+gaussian,sd x0.667,shift,0.6666666666666666,,15 min,2000,0.0,0.4235,0.0,1343.0,1283.0,1388.0,1332.5336481700117
+gaussian,sd x0.667,shift,0.6666666666666666,,"average, equal",2000,0.0015,0.9985,0.0,131.0,116.0,144.0,129.23835753630445
+gaussian,sd x0.667,shift,0.6666666666666666,,"average, balanced",2000,0.0,1.0,0.0,146.0,131.0,160.0,144.471
+gaussian,sd x0.667,shift,0.6666666666666666,,"average, sqrt",2000,0.001,0.9985,0.0005,136.0,121.0,149.0,134.38357536304457
+gaussian,sd x0.667,shift,0.6666666666666666,,"average, balanced, plain every minute (no proof at this level)",2000,0.0,1.0,0.0,146.0,131.0,160.0,144.3775
+gaussian,sd x0.667,shift,0.6666666666666666,,"max, balanced",2000,0.0,1.0,0.0,146.0,131.0,160.0,144.545
+gaussian,sd x0.667,shift,0.6666666666666666,,"average 5 and 15, balanced",2000,0.0,1.0,0.0,598.0,553.0,658.0,607.755
+gaussian,sd x0.5,shift,0.5,,1 min,2000,0.0025,0.9975,0.0,93.0,83.0,101.0,91.04661654135339
+gaussian,sd x0.5,shift,0.5,,5 min,2000,0.0,1.0,0.0,403.0,373.0,428.0,402.0675
+gaussian,sd x0.5,shift,0.5,,15 min,2000,0.0,1.0,0.0,1103.0,1058.0,1163.0,1110.92
+gaussian,sd x0.5,shift,0.5,,"average, equal",2000,0.002,0.998,0.0,96.0,86.0,104.0,94.05260521042084
+gaussian,sd x0.5,shift,0.5,,"average, balanced",2000,0.001,0.999,0.0,107.0,97.0,115.0,104.98698698698699
+gaussian,sd x0.5,shift,0.5,,"average, sqrt",2000,0.0015,0.9985,0.0,100.0,90.0,108.0,97.84276414621932
+gaussian,sd x0.5,shift,0.5,,"average, balanced, plain every minute (no proof at this level)",2000,0.001,0.999,0.0,107.0,97.0,115.0,104.92692692692692
+gaussian,sd x0.5,shift,0.5,,"max, balanced",2000,0.001,0.999,0.0,107.0,97.0,115.0,105.02502502502503
+gaussian,sd x0.5,shift,0.5,,"average 5 and 15, balanced",2000,0.0,1.0,0.0,448.0,418.0,473.0,445.6325
+gaussian,burst x2 for 15 min,burst,2.0,15.0,1 min,2000,0.0,0.2135,0.0,14.0,12.0,15.0,14.362997658079625
+gaussian,burst x2 for 15 min,burst,2.0,15.0,5 min,2000,0.0,0.0035,0.0,18.0,15.5,23.0,19.428571428571427
+gaussian,burst x2 for 15 min,burst,2.0,15.0,15 min,2000,0.0,0.0,0.0,,,,
+gaussian,burst x2 for 15 min,burst,2.0,15.0,"average, equal",2000,0.0,0.192,0.0,14.0,12.0,15.0,14.606770833333334
+gaussian,burst x2 for 15 min,burst,2.0,15.0,"average, balanced",2000,0.0,0.131,0.0,14.0,13.0,16.0,15.13740458015267
+gaussian,burst x2 for 15 min,burst,2.0,15.0,"average, sqrt",2000,0.0,0.1675,0.0,14.0,12.0,16.0,14.704477611940298
+gaussian,burst x2 for 15 min,burst,2.0,15.0,"average, balanced, plain every minute (no proof at this level)",2000,0.0,0.1315,0.0,14.0,13.0,16.0,15.140684410646388
+gaussian,burst x2 for 15 min,burst,2.0,15.0,"max, balanced",2000,0.0,0.129,0.0,14.0,13.0,16.0,15.062015503875969
+gaussian,burst x2 for 15 min,burst,2.0,15.0,"average 5 and 15, balanced",2000,0.0,0.0025,0.0,28.0,18.0,28.0,24.0
+gaussian,burst x2 for 60 min,burst,2.0,60.0,1 min,2000,0.0005,0.999,0.0,23.0,18.0,30.0,24.146646646646648
+gaussian,burst x2 for 60 min,burst,2.0,60.0,5 min,2000,0.0005,0.1825,0.0,53.0,48.0,58.0,52.0958904109589
+gaussian,burst x2 for 60 min,burst,2.0,60.0,15 min,2000,0.0,0.003,0.0,60.5,53.0,68.0,58.0
+gaussian,burst x2 for 60 min,burst,2.0,60.0,"average, equal",2000,0.0005,0.999,0.0,23.0,18.0,30.0,24.71921921921922
+gaussian,burst x2 for 60 min,burst,2.0,60.0,"average, balanced",2000,0.0005,0.998,0.0,25.0,20.0,32.0,26.79609218436874
+gaussian,burst x2 for 60 min,burst,2.0,60.0,"average, sqrt",2000,0.0005,0.998,0.0,24.0,19.0,31.0,25.37575150300601
+gaussian,burst x2 for 60 min,burst,2.0,60.0,"average, balanced, plain every minute (no proof at this level)",2000,0.0005,0.998,0.0,25.0,20.0,32.0,26.789078156312627
+gaussian,burst x2 for 60 min,burst,2.0,60.0,"max, balanced",2000,0.0005,0.998,0.0,25.0,20.0,32.0,26.81062124248497
+gaussian,burst x2 for 60 min,burst,2.0,60.0,"average 5 and 15, balanced",2000,0.0005,0.1245,0.0,53.0,48.0,58.0,52.77911646586345
+gaussian,burst x3 for 15 min,burst,3.0,15.0,1 min,2000,0.001,0.732,0.0,12.0,10.0,14.0,12.075819672131148
+gaussian,burst x3 for 15 min,burst,3.0,15.0,5 min,2000,0.0,0.0075,0.0,18.0,13.0,18.0,17.0
+gaussian,burst x3 for 15 min,burst,3.0,15.0,15 min,2000,0.0,0.0,0.0,,,,
+gaussian,burst x3 for 15 min,burst,3.0,15.0,"average, equal",2000,0.0005,0.7035,0.0,12.0,10.0,14.0,12.277185501066098
+gaussian,burst x3 for 15 min,burst,3.0,15.0,"average, balanced",2000,0.0,0.627,0.0,13.0,11.0,15.0,13.086124401913876
+gaussian,burst x3 for 15 min,burst,3.0,15.0,"average, sqrt",2000,0.0005,0.6825,0.0,12.0,11.0,14.0,12.56043956043956
+gaussian,burst x3 for 15 min,burst,3.0,15.0,"average, balanced, plain every minute (no proof at this level)",2000,0.0,0.627,0.0,13.0,11.0,15.0,13.08213716108453
+gaussian,burst x3 for 15 min,burst,3.0,15.0,"max, balanced",2000,0.0,0.626,0.0,13.0,11.0,15.0,13.07667731629393
+gaussian,burst x3 for 15 min,burst,3.0,15.0,"average 5 and 15, balanced",2000,0.0,0.0045,0.0,18.0,18.0,23.0,19.666666666666668
+gaussian,burst x3 for 60 min,burst,3.0,60.0,1 min,2000,0.0005,0.9995,0.0,13.0,11.0,16.0,13.865432716358178
+gaussian,burst x3 for 60 min,burst,3.0,60.0,5 min,2000,0.0005,0.7065,0.0,48.0,38.0,58.0,47.57183297947629
+gaussian,burst x3 for 60 min,burst,3.0,60.0,15 min,2000,0.0,0.0215,0.0,68.0,53.0,68.0,63.116279069767444
+gaussian,burst x3 for 60 min,burst,3.0,60.0,"average, equal",2000,0.0005,0.9995,0.0,14.0,11.0,17.0,14.206103051525762
+gaussian,burst x3 for 60 min,burst,3.0,60.0,"average, balanced",2000,0.0005,0.9995,0.0,15.0,12.0,18.0,15.48024012006003
+gaussian,burst x3 for 60 min,burst,3.0,60.0,"average, sqrt",2000,0.0005,0.9995,0.0,14.0,12.0,17.0,14.633316658329164
+gaussian,burst x3 for 60 min,burst,3.0,60.0,"average, balanced, plain every minute (no proof at this level)",2000,0.0005,0.9995,0.0,15.0,12.0,18.0,15.476738369184591
+gaussian,burst x3 for 60 min,burst,3.0,60.0,"max, balanced",2000,0.0005,0.9995,0.0,15.0,12.0,18.0,15.49024512256128
+gaussian,burst x3 for 60 min,burst,3.0,60.0,"average 5 and 15, balanced",2000,0.0,0.626,0.0,53.0,43.0,58.0,50.180511182108624
+gaussian,"trend, lag-one autocorrelation 0.3",trend,0.3,,1 min,2000,0.001,0.0375,0.032,707.0,492.5,1163.5,779.9333333333333
+gaussian,"trend, lag-one autocorrelation 0.3",trend,0.3,,5 min,2000,0.0,0.992,0.0,448.0,303.0,648.0,502.34979838709677
+gaussian,"trend, lag-one autocorrelation 0.3",trend,0.3,,15 min,2000,0.0,0.816,0.0,758.0,503.0,1043.0,779.1029411764706
+gaussian,"trend, lag-one autocorrelation 0.3",trend,0.3,,"average, equal",2000,0.001,0.955,0.017,593.0,408.0,813.0,626.6041884816754
+gaussian,"trend, lag-one autocorrelation 0.3",trend,0.3,,"average, balanced",2000,0.0,0.973,0.0085,525.5,363.0,733.0,565.9691675231244
+gaussian,"trend, lag-one autocorrelation 0.3",trend,0.3,,"average, sqrt",2000,0.0005,0.966,0.014,550.5,383.0,773.0,588.9026915113872
+gaussian,"trend, lag-one autocorrelation 0.3",trend,0.3,,"average, balanced, plain every minute (no proof at this level)",2000,0.0,0.973,0.0085,523.0,358.0,728.0,564.3283658787255
+gaussian,"trend, lag-one autocorrelation 0.3",trend,0.3,,"max, balanced",2000,0.0,0.97,0.009,533.0,368.0,739.25,572.1546391752578
+gaussian,"trend, lag-one autocorrelation 0.3",trend,0.3,,"average 5 and 15, balanced",2000,0.0,0.9845,0.0,493.0,333.0,688.0,537.3727780599289
+student_t3,sd x1.25,shift,1.25,,1 min,2000,0.0015,0.9985,0.0,250.0,169.0,359.0,274.449173760641
+student_t3,sd x1.25,shift,1.25,,5 min,2000,0.0005,0.8875,0.0,683.0,438.0,963.0,712.0084507042253
+student_t3,sd x1.25,shift,1.25,,15 min,2000,0.0,0.4235,0.0,968.0,683.0,1193.0,920.5029515938606
+student_t3,sd x1.25,shift,1.25,,"average, equal",2000,0.001,0.999,0.0,259.0,180.0,372.0,285.516016016016
+student_t3,sd x1.25,shift,1.25,,"average, balanced",2000,0.0005,0.9995,0.0,296.0,207.0,416.0,322.0620310155077
+student_t3,sd x1.25,shift,1.25,,"average, sqrt",2000,0.001,0.999,0.0,272.5,188.0,388.0,297.35585585585585
+student_t3,sd x1.25,shift,1.25,,"average, balanced, plain every minute (no proof at this level)",2000,0.0005,0.9995,0.0,295.0,206.5,416.0,321.61180590295146
+student_t3,sd x1.25,shift,1.25,,"max, balanced",2000,0.0005,0.9995,0.0,296.0,208.5,419.5,324.10255127563784
+student_t3,sd x1.25,shift,1.25,,"average 5 and 15, balanced",2000,0.0,0.861,0.0,753.0,498.0,1028.0,761.5278745644599
+student_t3,sd x1.5,shift,1.5,,1 min,2000,0.0025,0.9975,0.0,87.0,60.0,119.5,93.3047619047619
+student_t3,sd x1.5,shift,1.5,,5 min,2000,0.0,1.0,0.0,263.0,183.0,373.0,290.4525
+student_t3,sd x1.5,shift,1.5,,15 min,2000,0.0,0.963,0.0,593.0,413.0,833.0,641.8940809968848
+student_t3,sd x1.5,shift,1.5,,"average, equal",2000,0.002,0.998,0.0,90.0,62.0,123.0,96.23647294589178
+student_t3,sd x1.5,shift,1.5,,"average, balanced",2000,0.0015,0.9985,0.0,100.0,70.0,136.0,106.88532799198798
+student_t3,sd x1.5,shift,1.5,,"average, sqrt",2000,0.002,0.998,0.0,94.0,65.0,127.0,99.90781563126252
+student_t3,sd x1.5,shift,1.5,,"average, balanced, plain every minute (no proof at this level)",2000,0.0015,0.9985,0.0,100.0,70.0,136.0,106.80020030045067
+student_t3,sd x1.5,shift,1.5,,"max, balanced",2000,0.0015,0.9985,0.0,101.0,71.0,137.0,107.26539809714572
+student_t3,sd x1.5,shift,1.5,,"average 5 and 15, balanced",2000,0.0,1.0,0.0,288.0,206.75,403.0,317.325
+student_t3,sd x2,shift,2.0,,1 min,2000,0.002,0.998,0.0,36.0,27.0,46.0,37.71743486973948
+student_t3,sd x2,shift,2.0,,5 min,2000,0.0015,0.9985,0.0,118.0,88.0,153.0,125.80170255383075
+student_t3,sd x2,shift,2.0,,15 min,2000,0.0,1.0,0.0,293.0,218.0,383.0,310.9175
+student_t3,sd x2,shift,2.0,,"average, equal",2000,0.002,0.998,0.0,36.0,28.0,47.0,38.804108216432866
+student_t3,sd x2,shift,2.0,,"average, balanced",2000,0.0005,0.9995,0.0,40.0,30.0,51.0,42.24512256128064
+student_t3,sd x2,shift,2.0,,"average, sqrt",2000,0.001,0.999,0.0,38.0,28.0,49.0,40.0005005005005
+student_t3,sd x2,shift,2.0,,"average, balanced, plain every minute (no proof at this level)",2000,0.0005,0.9995,0.0,40.0,30.0,51.0,42.23261630815408
+student_t3,sd x2,shift,2.0,,"max, balanced",2000,0.0005,0.9995,0.0,40.0,30.0,51.0,42.29914957478739
+student_t3,sd x2,shift,2.0,,"average 5 and 15, balanced",2000,0.001,0.999,0.0,128.0,98.0,168.0,136.39339339339338
+student_t3,sd x0.8,shift,0.8,,1 min,2000,0.001,0.999,0.0,340.0,234.0,465.0,363.1056056056056
+student_t3,sd x0.8,shift,0.8,,5 min,2000,0.0,0.741,0.0,908.0,698.0,1148.0,915.695681511471
+student_t3,sd x0.8,shift,0.8,,15 min,2000,0.0,0.054,0.0,1313.0,1249.25,1388.0,1299.388888888889
+student_t3,sd x0.8,shift,0.8,,"average, equal",2000,0.001,0.999,0.0,351.0,247.0,478.0,376.55355355355357
+student_t3,sd x0.8,shift,0.8,,"average, balanced",2000,0.0005,0.9995,0.0,399.0,288.0,538.0,427.09554777388695
+student_t3,sd x0.8,shift,0.8,,"average, sqrt",2000,0.0005,0.9995,0.0,367.0,265.0,498.0,393.7448724362181
+student_t3,sd x0.8,shift,0.8,,"average, balanced, plain every minute (no proof at this level)",2000,0.0005,0.9995,0.0,398.0,287.5,536.0,426.29414707353675
+student_t3,sd x0.8,shift,0.8,,"max, balanced",2000,0.0005,0.9995,0.0,400.0,288.5,540.0,428.3751875937969
+student_t3,sd x0.8,shift,0.8,,"average 5 and 15, balanced",2000,0.0,0.6535,0.0,973.0,770.5,1198.0,974.4001530221882
+student_t3,sd x0.667,shift,0.6666666666666666,,1 min,2000,0.001,0.999,0.0,146.0,112.0,191.0,155.32482482482482
+student_t3,sd x0.667,shift,0.6666666666666666,,5 min,2000,0.0,0.998,0.0,528.0,438.0,663.0,566.4894789579158
+student_t3,sd x0.667,shift,0.6666666666666666,,15 min,2000,0.0,0.5905,0.0,1238.0,1148.0,1328.0,1235.2819644369179
+student_t3,sd x0.667,shift,0.6666666666666666,,"average, equal",2000,0.001,0.999,0.0,153.0,115.0,195.75,160.7107107107107
+student_t3,sd x0.667,shift,0.6666666666666666,,"average, balanced",2000,0.0,1.0,0.0,172.5,131.0,220.0,180.8445
+student_t3,sd x0.667,shift,0.6666666666666666,,"average, sqrt",2000,0.0,1.0,0.0,160.0,120.0,204.0,167.5775
+student_t3,sd x0.667,shift,0.6666666666666666,,"average, balanced, plain every minute (no proof at this level)",2000,0.0,1.0,0.0,172.0,131.0,220.0,180.65
+student_t3,sd x0.667,shift,0.6666666666666666,,"max, balanced",2000,0.0,1.0,0.0,173.0,131.0,221.0,181.0125
+student_t3,sd x0.667,shift,0.6666666666666666,,"average 5 and 15, balanced",2000,0.0,0.998,0.0,593.0,493.0,733.0,630.3371743486974
+student_t3,sd x0.5,shift,0.5,,1 min,2000,0.001,0.999,0.0,84.0,72.0,102.0,88.488988988989
+student_t3,sd x0.5,shift,0.5,,5 min,2000,0.0005,0.9995,0.0,358.0,323.0,403.0,368.7353676838419
+student_t3,sd x0.5,shift,0.5,,15 min,2000,0.0,0.9865,0.0,998.0,938.0,1073.0,1016.1170805879372
+student_t3,sd x0.5,shift,0.5,,"average, equal",2000,0.001,0.999,0.0,87.0,75.0,105.0,91.36886886886887
+student_t3,sd x0.5,shift,0.5,,"average, balanced",2000,0.0005,0.9995,0.0,97.0,83.0,116.0,101.20310155077539
+student_t3,sd x0.5,shift,0.5,,"average, sqrt",2000,0.001,0.999,0.0,90.0,77.0,109.0,94.75675675675676
+student_t3,sd x0.5,shift,0.5,,"average, balanced, plain every minute (no proof at this level)",2000,0.0005,0.9995,0.0,97.0,83.0,116.0,101.14607303651826
+student_t3,sd x0.5,shift,0.5,,"max, balanced",2000,0.0005,0.9995,0.0,97.0,83.0,116.0,101.24512256128064
+student_t3,sd x0.5,shift,0.5,,"average 5 and 15, balanced",2000,0.0,1.0,0.0,398.0,358.0,443.0,408.4075
+student_t3,burst x2 for 15 min,burst,2.0,15.0,1 min,2000,0.0005,0.0515,0.0,14.0,13.0,16.5,15.16504854368932
+student_t3,burst x2 for 15 min,burst,2.0,15.0,5 min,2000,0.0,0.0005,0.0,13.0,13.0,13.0,13.0
+student_t3,burst x2 for 15 min,burst,2.0,15.0,15 min,2000,0.0,0.0,0.0,,,,
+student_t3,burst x2 for 15 min,burst,2.0,15.0,"average, equal",2000,0.0005,0.0425,0.0,14.0,12.0,15.0,14.811764705882354
+student_t3,burst x2 for 15 min,burst,2.0,15.0,"average, balanced",2000,0.0005,0.027,0.0,15.0,13.0,17.0,15.61111111111111
+student_t3,burst x2 for 15 min,burst,2.0,15.0,"average, sqrt",2000,0.0005,0.037,0.0,14.0,12.0,16.0,14.864864864864865
+student_t3,burst x2 for 15 min,burst,2.0,15.0,"average, balanced, plain every minute (no proof at this level)",2000,0.0005,0.027,0.0,15.0,13.0,17.0,15.555555555555555
+student_t3,burst x2 for 15 min,burst,2.0,15.0,"max, balanced",2000,0.0005,0.0265,0.0,15.0,13.0,17.0,15.566037735849056
+student_t3,burst x2 for 15 min,burst,2.0,15.0,"average 5 and 15, balanced",2000,0.0,0.0005,0.0,13.0,13.0,13.0,13.0
+student_t3,burst x2 for 60 min,burst,2.0,60.0,1 min,2000,0.002,0.9285,0.0,34.0,26.0,44.0,34.91599353796446
+student_t3,burst x2 for 60 min,burst,2.0,60.0,5 min,2000,0.0015,0.09,0.0,53.0,48.0,58.0,52.861111111111114
+student_t3,burst x2 for 60 min,burst,2.0,60.0,15 min,2000,0.0,0.002,0.0,68.0,68.0,68.0,68.0
+student_t3,burst x2 for 60 min,burst,2.0,60.0,"average, equal",2000,0.0015,0.924,0.0,35.0,27.0,45.0,35.72564935064935
+student_t3,burst x2 for 60 min,burst,2.0,60.0,"average, balanced",2000,0.0015,0.8855,0.0,38.0,29.0,47.0,38.16036137775268
+student_t3,burst x2 for 60 min,burst,2.0,60.0,"average, sqrt",2000,0.002,0.91,0.0,36.0,28.0,46.0,36.54835164835165
+student_t3,burst x2 for 60 min,burst,2.0,60.0,"average, balanced, plain every minute (no proof at this level)",2000,0.0015,0.886,0.0,38.0,29.0,47.0,38.15349887133183
+student_t3,burst x2 for 60 min,burst,2.0,60.0,"max, balanced",2000,0.0015,0.8845,0.0,38.0,29.0,47.0,38.182023742227244
+student_t3,burst x2 for 60 min,burst,2.0,60.0,"average 5 and 15, balanced",2000,0.001,0.0625,0.0,58.0,48.0,63.0,56.04
+student_t3,burst x3 for 15 min,burst,3.0,15.0,1 min,2000,0.0015,0.332,0.0,14.0,12.0,15.0,14.078313253012048
+student_t3,burst x3 for 15 min,burst,3.0,15.0,5 min,2000,0.0,0.004,0.0,15.5,13.0,19.25,17.375
+student_t3,burst x3 for 15 min,burst,3.0,15.0,15 min,2000,0.0,0.0005,0.0,23.0,23.0,23.0,23.0
+student_t3,burst x3 for 15 min,burst,3.0,15.0,"average, equal",2000,0.0015,0.2985,0.0,14.0,12.0,15.0,14.247906197654942
+student_t3,burst x3 for 15 min,burst,3.0,15.0,"average, balanced",2000,0.0015,0.209,0.0,14.0,13.0,15.75,14.933014354066986
+student_t3,burst x3 for 15 min,burst,3.0,15.0,"average, sqrt",2000,0.0015,0.2645,0.0,14.0,13.0,15.0,14.497164461247637
+student_t3,burst x3 for 15 min,burst,3.0,15.0,"average, balanced, plain every minute (no proof at this level)",2000,0.0015,0.209,0.0,14.0,13.0,15.75,14.933014354066986
+student_t3,burst x3 for 15 min,burst,3.0,15.0,"max, balanced",2000,0.0015,0.2075,0.0,14.0,13.0,16.0,14.949397590361446
+student_t3,burst x3 for 15 min,burst,3.0,15.0,"average 5 and 15, balanced",2000,0.0,0.0015,0.0,18.0,15.5,20.5,18.0
+student_t3,burst x3 for 60 min,burst,3.0,60.0,1 min,2000,0.001,0.999,0.0,19.0,16.0,23.0,19.97797797797798
+student_t3,burst x3 for 60 min,burst,3.0,60.0,5 min,2000,0.0,0.478,0.0,53.0,43.0,58.0,51.47803347280335
+student_t3,burst x3 for 60 min,burst,3.0,60.0,15 min,2000,0.0,0.0125,0.0,68.0,53.0,68.0,62.6
+student_t3,burst x3 for 60 min,burst,3.0,60.0,"average, equal",2000,0.0005,0.9995,0.0,20.0,16.0,24.0,20.446723361680842
+student_t3,burst x3 for 60 min,burst,3.0,60.0,"average, balanced",2000,0.0,1.0,0.0,21.0,18.0,26.0,22.1935
+student_t3,burst x3 for 60 min,burst,3.0,60.0,"average, sqrt",2000,0.0,1.0,0.0,20.0,17.0,25.0,21.0635
+student_t3,burst x3 for 60 min,burst,3.0,60.0,"average, balanced, plain every minute (no proof at this level)",2000,0.0,1.0,0.0,21.0,18.0,26.0,22.1835
+student_t3,burst x3 for 60 min,burst,3.0,60.0,"max, balanced",2000,0.0,1.0,0.0,21.0,18.0,26.0,22.2125
+student_t3,burst x3 for 60 min,burst,3.0,60.0,"average 5 and 15, balanced",2000,0.0,0.372,0.0,53.0,48.0,58.0,52.858870967741936
+student_t3,"trend, lag-one autocorrelation 0.3",trend,0.3,,1 min,2000,0.001,0.175,0.0155,817.5,404.75,1140.5,772.8971428571429
+student_t3,"trend, lag-one autocorrelation 0.3",trend,0.3,,5 min,2000,0.0,0.9375,0.0,633.0,408.0,910.5,669.8453333333333
+student_t3,"trend, lag-one autocorrelation 0.3",trend,0.3,,15 min,2000,0.0,0.671,0.0,833.0,578.0,1103.0,833.0335320417288
+student_t3,"trend, lag-one autocorrelation 0.3",trend,0.3,,"average, equal",2000,0.001,0.839,0.009,773.0,523.0,1043.0,777.5613825983313
+student_t3,"trend, lag-one autocorrelation 0.3",trend,0.3,,"average, balanced",2000,0.0005,0.8905,0.0035,693.0,463.0,958.0,718.5328467153284
+student_t3,"trend, lag-one autocorrelation 0.3",trend,0.3,,"average, sqrt",2000,0.0005,0.8775,0.0055,723.0,485.5,998.0,745.1811965811966
+student_t3,"trend, lag-one autocorrelation 0.3",trend,0.3,,"average, balanced, plain every minute (no proof at this level)",2000,0.0005,0.8905,0.0035,693.0,458.0,958.0,716.1516002245929
+student_t3,"trend, lag-one autocorrelation 0.3",trend,0.3,,"max, balanced",2000,0.0005,0.8865,0.0035,703.0,473.0,978.0,731.8296672306825
+student_t3,"trend, lag-one autocorrelation 0.3",trend,0.3,,"average 5 and 15, balanced",2000,0.0,0.9175,0.0,663.0,438.0,933.0,697.283378746594
+noise_1,sd x1.25,shift,1.25,,1 min,2000,0.006,0.921,0.0,600.5,363.25,885.0,633.8811074918567
+noise_1,sd x1.25,shift,1.25,,5 min,2000,0.0,0.8435,0.0,728.0,453.0,1028.0,747.2264374629519
+noise_1,sd x1.25,shift,1.25,,15 min,2000,0.0,0.4645,0.0,923.0,683.0,1178.0,910.6318622174381
+noise_1,sd x1.25,shift,1.25,,"average, equal",2000,0.004,0.959,0.0,577.0,362.25,837.0,613.043795620438
+noise_1,sd x1.25,shift,1.25,,"average, balanced",2000,0.001,0.956,0.0,613.0,398.0,878.0,647.1553347280335
+noise_1,sd x1.25,shift,1.25,,"average, sqrt",2000,0.0025,0.9595,0.0,583.0,374.0,841.0,621.7910369984367
+noise_1,sd x1.25,shift,1.25,,"average, balanced, plain every minute (no proof at this level)",2000,0.001,0.957,0.0,608.5,398.0,878.0,645.9038662486938
+noise_1,sd x1.25,shift,1.25,,"max, balanced",2000,0.001,0.949,0.0,622.5,403.0,893.0,655.8055848261328
+noise_1,sd x1.25,shift,1.25,,"average 5 and 15, balanced",2000,0.0,0.8155,0.0,768.0,508.0,1033.0,772.7547516860822
+noise_1,sd x1.25,shift,1.25,,"5 min, gap",2000,0.0005,0.7925,0.0,763.0,493.0,1038.0,774.2649842271294
+noise_1,sd x1.25,shift,1.25,,"15 min, gap",2000,0.0,0.466,0.0,908.0,638.0,1163.0,892.3884120171674
+noise_1,sd x1.25,shift,1.25,,"average, equal, gap",2000,0.004,0.954,0.0,584.0,366.0,859.25,623.0125786163522
+noise_1,sd x1.25,shift,1.25,,"average, balanced, gap",2000,0.001,0.9545,0.0,633.0,408.0,892.0,658.8386589837611
+noise_1,sd x1.25,shift,1.25,,"average, sqrt, gap",2000,0.0025,0.96,0.0,605.5,383.0,879.5,638.0567708333333
+noise_1,sd x1.25,shift,1.25,,"max, balanced, gap",2000,0.001,0.948,0.0,638.0,414.5,902.25,666.3960970464135
+noise_1,sd x1.25,shift,1.25,,"average 5 and 15, balanced, gap",2000,0.0005,0.787,0.0,803.0,533.0,1051.75,797.2217280813214
+noise_1,sd x1.5,shift,1.5,,1 min,2000,0.0055,0.9945,0.0,193.0,126.0,283.0,213.24283559577677
+noise_1,sd x1.5,shift,1.5,,5 min,2000,0.0,1.0,0.0,288.0,198.0,413.0,317.0225
+noise_1,sd x1.5,shift,1.5,,15 min,2000,0.0,0.9725,0.0,563.0,398.0,788.0,612.4961439588689
+noise_1,sd x1.5,shift,1.5,,"average, equal",2000,0.005,0.995,0.0,188.0,126.0,267.0,204.0316582914573
+noise_1,sd x1.5,shift,1.5,,"average, balanced",2000,0.0025,0.9975,0.0,203.0,138.0,282.0,217.92731829573935
+noise_1,sd x1.5,shift,1.5,,"average, sqrt",2000,0.005,0.995,0.0,192.0,129.0,270.0,207.26281407035177
+noise_1,sd x1.5,shift,1.5,,"average, balanced, plain every minute (no proof at this level)",2000,0.0025,0.9975,0.0,203.0,138.0,281.0,216.9829573934837
+noise_1,sd x1.5,shift,1.5,,"max, balanced",2000,0.0025,0.9975,0.0,206.0,139.0,288.0,221.17293233082708
+noise_1,sd x1.5,shift,1.5,,"average 5 and 15, balanced",2000,0.0,1.0,0.0,313.0,218.0,433.0,338.58
+noise_1,sd x1.5,shift,1.5,,"5 min, gap",2000,0.0005,0.9995,0.0,303.0,208.0,438.0,341.48924462231116
+noise_1,sd x1.5,shift,1.5,,"15 min, gap",2000,0.0,0.9755,0.0,563.0,398.0,788.0,610.4141465914915
+noise_1,sd x1.5,shift,1.5,,"average, equal, gap",2000,0.0055,0.9945,0.0,191.0,128.0,269.0,207.14831573655104
+noise_1,sd x1.5,shift,1.5,,"average, balanced, gap",2000,0.003,0.997,0.0,208.0,141.0,288.0,221.44483450351052
+noise_1,sd x1.5,shift,1.5,,"average, sqrt, gap",2000,0.0055,0.9945,0.0,194.0,132.0,275.0,210.71392659627955
+noise_1,sd x1.5,shift,1.5,,"max, balanced, gap",2000,0.003,0.997,0.0,211.0,142.25,291.0,224.8505516549649
+noise_1,sd x1.5,shift,1.5,,"average 5 and 15, balanced, gap",2000,0.0005,0.9995,0.0,328.0,233.0,458.0,360.00100050025014
+noise_1,sd x2,shift,2.0,,1 min,2000,0.004,0.996,0.0,62.0,43.0,85.25,67.09889558232932
+noise_1,sd x2,shift,2.0,,5 min,2000,0.0005,0.9995,0.0,123.0,93.0,163.0,132.45222611305653
+noise_1,sd x2,shift,2.0,,15 min,2000,0.0,1.0,0.0,278.0,203.0,353.0,290.72
+noise_1,sd x2,shift,2.0,,"average, equal",2000,0.0025,0.9975,0.0,63.0,44.0,87.0,67.69674185463658
+noise_1,sd x2,shift,2.0,,"average, balanced",2000,0.002,0.998,0.0,69.5,49.0,93.0,73.78056112224449
+noise_1,sd x2,shift,2.0,,"average, sqrt",2000,0.0025,0.9975,0.0,65.0,46.0,89.0,69.74736842105263
+noise_1,sd x2,shift,2.0,,"average, balanced, plain every minute (no proof at this level)",2000,0.002,0.998,0.0,69.0,49.0,93.0,73.6503006012024
+noise_1,sd x2,shift,2.0,,"max, balanced",2000,0.002,0.998,0.0,70.0,50.0,93.0,74.29158316633267
+noise_1,sd x2,shift,2.0,,"average 5 and 15, balanced",2000,0.0005,0.9995,0.0,133.0,103.0,173.0,142.61230615307653
+noise_1,sd x2,shift,2.0,,"5 min, gap",2000,0.0,1.0,0.0,128.0,93.0,173.0,139.155
+noise_1,sd x2,shift,2.0,,"15 min, gap",2000,0.0,1.0,0.0,278.0,203.0,368.0,296.0225
+noise_1,sd x2,shift,2.0,,"average, equal, gap",2000,0.0025,0.9975,0.0,63.0,44.0,87.0,67.85714285714286
+noise_1,sd x2,shift,2.0,,"average, balanced, gap",2000,0.002,0.998,0.0,69.0,49.0,93.0,74.2379759519038
+noise_1,sd x2,shift,2.0,,"average, sqrt, gap",2000,0.0025,0.9975,0.0,65.0,46.5,89.0,70.03558897243107
+noise_1,sd x2,shift,2.0,,"max, balanced, gap",2000,0.002,0.998,0.0,70.0,50.0,94.0,74.78306613226452
+noise_1,sd x2,shift,2.0,,"average 5 and 15, balanced, gap",2000,0.0,1.0,0.0,138.0,103.0,183.0,149.5225
+noise_1,sd x0.8,shift,0.8,,1 min,2000,0.0025,0.6975,0.0055,783.0,511.5,1079.0,791.3849462365591
+noise_1,sd x0.8,shift,0.8,,5 min,2000,0.0005,0.5915,0.0,1088.0,933.0,1248.0,1078.0803043110736
+noise_1,sd x0.8,shift,0.8,,15 min,2000,0.0,0.002,0.0,1410.5,1384.25,1421.75,1395.5
+noise_1,sd x0.8,shift,0.8,,"average, equal",2000,0.002,0.7505,0.004,861.0,568.0,1143.0,845.2445036642239
+noise_1,sd x0.8,shift,0.8,,"average, balanced",2000,0.0005,0.7255,0.003,963.0,688.5,1193.0,929.4252239834597
+noise_1,sd x0.8,shift,0.8,,"average, sqrt",2000,0.0005,0.7515,0.0035,893.0,621.0,1168.0,878.065868263473
+noise_1,sd x0.8,shift,0.8,,"average, balanced, plain every minute (no proof at this level)",2000,0.0005,0.7295,0.003,961.0,688.0,1190.5,927.5688827964359
+noise_1,sd x0.8,shift,0.8,,"max, balanced",2000,0.0005,0.703,0.003,961.0,685.0,1200.0,928.4658605974396
+noise_1,sd x0.8,shift,0.8,,"average 5 and 15, balanced",2000,0.0,0.466,0.0,1155.5,1013.0,1293.0,1142.898068669528
+noise_1,sd x0.8,shift,0.8,,"5 min, gap",2000,0.0005,0.4885,0.0,1138.0,963.0,1278.0,1111.229273285568
+noise_1,sd x0.8,shift,0.8,,"15 min, gap",2000,0.0,0.0015,0.0,1343.0,1328.0,1380.5,1358.0
+noise_1,sd x0.8,shift,0.8,,"average, equal, gap",2000,0.002,0.7205,0.004,840.0,557.0,1133.0,834.8029146426093
+noise_1,sd x0.8,shift,0.8,,"average, balanced, gap",2000,0.0005,0.6735,0.003,947.0,667.5,1197.5,918.4201930215294
+noise_1,sd x0.8,shift,0.8,,"average, sqrt, gap",2000,0.0005,0.712,0.0035,880.0,608.0,1163.0,869.0969101123595
+noise_1,sd x0.8,shift,0.8,,"max, balanced, gap",2000,0.0005,0.6535,0.003,941.0,655.5,1198.0,915.327467482785
+noise_1,sd x0.8,shift,0.8,,"average 5 and 15, balanced, gap",2000,0.0,0.3615,0.0,1193.0,1028.0,1320.5,1163.802213001383
+noise_1,sd x0.667,shift,0.6666666666666666,,1 min,2000,0.004,0.9845,0.0,500.0,356.0,713.0,553.2412392077197
+noise_1,sd x0.667,shift,0.6666666666666666,,5 min,2000,0.0,0.9935,0.0,783.0,673.0,913.0,807.443885254152
+noise_1,sd x0.667,shift,0.6666666666666666,,15 min,2000,0.0,0.1435,0.0,1343.0,1298.0,1403.0,1339.3937282229965
+noise_1,sd x0.667,shift,0.6666666666666666,,"average, equal",2000,0.002,0.997,0.0,527.0,377.0,733.0,564.6369107321966
+noise_1,sd x0.667,shift,0.6666666666666666,,"average, balanced",2000,0.0,0.999,0.0,603.0,437.0,783.0,618.5360360360361
+noise_1,sd x0.667,shift,0.6666666666666666,,"average, sqrt",2000,0.0015,0.997,0.0,551.5,398.0,748.0,580.1860581745236
+noise_1,sd x0.667,shift,0.6666666666666666,,"average, balanced, plain every minute (no proof at this level)",2000,0.0,0.999,0.0,598.0,435.0,778.0,614.6601601601602
+noise_1,sd x0.667,shift,0.6666666666666666,,"max, balanced",2000,0.0,0.9975,0.0,608.0,437.0,798.0,627.274686716792
+noise_1,sd x0.667,shift,0.6666666666666666,,"average 5 and 15, balanced",2000,0.0,0.9855,0.0,873.0,758.0,1008.0,891.3485540334856
+noise_1,sd x0.667,shift,0.6666666666666666,,"5 min, gap",2000,0.0,0.984,0.0,843.0,721.75,988.0,865.4771341463414
+noise_1,sd x0.667,shift,0.6666666666666666,,"15 min, gap",2000,0.0,0.1285,0.0,1358.0,1298.0,1403.0,1345.0428015564203
+noise_1,sd x0.667,shift,0.6666666666666666,,"average, equal, gap",2000,0.002,0.996,0.0,527.0,376.75,738.0,570.6556224899598
+noise_1,sd x0.667,shift,0.6666666666666666,,"average, balanced, gap",2000,0.0,0.997,0.0,603.0,436.25,803.0,631.7437311935807
+noise_1,sd x0.667,shift,0.6666666666666666,,"average, sqrt, gap",2000,0.0015,0.9965,0.0,551.0,398.0,764.0,590.5388861013547
+noise_1,sd x0.667,shift,0.6666666666666666,,"max, balanced, gap",2000,0.0,0.9935,0.0,606.0,436.5,813.0,639.155007549069
+noise_1,sd x0.667,shift,0.6666666666666666,,"average 5 and 15, balanced, gap",2000,0.0,0.9685,0.0,938.0,813.0,1083.0,954.4119772844605
+noise_1,sd x0.5,shift,0.5,,1 min,2000,0.0005,0.999,0.0005,320.0,241.0,419.75,345.65515515515517
+noise_1,sd x0.5,shift,0.5,,5 min,2000,0.0,1.0,0.0,558.0,508.0,623.0,569.0525
+noise_1,sd x0.5,shift,0.5,,15 min,2000,0.0,0.944,0.0,1238.0,1163.0,1298.0,1234.9729872881355
+noise_1,sd x0.5,shift,0.5,,"average, equal",2000,0.0005,0.9995,0.0,332.0,252.0,437.0,355.072036018009
+noise_1,sd x0.5,shift,0.5,,"average, balanced",2000,0.0,1.0,0.0,375.0,288.75,483.0,394.7185
+noise_1,sd x0.5,shift,0.5,,"average, sqrt",2000,0.0005,0.9995,0.0,348.0,266.5,453.0,368.62381190595295
+noise_1,sd x0.5,shift,0.5,,"average, balanced, plain every minute (no proof at this level)",2000,0.0,1.0,0.0,374.0,288.0,479.25,392.711
+noise_1,sd x0.5,shift,0.5,,"max, balanced",2000,0.0,1.0,0.0,376.0,289.0,492.0,399.8485
+noise_1,sd x0.5,shift,0.5,,"average 5 and 15, balanced",2000,0.0,1.0,0.0,623.0,563.0,688.0,632.5675
+noise_1,sd x0.5,shift,0.5,,"5 min, gap",2000,0.0,1.0,0.0,598.0,543.0,669.25,610.82
+noise_1,sd x0.5,shift,0.5,,"15 min, gap",2000,0.0,0.933,0.0,1253.0,1178.0,1313.0,1247.3006430868168
+noise_1,sd x0.5,shift,0.5,,"average, equal, gap",2000,0.0005,0.9995,0.0,332.0,252.0,437.0,356.5137568784392
+noise_1,sd x0.5,shift,0.5,,"average, balanced, gap",2000,0.0,1.0,0.0,375.0,288.75,487.25,397.7965
+noise_1,sd x0.5,shift,0.5,,"average, sqrt, gap",2000,0.0005,0.9995,0.0,348.0,266.5,454.5,371.04752376188094
+noise_1,sd x0.5,shift,0.5,,"max, balanced, gap",2000,0.0,1.0,0.0,376.0,289.0,492.0,402.617
+noise_1,sd x0.5,shift,0.5,,"average 5 and 15, balanced, gap",2000,0.0,1.0,0.0,668.0,606.75,739.25,677.53
+noise_1,burst x2 for 15 min,burst,2.0,15.0,1 min,2000,0.0045,0.0155,0.0,17.0,13.5,20.0,17.0
+noise_1,burst x2 for 15 min,burst,2.0,15.0,5 min,2000,0.0,0.002,0.0,15.5,10.5,18.0,13.0
+noise_1,burst x2 for 15 min,burst,2.0,15.0,15 min,2000,0.0,0.0,0.0,,,,
+noise_1,burst x2 for 15 min,burst,2.0,15.0,"average, equal",2000,0.003,0.0125,0.0,15.0,11.0,19.0,15.44
+noise_1,burst x2 for 15 min,burst,2.0,15.0,"average, balanced",2000,0.0,0.007,0.0,13.5,11.0,17.5,14.928571428571429
+noise_1,burst x2 for 15 min,burst,2.0,15.0,"average, sqrt",2000,0.0015,0.009,0.0,15.0,10.25,20.25,15.722222222222221
+noise_1,burst x2 for 15 min,burst,2.0,15.0,"average, balanced, plain every minute (no proof at this level)",2000,0.0,0.007,0.0,13.5,11.0,17.5,14.928571428571429
+noise_1,burst x2 for 15 min,burst,2.0,15.0,"max, balanced",2000,0.0,0.007,0.0,13.5,11.0,17.5,14.928571428571429
+noise_1,burst x2 for 15 min,burst,2.0,15.0,"average 5 and 15, balanced",2000,0.0,0.0005,0.0,18.0,18.0,18.0,18.0
+noise_1,burst x2 for 15 min,burst,2.0,15.0,"5 min, gap",2000,0.0,0.0015,0.0,13.0,13.0,18.0,16.333333333333332
+noise_1,burst x2 for 15 min,burst,2.0,15.0,"15 min, gap",2000,0.0,0.0005,0.0,23.0,23.0,23.0,23.0
+noise_1,burst x2 for 15 min,burst,2.0,15.0,"average, equal, gap",2000,0.003,0.0125,0.0,15.0,11.0,19.0,15.44
+noise_1,burst x2 for 15 min,burst,2.0,15.0,"average, balanced, gap",2000,0.0,0.007,0.0,13.5,11.0,17.5,14.928571428571429
+noise_1,burst x2 for 15 min,burst,2.0,15.0,"average, sqrt, gap",2000,0.0015,0.009,0.0,15.0,10.25,20.25,15.722222222222221
+noise_1,burst x2 for 15 min,burst,2.0,15.0,"max, balanced, gap",2000,0.0,0.007,0.0,13.5,11.0,17.5,14.928571428571429
+noise_1,burst x2 for 15 min,burst,2.0,15.0,"average 5 and 15, balanced, gap",2000,0.0,0.0005,0.0,23.0,23.0,23.0,23.0
+noise_1,burst x2 for 60 min,burst,2.0,60.0,1 min,2000,0.0065,0.499,0.0,44.0,33.0,53.0,42.93887775551102
+noise_1,burst x2 for 60 min,burst,2.0,60.0,5 min,2000,0.0,0.098,0.0,58.0,48.0,63.0,53.86734693877551
+noise_1,burst x2 for 60 min,burst,2.0,60.0,15 min,2000,0.0,0.0035,0.0,68.0,53.0,68.0,57.285714285714285
+noise_1,burst x2 for 60 min,burst,2.0,60.0,"average, equal",2000,0.005,0.485,0.0,44.0,34.0,53.0,43.75051546391752
+noise_1,burst x2 for 60 min,burst,2.0,60.0,"average, balanced",2000,0.003,0.413,0.0,47.0,36.25,55.0,45.506053268765136
+noise_1,burst x2 for 60 min,burst,2.0,60.0,"average, sqrt",2000,0.0045,0.4645,0.0,45.0,35.0,55.0,44.55220667384284
+noise_1,burst x2 for 60 min,burst,2.0,60.0,"average, balanced, plain every minute (no proof at this level)",2000,0.003,0.415,0.0,47.0,37.0,55.0,45.493975903614455
+noise_1,burst x2 for 60 min,burst,2.0,60.0,"max, balanced",2000,0.003,0.407,0.0,47.0,36.0,55.0,45.40417690417691
+noise_1,burst x2 for 60 min,burst,2.0,60.0,"average 5 and 15, balanced",2000,0.0,0.061,0.0,58.0,48.0,63.0,54.721311475409834
+noise_1,burst x2 for 60 min,burst,2.0,60.0,"5 min, gap",2000,0.0,0.0785,0.0,53.0,43.0,58.0,52.17197452229299
+noise_1,burst x2 for 60 min,burst,2.0,60.0,"15 min, gap",2000,0.0,0.0025,0.0,68.0,68.0,68.0,62.0
+noise_1,burst x2 for 60 min,burst,2.0,60.0,"average, equal, gap",2000,0.005,0.4845,0.0,44.0,34.0,53.0,43.76986584107327
+noise_1,burst x2 for 60 min,burst,2.0,60.0,"average, balanced, gap",2000,0.003,0.405,0.0,46.0,36.0,55.0,45.2962962962963
+noise_1,burst x2 for 60 min,burst,2.0,60.0,"average, sqrt, gap",2000,0.0045,0.46,0.0,45.0,35.0,55.0,44.36195652173913
+noise_1,burst x2 for 60 min,burst,2.0,60.0,"max, balanced, gap",2000,0.003,0.399,0.0,46.0,36.0,55.0,45.214285714285715
+noise_1,burst x2 for 60 min,burst,2.0,60.0,"average 5 and 15, balanced, gap",2000,0.0,0.0475,0.0,53.0,48.0,58.0,52.1578947368421
+noise_1,burst x3 for 15 min,burst,3.0,15.0,1 min,2000,0.0065,0.1735,0.0,14.0,11.0,16.0,14.432276657060518
+noise_1,burst x3 for 15 min,burst,3.0,15.0,5 min,2000,0.0005,0.003,0.0,18.0,14.25,25.5,18.833333333333332
+noise_1,burst x3 for 15 min,burst,3.0,15.0,15 min,2000,0.0,0.0005,0.0,23.0,23.0,23.0,23.0
+noise_1,burst x3 for 15 min,burst,3.0,15.0,"average, equal",2000,0.0065,0.1575,0.0,14.0,12.0,16.0,14.622222222222222
+noise_1,burst x3 for 15 min,burst,3.0,15.0,"average, balanced",2000,0.0035,0.105,0.0,14.0,12.0,15.0,14.59047619047619
+noise_1,burst x3 for 15 min,burst,3.0,15.0,"average, sqrt",2000,0.005,0.135,0.0,14.0,12.0,16.0,14.425925925925926
+noise_1,burst x3 for 15 min,burst,3.0,15.0,"average, balanced, plain every minute (no proof at this level)",2000,0.0035,0.105,0.0,14.0,12.0,15.0,14.585714285714285
+noise_1,burst x3 for 15 min,burst,3.0,15.0,"max, balanced",2000,0.0035,0.105,0.0,14.0,12.0,15.0,14.604761904761904
+noise_1,burst x3 for 15 min,burst,3.0,15.0,"average 5 and 15, balanced",2000,0.0,0.001,0.0,15.5,14.25,16.75,15.5
+noise_1,burst x3 for 15 min,burst,3.0,15.0,"5 min, gap",2000,0.0,0.002,0.0,23.0,18.0,28.0,23.0
+noise_1,burst x3 for 15 min,burst,3.0,15.0,"15 min, gap",2000,0.0,0.0,0.0,,,,
+noise_1,burst x3 for 15 min,burst,3.0,15.0,"average, equal, gap",2000,0.0065,0.1565,0.0,14.0,12.0,16.0,14.591054313099042
+noise_1,burst x3 for 15 min,burst,3.0,15.0,"average, balanced, gap",2000,0.0035,0.104,0.0,14.0,12.0,15.0,14.596153846153847
+noise_1,burst x3 for 15 min,burst,3.0,15.0,"average, sqrt, gap",2000,0.0055,0.133,0.0,14.0,12.0,16.0,14.43233082706767
+noise_1,burst x3 for 15 min,burst,3.0,15.0,"max, balanced, gap",2000,0.0035,0.104,0.0,14.0,12.0,15.0,14.596153846153847
+noise_1,burst x3 for 15 min,burst,3.0,15.0,"average 5 and 15, balanced, gap",2000,0.0,0.0,0.0,,,,
+noise_1,burst x3 for 60 min,burst,3.0,60.0,1 min,2000,0.004,0.989,0.0,25.0,19.0,31.0,25.8685540950455
+noise_1,burst x3 for 60 min,burst,3.0,60.0,5 min,2000,0.0,0.506,0.0,53.0,43.0,58.0,50.0701581027668
+noise_1,burst x3 for 60 min,burst,3.0,60.0,15 min,2000,0.0,0.0115,0.0,68.0,53.0,68.0,63.43478260869565
+noise_1,burst x3 for 60 min,burst,3.0,60.0,"average, equal",2000,0.0035,0.988,0.0,25.0,19.0,32.0,26.455465587044536
+noise_1,burst x3 for 60 min,burst,3.0,60.0,"average, balanced",2000,0.003,0.984,0.0,27.0,21.0,35.0,28.632621951219512
+noise_1,burst x3 for 60 min,burst,3.0,60.0,"average, sqrt",2000,0.0035,0.9865,0.0,26.0,20.0,33.0,27.17384693360365
+noise_1,burst x3 for 60 min,burst,3.0,60.0,"average, balanced, plain every minute (no proof at this level)",2000,0.003,0.984,0.0,27.0,21.0,35.0,28.588414634146343
+noise_1,burst x3 for 60 min,burst,3.0,60.0,"max, balanced",2000,0.003,0.984,0.0,27.0,21.0,35.0,28.715955284552845
+noise_1,burst x3 for 60 min,burst,3.0,60.0,"average 5 and 15, balanced",2000,0.0,0.4075,0.0,53.0,48.0,58.0,52.19631901840491
+noise_1,burst x3 for 60 min,burst,3.0,60.0,"5 min, gap",2000,0.0,0.4785,0.0,53.0,43.0,58.0,50.079414838035525
+noise_1,burst x3 for 60 min,burst,3.0,60.0,"15 min, gap",2000,0.0,0.0135,0.0,68.0,68.0,68.0,64.66666666666667
+noise_1,burst x3 for 60 min,burst,3.0,60.0,"average, equal, gap",2000,0.0035,0.988,0.0,25.0,19.0,32.0,26.466093117408906
+noise_1,burst x3 for 60 min,burst,3.0,60.0,"average, balanced, gap",2000,0.003,0.984,0.0,27.0,21.0,35.0,28.676829268292682
+noise_1,burst x3 for 60 min,burst,3.0,60.0,"average, sqrt, gap",2000,0.0035,0.986,0.0,26.0,20.0,33.0,27.17393509127789
+noise_1,burst x3 for 60 min,burst,3.0,60.0,"max, balanced, gap",2000,0.003,0.984,0.0,27.0,21.0,35.0,28.744918699186993
+noise_1,burst x3 for 60 min,burst,3.0,60.0,"average 5 and 15, balanced, gap",2000,0.0,0.3825,0.0,53.0,48.0,58.0,51.908496732026144
+noise_1,"trend, lag-one autocorrelation 0.3",trend,0.3,,1 min,2000,0.005,0.022,0.0225,841.0,590.5,1080.25,813.0227272727273
+noise_1,"trend, lag-one autocorrelation 0.3",trend,0.3,,5 min,2000,0.0,0.9055,0.0,708.0,443.0,973.0,719.5764770844837
+noise_1,"trend, lag-one autocorrelation 0.3",trend,0.3,,15 min,2000,0.0,0.7195,0.0,848.0,578.0,1103.0,839.6608756080611
+noise_1,"trend, lag-one autocorrelation 0.3",trend,0.3,,"average, equal",2000,0.0045,0.787,0.013,853.0,588.0,1116.75,849.0622617534942
+noise_1,"trend, lag-one autocorrelation 0.3",trend,0.3,,"average, balanced",2000,0.0015,0.875,0.0045,755.5,493.0,1026.75,766.8394285714286
+noise_1,"trend, lag-one autocorrelation 0.3",trend,0.3,,"average, sqrt",2000,0.002,0.852,0.0075,803.0,528.0,1073.0,804.5704225352113
+noise_1,"trend, lag-one autocorrelation 0.3",trend,0.3,,"average, balanced, plain every minute (no proof at this level)",2000,0.0015,0.875,0.0045,753.0,493.0,1023.0,764.9097142857142
+noise_1,"trend, lag-one autocorrelation 0.3",trend,0.3,,"max, balanced",2000,0.0015,0.868,0.005,768.0,503.0,1039.25,775.3139400921659
+noise_1,"trend, lag-one autocorrelation 0.3",trend,0.3,,"average 5 and 15, balanced",2000,0.0,0.906,0.0,708.0,463.0,983.0,731.7362030905077
+noise_1,"trend, lag-one autocorrelation 0.3",trend,0.3,,"5 min, gap",2000,0.0,0.7635,0.0,778.0,503.0,1048.0,785.2102161100197
+noise_1,"trend, lag-one autocorrelation 0.3",trend,0.3,,"15 min, gap",2000,0.0,0.712,0.0,863.0,593.0,1103.0,849.4641853932584
+noise_1,"trend, lag-one autocorrelation 0.3",trend,0.3,,"average, equal, gap",2000,0.0045,0.667,0.0145,923.0,668.0,1163.0,906.2308845577211
+noise_1,"trend, lag-one autocorrelation 0.3",trend,0.3,,"average, balanced, gap",2000,0.0015,0.7945,0.005,818.0,563.0,1073.0,818.2271869100063
+noise_1,"trend, lag-one autocorrelation 0.3",trend,0.3,,"average, sqrt, gap",2000,0.002,0.748,0.009,860.5,606.75,1118.0,855.2125668449198
+noise_1,"trend, lag-one autocorrelation 0.3",trend,0.3,,"max, balanced, gap",2000,0.0015,0.7835,0.005,818.0,573.0,1073.0,824.3682195277601
+noise_1,"trend, lag-one autocorrelation 0.3",trend,0.3,,"average 5 and 15, balanced, gap",2000,0.0,0.8345,0.0,773.0,523.0,1033.0,785.2408627920911
+noise_2,sd x1.25,shift,1.25,,1 min,2000,0.0165,0.2895,0.007,860.0,482.0,1138.0,810.9723661485319
+noise_2,sd x1.25,shift,1.25,,5 min,2000,0.0015,0.374,0.0,893.0,611.75,1178.0,875.0454545454545
+noise_2,sd x1.25,shift,1.25,,15 min,2000,0.0,0.27,0.0,968.0,713.0,1193.0,937.2777777777778
+noise_2,sd x1.25,shift,1.25,,"average, equal",2000,0.015,0.4075,0.0045,888.0,555.5,1166.5,847.9398773006135
+noise_2,sd x1.25,shift,1.25,,"average, balanced",2000,0.0095,0.4415,0.0005,888.0,581.0,1159.0,855.0045300113251
+noise_2,sd x1.25,shift,1.25,,"average, sqrt",2000,0.0125,0.4285,0.0015,892.0,578.0,1148.0,856.191365227538
+noise_2,sd x1.25,shift,1.25,,"average, balanced, plain every minute (no proof at this level)",2000,0.0095,0.4435,0.0005,888.0,583.0,1158.0,854.8883878241263
+noise_2,sd x1.25,shift,1.25,,"max, balanced",2000,0.0095,0.429,0.0005,884.0,580.0,1148.0,852.9825174825174
+noise_2,sd x1.25,shift,1.25,,"average 5 and 15, balanced",2000,0.001,0.3955,0.0,908.0,648.0,1178.0,892.1845764854614
+noise_2,sd x1.25,shift,1.25,,"5 min, gap",2000,0.0005,0.214,0.0,968.0,658.0,1198.0,912.4976635514018
+noise_2,sd x1.25,shift,1.25,,"15 min, gap",2000,0.0,0.253,0.0,1013.0,758.0,1253.0,980.9249011857708
+noise_2,sd x1.25,shift,1.25,,"average, equal, gap",2000,0.015,0.348,0.0045,908.5,567.5,1154.0,858.2227011494252
+noise_2,sd x1.25,shift,1.25,,"average, balanced, gap",2000,0.009,0.3595,0.0005,913.0,646.5,1167.0,882.6870653685675
+noise_2,sd x1.25,shift,1.25,,"average, sqrt, gap",2000,0.012,0.354,0.0015,902.5,605.5,1148.0,863.0522598870057
+noise_2,sd x1.25,shift,1.25,,"max, balanced, gap",2000,0.009,0.346,0.0005,908.0,641.75,1158.0,876.5693641618498
+noise_2,sd x1.25,shift,1.25,,"average 5 and 15, balanced, gap",2000,0.0,0.2815,0.0,998.0,755.5,1225.5,963.772646536412
+noise_2,sd x1.5,shift,1.5,,1 min,2000,0.01,0.7555,0.0005,724.0,448.5,1036.5,742.8894771674388
+noise_2,sd x1.5,shift,1.5,,5 min,2000,0.0005,0.9385,0.0,598.0,378.0,868.0,637.8215237080448
+noise_2,sd x1.5,shift,1.5,,15 min,2000,0.0,0.8595,0.0,758.0,518.0,998.0,766.630017452007
+noise_2,sd x1.5,shift,1.5,,"average, equal",2000,0.0085,0.956,0.0005,603.0,398.0,847.25,635.2311715481171
+noise_2,sd x1.5,shift,1.5,,"average, balanced",2000,0.005,0.973,0.0,563.0,375.25,793.75,605.4367934224049
+noise_2,sd x1.5,shift,1.5,,"average, sqrt",2000,0.006,0.9665,0.0005,573.0,383.0,805.0,611.1293326435592
+noise_2,sd x1.5,shift,1.5,,"average, balanced, plain every minute (no proof at this level)",2000,0.005,0.9735,0.0,563.0,373.5,792.0,603.2917308680021
+noise_2,sd x1.5,shift,1.5,,"max, balanced",2000,0.005,0.97,0.0,578.0,383.0,818.0,617.1427835051546
+noise_2,sd x1.5,shift,1.5,,"average 5 and 15, balanced",2000,0.0005,0.9665,0.0,598.0,398.0,838.0,635.7909984480083
+noise_2,sd x1.5,shift,1.5,,"5 min, gap",2000,0.0005,0.855,0.0,733.0,478.0,998.0,745.766081871345
+noise_2,sd x1.5,shift,1.5,,"15 min, gap",2000,0.0,0.828,0.0,758.0,518.0,1013.0,770.5634057971015
+noise_2,sd x1.5,shift,1.5,,"average, equal, gap",2000,0.008,0.932,0.0005,653.0,430.0,918.25,685.2392703862661
+noise_2,sd x1.5,shift,1.5,,"average, balanced, gap",2000,0.0045,0.9515,0.0,623.0,414.5,875.5,659.8864950078823
+noise_2,sd x1.5,shift,1.5,,"average, sqrt, gap",2000,0.0055,0.948,0.0005,627.0,428.0,883.0,664.1914556962025
+noise_2,sd x1.5,shift,1.5,,"max, balanced, gap",2000,0.0045,0.944,0.0,633.0,428.0,893.5,671.4645127118644
+noise_2,sd x1.5,shift,1.5,,"average 5 and 15, balanced, gap",2000,0.0,0.933,0.0,680.5,448.0,938.0,704.3478027867095
+noise_2,sd x2,shift,2.0,,1 min,2000,0.0095,0.99,0.0005,261.0,161.0,391.0,289.5242424242424
+noise_2,sd x2,shift,2.0,,5 min,2000,0.001,0.999,0.0,213.0,153.0,298.0,235.25975975975976
+noise_2,sd x2,shift,2.0,,15 min,2000,0.0,1.0,0.0,338.0,248.0,473.0,377.6675
+noise_2,sd x2,shift,2.0,,"average, equal",2000,0.007,0.993,0.0,203.0,139.0,279.75,216.47230614300102
+noise_2,sd x2,shift,2.0,,"average, balanced",2000,0.005,0.995,0.0,203.0,141.0,273.0,212.5356783919598
+noise_2,sd x2,shift,2.0,,"average, sqrt",2000,0.006,0.994,0.0,199.5,138.0,273.25,211.4718309859155
+noise_2,sd x2,shift,2.0,,"average, balanced, plain every minute (no proof at this level)",2000,0.005,0.995,0.0,202.5,140.0,268.0,211.5743718592965
+noise_2,sd x2,shift,2.0,,"max, balanced",2000,0.005,0.995,0.0,203.0,143.0,278.0,216.26130653266333
+noise_2,sd x2,shift,2.0,,"average 5 and 15, balanced",2000,0.0005,0.9995,0.0,223.0,163.0,303.0,241.70685342671337
+noise_2,sd x2,shift,2.0,,"5 min, gap",2000,0.0,1.0,0.0,253.0,178.0,358.0,277.9625
+noise_2,sd x2,shift,2.0,,"15 min, gap",2000,0.0,1.0,0.0,353.0,263.0,488.0,388.7825
+noise_2,sd x2,shift,2.0,,"average, equal, gap",2000,0.0065,0.9935,0.0,218.0,148.0,303.0,232.7126321087066
+noise_2,sd x2,shift,2.0,,"average, balanced, gap",2000,0.005,0.995,0.0,218.0,158.0,293.0,232.12211055276381
+noise_2,sd x2,shift,2.0,,"average, sqrt, gap",2000,0.006,0.994,0.0,218.0,153.0,293.0,229.83601609657947
+noise_2,sd x2,shift,2.0,,"max, balanced, gap",2000,0.005,0.995,0.0,223.0,158.0,298.0,236.51256281407035
+noise_2,sd x2,shift,2.0,,"average 5 and 15, balanced, gap",2000,0.0,1.0,0.0,258.0,188.0,348.0,275.095
+noise_2,sd x0.8,shift,0.8,,1 min,2000,0.0135,0.1575,0.049,846.0,592.0,1125.0,842.4095238095238
+noise_2,sd x0.8,shift,0.8,,5 min,2000,0.0005,0.1035,0.0015,1178.0,1028.0,1318.0,1155.3188405797102
+noise_2,sd x0.8,shift,0.8,,15 min,2000,0.0,0.0015,0.0005,1388.0,1358.0,1403.0,1378.0
+noise_2,sd x0.8,shift,0.8,,"average, equal",2000,0.0125,0.1515,0.0415,941.0,641.5,1184.5,895.3201320132014
+noise_2,sd x0.8,shift,0.8,,"average, balanced",2000,0.0055,0.1215,0.024,1078.0,720.0,1243.5,972.8600823045267
+noise_2,sd x0.8,shift,0.8,,"average, sqrt",2000,0.0095,0.1425,0.0335,996.0,699.0,1209.0,930.8982456140351
+noise_2,sd x0.8,shift,0.8,,"average, balanced, plain every minute (no proof at this level)",2000,0.0055,0.1245,0.024,1083.0,722.0,1248.0,977.6746987951807
+noise_2,sd x0.8,shift,0.8,,"max, balanced",2000,0.0055,0.118,0.024,1080.5,711.5,1245.0,970.3347457627119
+noise_2,sd x0.8,shift,0.8,,"average 5 and 15, balanced",2000,0.0005,0.0575,0.001,1223.0,1095.5,1343.0,1200.9565217391305
+noise_2,sd x0.8,shift,0.8,,"5 min, gap",2000,0.0,0.045,0.0005,1263.0,1088.0,1363.0,1194.7222222222222
+noise_2,sd x0.8,shift,0.8,,"15 min, gap",2000,0.0,0.0,0.0,,,,
+noise_2,sd x0.8,shift,0.8,,"average, equal, gap",2000,0.0125,0.1395,0.0415,868.0,620.0,1140.0,859.8709677419355
+noise_2,sd x0.8,shift,0.8,,"average, balanced, gap",2000,0.0055,0.097,0.024,984.0,645.75,1202.75,913.5670103092783
+noise_2,sd x0.8,shift,0.8,,"average, sqrt, gap",2000,0.0095,0.126,0.0335,934.5,642.5,1156.25,891.3055555555555
+noise_2,sd x0.8,shift,0.8,,"max, balanced, gap",2000,0.0055,0.095,0.024,981.5,633.0,1183.75,911.2052631578947
+noise_2,sd x0.8,shift,0.8,,"average 5 and 15, balanced, gap",2000,0.0,0.016,0.0,1243.0,1103.0,1354.25,1213.15625
+noise_2,sd x0.667,shift,0.6666666666666666,,1 min,2000,0.0075,0.293,0.028,848.0,525.75,1160.5,839.6740614334472
+noise_2,sd x0.667,shift,0.6666666666666666,,5 min,2000,0.002,0.3955,0.0,1128.0,943.0,1285.5,1103.7585335018964
+noise_2,sd x0.667,shift,0.6666666666666666,,15 min,2000,0.0,0.013,0.0,1380.5,1301.75,1399.25,1351.6538461538462
+noise_2,sd x0.667,shift,0.6666666666666666,,"average, equal",2000,0.0075,0.341,0.0235,992.5,644.0,1223.0,921.3988269794721
+noise_2,sd x0.667,shift,0.6666666666666666,,"average, balanced",2000,0.004,0.3405,0.0065,1088.0,828.0,1288.0,1025.7782672540382
+noise_2,sd x0.667,shift,0.6666666666666666,,"average, sqrt",2000,0.0055,0.3475,0.018,1037.0,741.5,1255.0,972.1136690647483
+noise_2,sd x0.667,shift,0.6666666666666666,,"average, balanced, plain every minute (no proof at this level)",2000,0.004,0.35,0.0065,1091.0,828.0,1296.25,1029.2514285714285
+noise_2,sd x0.667,shift,0.6666666666666666,,"max, balanced",2000,0.004,0.321,0.0065,1083.0,818.5,1283.0,1019.1105919003115
+noise_2,sd x0.667,shift,0.6666666666666666,,"average 5 and 15, balanced",2000,0.0005,0.285,0.0,1170.5,1004.25,1313.0,1149.8245614035088
+noise_2,sd x0.667,shift,0.6666666666666666,,"5 min, gap",2000,0.0,0.218,0.0005,1183.0,1018.0,1318.0,1156.75
+noise_2,sd x0.667,shift,0.6666666666666666,,"15 min, gap",2000,0.0,0.0085,0.0,1358.0,1313.0,1388.0,1361.5294117647059
+noise_2,sd x0.667,shift,0.6666666666666666,,"average, equal, gap",2000,0.007,0.2845,0.024,913.0,568.0,1207.0,875.3514938488577
+noise_2,sd x0.667,shift,0.6666666666666666,,"average, balanced, gap",2000,0.0035,0.233,0.007,1068.0,737.75,1253.0,977.8433476394849
+noise_2,sd x0.667,shift,0.6666666666666666,,"average, sqrt, gap",2000,0.005,0.263,0.0185,999.0,647.0,1220.25,916.0475285171103
+noise_2,sd x0.667,shift,0.6666666666666666,,"max, balanced, gap",2000,0.0035,0.221,0.007,1054.5,726.0,1249.75,968.1696832579186
+noise_2,sd x0.667,shift,0.6666666666666666,,"average 5 and 15, balanced, gap",2000,0.0,0.135,0.0,1238.0,1094.25,1336.75,1203.5925925925926
+noise_2,sd x0.5,shift,0.5,,1 min,2000,0.0105,0.428,0.022,845.5,564.75,1117.25,837.3259345794393
+noise_2,sd x0.5,shift,0.5,,5 min,2000,0.001,0.7515,0.0005,1003.0,838.0,1193.0,1011.5961410512309
+noise_2,sd x0.5,shift,0.5,,15 min,2000,0.0,0.1665,0.0,1373.0,1298.0,1403.0,1347.1891891891892
+noise_2,sd x0.5,shift,0.5,,"average, equal",2000,0.009,0.634,0.017,1016.0,738.0,1223.0,960.4029968454258
+noise_2,sd x0.5,shift,0.5,,"average, balanced",2000,0.0065,0.6785,0.005,1043.0,833.0,1208.0,1004.093588798821
+noise_2,sd x0.5,shift,0.5,,"average, sqrt",2000,0.0075,0.6665,0.0105,1017.0,778.0,1208.0,974.4996249062266
+noise_2,sd x0.5,shift,0.5,,"average, balanced, plain every minute (no proof at this level)",2000,0.0065,0.688,0.0055,1038.0,831.0,1208.0,1002.0886627906976
+noise_2,sd x0.5,shift,0.5,,"max, balanced",2000,0.0065,0.648,0.005,1051.0,846.75,1218.0,1008.1358024691358
+noise_2,sd x0.5,shift,0.5,,"average 5 and 15, balanced",2000,0.001,0.673,0.0,1088.0,933.0,1238.0,1082.9517087667161
+noise_2,sd x0.5,shift,0.5,,"5 min, gap",2000,0.0005,0.565,0.0,1108.0,933.0,1246.75,1086.8893805309735
+noise_2,sd x0.5,shift,0.5,,"15 min, gap",2000,0.0,0.117,0.0,1388.0,1313.0,1418.0,1359.5384615384614
+noise_2,sd x0.5,shift,0.5,,"average, equal, gap",2000,0.0085,0.5085,0.018,983.0,668.0,1223.0,927.7354965585054
+noise_2,sd x0.5,shift,0.5,,"average, balanced, gap",2000,0.0055,0.525,0.0055,1083.0,803.0,1268.0,1018.4247619047619
+noise_2,sd x0.5,shift,0.5,,"average, sqrt, gap",2000,0.0065,0.5225,0.0115,1028.0,723.0,1253.0,964.3674641148325
+noise_2,sd x0.5,shift,0.5,,"max, balanced, gap",2000,0.0055,0.4865,0.0055,1082.0,800.0,1268.0,1013.7492291880781
+noise_2,sd x0.5,shift,0.5,,"average 5 and 15, balanced, gap",2000,0.0,0.4725,0.0,1193.0,1043.0,1313.0,1164.037037037037
+noise_2,burst x2 for 15 min,burst,2.0,15.0,1 min,2000,0.008,0.008,0.0,12.5,6.75,18.25,13.3125
+noise_2,burst x2 for 15 min,burst,2.0,15.0,5 min,2000,0.0,0.0,0.0,,,,
+noise_2,burst x2 for 15 min,burst,2.0,15.0,15 min,2000,0.0,0.0,0.0,,,,
+noise_2,burst x2 for 15 min,burst,2.0,15.0,"average, equal",2000,0.0055,0.007,0.0,12.5,7.5,18.75,13.071428571428571
+noise_2,burst x2 for 15 min,burst,2.0,15.0,"average, balanced",2000,0.0035,0.0045,0.0,14.0,11.0,15.0,12.666666666666666
+noise_2,burst x2 for 15 min,burst,2.0,15.0,"average, sqrt",2000,0.005,0.006,0.0,12.5,8.5,19.0,13.0
+noise_2,burst x2 for 15 min,burst,2.0,15.0,"average, balanced, plain every minute (no proof at this level)",2000,0.0035,0.0045,0.0,14.0,11.0,15.0,12.666666666666666
+noise_2,burst x2 for 15 min,burst,2.0,15.0,"max, balanced",2000,0.0035,0.0045,0.0,14.0,11.0,15.0,12.666666666666666
+noise_2,burst x2 for 15 min,burst,2.0,15.0,"average 5 and 15, balanced",2000,0.0,0.0,0.0,,,,
+noise_2,burst x2 for 15 min,burst,2.0,15.0,"5 min, gap",2000,0.0,0.0,0.0,,,,
+noise_2,burst x2 for 15 min,burst,2.0,15.0,"15 min, gap",2000,0.0,0.0,0.0,,,,
+noise_2,burst x2 for 15 min,burst,2.0,15.0,"average, equal, gap",2000,0.0055,0.007,0.0,12.5,7.5,18.75,13.071428571428571
+noise_2,burst x2 for 15 min,burst,2.0,15.0,"average, balanced, gap",2000,0.0035,0.0045,0.0,14.0,11.0,15.0,12.666666666666666
+noise_2,burst x2 for 15 min,burst,2.0,15.0,"average, sqrt, gap",2000,0.005,0.006,0.0,12.5,8.5,19.0,13.0
+noise_2,burst x2 for 15 min,burst,2.0,15.0,"max, balanced, gap",2000,0.0035,0.0045,0.0,14.0,11.0,15.0,12.666666666666666
+noise_2,burst x2 for 15 min,burst,2.0,15.0,"average 5 and 15, balanced, gap",2000,0.0,0.0,0.0,,,,
+noise_2,burst x2 for 60 min,burst,2.0,60.0,1 min,2000,0.0095,0.06,0.0,48.0,33.0,58.0,45.38333333333333
+noise_2,burst x2 for 60 min,burst,2.0,60.0,5 min,2000,0.0,0.0295,0.0,53.0,48.0,63.0,53.16949152542373
+noise_2,burst x2 for 60 min,burst,2.0,60.0,15 min,2000,0.0,0.0005,0.0,68.0,68.0,68.0,68.0
+noise_2,burst x2 for 60 min,burst,2.0,60.0,"average, equal",2000,0.008,0.0595,0.0,49.0,33.5,59.5,47.10084033613445
+noise_2,burst x2 for 60 min,burst,2.0,60.0,"average, balanced",2000,0.005,0.046,0.0,57.0,40.0,63.0,51.5
+noise_2,burst x2 for 60 min,burst,2.0,60.0,"average, sqrt",2000,0.007,0.053,0.0,52.5,36.25,60.0,48.4622641509434
+noise_2,burst x2 for 60 min,burst,2.0,60.0,"average, balanced, plain every minute (no proof at this level)",2000,0.005,0.0475,0.0,57.0,40.5,63.0,51.78947368421053
+noise_2,burst x2 for 60 min,burst,2.0,60.0,"max, balanced",2000,0.005,0.0455,0.0,57.0,40.0,63.0,51.43956043956044
+noise_2,burst x2 for 60 min,burst,2.0,60.0,"average 5 and 15, balanced",2000,0.0,0.0175,0.0,58.0,48.0,63.0,53.42857142857143
+noise_2,burst x2 for 60 min,burst,2.0,60.0,"5 min, gap",2000,0.0,0.012,0.0,53.0,48.0,58.0,54.041666666666664
+noise_2,burst x2 for 60 min,burst,2.0,60.0,"15 min, gap",2000,0.0,0.001,0.0,53.0,45.5,60.5,53.0
+noise_2,burst x2 for 60 min,burst,2.0,60.0,"average, equal, gap",2000,0.008,0.054,0.0,48.5,33.0,60.0,46.68518518518518
+noise_2,burst x2 for 60 min,burst,2.0,60.0,"average, balanced, gap",2000,0.005,0.0375,0.0,57.0,40.5,65.0,52.18666666666667
+noise_2,burst x2 for 60 min,burst,2.0,60.0,"average, sqrt, gap",2000,0.007,0.0465,0.0,52.0,36.0,60.0,48.666666666666664
+noise_2,burst x2 for 60 min,burst,2.0,60.0,"max, balanced, gap",2000,0.005,0.0365,0.0,57.0,40.0,65.0,51.87671232876713
+noise_2,burst x2 for 60 min,burst,2.0,60.0,"average 5 and 15, balanced, gap",2000,0.0,0.0065,0.0,63.0,58.0,63.0,59.15384615384615
+noise_2,burst x3 for 15 min,burst,3.0,15.0,1 min,2000,0.0155,0.018,0.0,15.0,12.0,23.25,16.444444444444443
+noise_2,burst x3 for 15 min,burst,3.0,15.0,5 min,2000,0.002,0.0045,0.0,13.0,13.0,13.0,12.444444444444445
+noise_2,burst x3 for 15 min,burst,3.0,15.0,15 min,2000,0.0,0.0,0.0,,,,
+noise_2,burst x3 for 15 min,burst,3.0,15.0,"average, equal",2000,0.0145,0.017,0.0,15.5,12.0,23.0,16.5
+noise_2,burst x3 for 15 min,burst,3.0,15.0,"average, balanced",2000,0.008,0.0115,0.0,18.0,13.0,24.0,17.956521739130434
+noise_2,burst x3 for 15 min,burst,3.0,15.0,"average, sqrt",2000,0.013,0.016,0.0,17.5,12.75,23.25,17.59375
+noise_2,burst x3 for 15 min,burst,3.0,15.0,"average, balanced, plain every minute (no proof at this level)",2000,0.008,0.0115,0.0,18.0,13.0,24.0,17.782608695652176
+noise_2,burst x3 for 15 min,burst,3.0,15.0,"max, balanced",2000,0.008,0.011,0.0,16.5,13.0,24.5,17.772727272727273
+noise_2,burst x3 for 15 min,burst,3.0,15.0,"average 5 and 15, balanced",2000,0.0005,0.004,0.0,18.0,13.0,18.0,16.125
+noise_2,burst x3 for 15 min,burst,3.0,15.0,"5 min, gap",2000,0.0,0.0005,0.0,28.0,28.0,28.0,28.0
+noise_2,burst x3 for 15 min,burst,3.0,15.0,"15 min, gap",2000,0.0,0.0,0.0,,,,
+noise_2,burst x3 for 15 min,burst,3.0,15.0,"average, equal, gap",2000,0.014,0.015,0.0,14.0,12.0,22.5,15.966666666666667
+noise_2,burst x3 for 15 min,burst,3.0,15.0,"average, balanced, gap",2000,0.0075,0.008,0.0,14.5,11.75,25.25,17.375
+noise_2,burst x3 for 15 min,burst,3.0,15.0,"average, sqrt, gap",2000,0.0125,0.013,0.0,16.0,12.0,24.75,17.423076923076923
+noise_2,burst x3 for 15 min,burst,3.0,15.0,"max, balanced, gap",2000,0.0075,0.008,0.0,14.5,11.75,25.25,17.375
+noise_2,burst x3 for 15 min,burst,3.0,15.0,"average 5 and 15, balanced, gap",2000,0.0,0.0,0.0,,,,
+noise_2,burst x3 for 60 min,burst,3.0,60.0,1 min,2000,0.0065,0.4375,0.0,44.0,33.0,55.0,43.10857142857143
+noise_2,burst x3 for 60 min,burst,3.0,60.0,5 min,2000,0.0,0.214,0.0,53.0,43.0,58.0,51.58644859813084
+noise_2,burst x3 for 60 min,burst,3.0,60.0,15 min,2000,0.0,0.009,0.0,53.0,53.0,68.0,55.5
+noise_2,burst x3 for 60 min,burst,3.0,60.0,"average, equal",2000,0.005,0.448,0.0,45.0,34.0,56.0,44.332589285714285
+noise_2,burst x3 for 60 min,burst,3.0,60.0,"average, balanced",2000,0.002,0.401,0.0,48.0,37.0,58.0,46.5286783042394
+noise_2,burst x3 for 60 min,burst,3.0,60.0,"average, sqrt",2000,0.003,0.4345,0.0,46.0,35.0,57.0,45.07940161104718
+noise_2,burst x3 for 60 min,burst,3.0,60.0,"average, balanced, plain every minute (no proof at this level)",2000,0.002,0.402,0.0,48.0,37.0,58.0,46.450248756218905
+noise_2,burst x3 for 60 min,burst,3.0,60.0,"max, balanced",2000,0.002,0.393,0.0,48.0,37.0,58.0,46.5763358778626
+noise_2,burst x3 for 60 min,burst,3.0,60.0,"average 5 and 15, balanced",2000,0.0,0.146,0.0,53.0,48.0,63.0,53.06849315068493
+noise_2,burst x3 for 60 min,burst,3.0,60.0,"5 min, gap",2000,0.0,0.1475,0.0,53.0,43.0,58.0,51.152542372881356
+noise_2,burst x3 for 60 min,burst,3.0,60.0,"15 min, gap",2000,0.0,0.01,0.0,68.0,53.0,68.0,57.5
+noise_2,burst x3 for 60 min,burst,3.0,60.0,"average, equal, gap",2000,0.005,0.4355,0.0,44.0,34.0,55.5,44.08725602755454
+noise_2,burst x3 for 60 min,burst,3.0,60.0,"average, balanced, gap",2000,0.002,0.374,0.0,47.0,37.0,56.0,45.93983957219251
+noise_2,burst x3 for 60 min,burst,3.0,60.0,"average, sqrt, gap",2000,0.003,0.4135,0.0,45.0,35.0,56.0,44.59613059250302
+noise_2,burst x3 for 60 min,burst,3.0,60.0,"max, balanced, gap",2000,0.002,0.369,0.0,47.0,37.0,56.0,46.0650406504065
+noise_2,burst x3 for 60 min,burst,3.0,60.0,"average 5 and 15, balanced, gap",2000,0.0,0.1095,0.0,53.0,48.0,58.0,52.817351598173516
+noise_2,"trend, lag-one autocorrelation 0.3",trend,0.3,,1 min,2000,0.014,0.077,0.0315,732.5,269.75,1128.0,702.5454545454545
+noise_2,"trend, lag-one autocorrelation 0.3",trend,0.3,,5 min,2000,0.0015,0.4005,0.0,908.0,583.0,1163.0,859.8851435705368
+noise_2,"trend, lag-one autocorrelation 0.3",trend,0.3,,15 min,2000,0.0,0.479,0.0,923.0,653.0,1178.0,904.7275574112734
+noise_2,"trend, lag-one autocorrelation 0.3",trend,0.3,,"average, equal",2000,0.0105,0.332,0.022,953.0,653.0,1208.0,901.019578313253
+noise_2,"trend, lag-one autocorrelation 0.3",trend,0.3,,"average, balanced",2000,0.0045,0.4825,0.008,923.0,638.0,1193.0,891.4746113989637
+noise_2,"trend, lag-one autocorrelation 0.3",trend,0.3,,"average, sqrt",2000,0.0075,0.414,0.0155,943.0,648.0,1198.0,900.4516908212561
+noise_2,"trend, lag-one autocorrelation 0.3",trend,0.3,,"average, balanced, plain every minute (no proof at this level)",2000,0.0045,0.484,0.008,923.0,638.0,1193.0,890.8584710743802
+noise_2,"trend, lag-one autocorrelation 0.3",trend,0.3,,"max, balanced",2000,0.0045,0.466,0.0075,923.0,638.0,1185.5,890.6727467811158
+noise_2,"trend, lag-one autocorrelation 0.3",trend,0.3,,"average 5 and 15, balanced",2000,0.0005,0.532,0.0,908.0,623.0,1178.0,884.8468045112782
+noise_2,"trend, lag-one autocorrelation 0.3",trend,0.3,,"5 min, gap",2000,0.001,0.2235,0.0,978.0,690.5,1223.0,936.4004474272931
+noise_2,"trend, lag-one autocorrelation 0.3",trend,0.3,,"15 min, gap",2000,0.0,0.449,0.0,968.0,683.0,1189.25,925.2048997772829
+noise_2,"trend, lag-one autocorrelation 0.3",trend,0.3,,"average, equal, gap",2000,0.01,0.249,0.0225,998.0,713.0,1238.0,935.4618473895582
+noise_2,"trend, lag-one autocorrelation 0.3",trend,0.3,,"average, balanced, gap",2000,0.004,0.3985,0.008,983.0,686.0,1208.0,928.577164366374
+noise_2,"trend, lag-one autocorrelation 0.3",trend,0.3,,"average, sqrt, gap",2000,0.007,0.329,0.0145,983.0,702.75,1223.0,931.9072948328268
+noise_2,"trend, lag-one autocorrelation 0.3",trend,0.3,,"max, balanced, gap",2000,0.004,0.384,0.0075,968.0,694.25,1208.0,925.20703125
+noise_2,"trend, lag-one autocorrelation 0.3",trend,0.3,,"average 5 and 15, balanced, gap",2000,0.0005,0.438,0.0,980.5,686.75,1193.0,933.9703196347032
