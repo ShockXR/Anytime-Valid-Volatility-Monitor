@@ -52,7 +52,8 @@ REAL settings, FROZEN before the real part was run for the first time (committed
   * the reading compares each combination with the best single frequency per metric; no other comparison and no
     tuning on the real data.
 
-Runtime: baselines about 1 minute, null about 3 minutes, change about 4 minutes, real about 5 minutes on 2 cores.
+Runtime on 2 cores of a shared machine: baselines about 10 seconds, null and change about 1 minute each, real about
+1 minute (data already in data/raw), figures 1 second.
 """
 
 from __future__ import annotations
@@ -548,23 +549,26 @@ def part_figures():
     df = pd.read_csv(OUT / "e17_change_summary.csv")
     shifts = df[(df.kind == "shift")]
     mons = ["1 min", "5 min", "15 min", "average, equal", "average, balanced", "average, sqrt", "max, balanced"]
-    fig, axes = plt.subplots(1, 3, figsize=(13, 4.2), sharey=True)
-    for ax, law in zip(axes, ("gaussian", "student_t3", "noise_1")):
+    fig, axes = plt.subplots(1, 4, figsize=(15, 4.6), sharey=True)
+    titles = {"gaussian": "Gaussian", "student_t3": "Student t3", "noise_1": "price noise, gamma = 1",
+              "noise_2": "price noise, gamma = 2"}
+    for ax, law in zip(axes, ("gaussian", "student_t3", "noise_1", "noise_2")):
         g = shifts[shifts.law == law]
         changes = list(dict.fromkeys(g.change))
         for m in mons:
             y = [g[(g.change == c) & (g.monitor == m)].median_delay.iloc[0] for c in changes]
-            ax.plot(range(len(changes)), y, marker="o", label=m, lw=1.5 if "average" in m or "max" in m else 2.5,
-                    ls="-" if "average" in m or "max" in m else "--")
+            single = not ("average" in m or "max" in m)
+            ax.plot(range(len(changes)), y, marker="o", label=m, lw=2.5 if single else 1.5, ls="--" if single else "-")
         ax.set_xticks(range(len(changes)))
         ax.set_xticklabels(changes, rotation=30, fontsize=8)
         ax.set_yscale("log")
-        ax.set_title(law.replace("_", " "))
+        ax.set_title(titles[law] + (" (1 min not valid)" if law.startswith("noise") else ""), fontsize=10)
         ax.grid(alpha=0.3)
-    axes[0].set_ylabel("median delay (minutes, log scale)")
-    axes[-1].legend(fontsize=7, loc="upper right")
+    axes[0].set_ylabel("median delay among detections (minutes, log scale)")
+    handles, labels = axes[0].get_legend_handles_labels()
+    fig.legend(handles, labels, loc="lower center", ncol=7, fontsize=8, frameon=False)
     fig.suptitle("E17 [SYNTHETIC]: median detection delay, persistent sd changes, true baseline, 5% per day proved")
-    fig.tight_layout()
+    fig.tight_layout(rect=(0, 0.07, 1, 1))
     FIG.mkdir(parents=True, exist_ok=True)
     fig.savefig(FIG / "e17_delays.png", dpi=130)
     print("saved", FIG / "e17_delays.png")
