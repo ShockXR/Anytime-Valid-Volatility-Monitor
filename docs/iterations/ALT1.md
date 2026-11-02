@@ -1,0 +1,75 @@
+# Iteration notes: ALT1 (quarticity stream, pre-averaging)
+
+Two alternative prototypes, `alternatives/quarticity_stream/` (A3) and `alternatives/preaveraging/` (A1). One entry per substantial iteration, failed attempts included. Dates are UTC, 2 November 2026.
+
+## Iteration 1. Quarticity stream: design and the two derivations
+
+* **OBJECTIVE.** Run the betting e-detector on `min(r^4, tau^4)` and settle the null mean and the bet range before any experiment.
+* **PROBLEM IDENTIFIED.** The code of the main package is generic in the statistic, but two constants are not: the null mean `q0` and the upper bound for the decrease side. A tempting shortcut, `q0 = 3 m0^2` (the Gaussian plug-in from the variance baseline), is wrong because clipping removes a larger share of the fourth moment than of the second: 2.7% too high at `c = 3` with the scaled MAD, 21% too high with the raw MAD. The decrease bet must stay below `1 / (tau^4 / q0 - 1) = 0.037`, against 0.124 for the variance stream.
+* **HYPOTHESIS.** With the model-free `q0` (sample mean of `min(r^4, tau^4)` in the calibration window) and the bound `tau^4`, the proofs of `docs/math.md` section 5 carry over unchanged; the quarticity stream will be slower on pure variance changes and will see tail and vol-of-vol changes that the variance stream cannot.
+* **CHANGES IMPLEMENTED.** `qstream.py`: streams, `calibrate_streams`, `run_stream_detector`, `stream_shift` (numerical integration of clipped moments for any density), `shape_change_returns`, `QuarticityMonitor` (subclass of `VolatilityMonitor`). A bet grid with two extra small bets (0.005, 0.01) for both streams.
+* **EXPERIMENTS PERFORMED.** A theory pass with `stream_shift` before running anything: mean and signal-to-noise ratio of both streams under Student t, two-point mixtures and sd changes, at clipping levels 3, 4 and 5.
+* **RESULTS.** The theory pass overturned half the hypothesis before any simulation: at `c = 3` a variance-matched Student t lowers the truncated variance (0.73 for t3, 0.92 for t5) more than it raises the truncated quarticity (0.95 and 1.12), because clipping at 3 sd removes most of a fat tail. Mixtures (vol of vol) are the case where quarticity wins (1.14 to 1.45 against 0.96 to 0.99).
+* **IMPROVEMENTS.** The experiment plan was changed to test both directions on both streams for every alternative, and to include the clipping level in the theory table.
+* **REMAINING ISSUES.** The signal-to-noise ratio of shape changes is 0.03 to 0.10 per step, so detection will need thousands of steps.
+* **NEXT ITERATION.** Run Q1 to Q4.
+
+## Iteration 2. Quarticity stream: a horizon that made Q3 unreadable (failed attempt)
+
+* **OBJECTIVE.** Measure detection of variance-fixed shape changes over a long horizon.
+* **PROBLEM IDENTIFIED.** The first Q3 used `A = 7800` (the per-day budget of E4) with a 10,000-step horizon. Under the null the Shiryaev-Roberts run length is close to `A`, so about 55% of paths alarm within 10,000 steps with no change at all. Results like "variance stream, up, 50% detected, median delay 3952" were pure null behaviour and the table could not be read.
+* **HYPOTHESIS.** Raising `A` so that the null false alarm within the horizon is at most 5% (`A = horizon / 0.05`) makes "detected within the horizon" meaningful again, at the cost of a longer delay for real changes (about `log(400,000 / 7800) = 3.9` extra nats of growth).
+* **CHANGES IMPLEMENTED.** `A_Q3 = 400,000`, horizon 20,000 steps, a CLI to rerun parts (`python run_experiment.py q3 q4`), figure labels updated.
+* **EXPERIMENTS PERFORMED.** Q3 rerun, 9 alternatives, 200 paths, both streams, both sides.
+* **RESULTS.** Clean tables: pre-change false alarm share at most 1% in every cell. Student t: variance stream detects a decrease on 100%, 99.5%, 96.5%, 57.5% of paths (t3 to t8); quarticity stream's increase side on 6%, 57.5%, 71.5%, 75%. Mixtures: quarticity 82.5% to 99% (median delays 4915, 2678, 1033), variance stream increase side 2% to 8%.
+* **IMPROVEMENTS.** Recorded in `RESULTS.md` as a negative result and a design rule: a long-horizon detection experiment must set `A` from the horizon, not from the daily budget.
+* **REMAINING ISSUES.** None for the synthetic part.
+* **NEXT ITERATION.** Real data.
+
+## Iteration 3. Quarticity stream: real data and the "shape ratio" that measured truncation
+
+* **OBJECTIVE.** Run the quarticity monitor on Binance BTCUSDT and DOGEUSDT (July to December 2025) and say what its alarms coincide with.
+* **PROBLEM IDENTIFIED.** Two. (a) A "top alarm days" table was empty of information because each monitor recalibrates on 1440 minutes after an alarm, so no day has more than one alarm. (b) The planned shape diagnostic `q_ratio / var_ratio^2` (1 for a pure scale change with fixed shape) came out at 0.81 to 0.90 after up alarms and 1.17 to 1.38 after down alarms for *every* monitor, including the variance one and both bands. That is the mechanical effect of a fixed `tau`: when the variance rises, clipping removes a larger share of the fourth moment than of the second. It is not a shape change.
+* **HYPOTHESIS.** The quarticity alarms mostly coincide with variance alarms; the ones that do not are still level changes.
+* **CHANGES IMPLEMENTED.** Replaced the top-days table by alarms per month; added the distance to the nearest variance alarm, the share of alarms on the same UTC day as a variance alarm, and a split of the quarticity alarms into "near" and "far" (more than 4 hours from any variance alarm) with their post / baseline ratios; added a band of 0.5625 for the quarticity monitor (same variance tolerance as 0.25); checked the one dated event online and recorded the sources in `results/q4_real_event_check.csv`.
+* **EXPERIMENTS PERFORMED.** Q4 rerun with the new summaries.
+* **RESULTS.** Alarm rates 0.70 against 0.69 per day; 87% of quarticity alarms share a day with a variance alarm, 60% to 62% within an hour; the 34 to 35 far alarms per coin are followed by moves in the flagged direction 80% to 88% of the time with median variance ratios of 1.30 to 1.42 (up) and 0.66 to 0.85 (down). All monitors alarm at 15:28 to 15:31 UTC on 10 October 2025 (crypto crash after the US tariff announcement).
+* **IMPROVEMENTS.** The write-up states that no pure shape event was found and explains why the shape ratio cannot show one with a fixed `tau`.
+* **REMAINING ISSUES.** A real-data separation of level and shape would need a `tau` that tracks the level (rolling MAD) and a longer sample.
+* **NEXT ITERATION.** Pre-averaging prototype.
+
+## Iteration 4. Pre-averaging: derivation and estimator design
+
+* **OBJECTIVE.** Compose pre-averaging (Jacod et al. 2009) with MAD truncation and the local kernel estimate, with a correct noise correction for the fourth moment.
+* **PROBLEM IDENTIFIED.** Three. (a) The paper's noise model (eq. 13, noise on returns) cannot be handled by any estimator, so the price-noise model is used. (b) The local quarticity of a pre-averaged return estimates `(sigma^2 + c)^2`, not `sigma^4`, where `c = omega^2 psi1 / (psi2 k^2 delta)` is the noise term; the correction `Q = rbar^4 / (3 (k psi2 delta)^2) - 2 c V + c^2` is needed, and with truncation the two moments must be divided by `kappa_4` and `kappa_2` first. (c) A jump enters `k - 1` overlapping windows; clipping leaves `tau^4` in each, about 4% of the day's quarticity per jump at `k = 60`, while dropping leaves almost nothing.
+* **HYPOTHESIS.** The composed estimator is unbiased for IQ at every noise ratio; the plain truncated estimator is inflated by `(1 + 2 gamma^2)^2`; dropping beats clipping under jumps.
+* **CHANGES IMPLEMENTED.** `preavg.py` with weights, discrete `psi` constants, `preaverage` (overlapping or blocks), `noise_variance` (minus the first autocovariance of clipped returns), `truncation_factors` for clip and drop, `local_moments`, `preavg_estimates`, `raw_truncated_estimates`, spot-variance functions and `monitor_stream`.
+* **EXPERIMENTS PERFORMED.** A 100-path sanity run at `gamma` in `{0, 0.5, 2, 4}` with and without jumps before writing the experiment script.
+* **RESULTS.** Sanity run: raw IQ ratio 2.23, 81.5 and 1098 at `gamma = 0.5, 2, 4`; pre-averaged clip 0.99 to 1.01; without the noise correction 1.09 at `gamma = 4`; with 4 jumps per day clip 1.13 to 1.17, drop 0.98 to 1.01. The estimated `omega^2` was within 1.5% of the truth.
+* **IMPROVEMENTS.** The experiment script includes the "no noise correction" and "drop" variants and a window sensitivity.
+* **REMAINING ISSUES.** The spot variance from pre-averaged windows has few effective degrees of freedom over 300 seconds, so its median ratio sits below 1 (0.92) even when its mean is right; both are reported.
+* **NEXT ITERATION.** Monitor experiments.
+
+## Iteration 5. Pre-averaging: a test that compared two different scales (failed attempt)
+
+* **OBJECTIVE.** A unit test that the block stream keeps the false alarm bound.
+* **PROBLEM IDENTIFIED.** The test alarmed on 100% of paths within a few steps. The calibration path was simulated with `n = 60,000` and the monitored paths with `n = 6000`, both with daily volatility 1, so the per-step standard deviation of the calibration was `sqrt(10)` times smaller. The "increase" was real and the detector was right.
+* **HYPOTHESIS.** With the same per-step scale the bound holds.
+* **CHANGES IMPLEMENTED.** The calibration is ten paths of the monitored length joined end to end.
+* **EXPERIMENTS PERFORMED.** Test rerun.
+* **RESULTS.** 6 tests pass in about 2 seconds; the full suite from the repository root passes (117 tests).
+* **IMPROVEMENTS.** None beyond the fix.
+* **REMAINING ISSUES.** None.
+* **NEXT ITERATION.** Run the four experiments.
+
+## Iteration 6. Pre-averaging: results, and the block size as the monitor's real knob
+
+* **OBJECTIVE.** Answer the two questions of A1 with Q1 to Q4 and decide what version of the monitor to recommend at one-second sampling.
+* **PROBLEM IDENTIFIED.** The first run of Q3 and Q4 compared only the raw monitor, the overlapping pre-averaged monitor and blocks with `k = 60`. Two things were unexpected. (a) The raw-return monitor's one-day false alarm rate rose with noise: 5.0%, 8.5%, 18%, 31%, 41.5% at `gamma = 0, 0.5, 1, 2, 4`, against a 5% bound. The cause is the MA(1) structure of returns under price noise: `E[r_t^2 | past] = sigma^2 delta + omega^2 + E[u_{t-1}^2 | past]`, so the conditional mean exceeds the baseline after a large return; the unconditional mean is fine, the conditional one is not. The main report's E4 saw 3.7% at `gamma = 0.5` only because it looked at 390 steps. (b) The `k = 60` block monitor was valid at every noise level but 20 to 45 times slower than the raw monitor without noise (1319 s against 32 s for a doubling), because `theta = 0.4` is the estimation-optimal window, not the monitoring-optimal one. Also, a background watcher for the first run never exited because `pgrep -f` matched its own command line; the run had finished 15 minutes earlier and no result was affected.
+* **HYPOTHESIS.** Smaller blocks (`k = 20`, `k = 10`) keep the guarantee (blocks on disjoint prices are independent for any `k`) and recover most of the speed, as long as the noise term `12 gamma^2 / k^2` is corrected and not too large.
+* **CHANGES IMPLEMENTED.** Monitors parameterised by `(k, step)`; Q3 and Q4 rerun with blocks `k = 60, 20, 10`; the overlapping version excluded from the delay table because its delay is meaningless without false alarm control; README methodology updated.
+* **EXPERIMENTS PERFORMED.** Q3 (5 noise levels, 5 monitors, 2 sides) and Q4 (5 noise levels, 3 changes, 4 monitors), 200 paths each.
+* **RESULTS.** Blocks stay within the bound at every `k` and `gamma` (0% to 5.5%). Delays for a doubling with `k = 10`: 259, 269, 299, 359, 649 s at `gamma = 0` to 4, against 32, 43.5, 86.5, 449.5, 2907 s for raw returns, which are invalid from `gamma = 0.5`. The crossover where blocks are both valid and faster is at `gamma` of about 2. Estimation results (Q1) were unchanged by the rerun: raw truncated IQ follows `(1 + 2 gamma^2)^2`, pre-averaged drop is unbiased at every noise level with and without jumps, clipping after pre-averaging has a jump bias that grows with `k`.
+* **IMPROVEMENTS.** The recommendation in `RESULTS.md` is concrete: estimate `gamma` from the first autocovariance; below about 0.5 use raw returns, above it use pre-averaged blocks with `k = 10` to 20, drop rather than clip, and the noise correction.
+* **REMAINING ISSUES.** The MA(1) finding needs a line in `docs/math.md` section 5.6 (file not owned by ALT1; reported to the coordinator). The fourth-moment correction uses local Gaussianity; the exact pre-averaged quarticity of Jacod et al. (2009) would be the paper-grade version. No real one-second data was available to measure actual `gamma` values.
+* **NEXT ITERATION.** None planned within this task. A natural follow-up is a confidence-sequence baseline for the block monitor (A2) so that the estimated `m0` is covered too.
