@@ -55,6 +55,7 @@ Usage
   python experiments/e13_benchmarks.py online-change [part]   # Q13c, part 0 or 1 (two halves)
   python experiments/e13_benchmarks.py real-calib   # Gaussian thresholds for 1440- and 375-step days
   python experiments/e13_benchmarks.py real-crypto  # Q13d, five Binance coins
+  python experiments/e13_benchmarks.py real-crypto-h1-2025  # Q13d, the same coins, 1 Jan to 30 Jun 2025
   python experiments/e13_benchmarks.py real-nifty   # Q13d, Nifty 50
   python experiments/e13_benchmarks.py cost         # Q13e
   python experiments/e13_benchmarks.py figures      # tables and figures from the saved CSV files
@@ -642,6 +643,44 @@ def real_crypto():
     save_real("crypto", rows, rnd, matched, ev_rows)
 
 
+def real_crypto_h1_2025():
+    """Same as real_crypto on a second, earlier half-year (1 Jan to 30 Jun 2025), with the same frozen settings."""
+    from e06b_five_coins_monitor import COINS
+
+    from avmonitor.data import intraday_scale, load_binance
+
+    th = pd.read_csv(OUT / "e13d_real_thresholds.csv").set_index("day").loc[1440].to_dict()
+    prepared = {}
+    for c, sym in COINS.items():
+        df = load_binance(sym, "2024-01-01", "2025-07-01", download=False)
+        s = intraday_scale(df.logret, lookback_days=20)
+        u = (df.logret / s).to_numpy(copy=True)
+        u[~np.isfinite(u)] = np.nan
+        i0 = int(np.searchsorted(df.index, pd.Timestamp("2025-01-01", tz="UTC")))
+        prepared[c] = (df.index, u, i0)
+    lens = {c: prepared[c][1].size - prepared[c][2] for c in COINS}
+    assert len(set(lens.values())) == 1, lens
+    um = np.stack([prepared[c][1][prepared[c][2]:] for c in COINS])
+    prior = np.stack([trailing_robust_var(prepared[c][1], 1440)[prepared[c][2]:] for c in COINS])
+    t0 = time.time()
+    P, S, L = real_bocpd(um, prior, 1 / 28800.0, 1440, False)
+    _, St, Lt = real_bocpd(um, prior, 1 / 28800.0, 1440, True)
+    print(f"BOCPD batches: {time.time() - t0:.0f} s for {um.shape}", flush=True)
+    rows, rnd, matched, ev_rows = [], [], [], []
+    for j, c in enumerate(COINS):
+        idx, u, i0 = prepared[c]
+        events, mt, n_mon = run_real_series(c, u, i0, 1440, 28800.0, 1440, 1 / 28800.0, th, batch_P=(P[j], S[j], L[j]),
+                                            batch_T=(None, St[j], Lt[j]))
+        r1, r2 = summarise_real(c, u, i0, 1440, events, n_mon, 1500 + j)
+        rows += r1
+        rnd.append(r2)
+        matched += mt
+        for m, ev in events.items():
+            ev_rows += [dict(series=c, method=m, time=idx[t], direction=d) for t, d in ev]
+        print(f"done {c}", flush=True)
+    save_real("crypto_h1_2025", rows, rnd, matched, ev_rows)
+
+
 def real_nifty():
     from e07_nifty import deseasonalise, load_clean
 
@@ -700,7 +739,7 @@ def cost():
     k = K_ONLINE
     t = time.perf_counter()
     for i in range(2 * k, n):
-        C.bjv_overlap_statistics(r[None, i - 2 * k : i], k, TRUNC)
+        C.bjv_overlap_statistics(r[None, i - 2 * k : i + 1], k, TRUNC)
     rows.append(dict(method=f"BJV rolling, one window pair per step (k={k}, truncated)", steps=n - 2 * k, seconds=time.perf_counter() - t))
     t = time.perf_counter()
     C.bjv_online_statistic(r[None, :], k, TRUNC)
@@ -722,11 +761,12 @@ def cost():
 
 def pooled_real():
     parts = []
-    for tag in ("crypto", "nifty"):
+    labels = {"crypto": "five Binance coins", "crypto_h1_2025": "five Binance coins, Jan to Jun 2025", "nifty": "Nifty 50"}
+    for tag, lab in labels.items():
         p = OUT / f"e13d_real_{tag}_summary.csv"
         if p.exists():
             d = pd.read_csv(p)
-            d["market"] = "five Binance coins" if tag == "crypto" else "Nifty 50"
+            d["market"] = lab
             parts.append(d)
     df = pd.concat(parts, ignore_index=True)
     g = df.groupby(["market", "method"], sort=False).agg(
@@ -800,7 +840,7 @@ def figures():
         sub = nd[nd.method == m].set_index("scenario").reindex(scen)
         x = np.arange(len(scen)) + (i - (len(meths) - 1) / 2) * w
         ax.bar(x, sub.fa_one_day, width=w, color=COLORS[m], label=m)
-        ax.errorbar(x, sub.fa_one_day, yerr=[sub.fa_one_day - sub.fa_one_day_lo, sub.fa_one_day_hi - sub.fa_one_day],
+        ax.errorbar(x, sub.fa_one_day, yerr=np.clip([sub.fa_one_day - sub.fa_one_day_lo, sub.fa_one_day_hi - sub.fa_one_day], 0, None),
                     fmt="none", ecolor="#0b0b0b", elinewidth=0.6, capsize=1.5)
     ax.axhline(0.05, color="#0b0b0b", ls="--", lw=0.8)
     ax.text(len(scen) - 0.5, 0.06, "e-detector bound (5% per day)", ha="right", fontsize=8)
@@ -878,7 +918,8 @@ def figures():
                 x = i + (j - 2) * 0.16
                 v, lo, hi = r[f"{dn}_rate_forecast"], r[f"{dn}_forecast_lo"], r[f"{dn}_forecast_hi"]
                 ax.bar(x, v, width=0.15, color=c_, label=m if i == 0 else None)
-                ax.errorbar(x, v, yerr=[[v - lo], [hi - v]], fmt="none", ecolor="#0b0b0b", elinewidth=0.6, capsize=1.5)
+                ax.errorbar(x, v, yerr=np.clip([[v - lo], [hi - v]], 0, None), fmt="none", ecolor="#0b0b0b", elinewidth=0.6,
+                            capsize=1.5)
         ax.axhline(0.5, color="#9a9893", ls="--", lw=0.8)
         ax.set_xticks([0, 1])
         ax.set_xticklabels(["after up alarms:\nnext day above EWMA forecast", "after down alarms:\nnext day below EWMA forecast"],
@@ -909,6 +950,8 @@ def main():
         real_calib()
     elif cmd == "real-crypto":
         real_crypto()
+    elif cmd == "real-crypto-h1-2025":
+        real_crypto_h1_2025()
     elif cmd == "real-nifty":
         real_nifty()
     elif cmd == "cost":

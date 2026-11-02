@@ -1,0 +1,2 @@
+series,method,days,n_forecast,share_above_forecast,share_below_forecast,n_prev,share_above_prev,share_below_prev,lag1_autocorr,sessions
+Nifty 50,random times,494.0,3000,0.5026666666666667,0.49733333333333335,3000,0.4746666666666667,0.5253333333333333,0.012678778635917851,494

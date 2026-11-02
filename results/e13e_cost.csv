@@ -1,0 +1,7 @@
+method,steps,seconds,microseconds_per_step,machine
+"e-detector, VolatilityMonitor.update (two-sided, 11 bets)",20000,0.21660703800080228,10.830351900040114,"x86_64, Python 3.13.18, 4 cores shared with other jobs"
+"BOCPD, BOCPDVariance.update (run-length cap 256)",20000,6.001743897999404,300.0871948999702,"x86_64, Python 3.13.18, 4 cores shared with other jobs"
+"BOCPD, BOCPDVariance.update (run-length cap 512)",20000,6.33489844900032,316.744922450016,"x86_64, Python 3.13.18, 4 cores shared with other jobs"
+"BJV rolling, one window pair per step (k=120, truncated)",19760,4.174348866999935,211.2524730263125,"x86_64, Python 3.13.18, 4 cores shared with other jobs"
+"BJV rolling, vectorised over the whole series (k=120, truncated)",20000,0.5455988159992557,27.279940799962787,"x86_64, Python 3.13.18, 4 cores shared with other jobs"
+"BJV rolling, vectorised, plain (cumulative sums, k=120)",20000,0.003737646999070421,0.18688234995352104,"x86_64, Python 3.13.18, 4 cores shared with other jobs"
