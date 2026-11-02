@@ -480,6 +480,43 @@ def part_c2():
     return df
 
 
+FINAL_UP = (np.array([0.25, 0.5]), np.array([0.5, 0.5]))
+FINAL_DOWN_FRACTIONS = (np.array([0.9, 0.99]), np.array([0.5, 0.5]))
+
+
+def part_c3():
+    """Fresh-seed validation of the final recommendation (chosen after parts C and C2):
+    increase bets (0.25, 0.5) with equal weights; decrease bets 0.9 and 0.99 of the largest
+    admissible bet with equal weights. Delays with change at step 1 and at step 501 (E4 setting),
+    3000 paths, all three models, sd ratios inside the design ranges."""
+    rng = np.random.default_rng(SEED + 9)
+    rows = []
+    for nm, mdl in MODELS.items():
+        tau, m0 = G.baseline(mdl, 3.0)
+        lm = G.lam_max("down", tau**2 / m0)
+        for direction, rhos in (("up", (1.2, 1.25, 1.5, 1.75, 2.0)), ("down", (0.5, 0.6, 0.67, 0.8, 0.85))):
+            grid0, w0 = default_grid(direction, tau**2 / m0)
+            fin = FINAL_UP if direction == "up" else (FINAL_DOWN_FRACTIONS[0] * lm, FINAL_DOWN_FRACTIONS[1])
+            for rho in rhos:
+                law = G.y_law(mdl, rho, tau, m0)
+                lam_o, _ = G.best_bet(law, direction)
+                for nu in (0, 500):
+                    seed = int(rng.integers(1 << 31))
+                    d_or = mean_delay(mdl, rho, tau, m0, [lam_o], [1.0], direction, 3000, np.random.default_rng(seed), nu)
+                    d_def = mean_delay(mdl, rho, tau, m0, grid0, w0, direction, 3000, np.random.default_rng(seed), nu)
+                    d_fin = mean_delay(mdl, rho, tau, m0, fin[0], fin[1], direction, 3000, np.random.default_rng(seed), nu)
+                    rows.append(dict(scenario=nm, direction=direction, ratio=rho, nu=nu, oracle=d_or[0], default=d_def[0],
+                                     default_se=d_def[1], final=d_fin[0], final_se=d_fin[1],
+                                     default_over_oracle=d_def[0] / d_or[0], final_over_oracle=d_fin[0] / d_or[0],
+                                     final_over_default=d_fin[0] / d_def[0], false_alarm_default=d_def[3],
+                                     false_alarm_final=d_fin[3]))
+            print(nm, direction, "done", flush=True)
+    df = pd.DataFrame(rows)
+    df.to_csv(OUT / "e11c3_final_validation.csv", index=False)
+    print(df.round(3).to_string())
+    return df
+
+
 # ----------------------------------------------------------------------------
 # Part D: why the false alarm bound is conservative
 # ----------------------------------------------------------------------------
@@ -623,7 +660,210 @@ def part_d():
     return dec, dp, adv
 
 
-PARTS = {"A": part_a, "B": part_b, "C": part_c, "C2": part_c2, "D": part_d}
+def part_d2():
+    """Two-sided split and grid choice at one day (Gaussian null, true baseline, 40,000 paths)."""
+    model = MODELS["gaussian"]
+    tau, m0 = G.baseline(model, 3.0)
+    B = tau**2 / m0
+    lm = G.lam_max("down", B)
+    up, wu = default_grid("up", B)
+    dn, wd = default_grid("down", B)
+    designs = {
+        "default grids": ((up, wu), (dn, wd)),
+        "E11 recommended grids (up 0.25/0.5, down 0.9/0.99 x max)": (FINAL_UP, (FINAL_DOWN_FRACTIONS[0] * lm,
+                                                                                 FINAL_DOWN_FRACTIONS[1])),
+        "single bets (up 0.5, down 0.95 x max)": ((np.array([0.5]), np.array([1.0])),
+                                                  (np.array([0.95 * lm]), np.array([1.0]))),
+    }
+    rng = np.random.default_rng(SEED + 8)
+    rows = []
+    m = 390
+    y = G.sample_y(model, 1.0, tau, m0, (40000, m), rng)
+    for name, ((gu, wu_), (gd, wd_)) in designs.items():
+        res = {}
+        for thr_name, thr in (("A", A), ("2A", 2 * A)):
+            res[("up", thr_name)] = G.run_mixture(y, gu, wu_, "up", thr)["alarm"]
+            res[("down", thr_name)] = G.run_mixture(y, gd, wd_, "down", thr)["alarm"]
+        a_up, a_dn = res[("up", "2A")], res[("down", "2A")]
+        two = np.where((a_up >= 0) | (a_dn >= 0), 1, 0)
+        rows.append(dict(design=name, horizon=m, bound_total=m / A,
+                         up_at_A=float(np.mean(res[("up", "A")] >= 0)), down_at_A=float(np.mean(res[("down", "A")] >= 0)),
+                         up_at_2A=float(np.mean(a_up >= 0)), down_at_2A=float(np.mean(a_dn >= 0)),
+                         both_at_2A=float(np.mean((a_up >= 0) & (a_dn >= 0))), two_sided=float(two.mean()),
+                         paths=y.shape[0]))
+    df = pd.DataFrame(rows)
+    df["two_sided_over_bound"] = df.two_sided / df.bound_total
+    df.to_csv(OUT / "e11d_two_sided_split.csv", index=False)
+    print(df.round(4).to_string())
+    return df
+
+
+# ----------------------------------------------------------------------------
+# Part E: first-order optimality as A grows (tracker B73)
+# ----------------------------------------------------------------------------
+
+A_LIST = 10.0 ** np.arange(2, 9)
+
+
+def first_passages(y, grid, weights, direction, thresholds):
+    """First index at which the SR mixture reaches each threshold (one run, all thresholds), -1 if never."""
+    reps, n = y.shape
+    grid = np.asarray(grid, float)
+    weights = np.asarray(weights, float)
+    sign = 1.0 if direction == "up" else -1.0
+    thresholds = np.asarray(thresholds, float)
+    S = np.zeros((reps, len(grid)))
+    out = np.full((reps, len(thresholds)), -1)
+    active = np.ones(reps, bool)
+    for t in range(n):
+        idx = np.flatnonzero(active)
+        if idx.size == 0:
+            break
+        f = 1.0 + grid[None, :] * (sign * (y[idx, t] - 1.0))[:, None]
+        S[idx] = f * (S[idx] + 1.0)
+        M = S[idx] @ weights
+        newly = (M[:, None] >= thresholds[None, :]) & (out[idx] < 0)
+        rows, cols = np.nonzero(newly)
+        out[idx[rows], cols] = t
+        active[idx[out[idx, -1] >= 0]] = False
+    return out
+
+
+def part_e():
+    rng = np.random.default_rng(SEED + 10)
+    models = {"gaussian": MODELS["gaussian"], "student t3": G.ReturnModel("student_t", df=3.0), "jumps": MODELS["jumps"]}
+    cells = [("up", 1.25), ("up", 1.5), ("up", 2.0), ("down", 0.5), ("down", 0.8)]
+    rows = []
+    for nm, mdl in models.items():
+        tau, m0 = G.baseline(mdl, 3.0)
+        B = tau**2 / m0
+        lm = G.lam_max("down", B)
+        for direction, rho in cells:
+            law = G.y_law(mdl, rho, tau, m0)
+            lam_o, kl_inf = G.best_bet(law, direction)
+            kl = G.kl_truncated(mdl, rho, np.inf)
+            grid0, w0 = default_grid(direction, B)
+            cap = 0.95 if direction == "up" else 0.99 * lm
+            cont = (np.arange(100) + 0.5) / 100 * cap  # fine uniform grid: a discretised continuous mixture
+            dets = {"oracle bet": ([lam_o], [1.0]), "default grid": (grid0, w0),
+                    "continuous mixture (100 bets, uniform on (0, cap))": (cont, np.full(100, 0.01)),
+                    "recommended grid": FINAL_UP if direction == "up" else (FINAL_DOWN_FRACTIONS[0] * lm,
+                                                                           FINAL_DOWN_FRACTIONS[1])}
+            g_grid = float(G.growth_rate(grid0, law, direction).max())
+            horizon = int(min(6000, 2.5 * np.log(A_LIST[-1]) / (0.8 * g_grid) + 50))
+            y = G.sample_y(mdl, rho, tau, m0, (1000, horizon), rng)
+            for det, (gr, w) in dets.items():
+                fp = first_passages(y, gr, w, direction, A_LIST)
+                g_det = float(G.growth_rate(np.asarray(gr), law, direction).max())
+                for i, a_ in enumerate(A_LIST):
+                    d = fp[:, i][fp[:, i] >= 0] + 1.0
+                    rows.append(dict(scenario=nm, direction=direction, ratio=rho, detector=det, A=a_,
+                                     mean_delay=d.mean(), se=d.std(ddof=1) / np.sqrt(d.size), missing=float(np.mean(fp[:, i] < 0)),
+                                     kl_inf=kl_inf, kl=kl, lam_oracle=lam_o, growth_detector=g_det,
+                                     lower_bound_first_order=np.log(a_) / kl_inf,
+                                     delay_over_bound=d.mean() / (np.log(a_) / kl_inf),
+                                     limit_fixed_grid=kl_inf / g_det, kl_inf_over_kl=kl_inf / kl))
+            print(nm, direction, rho, "done", flush=True)
+    df = pd.DataFrame(rows)
+    df.to_csv(OUT / "e11e_asymptotic_optimality.csv", index=False)
+    piv = df.pivot_table(index=["scenario", "direction", "ratio", "detector"], columns="A", values="delay_over_bound").round(3)
+    print(piv.to_string())
+    return df
+
+
+# ----------------------------------------------------------------------------
+# Figures (from the CSV files written by parts A, B and D)
+# ----------------------------------------------------------------------------
+
+SERIES = ["#2a78d6", "#eb6834", "#1baf7a", "#eda100"]  # validated categorical slots 1 to 4
+INK, MUTED, GRIDC = "#0b0b0b", "#52514e", "#e4e3df"
+
+
+def _style(ax):
+    ax.grid(True, color=GRIDC, lw=0.6)
+    ax.set_axisbelow(True)
+    for sp in ("top", "right"):
+        ax.spines[sp].set_visible(False)
+    for sp in ("left", "bottom"):
+        ax.spines[sp].set_color(MUTED)
+    ax.tick_params(colors=MUTED, labelsize=8)
+
+
+def part_fig():
+    import matplotlib
+
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    FIG.mkdir(exist_ok=True)
+    # 1. prediction quality
+    a = pd.read_csv(OUT / "e11a_delay.csv")
+    fig, ax = plt.subplots(figsize=(7.2, 4.2))
+    specs = [("first order log(A)/g, grid", a.pred_first_order_grid / a.sim_nu0_grid_mean, a.sim_nu0_grid_mean, "o"),
+             ("Wald bound (proved), grid", a.pred_wald_bound_grid / a.sim_nu0_grid_mean, a.sim_nu0_grid_mean, "s"),
+             ("second order, single best bet", a.pred_second_order_oracle / a.sim_nu0_oracle_mean, a.sim_nu0_oracle_mean, "D")]
+    for (lab, ratio, x, mk), col in zip(specs, SERIES):
+        ax.scatter(x, ratio, s=28, marker=mk, color=col, edgecolor="white", linewidth=0.8, label=lab, zorder=3)
+    ax.axhline(1.0, color=INK, lw=1)
+    ax.set_xscale("log")
+    ax.set_xlabel("simulated mean delay (steps, change at the first monitored step)", color=INK, fontsize=9)
+    ax.set_ylabel("predicted / simulated delay", color=INK, fontsize=9)
+    ax.set_title("E11a: the first-order delay misses the Shiryaev-Roberts memory term (synthetic, A = 7800)",
+                 fontsize=9.5, color=INK, loc="left")
+    _style(ax)
+    ax.legend(fontsize=8, frameon=False, loc="upper left")
+    fig.tight_layout()
+    fig.savefig(FIG / "e11_delay_predictions.png", dpi=140)
+    plt.close(fig)
+
+    # 2. price of robustness against c
+    c = pd.read_csv(OUT / "e11b_c_curve.csv")
+    c = c[np.isfinite(c.c) & (c.scenario == "gaussian")]
+    fig, axes = plt.subplots(1, 2, figsize=(9.6, 3.8), sharey=True)
+    for ax, direction, ratios, title in ((axes[0], "up", (1.25, 1.5, 2.0), "Increases (sd ratio)"),
+                                          (axes[1], "down", (0.5, 0.67, 0.8, 0.9), "Decreases (sd ratio)")):
+        for rho, col in zip(ratios, SERIES):
+            s_ = c[(c.direction == direction) & np.isclose(c.ratio, rho)].sort_values("c")
+            ax.plot(s_.c, s_.eff_grid, color=col, lw=2, label=f"{rho:g}")
+        ax.set_xlabel("truncation constant c (tau = c x scaled MAD)", color=INK, fontsize=9)
+        ax.set_title(title, fontsize=9.5, color=INK, loc="left")
+        ax.set_ylim(0, 1.02)
+        _style(ax)
+        ax.legend(fontsize=8, frameon=False, title="sd ratio", title_fontsize=8)
+    axes[0].set_ylabel("efficiency g_grid / KL (Gaussian LR = 1)", color=INK, fontsize=9)
+    fig.suptitle("E11b: growth of the robust detector relative to the Gaussian likelihood ratio, clean Gaussian data",
+                 fontsize=9.5, color=INK, x=0.01, ha="left")
+    fig.tight_layout()
+    fig.savefig(FIG / "e11_price_of_robustness.png", dpi=140)
+    plt.close(fig)
+
+    # 3. slack in the false alarm bound
+    d = pd.read_csv(OUT / "e11d_decomposition.csv")
+    dp = pd.read_csv(OUT / "e11d_worst_case_dp.csv")
+    fig, ax = plt.subplots(figsize=(7.2, 4.2))
+    for (lab, sub), col in zip((("two-sided default grids, Gaussian null (E9)", d[d.detector == "two-sided default grids (E9)"]),
+                                ("increase side, default grid, Gaussian null", d[d.detector == "increase side only, default grid"]),
+                                ("increase side, single bet 0.5, Gaussian null", d[d.detector == "increase side only, single bet 0.5"])),
+                               SERIES):
+        ax.plot(sub.horizon, sub.rate_over_bound, color=col, lw=2, marker="o", ms=5, label=lab)
+    w = dp[(dp.direction == "up") & np.isclose(dp.lam, 0.5)]
+    ax.plot(list(w.horizon) + [A], list(w.lower_over_bound) + [1.0], color=SERIES[3], lw=2, ls="--", marker="s", ms=5,
+            label="single bet 0.5, worst null (DP lower bound; exact at m = A)")
+    ax.axhline(1.0, color=INK, lw=1)
+    ax.set_xscale("log")
+    ax.set_ylim(0, 1.05)
+    ax.set_xlabel("horizon m (steps)", color=INK, fontsize=9)
+    ax.set_ylabel("P(false alarm within m) / (m / A)", color=INK, fontsize=9)
+    ax.set_title("E11d: the bound m/A is nearly attained by an adversarial null, not by Gaussian data",
+                 fontsize=9.5, color=INK, loc="left")
+    _style(ax)
+    ax.legend(fontsize=7.5, frameon=False, loc="lower right")
+    fig.tight_layout()
+    fig.savefig(FIG / "e11_false_alarm_slack.png", dpi=140)
+    plt.close(fig)
+
+
+PARTS = {"A": part_a, "B": part_b, "C": part_c, "C2": part_c2, "C3": part_c3, "D": part_d, "D2": part_d2, "E": part_e, "FIG": part_fig}
 
 if __name__ == "__main__":
     which = sys.argv[1:] or list(PARTS)
