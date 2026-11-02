@@ -279,6 +279,7 @@ def _offline_table(rows, stats_, crit, fname):
         lo, hi = wilson(int(np.sum(v > cm)), v.size)
         row["reject_matched_lo"], row["reject_matched_hi"] = lo, hi
     df = pd.DataFrame(rows)
+    df["kind"] = df.kind.replace({"null": "no change"})  # "null" would be read back as a missing value by pandas
     df.to_csv(OUT / fname, index=False)
     pd.set_option("display.width", 250)
     if (df.kind == "change").any():
@@ -294,17 +295,29 @@ def _offline_table(rows, stats_, crit, fname):
 # ----------------------------------------------------------------------------
 
 ONLINE_METHODS = ("e-detector, plug-in", "e-detector, CS baseline", "BOCPD, matched", "BOCPD, p >= 0.5",
-                  "BJV rolling, matched", "BJV rolling, nominal 5% per day", "BJV rolling, studentised, matched")
+                  "BJV rolling, matched", "BJV rolling, nominal 5% per day", "BJV rolling, studentised, matched",
+                  "BOCPD on truncated returns, matched")
+
+
+def clip_by_calibration(r_full, cal_len, c=3.0):
+    """Clip every return at tau = c x scaled MAD of the calibration window (the e-detector's truncation)."""
+    cal = r_full[:, :cal_len]
+    tau = c * np.median(np.abs(cal), axis=1, keepdims=True) * MAD_NORMAL_SCALE
+    return np.clip(r_full, -tau, tau)
 
 
 def online_paths(r_full, cal_len):
     """Streams for the online competitors on paths r_full = [calibration | monitored]."""
     cal, mon = r_full[:, :cal_len], r_full[:, cal_len:]
     _, S, L = C.bocpd_paths(mon, H_SIM, cal=cal, alpha0=ALPHA0, r_max=R_MAX, short=W_SHORT, return_log_odds=True)
+    # Our modification, not in Adams and MacKay: BOCPD on returns clipped at the e-detector's truncation level
+    rc = clip_by_calibration(r_full, cal_len)
+    _, St, Lt = C.bocpd_paths(rc[:, cal_len:], H_SIM, cal=rc[:, :cal_len], alpha0=ALPHA0, r_max=R_MAX, short=W_SHORT,
+                              return_log_odds=True)
     hist = r_full[:, cal_len - 2 * K_ONLINE :]
     Dz = C.bjv_online_statistic(hist, K_ONLINE, TRUNC)[:, 2 * K_ONLINE :]
     De = C.bjv_online_statistic(hist, K_ONLINE, TRUNC, norm="empirical")[:, 2 * K_ONLINE :]
-    return L, S, Dz, De
+    return L, S, Dz, De, Lt, St
 
 
 def online_calib_job(args):
@@ -315,9 +328,12 @@ def online_calib_job(args):
     fa = float(np.mean(a >= 0))
     _, _, L = C.bocpd_paths(r[:, cal_len:], hazard, cal=r[:, :cal_len], alpha0=ALPHA0, r_max=R_MAX, short=W_SHORT,
                             return_log_odds=True)
+    rc = clip_by_calibration(r, cal_len)
+    _, _, Lt = C.bocpd_paths(rc[:, cal_len:], hazard, cal=rc[:, :cal_len], alpha0=ALPHA0, r_max=R_MAX, short=W_SHORT,
+                             return_log_odds=True)
     Dz = C.bjv_online_statistic(r[:, cal_len - 2 * k :], k, TRUNC)[:, 2 * k :]
     De = C.bjv_online_statistic(r[:, cal_len - 2 * k :], k, TRUNC, norm="empirical")[:, 2 * k :]
-    return fa, L.max(1), np.nanmax(np.abs(Dz), axis=1), np.nanmax(np.abs(De), axis=1)
+    return fa, L.max(1), np.nanmax(np.abs(Dz), axis=1), np.nanmax(np.abs(De), axis=1), Lt.max(1)
 
 
 def matched_thresholds(day, a_level, cal_len, k, hazard, reps, seed):
@@ -330,9 +346,11 @@ def matched_thresholds(day, a_level, cal_len, k, hazard, reps, seed):
     pm = np.concatenate([p[1] for p in parts])
     dm = np.concatenate([p[2] for p in parts])
     em = np.concatenate([p[3] for p in parts])
+    tm = np.concatenate([p[4] for p in parts])
     return dict(day=day, A=a_level, cal_len=cal_len, k=k, hazard=hazard, paths=reps, edetector_fa_per_day=fa,
                 bocpd_threshold_log_odds=float(np.quantile(pm, 1 - fa)), bjv_threshold=float(np.quantile(dm, 1 - fa)),
                 bjv_studentised_threshold=float(np.quantile(em, 1 - fa)),
+                bocpd_truncated_threshold_log_odds=float(np.quantile(tm, 1 - fa)),
                 bjv_nominal=C.mosum_crit(day, k, 0.05))
 
 
@@ -342,11 +360,12 @@ def online_alarms(r_full, th):
     out = {}
     out["e-detector, plug-in"] = edet_alarm(mon, cal, A)
     out["e-detector, CS baseline"] = edet_alarm(mon, cal, A, baseline="cs")
-    L, S, Dz, De = online_paths(r_full, CAL)
+    L, S, Dz, De, Lt, St = online_paths(r_full, CAL)
     rows = np.arange(r_full.shape[0])
-    for name, h in (("BOCPD, matched", th["bocpd_threshold_log_odds"]), ("BOCPD, p >= 0.5", 0.0)):
-        a = C.first_crossing(L, h)
-        out[name] = (a, np.where(a >= 0, S[rows, np.maximum(a, 0)], 0.0))
+    for name, h, LL, SS in (("BOCPD, matched", th["bocpd_threshold_log_odds"], L, S), ("BOCPD, p >= 0.5", 0.0, L, S),
+                            ("BOCPD on truncated returns, matched", th["bocpd_truncated_threshold_log_odds"], Lt, St)):
+        a = C.first_crossing(LL, h)
+        out[name] = (a, np.where(a >= 0, SS[rows, np.maximum(a, 0)], 0.0))
     for name, h, Z in (("BJV rolling, matched", th["bjv_threshold"], Dz),
                        ("BJV rolling, nominal 5% per day", th["bjv_nominal"], Dz),
                        ("BJV rolling, studentised, matched", th["bjv_studentised_threshold"], De)):
@@ -510,7 +529,22 @@ def trailing_robust_var(u, day):
     return out
 
 
-def run_real_series(label, u, i0, day, a_level, cal_len, hazard, th, bands=(0.0, 0.25), batch_P=None):
+def real_bocpd(um, prior, hazard, cal_len, truncated):
+    """BOCPD on (rows of) monitored real returns um; prior: predictable prior variance per step (same shape).
+
+    ``truncated=True`` clips each return at 3 times the square root of that predictable robust variance
+    (the e-detector's truncation level, computed from the previous day instead of a calibration window).
+    """
+    x = np.clip(um, -3 * np.sqrt(prior), 3 * np.sqrt(prior)) if truncated else um
+    x = np.where(np.isfinite(um), x, np.nan)
+    if truncated:  # the first day has no trailing prior yet: use the calibration window's own robust scale
+        sc = np.nanmedian(np.abs(um[:, :cal_len]), axis=1, keepdims=True) * MAD_NORMAL_SCALE
+        x[:, :cal_len] = np.clip(um[:, :cal_len], -3 * sc, 3 * sc)
+    return C.bocpd_paths(x, hazard, cal=x[:, :cal_len], alpha0=ALPHA0, r_max=R_MAX, short=W_SHORT, prior_var_path=prior,
+                         return_log_odds=True)
+
+
+def run_real_series(label, u, i0, day, a_level, cal_len, hazard, th, bands=(0.0, 0.25), batch_P=None, batch_T=None):
     """All methods on one deseasonalised series u; monitoring starts at i0 (calibration first, as in E6b)."""
     from avmonitor.monitor import VolatilityMonitor
 
@@ -524,14 +558,15 @@ def run_real_series(label, u, i0, day, a_level, cal_len, hazard, th, bands=(0.0,
         events[f"e-detector, band {b}"] = [(e.index, e.direction) for e in ev]
     Dz = C.bjv_online_statistic(um[None, :], K_ONLINE, TRUNC)[0]
     De = C.bjv_online_statistic(um[None, :], K_ONLINE, TRUNC, norm="empirical")[0]
+    prior = trailing_robust_var(u, day)[i0:]
     if batch_P is None:
-        prior = trailing_robust_var(u, day)[i0:]
-        cal = um[:cal_len]
-        P, S, L = C.bocpd_paths(um[None, :], hazard, cal=cal[None, :], alpha0=ALPHA0, r_max=R_MAX, short=W_SHORT,
-                                prior_var_path=prior[None, :], return_log_odds=True)
-        P, S, L = P[0], S[0], L[0]
+        P, S, L = (a[0] for a in real_bocpd(um[None, :], prior[None, :], hazard, cal_len, False))
     else:
         P, S, L = batch_P
+    if batch_T is None:
+        _, St, Lt = (a[0] for a in real_bocpd(um[None, :], prior[None, :], hazard, cal_len, True))
+    else:
+        _, St, Lt = batch_T
     hb = th["bocpd_threshold_log_odds"]
     events["BOCPD, Gaussian-matched"] = C.scan_alarms(np.where(S > 0, L, -np.inf), np.where(S < 0, L, -np.inf), hb, hb,
                                                       start, dead)
@@ -539,15 +574,20 @@ def run_real_series(label, u, i0, day, a_level, cal_len, hazard, th, bands=(0.0,
     events["BJV rolling, nominal 5% per day"] = C.scan_alarms(Dz, -Dz, th["bjv_nominal"], th["bjv_nominal"], start, dead)
     he = th["bjv_studentised_threshold"]
     events["BJV rolling, studentised, Gaussian-matched"] = C.scan_alarms(De, -De, he, he, start, dead)
+    ht = th["bocpd_truncated_threshold_log_odds"]
+    events["BOCPD on truncated returns, Gaussian-matched"] = C.scan_alarms(np.where(St > 0, Lt, -np.inf),
+                                                                           np.where(St < 0, Lt, -np.inf), ht, ht, start, dead)
     matched = []
     for b in bands:
         ref = events[f"e-detector, band {b}"]
         nu_ = sum(1 for e in ref if e[1] == "up")
         nd_ = len(ref) - nu_
-        Lu, Ld = np.where(S > 0, L, -np.inf), np.where(S < 0, L, -np.inf)
-        hu, hd = C.match_alarm_counts(Lu, Ld, nu_, nd_, start, dead, lo_hi=(-50.0, 1000.0), iters=50)
-        events[f"BOCPD, matched to band {b}"] = C.scan_alarms(Lu, Ld, hu, hd, start, dead)
-        matched.append(dict(series=label, band=b, method="BOCPD (log-odds)", h_up=hu, h_down=hd, target_up=nu_, target_down=nd_))
+        for nm, LL, SS in (("BOCPD", L, S), ("BOCPD on truncated returns", Lt, St)):
+            Lu, Ld = np.where(SS > 0, LL, -np.inf), np.where(SS < 0, LL, -np.inf)
+            hu, hd = C.match_alarm_counts(Lu, Ld, nu_, nd_, start, dead, lo_hi=(-50.0, 1000.0), iters=50)
+            events[f"{nm}, matched to band {b}"] = C.scan_alarms(Lu, Ld, hu, hd, start, dead)
+            matched.append(dict(series=label, band=b, method=f"{nm} (log-odds)", h_up=hu, h_down=hd, target_up=nu_,
+                                target_down=nd_))
         for nm, Z in (("BJV rolling", Dz), ("BJV rolling, studentised", De)):
             hu, hd = C.match_alarm_counts(Z, -Z, nu_, nd_, start, dead, lo_hi=(0.0, 1000.0), iters=50)
             events[f"{nm}, matched to band {b}"] = C.scan_alarms(Z, -Z, hu, hd, start, dead)
@@ -580,13 +620,15 @@ def real_crypto():
     um = np.stack([prepared[c][1][prepared[c][2]:] for c in COINS])
     prior = np.stack([trailing_robust_var(prepared[c][1], 1440)[prepared[c][2]:] for c in COINS])
     t0 = time.time()
-    P, S, L = C.bocpd_paths(um, 1 / 28800.0, cal=um[:, :1440], alpha0=ALPHA0, r_max=R_MAX, short=W_SHORT,
-                            prior_var_path=prior, return_log_odds=True)
+    P, S, L = real_bocpd(um, prior, 1 / 28800.0, 1440, False)
     print(f"BOCPD batch: {time.time() - t0:.0f} s for {um.shape}", flush=True)
+    _, St, Lt = real_bocpd(um, prior, 1 / 28800.0, 1440, True)
+    print(f"BOCPD on truncated returns, batch: {time.time() - t0:.0f} s", flush=True)
     rows, rnd, matched, ev_rows = [], [], [], []
     for j, c in enumerate(COINS):
         idx, u, i0 = prepared[c]
-        events, mt, n_mon = run_real_series(c, u, i0, 1440, 28800.0, 1440, 1 / 28800.0, th, batch_P=(P[j], S[j], L[j]))
+        events, mt, n_mon = run_real_series(c, u, i0, 1440, 28800.0, 1440, 1 / 28800.0, th, batch_P=(P[j], S[j], L[j]),
+                                            batch_T=(None, St[j], Lt[j]))
         r1, r2 = summarise_real(c, u, i0, 1440, events, n_mon, 1300 + j)
         rows += r1
         rnd.append(r2)
@@ -733,7 +775,7 @@ def pooled_real():
 
 COLORS = {"e-detector, plug-in": "#2a78d6", "e-detector, CS baseline": "#1baf7a", "BOCPD, matched": "#eb6834",
           "BOCPD, p >= 0.5": "#f2a477", "BJV rolling, matched": "#7a52c7", "BJV rolling, nominal 5% per day": "#b9a3e3",
-          "BJV rolling, studentised, matched": "#c43c8a"}
+          "BJV rolling, studentised, matched": "#c43c8a", "BOCPD on truncated returns, matched": "#a83c0c"}
 
 
 def _style(ax):
@@ -823,9 +865,9 @@ def figures():
 
     g = pooled_real()
     fig, axes = plt.subplots(1, 2, figsize=(12, 4.2), sharey=True)
-    show = ["e-detector, band 0.25", "BOCPD, matched to band 0.25", "BJV rolling, matched to band 0.25",
-            "e-detector, band 0.0", "BOCPD, matched to band 0.0", "BJV rolling, matched to band 0.0"]
-    cols = ["#2a78d6", "#eb6834", "#7a52c7", "#8fb8ea", "#f2a477", "#b9a3e3"]
+    show = ["e-detector, band 0.25", "BOCPD, matched to band 0.25", "BOCPD on truncated returns, matched to band 0.25",
+            "BJV rolling, matched to band 0.25", "BJV rolling, studentised, matched to band 0.25"]
+    cols = ["#2a78d6", "#eb6834", "#a83c0c", "#7a52c7", "#c43c8a"]
     for ax, mk in zip(axes, ("five Binance coins", "Nifty 50")):
         gm = g[g.market == mk].set_index("method")
         for i, dn in enumerate(("up", "down")):
@@ -833,13 +875,14 @@ def figures():
                 if m not in gm.index:
                     continue
                 r = gm.loc[m]
-                x = i + (j - 2.5) * 0.13
+                x = i + (j - 2) * 0.16
                 v, lo, hi = r[f"{dn}_rate_forecast"], r[f"{dn}_forecast_lo"], r[f"{dn}_forecast_hi"]
-                ax.bar(x, v, width=0.12, color=c_, label=m if i == 0 else None)
+                ax.bar(x, v, width=0.15, color=c_, label=m if i == 0 else None)
                 ax.errorbar(x, v, yerr=[[v - lo], [hi - v]], fmt="none", ecolor="#0b0b0b", elinewidth=0.6, capsize=1.5)
         ax.axhline(0.5, color="#9a9893", ls="--", lw=0.8)
         ax.set_xticks([0, 1])
-        ax.set_xticklabels(["after up alarms:\nnext day above EWMA forecast", "after down alarms:\nnext day below EWMA forecast"], fontsize=8)
+        ax.set_xticklabels(["after up alarms:\nnext day above EWMA forecast", "after down alarms:\nnext day below EWMA forecast"],
+                           fontsize=8)
         ax.set_title(f"{mk} [REAL]", fontsize=9, loc="left")
         ax.set_ylim(0, 1)
         _style(ax)
