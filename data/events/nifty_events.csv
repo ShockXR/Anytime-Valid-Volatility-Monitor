@@ -1,0 +1,57 @@
+date,event_type,description,source_url,verification
+2018-02-01,budget,Union Budget 2018-19 (Arun Jaitley),https://cleartax.in/s/budget-day-market-movement-history-in-india,web search 2026-11-02: budget-day market history lists 1 Feb 2018
+2019-02-01,budget,Interim Budget 2019-20 (Piyush Goyal),https://www.businesstoday.in/amp/union-budget/story/interim-budget-2024-what-major-announcements-were-made-in-last-interim-budget-2019-check-details-415031-2024-01-27,web search 2026-11-02
+2019-07-05,budget,Union Budget 2019-20 (Nirmala Sitharaman; first budget after the 2019 election),https://news.cleartax.in/budget-session-2019-20-announced-5th-july/2003/amp,web search 2026-11-02
+2020-02-01,budget,Union Budget 2020-21 (Saturday; exchanges open for a special session),https://www.boomlive.in/budget-news/budget-2020-bse-to-remain-open-for-trade-on-budget-day-6629,web search 2026-11-02
+2021-02-01,budget,Union Budget 2021-22,https://cleartax.in/s/budget-day-market-movement-history-in-india,web search 2026-11-02: Nifty up 646.60 points to 14281.20 on 1 Feb 2021
+2022-02-01,budget,Union Budget 2022-23,https://www.business-standard.com/amp/article/news-cm/sensex-rises-850-pts-ahead-of-union-budget-announcement-122020100434_1.html,web search 2026-11-02
+2023-02-01,budget,Union Budget 2023-24,https://www.business-standard.com/amp/article/news-cm/sensex-nifty-at-the-high-point-of-the-day-ahead-of-the-union-budget-123020100372_1.html,web search 2026-11-02
+2024-02-01,budget,Interim Budget 2024-25 (presented 11:00 IST),https://eparlib.sansad.in/bitstream/123456789/2976558/1/8009_ls_b2_17_02022024.pdf,web search 2026-11-02: Lok Sabha record gives 1.2.2024 at 11.00 A.M.
+2024-07-23,budget,Union Budget 2024-25 (full budget after the 2024 election),https://www.tribuneindia.com/news/india/nirmala-to-table-record-seventh-budget-on-july-23-637371,web search 2026-11-02
+2025-02-01,budget,Union Budget 2025-26 (Saturday special live session),https://www.newsonair.gov.in/special-budget-session-2025-sensex-ends-flat-nifty-closes-marginally-down,web search 2026-11-02
+2026-02-01,budget,Union Budget 2026-27 (Sunday special live session),https://www.swastika.co.in/big-budget-day/budget-2026-special-trading-session-what-investors-must-know-about-the-rare-sunday-market,web search 2026-11-02; market fall on the day also reported at https://www.dnaindia.com/business/report-why-markets-fell-after-the-budget-sensex-down-1000-points-nifty-slips-3198918
+2017-04-06,rbi_policy,RBI MPC first bi-monthly statement 2017-18 (repo unchanged at 6.25%),https://www.gktoday.in/current-affairs/rbi-repo-rate-unchanged-monetary-policy-review-2017-18,web search 2026-11-02
+2017-08-02,rbi_policy,RBI MPC (repo cut 25 bp to 6%),https://www.businesstoday.in/amp/latest/policy/story/rbi-monetary-policy-urjit-patel-repo-rate-inflation-data-84875-2017-08-02,web search 2026-11-02
+2017-10-04,rbi_policy,RBI MPC (repo unchanged at 6%),https://www.business-standard.com/amp/article/finance/rbi-monetary-policy-repo-rate-kept-unchanged-at-6-117100400546_1.html,web search 2026-11-02
+2017-12-06,rbi_policy,RBI MPC (repo unchanged at 6%),https://www.businesstoday.in/amp/latest/economy-politics/story/reserve-bank-of-india-monetary-policy-rbi-governor-urjit-patel-repo-rate-unchanged-6-percent-88499-2017-12-06,web search 2026-11-02
+2018-04-05,rbi_policy,RBI MPC (meeting 4 to 5 April; repo unchanged),https://www.business-standard.com/amp/article/finance/urjit-patel-most-mpc-members-signal-shift-to-hawkish-stance-rbi-minutes-118041900933_1.html,web search 2026-11-02: decision announced on the last day of the 4 to 5 April meeting
+2018-06-06,rbi_policy,RBI MPC (repo raised 25 bp to 6.25%),https://fibre2fashion.com/news/textile-news/rbi-increases-repo-rate-by-25-bps-to-6-25--242609-newsdetails.htm?amp=true,web search 2026-11-02
+2018-08-01,rbi_policy,RBI MPC (repo raised 25 bp to 6.5%),https://moneylife.in/article/rbi-hikes-repo-rate-by-25-basis-points-to-65-percentage/54866.html,web search 2026-11-02
+2018-10-05,rbi_policy,RBI MPC (repo unchanged at 6.5%; stance to calibrated tightening),https://www.business-standard.com/amp/article/finance/monetary-policy-rbi-keeps-repo-rate-unchanged-at-6-50-rupee-plunges-top-highlights-118100500496_1.html,web search 2026-11-02
+2018-12-05,rbi_policy,RBI MPC (meeting 3 to 5 December; repo unchanged at 6.5%),https://www.business-standard.com/amp/article/finance/in-rbi-policy-meeting-urjit-patel-had-favoured-status-quo-on-repo-rate-118121901150_1.html,web search 2026-11-02
+2019-02-07,rbi_policy,RBI MPC (repo cut to 6.25%),https://indiainflation.com/rbi/repo-rate,web search 2026-11-02: year-wise repo rate list
+2019-04-04,rbi_policy,RBI MPC (repo cut to 6.00%),https://www.businesstoday.in/amp/industry/banks/story/rbi-to-unveil-this-fiscal-first-bi-monthly-policy-decision-for-2019-20-on-april-4-185691-2019-04-01,web search 2026-11-02; also https://indiainflation.com/rbi/repo-rate
+2019-06-06,rbi_policy,RBI MPC (repo cut to 5.75%),https://indiainflation.com/rbi/repo-rate,web search 2026-11-02
+2019-08-07,rbi_policy,RBI MPC (repo cut to 5.40%),https://indiainflation.com/rbi/repo-rate,web search 2026-11-02
+2019-10-04,rbi_policy,RBI MPC (repo cut to 5.15%),https://indiainflation.com/rbi/repo-rate,web search 2026-11-02
+2019-12-05,rbi_policy,RBI MPC (repo unchanged at 5.15%),https://blog.investyadnya.in/rbi-monetary-policy-highlights-dec-2019/,web search 2026-11-02
+2020-03-27,rbi_policy,RBI MPC off-cycle (repo cut 75 bp to 4.40%),https://indiainflation.com/rbi/repo-rate,web search 2026-11-02
+2020-05-22,rbi_policy,RBI MPC off-cycle (repo cut to 4.00%),https://indiainflation.com/rbi/repo-rate,web search 2026-11-02
+2020-12-04,rbi_policy,RBI MPC (repo unchanged at 4%),https://www.thequint.com/amp/story/news/business/rbi-governor-shaktikanta-das-monetary-policy-committee-decisions,web search 2026-11-02
+2021-02-05,rbi_policy,RBI MPC (repo unchanged at 4%),https://www.business-standard.com/amp/article/finance/rbi-maintains-status-quo-for-fourth-time-keeps-policy-rate-unchanged-at-4-121020500230_1.html,web search 2026-11-02
+2021-04-07,rbi_policy,RBI MPC (repo unchanged at 4%),https://www.business-standard.com/amp/article/finance/rbi-keeps-repo-rate-reverse-repo-rate-unchanged-at-4-and-3-35-121040700267_1.html,web search 2026-11-02
+2021-06-04,rbi_policy,RBI MPC (repo unchanged at 4%),https://www.businesstoday.in/latest/economy-politics/story/breaking-news-rbi-keeps-repo-rate-unchanged-maintains-accommodative-stance-298040-2021-06-04,web search 2026-11-02
+2021-08-06,rbi_policy,RBI MPC (repo unchanged at 4%; seventh hold in a row),https://udayavani.com/?p=1097865,web search 2026-11-02
+2021-10-08,rbi_policy,RBI MPC (repo unchanged at 4%; eighth hold in a row),https://www.money9.com/news/economy/rbi-maintains-status-quo-for-the-eighth-time-87973.html,web search 2026-11-02
+2022-05-04,rbi_policy,RBI MPC off-cycle (repo raised to 4.40%),https://indiainflation.com/rbi/repo-rate,web search 2026-11-02
+2022-06-08,rbi_policy,RBI MPC (repo raised to 4.90%),https://indiainflation.com/rbi/repo-rate,web search 2026-11-02; hikes also listed at https://www.business-standard.com/finance/news/rbi-mpc-repo-rate-october-2026-last-hikes-sanjay-malhotra-gdp-inflation-126100700290_1.html
+2022-08-05,rbi_policy,RBI MPC (repo raised to 5.40%),https://indiainflation.com/rbi/repo-rate,web search 2026-11-02
+2022-09-30,rbi_policy,RBI MPC (repo raised to 5.90%),https://indiainflation.com/rbi/repo-rate,web search 2026-11-02
+2022-12-07,rbi_policy,RBI MPC (repo raised to 6.25%),https://indiainflation.com/rbi/repo-rate,web search 2026-11-02
+2023-02-08,rbi_policy,RBI MPC (repo raised to 6.5%),https://www.business-standard.com/finance/news/rbi-mpc-repo-rate-october-2026-last-hikes-sanjay-malhotra-gdp-inflation-126100700290_1.html,web search 2026-11-02
+2023-04-06,rbi_policy,RBI MPC (repo unchanged at 6.5%),https://www.zeebiz.com/economy-infra/news-rbi-mpc-meeting-april-2023-repo-rate-maintains-229469/amp,web search 2026-11-02
+2023-12-08,rbi_policy,RBI MPC (repo unchanged at 6.5%),https://www.business-standard.com/amp/finance/news/rbi-monetary-policy-announcement-repo-rate-unchanged-at-6-5-2023-24-gdp-projection-raised-to-7-123120800225_1.html,web search 2026-11-02
+2024-02-08,rbi_policy,RBI MPC (repo unchanged at 6.5%),https://rbi.org.in/Scripts/BS_PressReleaseDisplay.aspx?prid=57366,web search 2026-11-02
+2024-08-08,rbi_policy,RBI MPC (repo unchanged at 6.5%; ninth hold in a row),https://www.newsonair.gov.in/rbi-to-announce-bi-monthly-monetary-policy-today,web search 2026-11-02
+2025-02-07,rbi_policy,RBI MPC (repo cut 25 bp to 6.25%),https://www.business-standard.com/amp/finance/news/rbi-rate-cut-february-2025-sanjay-malhotra-125020700479_1.html,web search 2026-11-02
+2025-04-09,rbi_policy,RBI MPC (repo cut 25 bp to 6.00%),https://www.angelone.in/news/rbi-monetary-policy-rate-decision-governer-sanjay-malhotra-slashed-repo-rate,web search 2026-11-02
+2025-06-06,rbi_policy,RBI MPC (repo cut 50 bp to 5.50%),https://www.wionews.com/business-economy/rbi-mpc-meeting-here-are-the-key-highlights-from-the-central-bank-june-2025-policy-review-1749193433645/amp,web search 2026-11-02
+2025-08-06,rbi_policy,RBI MPC (repo unchanged at 5.5%),https://www.outlookbusiness.com/economy-and-policy/rbi-holds-repo-rate-at-55-as-inflation-risks-ease-exports-face-pressure,web search 2026-11-02
+2025-12-05,rbi_policy,RBI MPC (repo cut 25 bp to 5.25%),https://indbiz.gov.in/rbi-ends-2025-with-sharp-growth-pivot-after-most-aggressive-rate-cuts-since-2019/,web search 2026-11-02
+2026-02-06,rbi_policy,RBI MPC (repo unchanged at 5.25%),https://www.outlookmoney.com/banking/rbi-mpc-meet-2026-rbi-keeps-repo-rate-unchanged-at-525-per-cent,web search 2026-11-02; schedule at https://www.angelone.in/news/economy/rbi-mpc-schedule-interest-rate-decision-to-come-by-february-6
+2026-06-05,rbi_policy,RBI MPC (repo unchanged at 5.25%),https://www.iasgyan.in/daily-current-affairs/rbi-monetary-policy-june-2026-key-decisions-implications-for-indian-economy,web search 2026-11-02
+2026-08-05,rbi_policy,RBI MPC (repo unchanged at 5.25%),https://www.sahi.com/blogs/rbi-mpc-meeting-august-2026-highlights,web search 2026-11-02
+2019-05-23,election_result,Lok Sabha election counting day 2019 (Nifty closed 0.69% lower at 11657.05),https://www.angelone.in/news/share-market/do-elections-shape-sensex-and-nifty-dynamics,web search 2026-11-02
+2024-06-04,election_result,Lok Sabha election counting day 2024 (Nifty fell nearly 6%),https://www.theweek.in/wire-updates/business/2024/06/04/del20-biz-stocks-close.html,web search 2026-11-02
+2020-03-13,covid_halt,Nifty hit the 10% lower circuit at about 09:20 IST; 45 minute halt then pre-open,https://www.business-standard.com/amp/article/news-cm/sensex-nifty-crash-10-hit-lower-circuit-120031300207_1.html,web search 2026-11-02
+2020-03-23,covid_halt,Second 10% lower circuit of March 2020; 45 minute halt,https://www.business-standard.com/amp/article/markets/sensex-hits-10-lower-circuit-trading-halted-for-45-minutes-120032300237_1.html,web search 2026-11-02
