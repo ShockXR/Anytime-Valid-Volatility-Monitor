@@ -35,7 +35,7 @@ We do **not** claim to have improved the estimator. Once both kernels are put on
 
 | Step | What | Where |
 | --- | --- | --- |
-| 1 | Truncation level τ = c × MAD × 1.4826 from past data only (rolling or exponentially weighted), c = 3 by default | `robust.py` |
+| 1 | Truncation level τ = c × MAD × 1.4826 from past data only (rolling or exponentially weighted), c = 3 by default; optionally a tighter c_down = 2 for the decrease side, which detects falls faster (E11f) | `robust.py`, `monitor.py` |
 | 2 | Bounded statistic X_t = min(r_t², τ²), after an intraday profile estimated from past days only | `robust.py`, `data.py` |
 | 3 | Baseline μ₀ = mean of X on a calibration window: plug-in, plug-in with a margin (band), or a confidence sequence | `detectors.py`, `confseq.py` |
 | 4 | Betting e-detector (Shiryaev-Roberts form): wealth M_t = Σ_j Π_{i=j..t} (1 + λ (X_i − μ₀)) over start times j, averaged over a grid of bets λ; separate detectors for increases and decreases | `detectors.py` |
