@@ -1,0 +1,5 @@
+direction,design,one_day_false_alarm,bound
+up,default,0.01505,0.05
+up,optimised K=2 weighted,0.02865,0.05
+down,default,0.00545,0.05
+down,optimised K=1,0.02165,0.05

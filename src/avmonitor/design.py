@@ -442,7 +442,7 @@ def run_mixture(y: np.ndarray, grid, weights, direction: str = "up", threshold: 
 
 
 def worst_case_false_alarm(lam: float, B: float, A: float, horizon: int, direction: str = "up",
-                           n_states: int = 700, n_left: int = 30, n_right: int = 90):
+                           n_states: int = 700, n_left: int = 30, n_right: int = 90, compute_upper: bool = True):
     """Bracket ``[lower, upper]`` for ``sup P(T_A <= m)`` over every null law, for m = 1..horizon.
 
     The supremum is over all adaptive choices of the conditional law of ``Y_t`` on ``[0, B]`` with
@@ -453,7 +453,9 @@ def worst_case_false_alarm(lam: float, B: float, A: float, horizon: int, directi
     is optimal at each step (concave envelope). ``upper`` rounds every transition up on a log grid
     of states and evaluates cells at their least favourable corner, so it is a rigorous upper bound
     (up to floating point). ``lower`` is the value of an actual adversary restricted to the grid
-    and rounding down, so it is attained (a lower bound on the supremum).
+    and rounding down, so it is attained (a lower bound on the supremum). Rounding up accumulates
+    over many steps, so ``upper`` is only informative for short horizons or fine grids; Theorem B
+    (``horizon / A``) is always a valid upper bound. ``compute_upper=False`` skips it (returns nan).
     """
     if direction == "up":
         u_lo, u_hi = -1.0, B - 1.0
@@ -494,12 +496,15 @@ def worst_case_false_alarm(lam: float, B: float, A: float, horizon: int, directi
     ia_lo = np.where(absorbed_a, ns, lo_a)
     ib_lo = np.where(absorbed_b, ns, lo_b)
     for k in range(horizon):
-        pa = V_up[ia_up]  # (ns, n_left + 1)
-        pb = V_up[ib_up]  # (ns, n_right + 1)
-        r1 = pa[:, 1:]  # right end of each left cell
-        r2 = pb[:, 1:]  # right end of each right cell
-        val = r1[:, :, None] + p2_up[None, :, :] * (r2[:, None, :] - r1[:, :, None])
-        new_up = val.max(axis=(1, 2))
+        if compute_upper:
+            pa = V_up[ia_up]  # (ns, n_left + 1)
+            pb = V_up[ib_up]  # (ns, n_right + 1)
+            r1 = pa[:, 1:]  # right end of each left cell
+            r2 = pb[:, 1:]  # right end of each right cell
+            val = r1[:, :, None] + p2_up[None, :, :] * (r2[:, None, :] - r1[:, :, None])
+            new_up = val.max(axis=(1, 2))
+        else:
+            new_up = np.full(ns, np.nan)
         qa = V_lo[ia_lo]
         qb = V_lo[ib_lo]
         l1 = qa[:, :-1]
@@ -518,30 +523,59 @@ def worst_case_false_alarm(lam: float, B: float, A: float, horizon: int, directi
 # ----------------------------------------------------------------------------
 
 
-def design_ratio(A: float, grid, weights, laws, direction: str = "up", use_memory: bool = True):
-    """Approximate worst-case ratio of mixture delay to oracle (single best bet) delay.
+def sr_delay_approx(A: float, weight: float, g: float, s2: float) -> float:
+    """Design approximation of the SR delay of one bet with weight ``w`` inside a mixture:
+    ``log(1 + (A / w) exp(-zeta)) / g`` with the Brownian memory term ``zeta`` capped at
+    ``log(1 / g) + gamma`` (its value for a growth-optimal bet).
 
-    For each post-change law the mixture delay is approximated by
-    ``min_k (log(A / w_k) - zeta_k) / g_k`` and the oracle delay by ``(log A - zeta*) / g*``, where
-    ``zeta`` is the Brownian SR memory term (``zeta_brownian``; set ``use_memory=False`` for the
-    first-order version with ``zeta = 0``). Returns (worst ratio, ratios per law).
+    For large ``A g`` this is the second-order formula ``(log(A / w) - zeta) / g`` without overshoot;
+    for a bet with almost no growth it tends to ``A e^{-gamma} / w`` instead of becoming negative.
+    The cap keeps poorly matched bets (log-wealth variance much larger than twice the growth),
+    where the Brownian memory formula is not reliable, on the pessimistic side.
+    """
+    if g <= 0:
+        return np.inf
+    zeta = min(zeta_brownian(g, s2), np.log(1.0 / g) + EULER_GAMMA)
+    return float(np.log1p((A / weight) * np.exp(-zeta)) / g)
+
+
+def oracle_delays(A: float, laws, direction: str = "up", use_memory: bool = True):
+    """Approximate delay of the single best bet for each law (``sr_delay_approx`` with weight 1,
+    or ``log(A) / g*`` when ``use_memory`` is False)."""
+    out = []
+    for law in laws:
+        lam_o, g_o = best_bet(law, direction)
+        _, s2_o = log_factor_moments(lam_o, law, direction)
+        out.append(sr_delay_approx(A, 1.0, g_o, s2_o) if use_memory else np.log(A) / g_o)
+    return np.asarray(out)
+
+
+def design_ratio(A: float, grid, weights, laws, direction: str = "up", use_memory: bool = True, oracle=None):
+    """Approximate ratio of mixture delay to oracle (single best bet) delay, worst case over ``laws``.
+
+    The mixture delay is approximated by ``min_k sr_delay_approx(A, w_k, g_k, s2_k)`` (each bet
+    alone, paying ``log(1 / w_k)``), the oracle delay by ``sr_delay_approx(A, 1, g*, s2*)``. With
+    ``use_memory=False`` both use the first-order ``log(A / w) / g``. The approximation ignores the
+    overshoot (present in both) and the extra speed a mixture gains from its other bets, so it is
+    pessimistic for mixtures. Returns (worst ratio, ratios per law).
     """
     grid = np.asarray(grid, float)
     weights = np.asarray(weights, float)
+    if oracle is None:
+        oracle = oracle_delays(A, laws, direction, use_memory)
     ratios = []
-    for law in laws:
-        lam_o, g_o = best_bet(law, direction)
-        mu_o, s2_o = log_factor_moments(lam_o, law, direction)
-        z_o = zeta_brownian(g_o, s2_o) if use_memory else 0.0
-        d_o = max(np.log(A) - z_o, 1e-9) / g_o
+    for law, d_o in zip(laws, oracle):
         best = np.inf
         g = growth_rate(grid, law, direction)
         for k in range(len(grid)):
             if g[k] <= 0 or weights[k] <= 0:
                 continue
-            mu_k, s2_k = log_factor_moments(grid[k], law, direction)
-            z_k = zeta_brownian(g[k], s2_k) if use_memory else 0.0
-            best = min(best, max(np.log(A / weights[k]) - z_k, 1e-9) / g[k])
+            if use_memory:
+                _, s2_k = log_factor_moments(grid[k], law, direction)
+                d_k = sr_delay_approx(A, weights[k], g[k], s2_k)
+            else:
+                d_k = np.log(A / weights[k]) / g[k]
+            best = min(best, d_k)
         ratios.append(best / d_o)
     ratios = np.asarray(ratios)
     return float(ratios.max()), ratios
@@ -551,39 +585,54 @@ def optimise_grid(A: float, laws, K: int, direction: str = "up", lam_cap: float 
                   free_weights: bool = True, use_memory: bool = True, seed: int = 0):
     """Choose ``K`` bets (and weights) minimising ``design_ratio`` over the given post-change laws.
 
-    Bets are parametrised on the log scale inside ``(0, lam_cap)``; weights by a softmax. Several
-    Nelder-Mead starts from geometric grids spanning the oracle bets. Returns (grid, weights, worst).
+    Step 1: search geometric grids between ``lam_lo`` and ``lam_hi`` (uniform weights) on a 2-D
+    lattice. Step 2: Nelder-Mead polish of free positions (and softmax weights if ``free_weights``)
+    from the best lattice point and a few random perturbations. Returns (grid, weights, worst ratio).
     """
     B = laws[0].B
     cap = lam_cap if lam_cap is not None else 0.999 * lam_max(direction, B)
-    oracle = np.array([best_bet(l, direction)[0] for l in laws])
-    lo, hi = max(oracle.min(), 1e-4), min(oracle.max(), cap)
+    oracle_d = oracle_delays(A, laws, direction, use_memory)
+
+    def ratio(lam, w):
+        return design_ratio(A, lam, w, laws, direction, use_memory, oracle=oracle_d)[0]
+
+    lattice = np.geomspace(cap * 1e-2, cap, 36)
+    best_val, best_lam = np.inf, None
+    for i, lo in enumerate(lattice):
+        for hi in lattice[i:]:
+            if K == 1 and hi != lo:
+                continue
+            lam = np.geomspace(lo, hi, K) if K > 1 else np.array([lo])
+            if K > 1 and hi == lo:
+                continue
+            v = ratio(lam, np.full(K, 1.0 / K))
+            if v < best_val:
+                best_val, best_lam = v, lam
+    best_w = np.full(K, 1.0 / K)
 
     def unpack(z):
-        lam = cap / (1.0 + np.exp(-z[:K]))  # logistic map into (0, cap)
+        lam = np.sort(cap / (1.0 + np.exp(-z[:K])))
         if free_weights and K > 1:
             e = np.exp(z[K:] - z[K:].max())
             w = e / e.sum()
         else:
             w = np.full(K, 1.0 / K)
-        return np.sort(lam), w[np.argsort(lam)]
+        return lam, w
 
     def obj(z):
         lam, w = unpack(z)
-        return design_ratio(A, lam, w, laws, direction, use_memory)[0]
+        return ratio(lam, w)
 
     rng = np.random.default_rng(seed)
-    best = (np.inf, None)
-    for trial in range(6):
-        start = np.geomspace(lo, hi, K) if K > 1 else np.array([np.sqrt(lo * hi)])
-        if trial > 0:
-            start = np.clip(start * np.exp(0.3 * rng.standard_normal(K)), 1e-5, 0.999 * cap)
-        z0 = np.log(start / (cap - start))
-        if free_weights and K > 1:
-            z0 = np.concatenate([z0, np.zeros(K)])
+    z_best = np.log(best_lam / (cap - best_lam))
+    if free_weights and K > 1:
+        z_best = np.concatenate([z_best, np.zeros(K)])
+    for trial in range(4):
+        z0 = z_best if trial == 0 else z_best + 0.2 * rng.standard_normal(z_best.size)
         res = optimize.minimize(obj, z0, method="Nelder-Mead",
-                                options={"maxiter": 4000, "xatol": 1e-6, "fatol": 1e-8})
-        if res.fun < best[0]:
-            best = (float(res.fun), res.x)
-    lam, w = unpack(best[1])
-    return lam, w, best[0]
+                                options={"maxiter": 3000, "xatol": 1e-5, "fatol": 1e-7})
+        if res.fun < best_val - 1e-12:
+            best_val = float(res.fun)
+            best_lam, best_w = unpack(res.x)
+            z_best = res.x
+    return np.asarray(best_lam), np.asarray(best_w), float(best_val)
