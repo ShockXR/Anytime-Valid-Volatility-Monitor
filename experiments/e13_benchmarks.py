@@ -761,7 +761,7 @@ def cost():
 
 def pooled_real():
     parts = []
-    labels = {"crypto": "five Binance coins", "crypto_h1_2025": "five Binance coins, Jan to Jun 2025", "nifty": "Nifty 50"}
+    labels = {"crypto": "five Binance coins, Jul to Dec 2025", "crypto_h1_2025": "five Binance coins, Jan to Jun 2025", "nifty": "Nifty 50"}
     for tag, lab in labels.items():
         p = OUT / f"e13d_real_{tag}_summary.csv"
         if p.exists():
@@ -867,6 +867,8 @@ def figures():
                     s = cd[(cd.scenario == sc) & (cd.method == m) & sel(cd)].sort_values("ratio")
                     x = s.ratio if lab == "increase" else 1 / s.ratio
                     ax.plot(x, s.median_delay, marker="o", ms=3, lw=1, color=COLORS[m], label=m)
+                    low = s.detected < 0.8
+                    ax.scatter(x[low], s.median_delay[low], s=30, marker="x", color=COLORS[m], lw=1.2)
                     bad = s.false_alarm_before_change > 0.2
                     ax.scatter(x[bad], s.median_delay[bad], s=40, facecolors="none", edgecolors="#d03b3b", lw=1)
                 ax.set_yscale("log")
@@ -875,10 +877,11 @@ def figures():
                 _style(ax)
             axes[0, 0].set_ylabel("median delay (steps)")
             axes[1, 0].set_ylabel("median delay (steps)")
-        axes[0, 0].legend(fontsize=6, frameon=False)
-        fig.suptitle("Online detection delay [SYNTHETIC]. Red rings: more than 20% of paths raised a false alarm before the change",
-                     fontsize=9, x=0.01, ha="left")
-        fig.tight_layout()
+        handles, labels = axes[0, 0].get_legend_handles_labels()
+        fig.legend(handles, labels, loc="upper center", ncol=4, fontsize=7, frameon=False, bbox_to_anchor=(0.5, 0.955))
+        fig.suptitle("Online detection delay among detected paths [SYNTHETIC]. Crosses: fewer than 80% of paths detected the change. "
+                     "Red rings: more than 20% raised a false alarm before it", fontsize=9, x=0.01, ha="left")
+        fig.tight_layout(rect=(0, 0, 1, 0.9))
         fig.savefig(FIG / "e13_online_delay.png", dpi=130)
         plt.close(fig)
 
@@ -904,11 +907,12 @@ def figures():
     plt.close(fig)
 
     g = pooled_real()
-    fig, axes = plt.subplots(1, 2, figsize=(12, 4.2), sharey=True)
+    markets = [m for m in ("five Binance coins, Jul to Dec 2025", "five Binance coins, Jan to Jun 2025", "Nifty 50") if m in set(g.market)]
+    fig, axes = plt.subplots(1, len(markets), figsize=(6 * len(markets), 4.2), sharey=True)
     show = ["e-detector, band 0.25", "BOCPD, matched to band 0.25", "BOCPD on truncated returns, matched to band 0.25",
             "BJV rolling, matched to band 0.25", "BJV rolling, studentised, matched to band 0.25"]
     cols = ["#2a78d6", "#eb6834", "#a83c0c", "#7a52c7", "#c43c8a"]
-    for ax, mk in zip(axes, ("five Binance coins", "Nifty 50")):
+    for ax, mk in zip(np.atleast_1d(axes), markets):
         gm = g[g.market == mk].set_index("method")
         for i, dn in enumerate(("up", "down")):
             for j, (m, c_) in enumerate(zip(show, cols)):
