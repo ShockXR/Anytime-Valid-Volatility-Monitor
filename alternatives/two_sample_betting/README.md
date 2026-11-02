@@ -115,11 +115,11 @@ When to prefer which: the mean-based monitor is the right tool when the question
 * `score`, `pvalues_against_reference` (vectorised over paths with a binary indexed tree, exact with ties, `O(n log n)` per path), `SequentialRanker` (streaming, `bisect` on a sorted list).
 * `gauss_score`, `gauss_score_abs_dev`: the Gaussianised rank score and its band penalty.
 * `RankBetConfig` (score kind, `a`, grids, bins, half-lives, prior, `eps`, band, family weights), `RankBetCore` (the three bettor families and the Shiryaev-Roberts mixture, vectorised over paths), `run_rank_detector` (first alarm per path and the share of `M_t` from each family at the alarm).
-* `RankMonitor`: streaming calibrate, monitor, alarm, restart loop with the same protocol as `VolatilityMonitor` (NaN returns skipped). Each `RankEvent` records the family shares and the mean of the last 240 p-values.
+* `RankMonitor`: streaming calibrate, monitor, alarm, restart loop with the same protocol as `VolatilityMonitor` (NaN returns skipped), about 80 microseconds per step in pure Python against about 10 for `VolatilityMonitor` (`results/t_timing.csv`, one run on a shared machine; the cost grows slowly with the segment length because each insertion into the sorted reference list is linear). Each `RankEvent` records the family shares, the mean of the last 240 p-values and the learned density ratio of new to reference p-values per bin (`RankBetCore.density_ratio`), which says what changed.
 
 `tsb_sim.py`: unit-variance simulators (Gaussian, variance-matched Student t, jumps at fixed total variance, a sign-skew law with the law of `|u|` held fixed, GARCH(1,1)), and `main_monitor_first_alarm`, a vectorised copy of the plug-in `VolatilityMonitor` (a test checks it alarm-for-alarm against the class).
 
-`run_experiment.py`: parts `pilot`, `q1`, `q1b`, `q1c`, `q2`, `q3`, `q4`, `figs`.
+`run_experiment.py`: parts `pilot`, `q1`, `q1b`, `q1c`, `q2`, `q3`, `q4`, `q5`, `q6`, `timing`, `figs`.
 
 ## 6. Experimental methodology
 
@@ -131,7 +131,10 @@ All synthetic runs use per-step units (unit pre-change variance), a 1440-step ca
 * **Q1c [SYNTHETIC] Fixed versus growing reference.** Gaussian null, reference windows of 240 and 1440 steps, 14 days, 500 paths.
 * **Q2 [SYNTHETIC] Power.** Change at monitored step 500, 4000 steps after it, 400 paths. Variance up (sd x1.25, x1.5), variance down (sd x0.8, x0.67), tails at fixed variance (Gaussian to variance-matched t4 and t3, and t4 to Gaussian), jump intensity at fixed total variance (0.2% to 0.5% and to 1% per step, jump sd 6, diffusion variance adjusted), skew at fixed `|u|` law (moves beyond 1.5 sd become negative with probability 0.8). Median delay with a distribution-free 95% interval (binomial order statistics), detection share, false alarms before the change.
 * **Q3 [SYNTHETIC] Truncation of a rank score.** Same paths with score `|u|` and `min(|u|, 3)`.
-* **Q4 [REAL].** Binance spot BTCUSDT and ETHUSDT one-minute bars, 1 July to 31 December 2025 (`load_binance(download=False)`, history from 1 April 2025 for the intraday profile), divided by `intraday_scale` (20-day lookback), exactly as in E6. Monitors: main monitor with bands 0 and 0.25; rank detector (absolute score) with `b = 0` and `b = 0.25`; the same on nonzero returns only (`b = 0.25`); signed score (`b = 0.25`). For every alarm: the share of `M_t` from each family; the distance to the nearest main-monitor (band 0.25) alarm, matched within 60 minutes, against a chance level from randomly shifted alarm times; and, over the 240 minutes before the alarm against the segment's calibration window, the robust scale ratio, the truncated variance ratio (what the main monitor sees), a scale-free shape distance (Kolmogorov-Smirnov distance between `|u|` divided by its median in the two windows), the shares of zero returns and of moves beyond 3 robust sd, and the share of up moves; the same over the next 1440 minutes. Control: 2000 random times with the same reference delays.
+* **Q5 [SYNTHETIC] The proved mean-based alternative.** `VolatilityMonitor(baseline="cs")` (`delta = 0.01`) on the Q1 Gaussian paths and five Q2 scenarios.
+* **Q6 [SYNTHETIC] Short references.** The same monitored data with references of 120, 240 and 1440 steps, four changes, 400 paths.
+* **T. Cost.** Wall-clock time per step of `RankMonitor` and `VolatilityMonitor` on the same 20,000 Gaussian returns, median of 3 repeats.
+* **Q4 [REAL].** Binance spot BTCUSDT and ETHUSDT one-minute bars, 1 July to 31 December 2025 (`load_binance(download=False)`, history from 1 April 2025 for the intraday profile), divided by `intraday_scale` (20-day lookback), exactly as in E6. Monitors: main monitor with bands 0 and 0.25; rank detector (absolute score) with `b = 0` and `b = 0.25`; the same on nonzero returns only (`b = 0.25`); signed score (`b = 0.25`); absolute score with a 120-minute reference (`b = 0.25`). All were fixed before the run. For every alarm: the share of `M_t` from each family; the learned density ratio of new to reference p-values per bin; the distance to the nearest alarm of the partner design (main monitor at band 0.25 for rank detectors, rank detector at `b = 0.25` for main monitors), matched within 60 minutes, against a chance level from randomly shifted alarm times; whether the partner was monitoring or calibrating at that moment; and, over the 240 minutes before the alarm against the segment's calibration window, the robust scale ratio, the truncated variance ratio (what the main monitor sees), a scale-free shape distance (Kolmogorov-Smirnov distance between `|u|` divided by its median in the two windows), the shares of zero returns and of moves beyond 3 robust sd, and the share of up moves; the same over the next 1440 minutes. Control: 2000 random times with the same reference delays.
 
 ## 7. Folder structure
 
@@ -141,13 +144,30 @@ alternatives/two_sample_betting/
 ├── RESULTS.md             all numbers, labelled [SYNTHETIC] or [REAL], and the ranking
 ├── rankbet.py             conformal p-values, bettors, e-detector, streaming RankMonitor
 ├── tsb_sim.py             simulators and the vectorised plug-in main monitor
-├── run_experiment.py      parts pilot, q1, q1b, q1c, q2, q3, q4, figs
+├── run_experiment.py      parts pilot, q1, q1b, q1c, q2, q3, q4, q5, q6, timing, figs
 ├── tests/
-│   └── test_rankbet.py    9 tests, about 3 seconds, no data needed
-└── results/               CSV outputs and figures of every part
+│   └── test_rankbet.py    9 tests, about 2 seconds, no data needed
+└── results/
+    ├── p_pilot_design.csv              design pilot (development seeds)
+    ├── q1_validity.csv                 no change: 1-day and 7-day false alarms
+    ├── q1b_garch.csv                   volatility clustering
+    ├── q1c_fixed_reference.csv         growing versus fixed reference
+    ├── q2_power.csv                    delays for ten changes
+    ├── q3_truncation.csv               truncated versus raw rank score
+    ├── q5_cs_baseline.csv              confidence-sequence main monitor
+    ├── q6_short_reference.csv          reference length 120, 240, 1440
+    ├── q4_real_summary.csv             alarm counts, overlap, blind time
+    ├── q4_real_events.csv              every alarm with its window metrics
+    ├── q4_real_profiles.csv            medians by group of alarms
+    ├── q4_real_random_times.csv        control windows
+    ├── q4_real_rank_only_alarms.csv    alarms only the rank detector raised while the main monitor watched
+    ├── t_timing.csv                    microseconds per step, rank against main monitor
+    ├── fig1_synthetic_delays.png
+    ├── fig2_real_alarm_profiles.png
+    └── fig3_real_density_ratio.png
 ```
 
-Run from the repository root with the package installed: `python alternatives/two_sample_betting/run_experiment.py q1 q1b q1c q2 q3 q4 figs` and `python -m pytest -q alternatives/two_sample_betting/tests`. The real-data part needs the Binance files under `data/raw` (see `data/README.md`).
+Run from the repository root with the package installed: `python alternatives/two_sample_betting/run_experiment.py` (all parts except the pilot; about 10 minutes on two cores of a shared machine) and `python -m pytest -q alternatives/two_sample_betting/tests`. The real-data part needs the Binance files under `data/raw` (see `data/README.md`).
 
 ## References
 

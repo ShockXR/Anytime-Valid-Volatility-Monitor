@@ -25,15 +25,21 @@ Research questions
   Q5  [SYNTHETIC] The repo's rigorous mean-based variant (VolatilityMonitor with
       baseline="cs", a confidence sequence for the baseline, guarantee delta + m / A)
       on the same paths as Q1 (Gaussian null) and five Q2 scenarios.
+  Q6  [SYNTHETIC] The price of a short reference window. The rank detector is
+      exact for any reference length; how much slower is it with 120 or 240
+      steps instead of 1440 (same monitored data)? The plug-in monitor is shown
+      for contrast (it is not valid with short windows, Q1).
   Q4  [REAL] Binance BTCUSDT and ETHUSDT one-minute returns, 1 Jul to 31 Dec
       2025, divided by the predictable intraday profile of the main package.
       Alarm counts of the rank detector against the main monitor (band 0.25),
       overlap within 60 minutes, and what the alarms raised only by the rank
       detector look like (scale ratio, scale-free shape distance, zero-return
       share, tail share, sign balance), against random times.
+  T   Cost. Wall-clock time per step of the streaming RankMonitor against the
+      main package's VolatilityMonitor on the same 20,000 Gaussian returns.
 
 Run from the repository root: ``python alternatives/two_sample_betting/run_experiment.py [parts]``
-with parts among ``pilot q1 q1b q2 q3 q4 figs`` (default: all but pilot).
+with parts among ``pilot q1 q1b q1c q2 q3 q5 q6 q4 timing figs`` (default: all but pilot).
 Seeds are fixed per part. At most two worker processes.
 """
 
@@ -434,6 +440,38 @@ def part_q5():
 
 
 # ----------------------------------------------------------------------------
+# Q6. The price of a short reference window
+# ----------------------------------------------------------------------------
+
+Q6_SCENARIOS = ["sd x1.25 (variance x1.56)", "sd x0.8 (variance x0.64)", "tails: Gaussian to t4, same variance",
+                "jumps: 0.2% to 1% per step, same variance"]
+
+
+def _q6_job(args):
+    name, seed = args
+    pre, post = Q2_SCENARIOS[name]
+    rows = []
+    for cal in (120, 240, 1440):
+        rng = np.random.default_rng(seed)  # same monitored data for every reference length (drawn first)
+        mon = S.change_paths(Q2_REPS, 0, NU, POST, pre, post, rng)
+        ref = S.draw(pre, (Q2_REPS, cal), rng)
+        r = np.concatenate([ref, mon], axis=1)
+        res = detectors_on(r, rng, cal=cal, which=("omni", "main0"))
+        for det, alarm in res.items():
+            rows.append(dict(scenario=name, reference_steps=cal, paths=Q2_REPS, detector=det, **summarize_change(alarm, NU)))
+    return rows
+
+
+def part_q6():
+    jobs = [(name, 600 + i) for i, name in enumerate(Q6_SCENARIOS)]
+    with Pool(2) as pool:
+        rows = [r for rr in pool.map(_q6_job, jobs) for r in rr]
+    df = pd.DataFrame(rows)
+    df.to_csv(OUT / "q6_short_reference.csv", index=False)
+    print(df.to_string())
+
+
+# ----------------------------------------------------------------------------
 # Q4. Real data: Binance BTCUSDT and ETHUSDT, Jul to Dec 2025
 # ----------------------------------------------------------------------------
 
@@ -767,7 +805,32 @@ def part_figs():
 # Main
 # ----------------------------------------------------------------------------
 
-PARTS = {"pilot": part_pilot, "q1": part_q1, "q1b": part_q1b, "q1c": part_q1c, "q2": part_q2, "q3": part_q3, "q4": part_q4, "q5": part_q5, "figs": part_figs}
+def part_timing():
+    """Median wall-clock microseconds per step over 3 repeats (machine dependent, single process)."""
+    from avmonitor.monitor import VolatilityMonitor
+
+    x = np.random.default_rng(700).standard_normal(20_000)
+    makers = {"RankMonitor (omnibus, abs)": lambda: R.RankMonitor(threshold=A, cal_len=CAL, seed=0),
+              "VolatilityMonitor (plug-in, band 0.25)": lambda: VolatilityMonitor(threshold=A, c=3.0, cal_len=CAL,
+                                                                                    null_band=0.25)}
+    rows = []
+    for name, make in makers.items():
+        us = []
+        for _ in range(3):
+            mon = make()
+            t0 = time.perf_counter()
+            for v in x:
+                mon.update(float(v))
+            us.append((time.perf_counter() - t0) / x.size * 1e6)
+        rows.append(dict(monitor=name, steps=x.size, repeats=3, median_us_per_step=float(np.median(us)),
+                         min_us_per_step=float(np.min(us)), max_us_per_step=float(np.max(us))))
+    df = pd.DataFrame(rows)
+    df.to_csv(OUT / "t_timing.csv", index=False)
+    print(df.to_string())
+
+
+PARTS = {"pilot": part_pilot, "q1": part_q1, "q1b": part_q1b, "q1c": part_q1c, "q2": part_q2, "q3": part_q3,
+         "q4": part_q4, "q5": part_q5, "q6": part_q6, "timing": part_timing, "figs": part_figs}
 
 if __name__ == "__main__":
     todo = sys.argv[1:] or [k for k in PARTS if k != "pilot"]
