@@ -42,3 +42,34 @@ The share of the fourth moment that survives truncation, `κ₄(a)`, is `robust.
 | 5.6 | Estimated baseline: margin and null band | `calibrate(margin_z=..., null_band=...)`, `VolatilityMonitor(null_band=...)` | E4c, E4d, E9c |
 | Intraday profile | Predictable per-minute scale from past days | `data.intraday_scale` | E5, E6, E7 |
 | Online MAD | Rolling and exponentially weighted scale | `robust.rolling_mad_zero`, `robust.ew_quantile_scale` | E3, `tests/test_edge_cases.py` |
+
+## Part 3. Keeping the guarantee with an estimated baseline (`docs/math.md`, section 6)
+
+| Item | What it is | Code | Checked by |
+|---|---|---|---|
+| Lemma 6.1 | Exponential inequality `exp(λ(ν - Z) - ψ_a(λ) e) ≤ 1` in expectation for a bounded Z | `confseq.psi_coef` | `tests/test_confseq.py` |
+| Theorem 6.2, Corollary 6.3 | Time-uniform empirical-Bernstein confidence sequence for the mean of a bounded variable | `confseq.eb_confseq`, `confseq.StreamingEBConfSeq` | `tests/test_confseq.py` (coverage on i.i.d. and time-varying means) |
+| Section 6.3, Theorem 6.4 | Detector baselines from the confidence sequence; `P(false alarm within m) ≤ δ + m / A` | `confseq.cs_baseline`, `VolatilityMonitor(baseline="cs")` | `tests/test_monitor_cs.py`, E8 |
+| Corollary 6.6 | Recalibration after every alarm | `VolatilityMonitor` restart loop with `baseline="cs"` | E8 (alarm counts) |
+| Section 6.4 | τ from data not used by the confidence sequence | `confseq.split_tau` | `tests/test_confseq.py` |
+
+## Part 4. Forecast-relative monitoring (E10)
+
+| Item | What it is | Code | Checked by |
+|---|---|---|---|
+| Standardised returns `r_t / sqrt(h_t)` with a predictable variance forecast | EWMA and GARCH(1,1) forecasts | `forecast.ewma_variance`, `forecast.garch11_filter`, `forecast.garch11_fit`, `forecast.standardise` | `tests/test_forecast.py` |
+| Signal cap `ρ(k) = k(1 - β) / (1 - α - β + αk) ≤ (1 - β) / α` | Share of a k-fold variance break that a frozen GARCH forecast passes to the standardised returns | `experiments/e10_forecast_relative.rho` | E10 Q10d (simulated against closed form) |
+| Information rate `I = E[½(q - 1 - ln q)]` and delay `ln A / I` | Lai (1998) first-order delay for the standardised stream | `experiments/e10_forecast_relative.q10d` | E10 Q10d, Q10e |
+
+## Part 5. Detection delay and bet design (`docs/theory_delay.md`)
+
+| Item | What it is | Code | Checked by |
+|---|---|---|---|
+| Section 2, Lemma 0 | Growth rate `g(λ) = E_Q log(1 + λU)` of one bet | `design.growth_rate`, `design.log_factor_moments` | `tests/test_delay_theory.py` |
+| Lemma 2 | Best nonparametric growth `KL_inf` (oracle bet) | `design.best_bet`, `design.approx_best_bet` | `tests/test_delay_theory.py`, E11 |
+| Corollary 3 | Information ladder: KL, KL of the truncated statistic, KL_inf, grid growth | `design.kl_gaussian_scale`, `design.kl_truncated`, `design.growth_rate` | E11b |
+| Corollary 4 | Speed limit for decreases, `log(B / (B - 1))` per step | `design.lam_max`, `design.speed_limit` | E11 |
+| Theorem 1 | Non-asymptotic delay bound `min_k (log(A / w_k) + overshoot_k) / g_k` | `design.wald_delay_bound`, `design.overshoot_bound` | E11 (1.3 to 2.7 times the simulated delay) |
+| Section 4.3 | Second-order delay `(log A + κ - ζ) / g` | `design.delay_second_order`, `design.renewal_constants`, `design.zeta_brownian` | E11 (within 3% in 20 cases) |
+| Section 7 | Optimised bet grids | `design.optimise_grid`, `design.design_ratio` | E11c |
+| Section 8 | Worst-case false alarm probability over all null laws, by dynamic programming | `design.worst_case_false_alarm` | E11d |
