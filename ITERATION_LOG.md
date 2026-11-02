@@ -288,9 +288,73 @@ See `docs/iterations/MAIN.md`, R2-5, and `docs/report_parts/E10.md`. In short: d
 
 ---
 
-ITERATION NUMBERS: 14 and later (theory, benchmarks and alternatives)
+ITERATION NUMBER: 14 (detection delay theory, and a design change it suggested)
 
-Detection delay and bet design (E11), the guarantee with a running truncation level (E14), panel monitoring (E15), the benchmark against published change-point methods (E13), and the alternative prototypes (`alternatives/`, logs ALT1 to ALT5) each keep their own iteration notes in `docs/iterations/`. Their main results are summarised in `docs/experiment_report.md` and `alternatives/ALTERNATIVES.md`.
+OBJECTIVE: Explain how fast the detector reacts, what robustness costs in speed, and whether the theory points to a better design.
+
+PROBLEM IDENTIFIED: E4 measured that the robust detector is 14%, 35% and 73% slower than a Gaussian likelihood-ratio detector on clean data, with no explanation of where the gap comes from or whether it can be closed.
+
+HYPOTHESIS: The delay is about ln A divided by the growth rate of the best bet, so a ratio of information numbers should predict the price of robustness, and the bound 0 ≤ X ≤ τ² should limit the evidence against a fall.
+
+CHANGES IMPLEMENTED: `docs/theory_delay.md` (growth rate, its dual form, a proved delay bound, a second-order formula, the information ladder, the decrease speed limit log(B / (B - 1)) with B = τ²/m₀, asymptotic optimality); `src/avmonitor/design.py`; then a new monitor option `c_down`, a separate, tighter clip for the decrease side, with two tests.
+
+EXPERIMENTS PERFORMED: E11 (Q11a to Q11e: 20 delay cases, the price of robustness, bet grids, the slack in the bound, optimality as A grows to 10^8) and E11f (c_down = 3, 2, 1.5; four return laws, 2000 null and 600 change paths per cell; five coins, July to December 2025).
+
+RESULTS: The second-order formula is within 3% of the simulated delay in all 20 cases; the information ratio predicts the penalties (1.16, 1.37, 1.95 against 1.14, 1.35, 1.73 simulated). At c = 3 even a total collapse of volatility needs at least 73 steps. c_down = 2 cut decrease delays by 4% to 51% in all 12 simulated cells with false alarms of 5.4% to 6.7% per day with the plug-in baseline, and was neutral to slightly positive on real data; c_down = 1.5 is hurt by ties in rounded prices.
+
+IMPROVEMENTS: A theory-driven, tested design option, and a quantitative account of the price of robustness and of the slack in the false alarm bound.
+
+REMAINING ISSUES: The delay theory awaits an independent review (round 2b, started); c_down is an option, not the default.
+
+NEXT ITERATION: Panel monitoring (15).
+
+---
+
+ITERATION NUMBER: 15 (many assets at once)
+
+OBJECTIVE: Monitor a panel of assets with a guarantee that does not degrade with the number of assets.
+
+PROBLEM IDENTIFIED: K single-asset monitors at level α each give up to about Kα chance of a false alarm per day, and a Shiryaev-Roberts statistic divided by time is not an e-value, so e-BH cannot be applied to it directly.
+
+HYPOTHESIS: Per-asset mixture e-processes with a sticky e-BH rule control the false discovery rate at every stopping time, under any dependence between assets.
+
+CHANGES IMPLEMENTED: `docs/theory_panel.md` (Theorem 1 with proof), `src/avmonitor/panel.py`, `experiments/e15_panel.py`.
+
+EXPERIMENTS PERFORMED: 48 synthetic designs (independent assets and a common factor with correlation 0.7 and common jumps), horizons up to ten blocks, the confidence-sequence baseline, and the five coins plus Nifty 50.
+
+RESULTS: Observed false discovery rate at most 0.96% against 5%. On real data discoveries are confirmed 78% to 97% of the time against about 50% at random times; the gain over a Bonferroni split is mostly earlier flags, not more of them.
+
+IMPROVEMENTS: A proved multi-asset guarantee, with its limits stated (the chance of any false discovery once real changes are present is not controlled).
+
+REMAINING ISSUES: As above; the panel theory awaits an independent review (round 2b).
+
+NEXT ITERATION: Review round 2a (16).
+
+---
+
+ITERATION NUMBER: 16 (independent review round 2a and its fixes)
+
+OBJECTIVE: Have the overnight work (math.md sections 5 and 6, E8 to E12, ALT3, README, strategy) checked by a reviewer who did not write it.
+
+PROBLEM IDENTIFIED: Many parts were written in parallel, and top-level documents quoted numbers from report parts that later changed.
+
+HYPOTHESIS: Tracing every number to its CSV will find copying errors and overclaims, but no wrong theorem.
+
+CHANGES IMPLEMENTED: `docs/review/independent_review_round2a.md` (8 critical, 13 major, 21 minor findings, 7 derivations). Fixes: `forecast.ewma_variance` rejects a non-finite start value and Q10c starts its EWMA on the first day with data; Q10d reports a pooled ratio of means with a bootstrap standard error; corrected numbers and wording in README, pitch, strategy, math.md, E8, E9, E10, E12 and ALT3 (for example 1.8 to 7.6 times the delay, not 7.2; the forecast cap described as a cap on a ratio, not a fraction of the shift; "restores the guarantee" only with a correct forecast model).
+
+EXPERIMENTS PERFORMED: The reviewer's reruns (Theorem 6.4 checked step by step; the clipped-RQ variance 8.19 by integration and Monte Carlo); our reruns of Q10c (the summary CSV is reproduced exactly) and Q10d (every earlier column unchanged).
+
+RESULTS: No wrong theorem. The critical findings were copying errors and overclaims; one result (Q10c) could not be reproduced from the committed script until the start-value fix.
+
+IMPROVEMENTS: Every top-level number now traces to a CSV; the main project and ALT3 no longer contradict each other about improving the estimator.
+
+REMAINING ISSUES: E12 control matching (weekday-matched pools, band confound) is being redone.
+
+NEXT ITERATION: Benchmarks against published methods (E13), running truncation (E14), sequential estimation (ALT6), final audit (10).
+
+---
+
+Further work streams (E13, E14, the alternative prototypes, logs ALT1 to ALT6) keep their own iteration notes in `docs/iterations/`. Their main results are summarised in `docs/experiment_report.md` and `alternatives/ALTERNATIVES.md`.
 
 ---
 

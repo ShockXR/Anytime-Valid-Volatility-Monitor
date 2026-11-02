@@ -20,6 +20,8 @@ Scores run from 1 (weak) to 10 (strong). They are our judgement, explained in ea
 
 For comparison, the main direction (the robust volatility monitor itself) scores 57 of 70 on the seven criteria used in `RESEARCH_STRATEGY_BAPAT.md`, section 8.
 
+**Names in other documents.** The experiment report and the strategy number the alternatives by report part, not by the letters used here: A1 and A3 are report part ALT1, A2 is E8, A4 is ALT5, A5 is ALT3, A6 is ALT2 and A7 is ALT4.
+
 **Recommended follow-ups.** A5 is the natural estimation paper with Prof. Bapat, because it stays inside his estimator and answers his own future-work items. A7 is the natural second detection paper, because it reuses the same machinery for the multivariate question the paper lists as future work. A1 matters for any use of the monitor at second-level sampling, because it found a failure of the main monitor's guarantee and a provable fix.
 
 **One lesson that appears in four directions.** The e-detector's guarantee needs the *conditional* mean of the statistic, given the past, to stay at the baseline. Anything that makes consecutive values of the statistic depend on each other breaks it, even when the *unconditional* mean is right: volatility clustering (E10), price-level noise and overlapping pre-averaged windows (A1), a reference window that is reused for every new observation (A4) and a plug-in baseline (E4e). Each prototype found its own fix: a forecast, non-overlapping blocks, a growing reference, a confidence sequence.
