@@ -54,7 +54,8 @@ class Baseline:
 
 
 def calibrate(
-    r_cal: np.ndarray, c: float = 3.0, margin_z: float = 0.0, floor: float = 0.0, null_band: float = 0.0
+    r_cal: np.ndarray, c: float = 3.0, margin_z: float = 0.0, floor: float = 0.0, null_band: float = 0.0,
+    *, baseline: str = "plugin", delta: float = 0.01, tau_frac: float = 0.25,
 ) -> Baseline:
     """Estimate the null regime from pre-change returns.
 
@@ -65,7 +66,33 @@ def calibrate(
     volatility clusters). ``null_band`` widens the null to "the truncated
     variance has moved by less than this fraction", for example 0.2 means the
     increase detector only bets against ``E[X] <= 1.2 m0``.
+
+    ``baseline="cs"`` (keyword only) returns a baseline for which the false
+    alarm guarantee holds with estimation error (``docs/math.md``, section 6):
+    ``tau`` from the first ``round(tau_frac * n)`` returns, and ``m0_up`` /
+    ``m0_down`` are upper / lower confidence bounds for the mean of
+    ``min(r^2, tau^2)`` on the remaining returns, each at level ``delta / 2``
+    (then times ``1 +/- null_band``). P(any false alarm within m steps) is then
+    at most ``delta + m / A``. In that mode ``m0`` is the plug-in mean of the
+    second part, ``var_x`` its variance and ``margin_z`` must be 0. Missing
+    values are dropped first. A lower bound of 0 is returned as ``m0_down =
+    1e-300``; the decrease side should then be switched off (its bets would be
+    near 0 and its Shiryaev-Roberts statistic would just count steps).
     """
+    if baseline == "cs":
+        from .confseq import cs_baseline  # local import: confseq imports this module's dependencies
+
+        if margin_z:
+            raise ValueError("margin_z applies to the plug-in baseline only")
+        r = np.asarray(r_cal, float)
+        r = r[np.isfinite(r)]
+        b = cs_baseline(r[None, :], c=c, delta_upper=delta / 2, delta_lower=delta / 2, tau_frac=tau_frac, floor=floor)
+        x2 = np.minimum(r[b.n_tau:] ** 2, b.tau[0] ** 2)
+        up = float(b.upper[0]) * (1 + null_band)
+        down = max(float(b.lower[0]) * (1 - null_band), 1e-300)
+        return Baseline(float(b.scale[0]), float(b.tau[0]), float(b.mean[0]), up, down, float(x2.var(ddof=1)), len(r))
+    if baseline != "plugin":
+        raise ValueError("baseline must be 'plugin' or 'cs'")
     r_cal = np.asarray(r_cal, float)
     scale = float(np.median(np.abs(r_cal)) * MAD_NORMAL_SCALE)
     tau = max(c * scale, floor)
