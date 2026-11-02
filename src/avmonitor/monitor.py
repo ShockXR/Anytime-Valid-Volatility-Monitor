@@ -92,9 +92,15 @@ class VolatilityMonitor:
         cs_c: float = 0.75,
         target_rel_width: float | None = None,
         cal_max: int | None = None,
+        c_down: float | None = None,
     ):
         self.A = float(threshold)
         self.c = c
+        # The decrease side may use its own truncation constant (docs/theory_delay.md, 6.3): each side is a
+        # valid e-detector for its own truncated statistic, so the two-sided guarantee is unchanged.
+        self.c_down = float(c) if c_down is None else float(c_down)
+        if self.c_down <= 0:
+            raise ValueError("c_down must be positive")
         self.cal_len = cal_len
         self.band = null_band
         self.up_grid = np.asarray(up_grid, float)
@@ -119,6 +125,8 @@ class VolatilityMonitor:
             self.cs_n_plan = cal_len - self.n_tau if cs_n_plan is None else cs_n_plan
         elif target_rel_width is not None:
             raise ValueError("target_rel_width needs baseline='cs'")
+        if baseline == "cs" and self.c_down != float(c):
+            raise ValueError("a separate c_down is implemented for the plug-in baseline only")
         self.tau_frac = tau_frac
         self.cs_c = cs_c
         self.target_rel_width = target_rel_width
@@ -193,14 +201,22 @@ class VolatilityMonitor:
         self._n_finite = int(r.size)
         self.scale = scale
         self.tau2 = tau2
+        if self.c_down == self.c:
+            tau2_dn, m0_dn = tau2, m0
+        else:
+            tau2_dn = (self.c_down * scale) ** 2
+            m0_dn = float(np.mean(np.minimum(r**2, tau2_dn))) if r.size else 0.0
+        self.tau2_dn = tau2_dn
         if self.margin_z:
             x = np.minimum(r**2, tau2)
             se = float(np.sqrt(x.var(ddof=1) / x.size)) if x.size > 1 else float("inf")
+            xd = np.minimum(r**2, tau2_dn)
+            se_dn = float(np.sqrt(xd.var(ddof=1) / xd.size)) if xd.size > 1 else float("inf")
             m_up = (m0 + self.margin_z * se) * (1 + self.band)
-            m_dn = (m0 - self.margin_z * se) * (1 - self.band)
+            m_dn = (m0_dn - self.margin_z * se_dn) * (1 - self.band)
         else:
             m_up = m0 * (1 + self.band)
-            m_dn = m0 * (1 - self.band)
+            m_dn = m0_dn * (1 - self.band)
         self._finish(m0, m_up, m_dn, None, None)
 
     def _feed_cs(self, r: float):
@@ -224,6 +240,7 @@ class VolatilityMonitor:
                     self._fallback = True
             self.tau_scale = scale
             self.tau2 = tau2
+            self.tau2_dn = tau2
             half = self.delta / 2
             self._cs = StreamingEBConfSeq(tau2, half, half, n_plan=self.cs_n_plan, c=self.cs_c)
             self._n_tau_used = len(self.buffer)
@@ -254,7 +271,7 @@ class VolatilityMonitor:
         self.m0 = m0
         self.m_up = m_up
         self.m_dn = m_dn
-        b = self.tau2 / self.m_dn if self.m_dn > 0 else math.inf
+        b = self.tau2_dn / self.m_dn if self.m_dn > 0 else math.inf
         self.down_active = bool(math.isfinite(b) and b > 1.0)
         if self.down_active:
             self.lam_dn = self.down_fractions / (b - 1.0)
@@ -268,7 +285,8 @@ class VolatilityMonitor:
         self.segments.append(dict(start=self.start, cal_len=len(self.buffer), n_finite=self._n_finite,
                                   baseline=self.baseline,
                                   n_tau=self._n_tau_used if self.baseline == "cs" else None,
-                                  scale=self.scale, tau2=self.tau2, m0=m0, m_up=m_up, m_dn=m_dn,
+                                  scale=self.scale, tau2=self.tau2, tau2_dn=self.tau2_dn, m0=m0, m_up=m_up,
+                                  m_dn=m_dn,
                                   upper=upper, lower=lower, extended=self._extended, fallback=self._fallback,
                                   down_active=self.down_active))
 
@@ -287,7 +305,8 @@ class VolatilityMonitor:
         x = min(r * r, self.tau2)
         self.S_up = (1.0 + self.up_grid * (x / self.m_up - 1.0)) * (self.S_up + 1.0)
         if self.down_active:
-            self.S_dn = (1.0 + self.lam_dn * (1.0 - x / self.m_dn)) * (self.S_dn + 1.0)
+            xd = x if self.tau2_dn == self.tau2 else min(r * r, self.tau2_dn)
+            self.S_dn = (1.0 + self.lam_dn * (1.0 - xd / self.m_dn)) * (self.S_dn + 1.0)
         mu, md = self.S_up.mean(), self.S_dn.mean()
         ev = None
         if mu >= 2 * self.A:

@@ -395,3 +395,33 @@ def test_cs_path_skips_missing_returns():
     e1, e2 = mon.events[0], dropped.events[0]
     assert (e1.index, e1.direction, e1.monitored_since) == (orig_index[e2.index], e2.direction, e2.monitored_since)
     assert e1.stat == e2.stat and e1.baseline_scale == e2.baseline_scale
+
+
+def test_separate_decrease_truncation_matches_default_and_is_faster():
+    """c_down equal to c reproduces the default exactly; a tighter decrease clip detects a fall sooner."""
+    import numpy as np
+    from avmonitor.monitor import VolatilityMonitor
+
+    rng = np.random.default_rng(7)
+    r = np.concatenate([rng.standard_normal(1440), rng.standard_normal(3000)])
+    a = VolatilityMonitor(threshold=7800, cal_len=1440).run(r)
+    b = VolatilityMonitor(threshold=7800, cal_len=1440, c_down=3.0).run(r)
+    assert [(e.index, e.direction) for e in a] == [(e.index, e.direction) for e in b]
+
+    delays = {3.0: [], 1.5: []}
+    for seed in range(40):
+        g = np.random.default_rng(100 + seed)
+        x = np.concatenate([g.standard_normal(1440), 0.6 * g.standard_normal(3000)])
+        for cd in delays:
+            ev = VolatilityMonitor(threshold=7800, cal_len=1440, c_down=cd).run(x)
+            down = [e.index - 1440 for e in ev if e.direction == "down"]
+            delays[cd].append(down[0] if down else 3000)
+    assert np.median(delays[1.5]) < np.median(delays[3.0])
+
+
+def test_separate_decrease_truncation_rejects_cs_baseline():
+    import pytest
+    from avmonitor.monitor import VolatilityMonitor
+
+    with pytest.raises(ValueError):
+        VolatilityMonitor(baseline="cs", c_down=1.5)
