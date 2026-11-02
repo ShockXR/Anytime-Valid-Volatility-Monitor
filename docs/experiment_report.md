@@ -28,7 +28,7 @@ To rerun: `pip install -r requirements.txt && pip install -e .`, then `python sc
 | E12 | Crypto alarms around FOMC and CPI releases | Up alarms within 6 hours of 14 to 15 of 16 FOMC statements against about 30% of matched control windows; the streaming monitor is blind about 70% of the time while recalibrating. |
 | E13 | Benchmark against Bibinger, Jirak and Vetter (2017) and Bayesian online change points | In progress. |
 | E14 | A guarantee with a running truncation level | In progress. |
-| E15 | Panel monitoring with false discovery control | In progress. |
+| E15 | Panel monitoring with false discovery control | Proved FDR control at every stopping time with e-BH on per-asset e-processes (a Shiryaev-Roberts statistic divided by t is not an e-value); FDR at most 0.96% in 48 designs; on five coins plus Nifty, discoveries are confirmed 78% to 97% of the time against about 50% at random, and e-BH's gain over Bonferroni is mostly earlier flags. |
 | ALT1 | Quarticity stream; pre-averaging for noise | Price noise breaks the raw-return guarantee; non-overlapping pre-averaged blocks restore it. |
 | ALT2 | Risk switch | Tails on par with daily volatility targeting, worse tracking, no Sharpe difference; the robust trigger beats the Gaussian one. |
 | ALT3 | Robust local IQ estimator | Squaring a local variance is 95% efficient against 74% for RQ-type estimators; one daily MAD stops converging when volatility moves within the day; on BTC and DOGE large returns come in bursts and scale-truncated estimators remove a third to a half of IQ. |
@@ -961,6 +961,37 @@ Script `experiments/e11_delay_theory.py` (parts A, B, C, C2, C3, C4, C4V, D, D2,
 
 Figures: `results/figures/e11_delay_predictions.png`, `e11_price_of_robustness.png`, `e11_false_alarm_slack.png`, `e11_asymptotic_optimality.png`.
 
+## E11f. A tighter clip for decreases, tested
+
+**Question.** Section 6.3 of `docs/theory_delay.md` predicts that clipping at c = 1.5 to 2 on the decrease side, while keeping c = 3 for increases, cuts decrease delays by a quarter to a half without touching the guarantee. Does it, with an estimated baseline, with ties and zeros, and on real data? The monitor now has this as an option, `VolatilityMonitor(c_down=...)` (plug-in baseline only; the default keeps c_down = c).
+
+**Method.** `experiments/e11f_split_c.py`. Part a [SYNTHETIC]: plug-in baseline from a 1440-step calibration window, band 0, A = 28,800 (each side at 2A, so at most 5% per 1440-step day with the true baseline); 2000 no-change paths and 600 paths per decrease (sd × 0.8, 0.67, 0.5 at the first monitored step) for four return laws: Gaussian, Student t4, Gaussian with jumps (0.5% per step, 8 sd), and returns rounded to half a standard deviation ("ticks", about 38% zeros). The vectorised code is checked alarm for alarm against the class. Part b [REAL]: the five Binance coins, July to December 2025, deseasonalised with the past-only intraday profile, band 0.25; an alarm counts as confirmed when the robust scale of the next 1440 minutes is on the flagged side of the calibration scale. Files: `results/e11f_split_c_synthetic.csv`, `results/e11f_split_c_real.csv`.
+
+**Results [SYNTHETIC].** Median decrease delay in steps (every path detected):
+
+| Law | sd × 0.8: c_down 3 / 2 / 1.5 | sd × 0.67 | sd × 0.5 | False alarm within one day, both sides (decrease side) |
+|---|---|---|---|---|
+| Gaussian | 247 / 176 / 185 | 158 / 85 / 73 | 118 / 58 / 40 | 5.7% (2.1%) / 5.7% (2.1%) / 6.1% (2.5%) |
+| Student t4 | 334 / 289 / 277 | 160 / 117 / 106 | 100 / 62 / 48 | 5.4% (2.7%) / 5.7% (2.9%) / 6.0% (3.2%) |
+| jumps | 273 / 196 / 206 | 161 / 88 / 74 | 119 / 59 / 40 | 6.1% (2.5%) / 6.2% (2.6%) / 6.7% (3.1%) |
+| ticks | 186 / 178 / 254 | 96 / 69 / 80 | 68 / 38 / 33 | 5.7% (2.9%) / 5.7% (2.9%) / 5.4% (2.6%) |
+
+**Reading.** With c_down = 2 the decrease delay falls in all 12 cells, by 4% to 51% (29%, 46% and 51% for Gaussian data, against the theory's 26% to 49%). c_down = 1.5 is faster still for large falls but slower than c_down = 2 for a 20% fall, and with ticks it is slower than c = 3 for that fall (254 against 186 steps): with a small clip, the many zero and one-tick returns carry most of the statistic and a modest scale change moves it little. The false alarm rates are those of the plug-in baseline (E4e: above the 5% that the true baseline would guarantee, here 5.4% to 6.7%); the decrease side's share rises by at most 0.7 percentage points at c_down = 1.5, because its larger bets react more to errors in the estimated baseline. The proofs are unchanged: each side is valid for its own clipped statistic.
+
+**Results [REAL].** Share of alarms confirmed by the next day (number of alarms in brackets):
+
+| Coin | Decrease alarms, c_down 3 / 2 / 1.5 | Increase alarms, c_down 3 / 2 / 1.5 |
+|---|---|---|
+| BTC | 85% (55) / 90% (50) / 94% (47) | 79% (72) / 78% (76) / 79% (75) |
+| ETH | 89% (46) / 91% (43) / 93% (40) | 79% (76) / 79% (80) / 79% (80) |
+| XRP | 90% (58) / 84% (58) / 87% (54) | 84% (71) / 80% (69) / 80% (70) |
+| SOL | 93% (46) / 96% (46) / 95% (39) | 79% (77) / 81% (77) / 78% (79) |
+| DOGE | 85% (53) / 90% (49) / 93% (42) | 76% (73) / 80% (77) / 74% (81) |
+
+On real data the tighter clip gives slightly fewer and, for four of five coins, more often confirmed decrease alarms, but with 40 to 58 alarms per coin these differences are within sampling noise (a 95% interval for 85% of 55 alarms runs from about 74% to 92%). Increase alarms are unaffected, as they should be. The monitor still spends about two thirds of the time calibrating, whatever c_down.
+
+**Conclusion.** c_down = 2 is a safe default candidate: it is faster in every simulated cell, valid by construction, and neutral to slightly positive on real data. c_down = 1.5 should not be used on data with many ties. We kept c_down = c as the package default so that every earlier experiment stays reproducible, and recommend `c_down=2` for new runs.
+
 ---
 
 ## E12. Event study: do crypto alarms line up with scheduled US macro news?
@@ -1076,6 +1107,334 @@ The Gaussian alarm at a release sits on a return of 8 to 9 scale units (median; 
 * Settings were chosen in E5c on Bitstamp BTC, July to December 2025, which overlaps the last six months of this sample; the fresh-calibration design was added after seeing the streaming results (it is marked secondary for that reason).
 * The Gaussian monitor runs with band 0 and the robust monitor with band 0.25, as in E5c; part of the Gaussian control rate comes from the narrower null, the rest from the missing truncation.
 * Binance data come from a third-party mirror (checked for gaps and duplicates, none found).
+
+---
+
+## E14. A running truncation level with a guarantee, and a monitor with no blind period
+
+Script `experiments/e14_running_tau.py`; outputs `results/e14*.csv` and `results/figures/e14_*.png`. Theory in `docs/theory_running_tau.md`. Code: `src/avmonitor/running.py` (`RunningTauMonitor`, `ConformalMonitor`, `AwakeRunningTauMonitor`); tests `tests/test_running.py`. Seeds are fixed in the script; all settings were fixed before the reported runs (`docs/iterations/TH2.md`).
+
+**Question.** The e-detector bets on `X_t = min(r_t², τ²)` against the null mean `m(τ)`. E8 keeps a proved false alarm bound with an estimated mean, but only for one τ fixed before monitoring. Real data want τ_t to follow the current scale, and E12 found that the 1440-step recalibration after every alarm leaves the streaming monitor blind about 70% of the time. Can τ_t be any predictable rule with a proof, can monitoring resume right after an alarm with a proof, and what do the proofs cost?
+
+**Method.** Three constructions, all proved in `docs/theory_running_tau.md`:
+
+* **Route A (band).** A band `L(s) ≤ m_F(s) ≤ U(s)` that holds for all truncation levels s at once with probability 1 - δ; the increase side bets against `U(τ_t)`, the decrease side against `L(τ_t)`, for any predictable τ_t. Bound: P(false alarm within m) ≤ δ + m / A (Theorem A.1). Two bands: the time-uniform DKW band of Howard and Ramdas (2022), integrated (`A-dkw-run`), and empirical Bernstein confidence sequences on a grid of 13 levels (`A-grid-*`). τ_t = 3 × scaled MAD of the last 120 returns, refreshed every 10 steps and snapped to the grid (`A-grid-run`), or the grid centre (`A-grid-fixed`).
+* **Route B (ranks).** Smoothed conformal p-values of |r_t| among all earlier values are i.i.d. uniform under exchangeability (Vovk, Nouretdinov and Gammerman 2003), so betting on them gives P(false alarm within m) ≤ m / A exactly, with no baseline, no δ and no τ (Theorem B.2). Bets: a clipped Gaussian likelihood ratio in rank space (`B-lr`) or indicators of running quantiles (`B-ind`). `B-freeze` freezes the reference set when a statistic reaches 20 (a heuristic with no proof).
+* **No blind period.** `awake-A`: after an alarm the grid band is learned from the post-alarm returns while monitoring; the Shiryaev-Roberts chain started at step j bets against the band snapshot taken before j; each chain is multiplied by the indicator that the band has not failed by its snapshot time, an event known when the chain starts, which keeps it a supermartingale without conditioning on the unobservable event "the band never fails" (Theorem A.4, the structure of `docs/math.md` Theorem 6.4). `awake-B`: route B with the reference set restarted empty and betting from the first post-alarm return (Remark B.3). Both resume at once; only the very first segment needs 120 returns.
+
+Comparators: `plugin` (the default monitor: fixed τ, plug-in mean; no proof), `plugin-run` (plug-in mean at the running level; no proof), `cs` (E8), `oracle` (true τ and true m(τ)). A = 7800 for methods with bound m / A and 390 / (0.05 - 0.01) = 9750 for methods with bound δ + m / A (δ = 0.01), so every proved bound is 5% per 390-step day. Two-sided rule as in the monitor (each side at 2A).
+
+[SYNTHETIC] Unit-scale returns: Gaussian, Student t3 (unit variance), jumps (probability 0.005 per step, size N(0, 10²)), price ticks (Gaussian rounded to 0.5, 38% zeros), as in E9.
+
+### Q14a. False alarms at scale [SYNTHETIC]
+
+False alarm rate within one day (390 steps; every bound 5%) and within five days (1950 steps; bound 1950 / 7800 = 25% for A = 7800, 0.01 + 1950 / 9750 = 21% for A = 9750), 5000 paths per cell (Monte Carlo standard error at most 0.7 points). Bold: the lower end of the 95% Wilson interval is above the bound. The bound is proved for oracle, cs, the route A methods, B-lr and B-ind only.
+
+Within one day (390 steps):
+
+| Returns | Calibration | oracle | plugin | plugin-run | cs | A-grid-fixed | A-grid-run | A-dkw-run | B-lr | B-ind | B-freeze |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| Gaussian | 1440 | 0.94% | 1.54% | 1.82% | 0.00% | 0.00% | 0.00% | 0.00% | 3.08% | 2.48% | 3.80% |
+| Student t3 | 1440 | 1.70% | 2.38% | 2.38% | 0.04% | 0.00% | 0.00% | 0.00% | 2.76% | 1.92% | 3.56% |
+| Jumps | 1440 | 0.92% | 1.40% | 1.72% | 0.00% | 0.00% | 0.00% | 0.00% | 2.82% | 2.42% | 3.72% |
+| Ticks | 1440 | 1.30% | 2.26% | 2.12% | 0.02% | 0.00% | 0.00% | 0.00% | 2.76% | 2.14% | 3.64% |
+| Gaussian | 390 | 0.78% | 4.04% | 4.58% | 0.00% | 0.00% | 0.00% | 0.00% | 2.72% | 1.78% | **6.50%** |
+| Student t3 | 390 | 1.58% | 4.88% | 4.74% | 0.00% | 0.00% | 0.00% | 0.00% | 2.50% | 1.74% | **6.52%** |
+| Jumps | 390 | 0.98% | 4.12% | 4.52% | 0.02% | 0.00% | 0.00% | 0.00% | 3.22% | 2.32% | **7.02%** |
+| Ticks | 390 | 1.38% | 4.60% | 5.00% | 0.00% | 0.00% | 0.00% | 0.00% | 2.84% | 2.14% | **6.44%** |
+
+Within five days (1950 steps):
+
+| Returns | Calibration | oracle | plugin | plugin-run | cs | A-grid-fixed | A-grid-run | A-dkw-run | B-lr | B-ind | B-freeze |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| Gaussian | 1440 | 12.18% | 23.24% | 22.90% | 0.04% | 0.00% | 0.04% | 0.00% | 16.18% | 16.04% | 21.16% |
+| Student t3 | 1440 | 13.84% | 23.92% | 23.28% | 0.26% | 0.22% | 0.20% | 0.00% | 16.64% | 15.72% | 20.90% |
+| Jumps | 1440 | 11.80% | 23.04% | 22.50% | 0.06% | 0.04% | 0.04% | 0.00% | 15.56% | 15.14% | 20.00% |
+| Ticks | 1440 | 13.18% | 23.16% | 22.74% | 0.22% | 0.10% | 0.06% | 0.00% | 15.78% | 14.78% | 20.46% |
+| Gaussian | 390 | 12.46% | **40.60%** | **40.24%** | 0.00% | 0.00% | 0.00% | 0.00% | 15.78% | 14.54% | **31.00%** |
+| Student t3 | 390 | 14.14% | **42.66%** | **41.42%** | 0.00% | 0.00% | 0.00% | 0.00% | 15.58% | 14.12% | **31.30%** |
+| Jumps | 390 | 13.60% | **42.14%** | **41.58%** | 0.02% | 0.00% | 0.00% | 0.00% | 17.64% | 15.74% | **33.62%** |
+| Ticks | 390 | 13.72% | **42.92%** | **41.64%** | 0.00% | 0.00% | 0.00% | 0.00% | 16.74% | 15.72% | **32.70%** |
+
+The band of route A failed (true m outside the band at some grid level) on at most 0.02% of paths in every cell, against an allowed 1%; the E8 confidence sequence failed on at most 0.04% (`band_failed` in the CSV files). Figure: `e14_validity.png`.
+
+**Reading.**
+* **The plug-in breaks at longer horizons.** Within one day it stays below 5% (4.0% to 4.9% at 390 calibration steps), as E8 found, but within five days it alarms on 40.6% to 42.9% of null paths at 390 calibration steps, far above the 25% bound; at 1440 steps it is at 23% against 25%. A running τ does not change this (`plugin-run`). This is not a Monte Carlo accident: Proposition A.6 of the theory note proves that at a fixed calibration length the plug-in has a positive drift under the null on a fixed share of calibration windows, so its run length there grows only like log A; Q14w quantifies it.
+* **Route B is valid at its nominal level and uses its budget.** 1.7% to 3.2% per day, 14% to 18% over five days, close to the oracle (0.8% to 1.7%, 12% to 14%). `B-freeze` exceeds the bound (6.4% to 7.0% per day at 390 calibration steps; 31% to 34% over five days), which is what the theory predicts for a frozen reference.
+* **Route A and E8 are valid with a very wide margin**: at most 0.26% over five days. They spend almost none of the budget, which is the price of the band: see the delays in Q14b.
+
+### Q14b. Delay and power [SYNTHETIC]
+
+Change of the standard deviation 500 monitored steps in; median delay in steps among detected paths (in brackets: share detected within 2500 steps after the change, shown when below 95%; misses include false alarms before the change). 1000 paths per cell. Figure: `e14_delay.png`.
+
+Calibration 390 steps:
+
+| Returns | sd ratio | plugin | cs | A-grid-fixed | A-grid-run | A-dkw-run | B-lr | B-ind | B-freeze |
+|---|---|---|---|---|---|---|---|---|---|
+| Gaussian | x1.25 | 99 (93%) | 770 (59%) | 988 (37%) | 1235 (22%) |  (0%) | 102 | 151 | 86 (91%) |
+| Gaussian | x1.5 | 39 (92%) | 128 | 158 | 190 |  (0%) | 32 | 45 | 31 (88%) |
+| Gaussian | x2 | 19 (94%) | 36 | 40 | 38 | 59 (7%) | 14 | 18 | 14 (90%) |
+| Gaussian | x0.8 | 162 (93%) | 799 (72%) | 1080 (50%) | 1002 (51%) |  (0%) | 129 | 268 | 116 (91%) |
+| Gaussian | x0.667 | 97 (94%) | 248 | 291 | 190 | 780 (66%) | 52 | 85 | 50 (91%) |
+| Gaussian | x0.5 | 74 (93%) | 146 | 158 | 92 | 129 | 26 | 37 | 25 (90%) |
+| Jumps | x1.25 | 108 (93%) | 823 (55%) | 1066 (35%) | 1362 (17%) |  (0%) | 125 | 161 | 104 (91%) |
+| Jumps | x1.5 | 42 (94%) | 149 | 187 | 274 |  (0%) | 40 | 51 | 38 (91%) |
+| Jumps | x2 | 20 (93%) | 38 | 42 | 40 | 53 (6%) | 16 | 18 | 16 (91%) |
+| Jumps | x0.8 | 182 | 947 (53%) | 1183 (28%) | 1108 (41%) |  (0%) | 147 | 262 | 130 (91%) |
+| Jumps | x0.667 | 104 (94%) | 300 | 368 | 197 | 894 (56%) | 51 | 85 | 49 (92%) |
+| Jumps | x0.5 | 76 (93%) | 158 | 178 | 95 | 136 | 26 (95%) | 37 | 26 (90%) |
+| Student t3 | x1.25 | 182 (91%) | 1223 (11%) | 1005 (4%) | 1092 (4%) |  (0%) | 260 (85%) | 341 (70%) | 214 (90%) |
+| Student t3 | x1.5 | 68 (91%) | 435 (92%) | 608 (80%) | 666 (69%) |  (0%) | 78 | 116 | 74 (91%) |
+| Student t3 | x2 | 28 (94%) | 76 | 90 | 90 | 58 (3%) | 29 | 36 | 27 (92%) |
+| Student t3 | x0.8 | 253 (94%) | 1340 (14%) | 1264 (4%) | 1450 (8%) |  (0%) | 241 (92%) | 322 | 211 (91%) |
+| Student t3 | x0.667 | 118 (92%) | 566 (91%) | 766 (78%) | 558 (94%) | 1349 (10%) | 80 | 105 | 75 (90%) |
+| Student t3 | x0.5 | 70 (93%) | 167 | 193 | 117 | 211 | 34 | 44 | 34 (92%) |
+
+Calibration 1440 steps:
+
+| Returns | sd ratio | plugin | cs | A-grid-fixed | A-grid-run | A-dkw-run | B-lr | B-ind | B-freeze |
+|---|---|---|---|---|---|---|---|---|---|
+| Gaussian | x1.25 | 105 | 294 | 326 | 336 |  (0%) | 99 | 137 | 91 |
+| Gaussian | x1.5 | 39 | 68 | 74 | 72 | 100 (3%) | 32 | 44 | 31 |
+| Gaussian | x2 | 19 | 27 | 28 | 27 | 55 | 14 | 17 | 14 (94%) |
+| Gaussian | x0.8 | 159 | 334 | 371 | 305 | 1418 (35%) | 126 | 239 | 121 |
+| Gaussian | x0.667 | 100 | 157 | 168 | 116 | 200 | 52 | 80 | 50 (95%) |
+| Gaussian | x0.5 | 74 | 105 | 109 | 71 | 91 | 25 | 35 | 25 (94%) |
+| Jumps | x1.25 | 102 | 316 | 364 | 430 |  (0%) | 106 | 146 | 97 (95%) |
+| Jumps | x1.5 | 40 | 72 | 77 | 78 | 80 (3%) | 37 | 47 | 36 (94%) |
+| Jumps | x2 | 20 | 27 | 29 | 28 | 54 | 16 | 18 | 15 (95%) |
+| Jumps | x0.8 | 177 | 390 | 436 | 343 | 1276 (27%) | 134 | 248 | 129 |
+| Jumps | x0.667 | 107 | 175 | 182 | 123 | 219 | 54 | 84 | 52 (95%) |
+| Jumps | x0.5 | 77 | 111 | 111 | 73 | 94 | 26 | 36 | 25 (94%) |
+| Student t3 | x1.25 | 194 | 676 (92%) | 783 (88%) | 937 (76%) | 1065 (0%) | 243 | 327 (88%) | 219 |
+| Student t3 | x1.5 | 67 | 142 | 152 | 177 | 1442 (19%) | 73 | 98 | 69 (94%) |
+| Student t3 | x2 | 29 | 44 | 46 | 45 | 95 | 28 | 35 | 28 |
+| Student t3 | x0.8 | 242 | 844 (91%) | 944 (86%) | 840 (92%) | 1343 (5%) | 224 | 287 | 205 |
+| Student t3 | x0.667 | 112 | 216 | 230 | 172 | 409 | 75 | 98 | 73 |
+| Student t3 | x0.5 | 69 | 103 | 108 | 81 | 112 | 34 | 44 | 34 (94%) |
+
+False alarms in the 500 steps before the change (largest over the six rows of each cell; bound 500 / 7800 = 6.4%, or 0.01 + 500 / 9750 = 6.1% for route A and cs): plug-in 7.0% to 9.3% at 390 calibration steps and 3.3% to 5.0% at 1440; B-lr 4.6% to 5.2%; B-ind 3.5% to 4.3%; B-freeze 5.7% to 11.8%; route A and cs at most 0.1% (`e14b_delay_*.csv`).
+
+**Reading.**
+* **B-lr, a proved and exact detector, beats the unproved plug-in on every decrease**, by a factor of two to three for the larger ones (x0.5: 25 to 34 steps against 69 to 77; x0.67: 51 to 80 against 97 to 118), and on x1.5 and x2 under Gaussian and jump returns. It is about as fast on x1.25 under Gaussian and jump returns (99 to 125 steps against 99 to 108) and slower on increases under Student t3 (x1.25: 260 and 243 against 182 and 194; x1.5: 78 and 73 against 68 and 67), where the heavy tails make the Gaussian-tuned rank bets inefficient. Part of the speed comes from the bets, not from the ranks: the rank bets are full likelihood ratios for a normal scale change (λ = 1), while the bets on X are linear with λ at most 0.5. B-ind, the rank detector with simple indicator bets, is slower than the plug-in on increases (Gaussian x1.5: 44 to 45 against 39) and still faster on decreases (x0.5: 35 to 44 against 69 to 77).
+* **Route A pays for its band.** At 1440 calibration steps the grid band is close to E8 on increases and faster on decreases with a running τ (Gaussian x0.5: 71 steps against 105 for cs; Student t3: 81 against 103). At 390 calibration steps it misses most small changes (x1.25: 4% to 37% detected). The running τ helps decreases and costs a little on small increases (Gaussian 1440, x1.25: 336 against 326 with τ fixed; Student t3: 937 against 783), because after an increase τ_t moves up to a level where the band is wider.
+* **The integrated DKW band is too wide to be useful**: it detects none of the x1.25 changes and at most 19% of the x1.5 changes within 2500 steps. It is kept as the simplest band that is uniform over all levels, and as a negative result.
+* **B-freeze** is the fastest but has no proof and exceeds the pre-change bound (up to 11.8%).
+
+### Q14c. Seasonality and drift (the null is false) [SYNTHETIC]
+
+Share of paths with an alarm within one day (390 steps) and five days (1950) after 1440 calibration steps; in brackets the share with an increase alarm. 1000 paths. No monitor here has a guarantee: the returns are not identically distributed.
+
+Within one day:
+
+| Scenario | band | plugin | cs | A-grid-fixed | A-grid-run | B-lr | B-ind |
+|---|---|---|---|---|---|---|---|
+| intraday U-shape (amplitude 0.6), raw | 0.0 | 63.6% (47% up) | 7.0% (6% up) | 3.9% (4% up) | 6.8% (4% up) | 76.3% (39% up) | 37.8% (24% up) |
+| intraday U-shape (amplitude 0.6), raw | 0.25 | 2.1% (2% up) | 0.1% (0% up) | 0.1% (0% up) | 0.1% (0% up) | 0.2% (0% up) | 0.3% (0% up) |
+| slow SV (log-vol sd 0.15, half-life 390) | 0.0 | 46.5% (23% up) | 16.7% (9% up) | 13.6% (7% up) | 16.6% (7% up) | 44.9% (22% up) | 28.2% (16% up) |
+| slow SV (log-vol sd 0.15, half-life 390) | 0.25 | 10.0% (6% up) | 2.5% (2% up) | 1.8% (1% up) | 2.2% (2% up) | 1.0% (1% up) | 0.7% (1% up) |
+| GARCH(1,1) 0.05 / 0.94 | 0.0 | 84.7% (46% up) | 52.7% (31% up) | 47.5% (29% up) | 54.0% (29% up) | 86.6% (46% up) | 65.6% (41% up) |
+| GARCH(1,1) 0.05 / 0.94 | 0.25 | 40.1% (27% up) | 19.9% (16% up) | 17.0% (13% up) | 19.7% (14% up) | 17.4% (16% up) | 12.6% (13% up) |
+
+Within five days:
+
+| Scenario | band | plugin | cs | A-grid-fixed | A-grid-run | B-lr | B-ind |
+|---|---|---|---|---|---|---|---|
+| intraday U-shape (amplitude 0.6), raw | 0.0 | 99.7% (95% up) | 32.4% (27% up) | 18.2% (18% up) | 33.0% (19% up) | 100.0% (94% up) | 91.9% (78% up) |
+| intraday U-shape (amplitude 0.6), raw | 0.25 | 11.4% (11% up) | 0.3% (0% up) | 0.1% (0% up) | 0.2% (0% up) | 1.0% (1% up) | 1.8% (2% up) |
+| slow SV (log-vol sd 0.15, half-life 390) | 0.0 | 98.7% (62% up) | 75.7% (40% up) | 69.4% (36% up) | 70.0% (34% up) | 95.8% (65% up) | 88.6% (57% up) |
+| slow SV (log-vol sd 0.15, half-life 390) | 0.25 | 53.8% (31% up) | 20.6% (12% up) | 14.8% (9% up) | 17.0% (10% up) | 5.9% (6% up) | 4.0% (4% up) |
+| GARCH(1,1) 0.05 / 0.94 | 0.0 | 100.0% (90% up) | 97.6% (78% up) | 96.4% (77% up) | 97.8% (75% up) | 100.0% (93% up) | 99.8% (91% up) |
+| GARCH(1,1) 0.05 / 0.94 | 0.25 | 94.9% (74% up) | 73.4% (57% up) | 66.7% (52% up) | 73.4% (54% up) | 65.3% (61% up) | 51.6% (52% up) |
+
+**Reading.** With no null band every monitor reacts to an undeseasonalised intraday profile and to slow stochastic volatility, the rank detectors and the plug-in most (they spend their budget), route A and cs least (their bands absorb some drift). With the null band 0.25 (E12's frozen setting) the rank detectors are the most tolerant of slow drift (slow SV, five days: 5.9% and 4.0% against 53.8% for the plug-in and 15% to 21% for route A and cs), probably because their reference set keeps growing and so follows the long-run level rather than the calibration day. Under GARCH(1,1) every monitor alarms on half or more of the paths within five days even with the band, as in E8: these alarms describe volatility clustering, which every null here excludes.
+
+---
+
+## E15. Monitoring a panel of assets with false discovery control
+
+Script `e15_panel.py`, code `src/avmonitor/panel.py`, theory and proofs `docs/theory_panel.md`. Q15a to Q15c are **[SYNTHETIC]** with fixed seeds (15 onwards, 151, 1500); Q15d and Q15e are **[REAL]** (Binance one-minute data and Nifty 50 one-minute data, see `data/MANIFEST.csv`; control draws use seed 152). Every number below is in `results/e15*.csv`.
+
+**Why.** A user rarely watches one asset. With K single-asset monitors, each at false alarm level α per day, the chance that some monitor raises a false alarm on a quiet day grows with K (up to about Kα). Raising every level to K/α (Bonferroni) fixes that but makes every monitor slower. In fixed-sample testing the standard compromise is the false discovery rate (FDR): the expected share of false alarms among the alarms raised. Its version for e-values, e-BH (Wang and Ramdas 2022), works under any dependence between assets, which matters because asset volatilities move together. But e-BH needs e-values, and the Shiryaev-Roberts statistic of the single-asset monitor is not one at a data-dependent time (`docs/theory_panel.md`, Proposition 1). E15 tests the fix proposed in the theory note: turn each asset's bet chains into a mixture e-process for "no change since the block started", run e-BH on these e-processes at every step, and keep an asset discovered once it is discovered ("sticky e-BH").
+
+**What is proved (`docs/theory_panel.md`, Theorem 1).** Within one block, whatever the dependence between assets: the FDR is at most α at every stopping time; the expected worst false discovery proportion over the block is at most α(1 + log(1/α)), about 20% for α = 5%; and if nothing changes, the probability of any discovery is at most α. Not controlled: the probability of at least one false discovery once some assets change, the expected number of false discoveries (up to αK), and the FDR of all discoveries pooled over many blocks.
+
+**Methods compared.** All use the same truncated squared returns and the same bet grids as the single-asset monitor (c = 3, both directions).
+
+* *naive SR (A)*: one Shiryaev-Roberts e-detector per asset at the single-asset level A = m/α (m = block length), no multiplicity correction.
+* *Bonferroni SR (A × K)*: the same detectors at A·K.
+* *panel Bonferroni*: the panel e-process (window weights over one block) with threshold K/α. By the window identity this is almost the same detector as Bonferroni SR.
+* *panel e-BH*: the panel e-process with sticky e-BH at level α.
+
+Path by path, naive flags an asset no later than e-BH, and e-BH no later than Bonferroni (`tests/test_panel.py`).
+
+### Q15a. Validity [SYNTHETIC]
+
+**Setup.** One block of m = 390 steps, α = 5% per block (A = 7,800). Unit-variance Gaussian returns plus jumps (probability 0.002 per step, jump sd 4), truncation at 3. "Independent": separate shocks and jumps per asset. "Factor + co-jumps": a common factor with correlation 0.7 between every pair of assets, and jumps that hit every asset at the same step. The baseline is the exact null mean of the truncated square (closed form), so that the multiple-testing layer is tested on its own. 2,000 paths when nothing changes, 600 otherwise (`results/e15a_synthetic.csv`).
+
+Probability of any discovery when no asset changes (95% interval about ±0.3 points near 0.5%, ±1 point near 5%):
+
+| Dependence | K | naive SR (A) | Bonferroni SR (A × K) | panel Bonferroni | panel e-BH |
+|---|---|---|---|---|---|
+| independent | 5 | 5.55% | 0.90% | 0.90% | 0.90% |
+| independent | 10 | 9.20% | 0.70% | 0.70% | 0.70% |
+| independent | 20 | 17.50% | 0.50% | 0.50% | 0.50% |
+| independent | 50 | 37.20% | 0.50% | 0.50% | 0.50% |
+| factor + co-jumps | 5 | 4.45% | 0.60% | 0.60% | 0.60% |
+| factor + co-jumps | 10 | 7.15% | 0.55% | 0.55% | 0.55% |
+| factor + co-jumps | 20 | 13.35% | 0.65% | 0.65% | 0.65% |
+| factor + co-jumps | 50 | 22.35% | 0.30% | 0.30% | 0.35% |
+
+When some assets change (48 designs: 20% or 60% of assets change by sd × 1.25, at a common step 100 or at steps drawn uniformly from 50 to 300, or by sd × 1.5 at step 100; four K; two dependence settings), the worst value over all 48 designs of each error measure:
+
+| Error measure (worst design) | naive SR (A) | Bonferroni SR (A × K) | panel e-BH | proved bound for e-BH |
+|---|---|---|---|---|
+| FDR at the end of the block | 4.57% | 0.58% | 0.96% | 5% |
+| FDR at the first discovery | 7.83% | 0.67% | 0.67% | 5% |
+| E[max over the block of the false discovery proportion] | 13.28% | 0.75% | 1.00% | about 20% |
+| P(at least one false discovery) | 33.3% | 1.17% | 8.0% | not controlled |
+| E[number of false discoveries] | 0.44 | 0.012 | 0.115 | not controlled (up to αK) |
+
+The largest standard error of an e-BH FDR estimate is 0.29 points. The worst e-BH value of P(at least one false discovery), 8.0%, is at K = 50, independent assets, 60% changing together; the worst E[number of false discoveries], 0.115, is the same design with a common factor.
+
+**Reading.** The naive rule fails as expected: with 50 independent assets, 37% of quiet blocks contain a false alarm. Bonferroni and e-BH keep this below 1% for every K, under strong dependence too. With changes, e-BH's FDR stays below 1% in every design, so the proved 5% bound is far from tight here. The slack is already there for one asset: from the naive column at K = 5 with independent assets (5.55% for five assets), a single monitor at level A raises a false alarm in about 1.1% of quiet blocks, against its bound of 5%. e-BH inherits that slack. The price of e-BH is visible where theory says it should be: the chance of at least one false discovery rises to 8% at K = 50, because once many assets are discovered, e-BH lowers the bar for the rest. Panel Bonferroni and Bonferroni SR agree to within 0.17 points of power in every design, as the window identity predicts.
+
+### Q15b. Power and delay [SYNTHETIC]
+
+Factor + co-jumps, sd × 1.25 at the change. Power is the share of changed assets discovered at or after their change within the block; delay is in steps, over detected changes only. Independent assets and sd × 1.5 are in `results/e15a_synthetic.csv`.
+
+| Changed assets | K | Power: naive | Bonferroni SR | e-BH | Median delay: naive | Bonferroni SR | e-BH |
+|---|---|---|---|---|---|---|---|
+| 20%, together at step 100 | 5 | 97.7% | 92.7% | 92.7% | 110 | 139 | 139 |
+| | 10 | 98.0% | 92.3% | 94.1% | 102.5 | 147.5 | 143 |
+| | 20 | 98.0% | 88.8% | 93.3% | 107 | 161 | 148 |
+| | 50 | 98.4% | 84.0% | 93.1% | 110 | 178 | 159 |
+| 60%, together at step 100 | 5 | 97.4% | 94.0% | 96.2% | 107 | 136.5 | 127 |
+| | 10 | 97.4% | 89.9% | 96.0% | 110 | 152 | 134 |
+| | 20 | 97.9% | 88.9% | 96.3% | 110 | 162 | 137 |
+| | 50 | 98.0% | 84.1% | 96.2% | 109 | 174 | 138 |
+| 20%, staggered (steps 50 to 300) | 5 | 83.0% | 72.2% | 72.2% | 95.5 | 122 | 122 |
+| | 10 | 85.0% | 68.2% | 71.4% | 96.5 | 127.5 | 125 |
+| | 20 | 83.6% | 61.7% | 69.2% | 99 | 140 | 133 |
+| | 50 | 83.2% | 55.5% | 67.5% | 96 | 150 | 137 |
+| 60%, staggered (steps 50 to 300) | 5 | 83.6% | 74.1% | 78.6% | 97 | 123 | 117 |
+| | 10 | 84.0% | 67.1% | 77.7% | 95 | 128 | 118 |
+| | 20 | 82.5% | 62.4% | 76.6% | 96 | 139 | 122 |
+| | 50 | 84.2% | 56.9% | 77.8% | 93 | 146 | 121 |
+
+Over all 48 change designs, e-BH finds on average 5.0 percentage points more changed assets than Bonferroni SR (never fewer; at most 21.3 points more, independent assets, 60% staggered, K = 50: 77.7% against 56.4%). With sd × 1.5 all rules find essentially every change (power at least 99.88%), and the median delay is 47 to 57 steps for e-BH, 51 to 66 for Bonferroni SR and 41 to 42.5 for the naive rule.
+
+**Reading.** e-BH recovers most of what Bonferroni loses as K grows. With 60% of 50 assets changing together, Bonferroni's power falls to 84% and its median delay rises to 174 steps; e-BH stays at 96% and 138 steps (96% and 127 steps at K = 5). The gain is largest when many assets change, which is when the e-BH bar drops furthest. Delays are measured on different sets (e-BH detects a superset of Bonferroni's detections, including harder ones), so the delay comparison, if anything, favours Bonferroni. The naive rule is faster still but, as Q15a shows, gives no multiplicity control.
+
+**Estimated baselines (robustness).** With the confidence-sequence baseline (`docs/math.md`, section 6) estimated from 1,440 null steps per asset, δ = 0.01 split over K (so the proved bound is α + δ = 6%), K = 20, 20% of assets changing together by sd × 1.25, 400 paths (`results/e15a_cs_baseline.csv`):
+
+| Dependence | Rule | P(any false discovery), no change | P(any false discovery), with changes | Power | Median delay |
+|---|---|---|---|---|---|
+| factor + co-jumps | e-BH | 0% | 0% | 41.0% | 213 |
+| factor + co-jumps | Bonferroni | 0% | 0% | 35.5% | 212.5 |
+| independent | e-BH | n/a | 0% | 36.0% | 234 |
+| independent | Bonferroni | n/a | 0% | 33.0% | 224.5 |
+
+With the oracle baseline the same designs give 93.3% (e-BH) and 88.8% (Bonferroni) power with a common factor, 94.1% and 88.4% with independent assets. **Negative result:** the provable baseline costs more than half the power at this small change, much more than the multiplicity correction does. The confidence-sequence bounds per asset are at level δ/K = 0.0005, so they are wide.
+
+### Q15c. One guarantee per block against one for the whole horizon [SYNTHETIC]
+
+K = 20 independent assets, ten blocks of 390 steps (3,900 steps). Either no change, or 6 assets change (sd × 1.5) at times drawn uniformly over the whole horizon. Baselines are the exact null mean throughout (no recalibration). 400 paths (`results/e15c_horizon.csv`). The block rules restart every 390 steps and the first discovery of each asset over the ten blocks is kept; the "since start" rules run one block of 3,900 steps.
+
+| Rule | P(any discovery), no change | P(at least one false discovery), 6 change | FDR, 6 change | E[max FDP over the horizon] | E[false discoveries] | Power | Median delay |
+|---|---|---|---|---|---|---|---|
+| daily blocks, e-BH | 4.75% | 23.5% | 3.81% | 6.44% | 0.27 | 98.1% | 56 |
+| daily blocks, Bonferroni | 4.75% | 4.25% | 0.63% | 1.80% | 0.04 | 98.0% | 63 |
+| since start, Pareto weights (h = 390), e-BH | 1.75% | 5.75% | 0.86% | 2.26% | 0.06 | 97.4% | 72 |
+| since start, window h = 3,900, e-BH | 2.00% | 5.75% | 0.88% | 1.56% | 0.06 | 97.9% | 67 |
+
+Median delay by the time of the change (`results/e15c_delay_by_change_time.csv`; share of changes detected in brackets):
+
+| Change at step | daily e-BH | daily Bonferroni | since start, Pareto | since start, window 3,900 |
+|---|---|---|---|---|
+| 0 to 389 | 62 (100%) | 64 (100%) | 63 (100%) | 74 (100%) |
+| 390 to 1,299 | 59 (99.8%) | 65 (99.8%) | 71 (99.8%) | 71 (100%) |
+| 1,300 to 2,599 | 54 (99.6%) | 62 (99.9%) | 72 (99.8%) | 65 (99.9%) |
+| 2,600 to 3,899 | 53 (94.9%) | 63 (94.5%) | 76 (92.7%) | 64 (94.0%) |
+
+**Reading.** Two lessons, both predicted by the theory note (section 6).
+
+1. *A guarantee per block is not a guarantee for the horizon.* Under no change, ten daily blocks give 4.75% probability of any discovery, well inside the 10 × 5% that per-block control allows. With changes, daily e-BH has a 23.5% chance of at least one false discovery over the horizon, against 4.25% for daily Bonferroni. The reason: in this design baselines are never recalibrated, so a changed asset is discovered again in every later block; each time, e-BH lowers the bar for the other 19 assets, and the null assets get many chances at a low bar. In each block the FDR guarantee holds, but nothing bounds the pooled count over blocks. The pooled FDR here (3.8%) and worst FDP (6.4%) happen to stay moderate; they are not covered by any theorem.
+2. *One e-process for the whole horizon keeps a single guarantee and pays with delay.* The Pareto rule keeps the any-false-discovery probability at 1.75% (no change) and 5.75% (with changes) for all 3,900 steps, but its median delay grows from 63 to 76 steps as the change comes later, the log(1/w) cost of Proposition 2 in the theory note. The last row is censored (changes near the end are often not detected in time), so its medians are biased toward short delays. Daily e-BH and the window rule get *faster* for later changes because earlier discoveries stay in the e-BH set and lower the bar; daily Bonferroni has no such effect and is flat.
+
+### Q15d. Five Binance coins [REAL]
+
+**Setup.** BTC, ETH, XRP, SOL and DOGE against USDT, one-minute log returns divided by a past-only intraday volatility profile (`avmonitor.data.intraday_scale`, 20-day look-back). One block per UTC day (1,440 minutes), α = 5% per day, K = 5. At each UTC midnight each coin is calibrated on its previous 1,440 returns: plug-in baseline (as in E6), c = 3, null band b = 0.25 (the E5/E6 primary setting) or b = 0.5 (the other band of the E6 grid). Window weights over 1,440 returns. Periods: Jul to Dec 2025 (the E6 period) and Jan 2024 to Jun 2025 (the E6 out-of-sample period; blocks start on 22 Jan 2024 to leave room for the profile and calibration). No setting was chosen from E15 results (see `docs/iterations/PANEL.md` for when band 0.5 was added).
+
+Four rules on the same e-value paths: sticky e-BH; Bonferroni (first time the e-value reaches K/α = 100); naive (first time it reaches 1/α = 20); and, as a hindsight benchmark, a per-asset constant threshold chosen after the fact so that it makes exactly as many discoveries as e-BH ("rate-matched"). The vectorised e-BH run was checked step by step against an offline e-BH on the first 40 blocks of every run.
+
+**Validation (as in E6).** For each discovery, the robust sd (scaled MAD) of the coin's next 1,440 returns is divided by the calibration scale. An up discovery is "confirmed" if this ratio is above 1, a down discovery if it is below 1. Controls: for each e-BH discovery, 5 random days of the same asset at the same minute of the day.
+
+| Coins, period | Band | Discoveries: e-BH / Bonferroni / naive | e-BH per day (of 5) | Up confirmed (95% CI), n | Control | Down confirmed (95% CI), n | Control |
+|---|---|---|---|---|---|---|---|
+| Jul to Dec 2025 (184 days) | 0.25 | 790 / 762 / 810 | 4.29 | 78.0% (74.2 to 81.4), 500 | 50.4% | 86.4% (81.9 to 89.9), 286 | 48.7% |
+| Jan 2024 to Jun 2025 (526 days) | 0.25 | 2,296 / 2,211 / 2,346 | 4.37 | 80.0% (77.8 to 82.1), 1,313 | 46.2% | 84.9% (82.5 to 87.0), 978 | 52.7% |
+| Jul to Dec 2025 | 0.5 | 552 / 508 / 573 | 3.00 | 80.7% (76.6 to 84.1), 424 | 49.4% | 96.9% (92.2 to 98.8), 127 | 50.0% |
+| Jan 2024 to Jun 2025 | 0.5 | 1,527 / 1,446 / 1,614 | 2.90 | 82.6% (80.3 to 84.6), 1,176 | 47.0% | 96.2% (93.7 to 97.8), 346 | 55.4% |
+
+What e-BH adds over Bonferroni, and what the naive rule adds over e-BH (`results/e15d_validation.csv`, `results/e15d_structure.csv`):
+
+| Coins, period | Band | e-BH only (not Bonferroni): n; up confirmed; down confirmed | naive only (not e-BH): n; up; down | Median / mean minutes e-BH before Bonferroni | e-BH strictly earlier | e-BH discoveries with e-value below K/α |
+|---|---|---|---|---|---|---|
+| Jul to Dec 2025 | 0.25 | 28; 12 of 21; 5 of 7 | 20; 4 of 10; 9 of 10 | 4 / 32 | 76.8% | 613 of 790 |
+| Jan 2024 to Jun 2025 | 0.25 | 85; 20 of 39; 35 of 46 | 50; 10 of 28; 19 of 22 | 4 / 38 | 76.1% | 1,767 of 2,296 |
+| Jul to Dec 2025 | 0.5 | 44; 15 of 30; 14 of 14 | 21; 10 of 13; 7 of 8 | 2 / 30 | 71.7% | 408 of 552 |
+| Jan 2024 to Jun 2025 | 0.5 | 81; 22 of 52; 29 of 29 | 87; 33 of 58; 25 of 29 | 2 / 24 | 70.5% | 1,101 of 1,527 |
+
+"Strictly earlier" is the share of coin-days found by both rules on which e-BH flagged first. The rate-matched hindsight threshold confirms at the same rate as e-BH in all 12 panel, period, band and direction cells (two-proportion tests, p-values 0.56 to 1.00, `results/e15d_rate_matched_tests.csv`).
+
+**Reading.**
+
+1. *The strict daily null is false on most coin-days.* At band 0.25 e-BH discovers 86% to 87% of coin-days, at band 0.5 58% to 60%, and at band 0.25 there are at least two discoveries on 170 of 184 days. This repeats E9 and E10: under volatility clustering, "the truncated variance stays within 25% of yesterday's level all day" is rarely true for crypto. The FDR guarantee is then nearly empty in practice, because almost every hypothesis is false.
+2. *The multiplicity rule changes the timing more than the set.* e-BH finds only 3.7% to 8.7% more coin-days than Bonferroni. But on the coin-days both find, e-BH flags first 71% to 77% of the time, by a median of 2 to 4 minutes and a mean of 24 to 38 minutes (the mean is pulled up by a long tail, see `results/figures/e15_real_discoveries.png`, panel c). 72% to 78% of e-BH discoveries were made while the e-value was still below the Bonferroni level K/α.
+3. *Discoveries point the right way.* An e-BH up discovery is followed by a higher robust volatility over the next day 78% to 83% of the time, against 46% to 50% at matched random times; a down discovery by a lower one 85% to 97% of the time, against 49% to 55%.
+4. *The marginal up discoveries are weak.* The up discoveries that only e-BH makes (not Bonferroni) are confirmed 42% to 57% of the time, which is near the control rate; marginal down discoveries are confirmed 71% to 100% of the time (small n). The naive rule's extra discoveries are similar. So the extra discoveries add little information beyond what Bonferroni finds; the value of e-BH here is earlier alarms, not more alarms.
+5. *e-BH is not better than a well chosen fixed threshold, in hindsight.* A per-asset threshold set after the fact to make as many discoveries confirms at the same rate. The difference is that e-BH's level is fixed in advance and carries the FDR guarantee; the rate-matched threshold (33 to 48 on the e-value scale) was read off the data.
+
+### Q15e. Five coins and the Nifty 50 index on one clock [REAL]
+
+**Setup.** The five coins plus the Nifty 50 index, Feb 2024 to Dec 2025 (700 UTC days, 472 Nifty sessions), K = 6, other settings as in Q15d. Nifty: regular sessions only, 09:15 to 15:30 IST (03:45 to 10:00 UTC), 374 one-minute returns per session; returns divided by a strictly past-only session profile (per-minute median of |r| over the previous 20 sessions, 5-minute smoothing within the session, normalised to median 1; E7's settings without its start-up look-ahead). Outside its session the Nifty return is missing: its e-process does not move and its clock does not advance. Nifty has its own clock throughout: window h = 374 returns (one session), calibration on its previous 750 returns (E7's primary setting). Each UTC day contains at most one Nifty session. Nifty stays in the panel on weekends and holidays with e-value 1, so K = 6 every day (a small, conservative cost).
+
+Panel totals (`results/e15d_validation.csv`):
+
+| Band | Discoveries: e-BH / Bonferroni / naive | e-BH per day (of 6) | Up confirmed (95% CI), n | Control | Down confirmed (95% CI), n | Control | Median / mean minutes e-BH before Bonferroni |
+|---|---|---|---|---|---|---|---|
+| 0.25 | 3,257 / 3,107 / 3,352 | 4.65 | 80.8% (79.0 to 82.5), 1,906 | 47.2% | 85.7% (83.7 to 87.4), 1,347 | 52.3% | 5 / 35 |
+| 0.5 | 2,120 / 1,990 / 2,273 | 3.03 | 82.8% (80.9 to 84.6), 1,638 | 48.0% | 95.8% (93.7 to 97.3), 481 | 53.1% | 2 / 25 |
+
+Nifty discoveries only (`results/e15e_nifty_discoveries.csv`; controls are pooled over assets in this design and are not reported separately for Nifty):
+
+| Band | Rule | Up confirmed, n | Down confirmed, n | Discovered outside the Nifty session |
+|---|---|---|---|---|
+| 0.25 | e-BH | 92.1% (116 of 126) | 87.0% (87 of 100) | 3 up, 1 down |
+| 0.25 | Bonferroni | 91.0% (101 of 111) | 88.1% (74 of 84) | 0 |
+| 0.25 | naive | 89.7% (122 of 136) | 89.4% (93 of 104) | 0 |
+| 0.5 | e-BH | 90.4% (75 of 83) | 95.2% (20 of 21) | 1 up |
+| 0.5 | Bonferroni | 89.7% (70 of 78) | 100% (16 of 16) | 0 |
+| 0.5 | naive | 92.3% (84 of 91) | 83.3% (25 of 30) | 0 |
+
+e-BH discovered Nifty on 226 of 472 sessions at band 0.25 (48%) and 104 at band 0.5 (22%). Which assets are discovered together on a day (`results/e15e_codiscoveries.csv`): at band 0.25, all six on 144 days and all five coins without Nifty on 329 of 700 days; Nifty alone on 4 days. At band 0.5: all six on 35 days, the five coins without Nifty on 212, Nifty alone on 28.
+
+**Reading.**
+
+1. *Trading hours are handled without any synchronisation.* Each asset runs on its own clock and its own calibration window, and the guarantee needs only that the trading calendar is known one step ahead. The Nifty discoveries confirm at about 87% to 95% in both directions.
+2. *Borrowing strength across assets is real and visible.* Under e-BH, Nifty was discovered 4 times (band 0.25) and once (band 0.5) after its session had closed: its e-process was frozen, but crypto discoveries later in the UTC day lowered the e-BH bar below Nifty's frozen e-value. Bonferroni and naive rules cannot do this by construction. Such a discovery means "Nifty's session already looked different, and the market-wide picture makes it count" (`docs/theory_panel.md`, section 7).
+3. *The coins move together, Nifty much less.* At band 0.25 the five coins are discovered together on 329 of 700 days without Nifty and on 144 more with it. At band 0.5 Nifty is discovered alone on 28 days, as often as XRP and more often than any other coin. Crypto and Indian equity volatility regimes overlap only partly.
+
+### Caveats
+
+* **Oracle baselines in Q15a to Q15c.** The synthetic validity results use the exact null mean. With the confidence-sequence baseline (proved bound α + δ) power falls from about 93% to 36% to 41% in the one design tested; with the plug-in baseline used on real data there is no proved bound (E4d, E8).
+* **The real-data null.** The strict daily null with a band is false on most crypto days (point 1 of Q15d). A forecast-relative null (E10) would make the panel's discoveries mean "the forecast was wrong", which is closer to what a user wants; this was not tested in the panel.
+* **Which past the null conditions on.** Theorem 1 needs each asset's null to hold given the whole panel's past. If volatility spills over from one asset to another with a lag, this is stronger than the asset's own-past null. E15 does not test for spillovers.
+* **Validation is a proxy.** "Confirmed" compares the next day's robust volatility with the calibration scale. It measures persistence of the regime, not whether the null was false at the discovery time, and the controls are pooled over assets.
+* **Nifty data cleaning.** E7 sets frozen-price runs (5 or more minutes of exact zero returns) to missing. E15 did not apply that filter, but E7's list of such runs (`results/e07a_frozen_runs.csv`) has none in 2024 or 2025, so it would not have changed the input.
+* **Per-block guarantee only.** Q15c shows that per-block FDR control does not bound false discoveries pooled over many blocks.
+* **Seeds and sample sizes.** Synthetic rows use 600 paths (2,000 under no change), so a power estimate near 90% has a standard error of at most about 1.2 points (one changed asset); differences between e-BH and Bonferroni of 2 points or less at K = 5 or 10 are within noise.
 
 ---
 

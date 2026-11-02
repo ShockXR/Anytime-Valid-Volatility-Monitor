@@ -26,7 +26,7 @@ To rerun: `pip install -r requirements.txt && pip install -e .`, then `python sc
 | E12 | Crypto alarms around FOMC and CPI releases | Up alarms within 6 hours of 14 to 15 of 16 FOMC statements against about 30% of matched control windows; the streaming monitor is blind about 70% of the time while recalibrating. |
 | E13 | Benchmark against Bibinger, Jirak and Vetter (2017) and Bayesian online change points | In progress. |
 | E14 | A guarantee with a running truncation level | In progress. |
-| E15 | Panel monitoring with false discovery control | In progress. |
+| E15 | Panel monitoring with false discovery control | Proved FDR control at every stopping time with e-BH on per-asset e-processes (a Shiryaev-Roberts statistic divided by t is not an e-value); FDR at most 0.96% in 48 designs; on five coins plus Nifty, discoveries are confirmed 78% to 97% of the time against about 50% at random, and e-BH's gain over Bonferroni is mostly earlier flags. |
 | ALT1 | Quarticity stream; pre-averaging for noise | Price noise breaks the raw-return guarantee; non-overlapping pre-averaged blocks restore it. |
 | ALT2 | Risk switch | Tails on par with daily volatility targeting, worse tracking, no Sharpe difference; the robust trigger beats the Gaussian one. |
 | ALT3 | Robust local IQ estimator | Squaring a local variance is 95% efficient against 74% for RQ-type estimators; one daily MAD stops converging when volatility moves within the day; on BTC and DOGE large returns come in bursts and scale-truncated estimators remove a third to a half of IQ. |

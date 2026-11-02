@@ -71,6 +71,15 @@ Prof. Bapat's earlier work is mainly on **sequential estimation** (stopping rule
 | Choe, Y. J. and Ramdas, A. Combining evidence across filtrations. arXiv:2402.09698, listed as accepted in *JRSS B* (volume and DOI unverified) | Combines e-processes built on different information sets. Its example tests whether high-volatility days in stock returns occur at random. | The closest finance application of e-processes to volatility we found. |
 | Wang, Q., Wang, R. and Ziegel, J. E-backtesting. *Management Science*, doi:10.1287/mnsc.2023.01659 (year, volume and pages unverified) | Anytime-valid, model-free backtests of Expected Shortfall with e-processes. | Shows that e-processes are already used in financial risk management. |
 
+| Wang, R. and Ramdas, A. (2022). False discovery rate control with e-values. *JRSS B* 84(3), 822 to 852. doi:10.1111/rssb.12489 | The e-BH procedure: FDR control from e-values under any dependence. | The panel monitor (E15, `docs/theory_panel.md`) runs e-BH on per-asset e-processes. |
+| Dandapanthula, S. and Ramdas, A. (2025). Multiple testing in multi-stream sequential change detection. arXiv:2501.04130 | Shows that a finite average run length is incompatible with nontrivial worst-case FDR in multi-stream change detection, and proposes an error-over-patience criterion. | E15 positions its block-wise guarantee against this result. Statements checked against the arXiv listing only. |
+| Wang, H., Dandapanthula, S. and Ramdas, A. (2025). Anytime-valid FDR control with the stopped e-BH procedure. *Statistics and Probability Letters*, arXiv:2502.08539 (volume and pages unverified) | FDR control of e-BH at stopping times. | Basis of the "sticky" e-BH variant in E15. |
+| Tavyrikov, Y., Goeman, J. J. and de Heide, R. (2026). Carefree multiple testing with e-processes. *Electronic Journal of Statistics* 20, 3178 to 3189. doi:10.1214/26-EJS2546 | Multiple testing with e-processes that may be stopped and resumed. | Related to the time-uniform statements of E15. |
+| Chen, J., Zhang, W. and Poor, H. V. (2020). A false discovery rate oriented approach to parallel sequential change detection problems. *IEEE Transactions on Signal Processing* 68, from p. 1823 (DOI unverified) | FDR-oriented detection in parallel streams, parametric. | Earlier, non-anytime-valid approach to the panel problem. |
+| Chen, Y. and Li, X. (2023). Compound sequential change-point detection in parallel data streams. *Statistica Sinica* 33, 453 to 474. doi:10.5705/ss.202020.0508 | Detects changes that affect a subset of many streams. | Same problem, likelihood-based. |
+
+The full list behind E15, with how each reference was checked, is in `docs/theory_panel.md`, section 9.
+
 ## 8. Online monitoring of volatility
 
 | Reference | What it does | Relation |

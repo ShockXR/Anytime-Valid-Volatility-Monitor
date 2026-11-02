@@ -26,6 +26,7 @@ Sub-questions (status in [`RESEARCH_STRATEGY_BAPAT.md`](RESEARCH_STRATEGY_BAPAT.
 * **Estimated baselines need care [SYNTHETIC].** Plugging in an estimated "normal" level roughly triples false alarms with a 390-step calibration window and gives 44% against a guaranteed 25% over five days (E4e, E10). A confidence-sequence baseline restores a proof, P(false alarm within m) ≤ δ + m / A, at a cost of 1.8 to 7.2 times the delay with short calibration (E8).
 * **Volatility clustering breaks the null, and fixing it caps the signal [SYNTHETIC].** Under persistent GARCH clustering the raw monitor alarms on 82% to 100% of quiet days. Dividing returns by a fitted GARCH forecast brings this back to 3% to 6%, but a forecast that keeps adapting passes at most (1 − β)/α of any level shift: a doubling of volatility looks like a 9% rise at persistence 0.99. We derived this cap in closed form and checked it by simulation (E10).
 * **Alarms on real data carry information, but the main contribution is the guarantee [REAL].** On the five coins, alarms are followed by volatility on the flagged side of EWMA and HAR forecasts 71% to 83% of the time, against about 50% at random times, in and out of sample (E6). A simple ratio rule tuned with hindsight is about as precise (E6e), so what the e-detector adds is a false-alarm guarantee with fixed settings, not extra precision.
+* **Many assets at once [SYNTHETIC and REAL].** A Shiryaev-Roberts statistic divided by time is not an e-value, so the usual multiple-testing recipes do not apply directly. Per-asset e-processes with e-BH give a proved false discovery rate at every stopping time (at most 0.96% observed in 48 designs). On five coins plus Nifty its discoveries are confirmed 78% to 97% of the time against about 50% at random times; its gain over a Bonferroni split is mostly earlier flags, not more of them (E15, `docs/theory_panel.md`).
 * **Events [REAL].** 14 to 15 of 16 FOMC statements are flagged within six hours, against about 30% of matched control times (E12). On Nifty 50, Union Budget days are flagged (E7).
 * **Reproducing the paper [PUBLISHED vs SYNTHETIC].** The published tables are consistent with the printed formulas, unnormalised kernel weights, the raw (unscaled) MAD and a crypto sample with about 2,000 missing minutes. Two findings we would like to discuss: the printed kernel estimators are not on the integrated-quarticity scale, and truncation at c × MAD leaves a bias that does not shrink with n. Both have one-line fixes ([`docs/estimator_issues.md`](docs/estimator_issues.md), E1, E6).
 
@@ -109,6 +110,8 @@ Each experiment is one script in `experiments/` that writes CSV files to `result
 | E11 | Detection delay theory and bet design; a tighter clip for decreases | `e11_delay_theory.py`, `e11f_split_c.py` | SYNTHETIC and REAL |
 | E12 | FOMC and CPI event study on crypto | `e12_crypto_events.py` | REAL |
 | E13 | Benchmark against published change-point methods | `e13_benchmarks.py` | SYNTHETIC |
+| E14 | Running truncation level and monitors without a blind period | `e14_running_tau.py` | SYNTHETIC |
+| E15 | Panel of assets with false discovery control | `e15_panel.py synthetic`, `horizon`, `real`, `cs`, `figures` | SYNTHETIC and REAL |
 
 Then rebuild the report from its parts:
 
@@ -150,6 +153,7 @@ The full list, with what each one affects, is in [`docs/limitations.md`](docs/li
 │   ├── estimator_issues.md     checks of the estimator, with evidence
 │   ├── math.md                 derivations and proofs
 │   ├── theory_delay.md         detection delay and bet design
+│   ├── theory_panel.md         many assets at once: e-BH and false discovery control
 │   ├── equation_map.md         symbol to code map
 │   ├── literature_review.md    verified references and the gap
 │   ├── limitations.md          what the results do not show
@@ -170,6 +174,7 @@ The full list, with what each one affects, is in [`docs/limitations.md`](docs/li
 │   ├── competitors.py          published change-point methods used as benchmarks
 │   ├── running.py              running truncation level
 │   ├── design.py               bet grid design from the delay theory
+│   ├── panel.py                panel monitor with e-BH across assets
 │   ├── simulate.py             paper design, stochastic volatility with jumps and noise, GARCH, change points
 │   ├── data.py                 loaders, predictable intraday profile, frozen-price detection
 │   ├── strategy.py             interface for the risk switch (implemented in alternatives/risk_switch)

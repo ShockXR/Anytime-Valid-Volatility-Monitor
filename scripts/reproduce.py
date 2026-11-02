@@ -60,7 +60,11 @@ EXPERIMENTS = [
     ("E12 crypto events", ["experiments/e12_crypto_events.py"], True, "full"),
     ("E13 benchmarks", ["experiments/e13_benchmarks.py"], False, "full"),
     ("E14 running truncation", ["experiments/e14_running_tau.py"], False, "full"),
-    ("E15 panel", ["experiments/e15_panel.py"], False, "full"),
+    ("E15 panel, synthetic", ["experiments/e15_panel.py", "synthetic"], False, "full"),
+    ("E15 panel, horizon", ["experiments/e15_panel.py", "horizon"], False, "full"),
+    ("E15 panel, confidence-sequence baseline", ["experiments/e15_panel.py", "cs"], False, "full"),
+    ("E15 panel, real data", ["experiments/e15_panel.py", "real"], True, "full"),
+    ("E15 panel, figures", ["experiments/e15_panel.py", "figures"], True, "full"),
 ]
 
 RESULT_DIRS = ["results"] + [str(p.relative_to(ROOT)) for p in sorted((ROOT / "alternatives").glob("*/results"))]
