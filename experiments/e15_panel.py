@@ -550,7 +550,7 @@ def run_real():
             tests.append(dict(panel=panel, period=period, band=band, direction=d, ebh_n=e[f"{d}_n"],
                               ebh_hit=e[f"{d}_hit"], matched_n=rm[f"{d}_n"], matched_hit=rm[f"{d}_hit"],
                               p_value=two_prop(e[f"{d}_hits"], e[f"{d}_n"], rm[f"{d}_hits"], rm[f"{d}_n"])))
-    disc.to_csv(OUT / "e15d_discoveries.csv", index=False)
+    disc.to_csv(OUT / "e15d_discoveries.csv.gz", index=False)  # about 42,000 rows, stored compressed
     summ.to_csv(OUT / "e15d_validation.csv", index=False)
     struct.to_csv(OUT / "e15d_structure.csv", index=False)
     pd.DataFrame(tests).to_csv(OUT / "e15d_rate_matched_tests.csv", index=False)
@@ -564,6 +564,8 @@ def run_real():
 
 def figures():
     import matplotlib
+    import matplotlib.dates
+    import matplotlib.ticker
 
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
@@ -592,6 +594,7 @@ def figures():
             ax.axhline(ALPHA, color="k", ls="--", lw=1)
         ax.set_title(title, fontsize=10)
         ax.set_xscale("log")
+        ax.xaxis.set_minor_locator(matplotlib.ticker.NullLocator())
         ax.set_xticks([5, 10, 20, 50], ["5", "10", "20", "50"])
         ax.grid(alpha=0.3)
     for ax in axes[1]:
@@ -603,26 +606,48 @@ def figures():
     fig.savefig(FIG / "e15_synthetic.png", dpi=130)
     plt.close(fig)
 
-    disc = pd.read_csv(OUT / "e15d_discoveries.csv", parse_dates=["day"])
-    d = disc[(disc.panel == "five coins + Nifty") & (disc.rule == "e-BH")]
+    disc = pd.read_csv(OUT / "e15d_discoveries.csv.gz", parse_dates=["day"])
+    d = disc[(disc.panel == "five coins + Nifty") & (disc.band == 0.25)]
+    eb = d[d.rule == "e-BH"]
     names = ["BTC", "ETH", "XRP", "SOL", "DOGE", "NIFTY"]
-    fig, ax = plt.subplots(figsize=(13, 3.6))
+    fig = plt.figure(figsize=(13, 8))
+    gs = fig.add_gridspec(2, 3, height_ratios=[1, 1.25])
+    ax = fig.add_subplot(gs[0, :])
+    per_day = eb.groupby("day").size().reindex(pd.date_range(eb.day.min(), eb.day.max(), freq="D"), fill_value=0)
+    ax.bar(per_day.index, per_day.values, width=1.0, color="#bdbdbd", label="e-BH discoveries per UTC day")
+    ax.plot(per_day.index, per_day.rolling(28, center=True).mean(), color="#d62728", lw=1.5, label="28-day mean")
+    ax.set_ylabel("discoveries (of 6 assets)")
+    ax.set_title("(a) e-BH discoveries per day, five Binance coins and Nifty 50, band 0.25, Feb 2024 to Dec 2025",
+                 fontsize=10)
+    ax.legend(fontsize=8, loc="upper right")
+    ax.grid(alpha=0.3)
+    ax = fig.add_subplot(gs[1, :2])
+    z = eb[(eb.day >= "2025-10-01") & (eb.day < "2025-12-01")]
     for i, a in enumerate(names):
-        g = d[d.asset == a]
-        below = g.evalue < len(names) / ALPHA
-        for sub, mk, lab in ((g[~below], "|", "e-value >= K / alpha (Bonferroni would also flag)"),
-                             (g[below], "x", "e-value < K / alpha (only e-BH flags)")):
-            up = sub.direction == "up"
-            ax.scatter(sub.day[up], np.full(up.sum(), i + 0.12), marker=mk, color="#d62728", s=30,
-                       label=f"up, {lab}" if i == 0 else None)
-            ax.scatter(sub.day[~up], np.full((~up).sum(), i - 0.12), marker=mk, color="#1f77b4", s=30,
-                       label=f"down, {lab}" if i == 0 else None)
+        g = z[z.asset == a]
+        t = pd.to_datetime(g.day) + pd.to_timedelta(g.offset, unit="min")
+        for cat, mk in (("e-BH and Bonferroni", "o"), ("e-BH only (not Bonferroni)", "x")):
+            for dirn, col, dy in (("up", "#d62728", 0.12), ("down", "#1f77b4", -0.12)):
+                sel = ((g.category == cat) & (g.direction == dirn)).to_numpy()
+                ax.scatter(t[sel], np.full(sel.sum(), i + dy), marker=mk, s=22, color=col, facecolors="none" if mk == "o" else None,
+                           label=f"{dirn}, {'also' if mk == 'o' else 'not'} found by Bonferroni that day" if i == 2 else None)
     ax.set_yticks(range(len(names)), names)
     ax.set_ylim(-0.6, len(names) - 0.4)
     ax.grid(axis="x", alpha=0.3)
-    ax.legend(fontsize=7, ncol=2, loc="upper center", bbox_to_anchor=(0.5, -0.12))
-    ax.set_title("E15 [REAL]: e-BH discoveries in the mixed panel (five Binance coins and Nifty 50), one block per "
-                 "UTC day, alpha = 5% per day", fontsize=10)
+    ax.legend(fontsize=7, ncol=2, loc="upper center", bbox_to_anchor=(0.5, -0.1))
+    ax.xaxis.set_major_formatter(matplotlib.dates.DateFormatter("%d %b"))
+    ax.set_title("(b) discovery times, October and November 2025", fontsize=10)
+    ax = fig.add_subplot(gs[1, 2])
+    piv = d[d.rule.isin(["e-BH", "Bonferroni (K/alpha)"])].pivot_table(index=["asset", "day"], columns="rule",
+                                                                         values="offset", aggfunc="first").dropna()
+    gain = (piv["Bonferroni (K/alpha)"] - piv["e-BH"]).to_numpy()
+    ax.hist(np.clip(gain, 0, 240), bins=np.arange(0, 245, 5), color="#d62728", alpha=0.8)
+    ax.set_xlabel("minutes by which e-BH precedes Bonferroni (clipped at 240)")
+    ax.set_ylabel("asset-days found by both")
+    ax.set_title(f"(c) timing gain, median {np.median(gain):.0f} min, mean {gain.mean():.0f} min", fontsize=10)
+    ax.grid(alpha=0.3)
+    fig.suptitle("E15 [REAL]: panel monitor on the UTC minute clock, one block per UTC day, alpha = 5% per day",
+                 fontsize=11)
     fig.tight_layout()
     fig.savefig(FIG / "e15_real_discoveries.png", dpi=130)
     plt.close(fig)
