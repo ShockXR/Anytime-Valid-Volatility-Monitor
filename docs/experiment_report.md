@@ -26,7 +26,7 @@ To rerun: `pip install -r requirements.txt && pip install -e .`, then `python sc
 | E10 | Monitoring relative to a volatility forecast | Restores the guarantee under clustering; a frozen persistent forecast lets through at most (1 - β)/α of any break, and an information bound puts the delay near two days. |
 | E11 | Detection delay and bet design (theory) | Proved delay bound and asymptotic optimality (the delay attains log A / KL_inf); the price of robustness is a ratio of information numbers that predicts E4's 14% to 73% penalties, mostly the cost of making no distributional assumption; truncation caps decrease detection at log(B / (B - 1)) per step (at least 73 steps at c = 3); the false alarm bound is nearly attained by an adversarial null for a single bet. |
 | E12 | Crypto alarms around FOMC and CPI releases | Streaming monitor (fixed in advance): up alarms within 6 hours of 8 to 9 of 16 FOMC statements (all at which it was monitoring) against 11% to 17% of weekday-matched controls; primary test passes for FOMC, not for CPI on BTC. Fresh calibration: 14 to 15 of 16 against 29% to 32%. The streaming monitor is blind about 70% of the time while recalibrating. |
-| E13 | Benchmark against Bibinger, Jirak and Vetter (2017) and Bayesian online change points | In progress. |
+| E13 | Benchmark against Bibinger, Jirak and Vetter (2017) and Bayesian online change points | Under jumps and fat tails BOCPD raises false alarms on 53% to 73% of days at a threshold giving 1% on Gaussian data; the e-detector stays at 1.2% to 1.3%. On clean data BOCPD detects decreases two to three times faster, and on clipped returns keeps that speed under jumps. BJV (a reconstruction from the published idea; equations not checked against the paper) finds a 25% change in 6% to 30% of offline windows against 100%. On crypto, at equal alarm counts, the e-detector's alarms are followed by a day beyond the forecast more often (78.5% and 80.5% against 58.7% to 71.7%; held out 82.0% and 69.7% against 56.7% to 71.5%, with one tie); on Nifty no difference is significant. |
 | E14 | A guarantee with a running truncation level, and no blind period | The plug-in has no bound of the form C m / A (Proposition A.6; 41% to 43% over five days against 25%). A band over all truncation levels allows any running τ with a proof; an exact rank detector needs no baseline (1.7% to 3.2% per day) and, restarted at once, catches 98% to 99.6% of changes against 56% to 66% for the default protocol. On E12's releases it watches 114 of 114 instead of 55. |
 | E15 | Panel monitoring with false discovery control | Proved FDR control at every stopping time with e-BH on per-asset e-processes (a Shiryaev-Roberts statistic divided by t is not an e-value); FDR at most 0.96% in 48 designs; on five coins plus Nifty, discoveries are confirmed 78% to 97% of the time against about 50% at random, and e-BH's gain over Bonferroni is mostly earlier flags. |
 | ALT1 | Quarticity stream; pre-averaging for noise | Price noise breaks the raw-return guarantee; non-overlapping pre-averaged blocks restore it. |
@@ -1275,7 +1275,80 @@ Change at step 500 of monitoring, 1500 steps observed after it, 200 paths per ce
 
 **Price noise and ticks** (full tables in `results/e13c_online_change.csv`). With price noise, BOCPD halves the e-detector's delay for decreases (66 against 122 steps for sd × 0.5; 123 against 166 for × 0.67) but detects only 53% to 66% of the small changes (sd × 1.25 or × 0.8) against 97% to 98%. With ticks, BOCPD is faster for decreases (28 against 53 steps for × 0.5); it detects 84% to 98% of the changes and the e-detector 96% to 99%; BOCPD on truncated returns detects only 46% of a 25% increase.
 
-REAL_DATA_PLACEHOLDER
+### Q13d. Real data [REAL]
+
+**Set-up.** One-minute returns divided by a predictable intraday volatility profile (E6b for crypto, E7's session profile for Nifty). The e-detector uses its frozen real-data settings: crypto A = 28,800 per day, cal 1440, c = 3; Nifty A = 7500 per session, cal 750 (E7's primary). The competitors run continuously: BOCPD with a predictable prior (robust variance of the previous day) and H = 1 / A; BOCPD on returns clipped at 3 times the robust sd of the previous day; rolling BJV with k = 120 (truncated, Gaussian-normalised and studentised). After every alarm each method pauses for as long as the e-detector recalibrates (1440 or 750 steps). Gaussian-matched thresholds come from 2000 simulated Gaussian paths with the same day length, calibration length and A (`results/e13d_real_thresholds.csv`; the e-detector's simulated rate there is 3.95% per 1440-step day and 1.45% per 375-step session). Lag-one autocorrelation of the deseasonalised returns is -0.016 to 0.027 for BTC, ETH, XRP and SOL, 0.013 for Nifty and 0.132 for DOGE, so microstructure noise is small at one minute except for DOGE (coarse price ticks); this is why plain, not pre-averaged, realised variance is used.
+
+**Validation.** As in E6e: after an up alarm, is the robust volatility of the next day (1440 minutes or 375 bars) above an EWMA forecast made with past data only; after a down alarm, is it below? At random times the share is 46.5% to 50.1% for each coin and 50.3% for Nifty. "Rate-matched": each competitor's up and down thresholds are set, per series, so that it raises the same numbers of up and down alarms as the e-detector (this uses the real data, by design, and favours the competitors). p-values: two-proportion z-test against the e-detector, alarms treated as independent.
+
+**Five Binance coins, 1 July to 31 December 2025 (184 days each), matched to the e-detector with null band 0.25:**
+
+| Method | alarms per day | up alarms | next day above forecast (95% CI) | p vs e-detector | down alarms | next day below forecast (95% CI) | p vs e-detector |
+|---|---|---|---|---|---|---|---|
+| e-detector | 0.68 | 369 | 78.5% (74.0% to 82.4%) |  | 258 | 80.5% (75.2% to 84.9%) |  |
+| BOCPD | 0.68 | 364 | 67.8% (62.8% to 72.4%) | 0.001 | 257 | 61.7% (55.6% to 67.5%) | < 0.001 |
+| BOCPD on truncated returns | 0.68 | 369 | 68.0% (63.1% to 72.6%) | 0.001 | 255 | 71.7% (65.8% to 76.8%) | 0.020 |
+| BJV rolling | 0.68 | 367 | 65.6% (60.6% to 70.3%) | < 0.001 | 254 | 58.7% (52.6% to 64.6%) | < 0.001 |
+| BJV rolling, studentised | 0.68 | 368 | 66.5% (61.5% to 71.1%) | < 0.001 | 257 | 62.4% (56.3% to 68.1%) | < 0.001 |
+
+The e-detector scores highest in all ten coin and direction cells against all four competitors (`results/e13d_real_crypto_summary.csv`). Matched to band 0 instead (about 0.83 alarms per day), the e-detector scores 74.9% (up) and 68.3% (down) against 57.7% to 65.3% and 53.2% to 58.4% (p ≤ 0.006).
+
+**Held-out half-year: the same coins, 1 January to 30 June 2025 (181 days), same frozen settings (no setting of any method was chosen on this period):**
+
+| Method | alarms per day | up alarms | next day above forecast (95% CI) | p vs e-detector | down alarms | next day below forecast (95% CI) | p vs e-detector |
+|---|---|---|---|---|---|---|---|
+| e-detector | 0.68 | 308 | 82.0% (77.3% to 85.9%) |  | 304 | 69.7% (64.4% to 74.6%) |  |
+| BOCPD | 0.67 | 305 | 69.2% (63.8% to 74.1%) | < 0.001 | 302 | 56.7% (51.0% to 62.2%) | < 0.001 |
+| BOCPD on truncated returns | 0.67 | 306 | 71.5% (66.2% to 76.3%) | 0.002 | 304 | 67.0% (61.5% to 72.0%) | 0.468 |
+| BJV rolling | 0.67 | 306 | 68.6% (63.2% to 73.6%) | < 0.001 | 303 | 59.8% (54.2% to 65.2%) | 0.011 |
+| BJV rolling, studentised | 0.67 | 304 | 67.8% (62.3% to 72.8%) | < 0.001 | 302 | 58.3% (52.7% to 63.8%) | 0.003 |
+
+Per coin (`results/e13d_real_crypto_h1_2025_summary.csv`), the e-detector scores highest in nine of the ten coin and direction cells and ties the truncated BOCPD in the tenth (DOGE, down alarms, 41 of 58 each). Matched to band 0: e-detector 74.8% and 66.3%; competitors 61.8% to 65.0% (p ≤ 0.007) and 54.9% to 63.4% (truncated BOCPD 63.4%, p = 0.37).
+
+**Nifty 50, 2024 to 2025 (494 regular sessions), matched to band 0.25:**
+
+| Method | alarms per day | up alarms | next day above forecast (95% CI) | p vs e-detector | down alarms | next day below forecast (95% CI) | p vs e-detector |
+|---|---|---|---|---|---|---|---|
+| e-detector | 0.30 | 79 | 81.0% (71.0% to 88.1%) |  | 69 | 82.6% (72.0% to 89.8%) |  |
+| BOCPD | 0.30 | 78 | 78.2% (67.8% to 85.9%) | 0.662 | 69 | 75.4% (64.0% to 84.0%) | 0.296 |
+| BOCPD on truncated returns | 0.29 | 76 | 77.6% (67.1% to 85.5%) | 0.603 | 69 | 76.8% (65.6% to 85.2%) | 0.397 |
+| BJV rolling | 0.30 | 79 | 78.5% (68.2% to 86.1%) | 0.692 | 69 | 69.1% (57.4% to 78.8%) | 0.065 |
+| BJV rolling, studentised | 0.30 | 79 | 77.2% (66.8% to 85.1%) | 0.557 | 69 | 70.6% (58.9% to 80.1%) | 0.096 |
+
+Matched to band 0 the five methods are within 70.0% to 83.1% (up) and 66.7% to 72.0% (down), with no difference significant (p ≥ 0.11).
+
+**Alarm rates at the Gaussian-matched thresholds.** Real volatility moves far more than the Gaussian null, so every method alarms much more often than its Gaussian rate (about 0.04 per day). Crypto, Jul to Dec 2025: e-detector 0.83 alarms per day (band 0) and 0.68 (band 0.25); BOCPD 0.95; BOCPD on truncated returns 0.91; rolling BJV 0.87 (0.83 at its nominal 5% per day); studentised BJV 0.72. Nifty, per session: 0.38 and 0.30; 0.46; 0.41; 0.39 (0.37); 0.29. At these unmatched rates the competitors' forecast scores are 52.9% to 66.2% on crypto and 58.0% to 74.7% on Nifty (`results/e13d_real_pooled.csv`).
+
+### Q13e. Cost per step
+
+One series, 20,000 steps, Python and numpy on the shared 4-core machine (`results/e13e_cost.csv`; indicative): e-detector (`VolatilityMonitor.update`, two sides, 11 bets) 10.8 µs per step; BOCPD 300 µs (run-length cap 256) and 317 µs (cap 512), dominated by numpy call overhead on a few hundred run lengths; rolling BJV 211 µs per step if one truncated window pair is recomputed at each step, 27 µs per step vectorised over a whole series, 0.19 µs per step without truncation (running sums). The e-detector is the cheapest of the robust online methods by a factor of about 2.5 to 30; all are far below one minute per step.
+
+### Reading
+
+* **Where the competitors win.** On clean data (Gaussian, ticks, price noise) BOCPD detects *decreases* two to three times faster than the e-detector (26 against 81 steps for a halving of the sd, 51 against 109 for sd × 0.67) and large increases faster (13 against 20 steps for a doubling), at the same false alarm rate. Clipping the returns first (our "BOCPD on truncated returns") keeps most of that speed under jumps (25 against 81 steps) with 1.6% false alarms per day. In the held-out crypto half-year, the truncated BOCPD's down alarms were as informative as the e-detector's (67.0% against 69.7%, p = 0.47). These are real advantages, and a practitioner who trusts the Gaussian shape of returns, or only cares about decreases, could prefer BOCPD on truncated returns.
+* **Where they lose.** Plain BOCPD is not usable on returns with jumps or fat tails: false alarms on 73% (jumps) and 53% (Student t5) of days at a threshold that gives 1% on Gaussian data. Truncation fixes jumps but not fat tails (7.5% per day under t5, against 1.2% for the e-detector, whose bound of 5% is a theorem). Neither BOCPD version detects small increases as reliably (81% to 90% of 25% increases against 98% to 99%).
+* **BJV.** Truncation makes it robust to price jumps (as designed); Gaussian normalisation does not survive fat tails (37% to 53% size under t5) unless the statistic is studentised. Its power is much lower in our designs: offline, a 25% change is found in 6% to 8% of windows with k = 50 (30% with k = 125) against 100% for the e-detector at the same size. This is not a flaw of the paper: BJV is built to find *local* volatility jumps inside smoothly moving volatility, so its windows must be short, and it has no reference period. For a lasting change after a known calm stretch, accumulating evidence (betting or CUSUM) wins. Its asymptotic Gumbel critical values were very conservative here (0.3% to 1.5% for a nominal 5%). As an online rolling test it is a Shewhart-type chart and misses most small changes (9% to 35% detected for sd ratios 1.25 and 0.8).
+* **Real data, rate-matched (reviewer point M3).** At equal numbers of up and down alarms, the e-detector's alarms on crypto were followed by a day beyond an EWMA forecast clearly more often than the competitors' (78.5% and 80.5% against 58.7% to 71.7% in Jul to Dec 2025; 82.0% and 69.7% against 56.7% to 71.5% in the held-out Jan to Jun 2025). On Nifty all methods score 69% to 83% and the differences are not significant. A plausible reason, not tested here: the e-detector compares against a fixed calibrated baseline and alarms only after evidence has accumulated, so its alarms mark persistent shifts, while the competitors, tuned to the same rate, also fire on short bursts.
+* **The guarantee needs the CS baseline.** With only 500 calibration steps, the plug-in e-detector's nominal offline size was 11.4% to 18.6% instead of 5% (review point M4 again). The CS baseline restores it (0.0%) at a cost of roughly 1.5 to 2.5 times the delay.
+
+### Caveats
+
+* The BJV implementation follows the published idea, not the published equations, which could not be read here (see above). Results with simulation-calibrated critical values do not depend on the asymptotic constants, but the exact standardisation might differ from the paper's.
+* BOCPD settings (w = 250, run-length cap 512, α₀ = 2, H = 1 / A) were chosen on a Gaussian pilot to help BOCPD; a Student t likelihood or a learned hazard might do better under fat tails and was not tried.
+* Competitor thresholds matched "per day" rest on about 60 false alarms in 4000 Gaussian paths; online change cells have 200 paths (standard error of a detection share up to 3.5 points; medians are noisy).
+* The real-data validation is a proxy (next-day robust volatility against an EWMA forecast), alarms are not independent (volatility clusters), and the matching of alarm counts uses the same data. The e-detector's settings were frozen in E5 on Bitstamp BTC in Jul to Dec 2025, so only the Jan to Jun 2025 crypto run is fully held out for it.
+* Under slow stochastic volatility and GARCH clustering every method alarms often; for the e-detector this is the stated behaviour (its null is false there, E4c and E9c), for the others it shows that none of them separates "regime change" from ordinary clustering either.
+
+### References (each checked by web search on 2 November 2026)
+
+* Bibinger, M., Jirak, M. and Vetter, M. (2017). Nonparametric change-point analysis of volatility. *Annals of Statistics* 45(4), 1542 to 1578. doi:10.1214/16-AOS1499. https://projecteuclid.org/euclid.aos/1498636866 and arXiv:1502.00043, https://arxiv.org/abs/1502.00043 (metadata and abstract verified; full text not accessible from this environment).
+* Bibinger, M. and Madensoy, M. (2019). Change-point inference on volatility in noisy Itô semimartingales. arXiv:1711.08736, https://arxiv.org/pdf/1711.08736 (source, via search, of the statement that BJV's simulations use k_n = 125; not read in full).
+* Adams, R. P. and MacKay, D. J. C. (2007). Bayesian online changepoint detection. arXiv:0710.3742, https://arxiv.org/abs/0710.3742.
+* Eichinger, B. and Kirch, C. (2018). A MOSUM procedure for the estimation of multiple random change points. *Bernoulli* 24(1), 526 to 564. https://projecteuclid.org/journals/bernoulli/volume-24/issue-1/A-MOSUM-procedure-for-the-estimation-of-multiple-random-change/10.3150/16-BEJ887.pdf. Critical value formula taken from the R package `mosum`: https://raw.githubusercontent.com/cran/mosum/master/R/mosum_test.R.
+* Leadbetter, M. R., Lindgren, G. and Rootzén, H. (1983). *Extremes and Related Properties of Random Sequences and Processes*. Springer. https://link.springer.com/book/10.1007/978-1-4612-5449-2.
+* Mancini, C. (2009). Non-parametric threshold estimation for models with stochastic diffusion coefficient and jumps. *Scandinavian Journal of Statistics* 36, 270 to 296. arXiv preprint https://arxiv.org/abs/math/0607378.
+
+Figures: `results/figures/e13_offline_power.png`, `e13_online_false_alarms.png`, `e13_online_delay.png`, `e13_real_validation.png`.
 
 ---
 
@@ -1678,7 +1751,7 @@ Script `e15_panel.py`, code `src/avmonitor/panel.py`, theory and proofs `docs/th
 * *panel Bonferroni*: the panel e-process (window weights over one block) with threshold K/α. By the window identity this is almost the same detector as Bonferroni SR.
 * *panel e-BH*: the panel e-process with sticky e-BH at level α.
 
-Path by path, naive flags an asset no later than e-BH, and e-BH no later than Bonferroni (`tests/test_panel.py`).
+Path by path, for the three panel rules applied to the same e-values, naive flags an asset no later than e-BH, and e-BH no later than Bonferroni (`tests/test_panel.py`).
 
 ### Q15a. Validity [SYNTHETIC]
 
@@ -1772,7 +1845,7 @@ Median delay by the time of the change (`results/e15c_delay_by_change_time.csv`;
 **Reading.** Two lessons, both predicted by the theory note (section 6).
 
 1. *A guarantee per block is not a guarantee for the horizon.* Under no change, ten daily blocks give 4.75% probability of any discovery, well inside the 10 × 5% that per-block control allows. With changes, daily e-BH has a 23.5% chance of at least one false discovery over the horizon, against 4.25% for daily Bonferroni. The reason: in this design baselines are never recalibrated, so a changed asset is discovered again in every later block; each time, e-BH lowers the bar for the other 19 assets, and the null assets get many chances at a low bar. In each block the FDR guarantee holds, but nothing bounds the pooled count over blocks. The pooled FDR here (3.8%) and worst FDP (6.4%) happen to stay moderate; they are not covered by any theorem.
-2. *One e-process for the whole horizon keeps a single guarantee and pays with delay.* The Pareto rule keeps the any-false-discovery probability at 1.75% (no change) and 5.75% (with changes) for all 3,900 steps, but its median delay grows from 63 to 76 steps as the change comes later, the log(1/w) cost of Proposition 2 in the theory note. The last row is censored (changes near the end are often not detected in time), so its medians are biased toward short delays. Daily e-BH and the window rule get *faster* for later changes because earlier discoveries stay in the e-BH set and lower the bar; daily Bonferroni has no such effect and is flat.
+2. *One e-process for the whole horizon keeps a single guarantee and pays with delay.* The Pareto rule keeps the any-false-discovery probability at 1.75% (no change) and 5.75% (with changes) for all 3,900 steps, but its median delay grows from 63 to 76 steps as the change comes later, the cost of the Pareto weights, log(1/w), which by Proposition 2 of the theory note cannot be avoided in order. The last row is censored (changes near the end are often not detected in time), so its medians are biased toward short delays. Daily e-BH and the window rule get *faster* for later changes because earlier discoveries stay in the e-BH set and lower the bar; daily Bonferroni has no such effect and is flat.
 
 ### Q15d. Five Binance coins [REAL]
 
@@ -1798,14 +1871,14 @@ What e-BH adds over Bonferroni, and what the naive rule adds over e-BH (`results
 | Jul to Dec 2025 | 0.5 | 44; 15 of 30; 14 of 14 | 21; 10 of 13; 7 of 8 | 2 / 30 | 71.7% | 408 of 552 |
 | Jan 2024 to Jun 2025 | 0.5 | 81; 22 of 52; 29 of 29 | 87; 33 of 58; 25 of 29 | 2 / 24 | 70.5% | 1,101 of 1,527 |
 
-"Strictly earlier" is the share of coin-days found by both rules on which e-BH flagged first. The rate-matched hindsight threshold confirms at the same rate as e-BH in all 12 panel, period, band and direction cells (two-proportion tests, p-values 0.56 to 1.00, `results/e15d_rate_matched_tests.csv`).
+"Strictly earlier" is the share of coin-days found by both rules on which e-BH flagged first. The rate-matched hindsight threshold confirms at the same rate as e-BH in all 12 panel, period, band and direction cells (two-proportion tests, p-values 0.56 to 1.00, `results/e15d_rate_matched_tests.csv`; the two discovery sets overlap, so the tests are only indicative).
 
 **Reading.**
 
 1. *The strict daily null is false on most coin-days.* At band 0.25 e-BH discovers 86% to 87% of coin-days, at band 0.5 58% to 60%, and at band 0.25 there are at least two discoveries on 170 of 184 days. This repeats E9 and E10: under volatility clustering, "the truncated variance stays within 25% of yesterday's level all day" is rarely true for crypto. The FDR guarantee is then nearly empty in practice, because almost every hypothesis is false.
 2. *The multiplicity rule changes the timing more than the set.* e-BH finds only 3.7% to 8.7% more coin-days than Bonferroni. But on the coin-days both find, e-BH flags first 71% to 77% of the time, by a median of 2 to 4 minutes and a mean of 24 to 38 minutes (the mean is pulled up by a long tail, see `results/figures/e15_real_discoveries.png`, panel c). 72% to 78% of e-BH discoveries were made while the e-value was still below the Bonferroni level K/α.
 3. *Discoveries point the right way.* An e-BH up discovery is followed by a higher robust volatility over the next day 78% to 83% of the time, against 46% to 50% at matched random times; a down discovery by a lower one 85% to 97% of the time, against 49% to 55%.
-4. *The marginal up discoveries are weak.* The up discoveries that only e-BH makes (not Bonferroni) are confirmed 42% to 57% of the time, which is near the control rate; marginal down discoveries are confirmed 71% to 100% of the time (small n). The naive rule's extra discoveries are similar. So the extra discoveries add little information beyond what Bonferroni finds; the value of e-BH here is earlier alarms, not more alarms.
+4. *The marginal up discoveries are weak.* The up discoveries that only e-BH makes (not Bonferroni) are confirmed 42% to 57% of the time, which is near the control rate; marginal down discoveries are confirmed 71% to 100% of the time (small n). The up discoveries that only the naive rule makes are confirmed 36% to 77% of the time across cells, a wider range. So the extra discoveries add little information beyond what Bonferroni finds; the value of e-BH here is earlier alarms, not more alarms.
 5. *e-BH is not better than a well chosen fixed threshold, in hindsight.* A per-asset threshold set after the fact to make as many discoveries confirms at the same rate. The difference is that e-BH's level is fixed in advance and carries the FDR guarantee; the rate-matched threshold (33 to 48 on the e-value scale) was read off the data.
 
 ### Q15e. Five coins and the Nifty 50 index on one clock [REAL]
