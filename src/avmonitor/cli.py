@@ -75,10 +75,24 @@ def _load(a):
 def cmd_run(a) -> int:
     from .data import intraday_scale
 
-    df = _load(a)
+    # The intraday profile uses past days only, so load a warm-up period before --start
+    # (calendar days; sessions markets need extra days for weekends and holidays).
+    warm_days = int(a.lookback_days * (1.6 if a.source == "nifty" else 1.0)) + 7
+    start = pd.Timestamp(a.start)
+    aw = argparse.Namespace(**vars(a))
+    aw.start = (start - pd.Timedelta(days=warm_days)).strftime("%Y-%m-%d")
+    df_all = _load(aw)
+    s_all = intraday_scale(df_all["logret"], lookback_days=a.lookback_days)
+    t0 = start.tz_localize(df_all.index.tz) if df_all.index.tz is not None and start.tz is None else start
+    keep = df_all.index >= t0
+    df, s = df_all.loc[keep], s_all.loc[keep]
+    if len(df) == 0:
+        raise SystemExit("no data in the requested period")
     spd = STEPS_PER_DAY[a.source]
     r = df["logret"]
-    s = intraday_scale(r, lookback_days=a.lookback_days)
+    n_nan = int((~np.isfinite((r / s).to_numpy())).sum())
+    if n_nan > 0.5 * len(r):
+        print(f"note: {n_nan} of {len(r)} returns have no intraday scale yet (not enough earlier data); they are skipped")
     u = (r / s).to_numpy(copy=True)
     u[~np.isfinite(u)] = np.nan
     A = _threshold(spd, a.budget)
