@@ -21,14 +21,16 @@ tuned here: A = 28,800 per side (at most a 5% chance of any false alarm per day
 when the null holds), c = 3, cal_len = 1440 minutes, null band 0.25, returns
 divided by the predictable intraday profile ``intraday_scale`` (20-day lookback).
 Benchmark: the Gaussian likelihood ratio monitor (band 0), which reacts to single
-large returns because it does not truncate.
+large returns because it does not truncate. Because the band alone changes the
+alarm rate, the robust monitor is also run with band 0 ("robust e-detector,
+band 0", iteration 4) so that robust against Gaussian compares like with like.
 
 Two designs
   "streaming": the monitor runs over the whole two years exactly as in E5c and E6
       (calibrate 1440 minutes, monitor, alarm, recalibrate). Its state at a release
       is whatever the stream left it in; after an alarm it is blind for a day.
   "fresh calibration" (added in iteration 2 after the streaming run showed that the
-      monitor was in calibration mode at 40% to 60% of the releases): for every event
+      monitor was in calibration mode at 44% to 64% of the releases): for every event
       and every control anchor a new monitor is calibrated on the 1440 minutes
       before the anchor and then monitors the 48 hours after it, so both detectors
       are awake at every anchor. For the pre-release window a monitor is calibrated
@@ -42,15 +44,22 @@ Research questions
         its matched control windows) the event label is exchangeable under the null,
         so the number of event windows with an alarm is a sum of independent
         Bernoulli draws with p_i = (alarms in stratum i) / (windows in stratum i);
-        the one-sided p-value is P(T >= observed). A pooled one-sided Fisher exact
-        test (event windows against the union of control windows) is reported as a
-        cruder comparison. Multiple comparisons: the PRIMARY family, fixed before the
+        the one-sided p-value is P(T >= observed). Control rates are MATCHED: for
+        each event, the share of its own control windows with the outcome, averaged
+        over events (iteration 4). Cross-check: an exact stratified Fisher
+        (Cochran-Mantel-Haenszel) test with one stratum per weekday and clock time,
+        in which events of one weekday share their control windows. The union rate
+        and the pooled Fisher test of iterations 1 to 3 mixed weekdays (Thursday and
+        Friday windows reach into the weekend) and are kept only as columns marked
+        "_superseded". Multiple comparisons: the PRIMARY family, fixed before the
         first run, is {FOMC, CPI} x {up alarm within 6 hours} on BTC with the robust
         detector in the streaming design, Holm-corrected at 5%. ETH and SOL are
         replications (raw p-values; the three coins move together, so they are not
         independent evidence). Every other outcome, detector, design and sample is
         secondary and reported raw; a Holm correction over the six robust "up within
         6 hours" tests (3 coins x 2 types) is also given within each design.
+        Secondary outcome added in iteration 4 (after the review, not planned):
+        an up alarm at most 60 minutes after the release ("up_post_1h").
   Q12b. How many minutes after the release does the first up alarm come, and how
         often does an up alarm fire in the 6 hours BEFORE the release (which would
         be anticipation or a false alarm, since the number is not yet public)?
@@ -61,13 +70,15 @@ Research questions
         deseasonalised return in the 5 minutes up to the alarm, in units of the
         baseline scale (above 3 it would have been truncated by the robust monitor),
         and the robust volatility of the next 1440 minutes relative to the baseline
-        (near 1 means no persistent change).
+        (near 1 means no persistent change). The "jump only" share (a return above
+        3 scale units and no increase over the next day) cannot tell a jump from a
+        burst of a few hours that is over within the day, as releases produce.
 
 Outputs: results/e12_events_checked.csv, e12_events_excluded.csv, e12_event_windows.csv, e12_control_windows.csv,
 e12_tests.csv, e12_delay.csv, e12_gaussian_vs_robust.csv, e12_monitor_summary.csv,
 e12_all_alarms.csv, e12_profiles.csv and results/figures/e12_event_profiles.png.
 No random numbers are used (the permutation distribution is computed exactly).
-Usage: python experiments/e12_crypto_events.py   (about 5 minutes, one process)
+Usage: python experiments/e12_crypto_events.py   (about 2 to 5 minutes, one process)
 """
 
 from __future__ import annotations
@@ -91,11 +102,17 @@ START, END = "2024-01-01", "2026-01-01"  # data loaded (the first 20 days warm u
 MONITOR_START = "2024-01-21"  # first minute of the monitored stream; events before it are excluded
 TZ = "America/New_York"
 A, C, CAL, BAND = 28800.0, 3.0, 1440, 0.25
-DETECTORS = {"robust e-detector": (VolatilityMonitor, BAND), "Gaussian LR": (GaussianLRMonitor, 0.0)}
+# "robust e-detector, band 0" (iteration 4, review round 2a M3): the robust monitor with the Gaussian benchmark's band,
+# so that robust against Gaussian is a like-for-like comparison (GaussianLRMonitor has no band; it ignores null_band).
+BAND0_DETECTOR = "robust e-detector, band 0"
+DETECTORS = {"robust e-detector": (VolatilityMonitor, BAND), "Gaussian LR": (GaussianLRMonitor, 0.0),
+             BAND0_DETECTOR: (VolatilityMonitor, 0.0)}
 PRIMARY_DETECTOR, PRIMARY_COIN, PRIMARY_DESIGN = "robust e-detector", "BTC", "streaming"
 DESIGNS = ("streaming", "fresh calibration")
 TYPES = ("fomc", "cpi")
-OUTCOMES = ("up_post", "up_pre", "down_follow", "any_post")
+# up_post_1h (iteration 4, secondary, added after the review): first up alarm at most 60 minutes after the release
+OUTCOMES = ("up_post", "up_post_1h", "up_pre", "down_follow", "any_post")
+HOUR = 60
 POST = 6 * 60  # Q12a window: [release, release + 6 h)
 PRE = 6 * 60  # anticipation window: [release - 6 h, release)
 DOWN_TO = 48 * 60  # Q12c window: [release + 6 h, release + 48 h)
@@ -105,7 +122,7 @@ BIN = 5  # minutes per bin in the figure
 JUMP_LOOKBACK = 5  # minutes up to the alarm scanned for the largest |return|
 DAY = 1440
 MIN_FINITE = 1000
-WINDOW_KEYS = ["monitoring_at_start", "monitored_share_post", "any_post", "up_post", "n_up_post", "down_post",
+WINDOW_KEYS = ["monitoring_at_start", "monitored_share_post", "any_post", "up_post", "up_post_1h", "n_up_post", "down_post",
                "first_up_delay_min", "first_up_max_abs_recent_over_scale", "first_up_post_over_baseline", "up_pre",
                "last_up_lead_min", "down_follow", "first_down_follow_min", "down_after_up", "abs_ret_first_hour_over_pre",
                "abs_ret_post_over_pre"]
@@ -150,6 +167,15 @@ def control_anchors(index: pd.DatetimeIndex, event_days: list, weekday: int, tim
             continue
         out.append(i)
     return out
+
+
+def weekend_flags(index: pd.DatetimeIndex, i0: int) -> tuple[bool, bool, bool]:
+    """Whether the pre window [-6 h, 0), the post window [0, 6 h) and the follow-up window [6 h, 48 h) around i0 touch
+    a Saturday or Sunday (UTC). Used to check that every event and its matched controls agree (iteration 4, M2)."""
+    def touches(lo: int, hi: int) -> bool:
+        return bool((index[max(0, i0 + lo) : i0 + hi].dayofweek >= 5).any())
+
+    return touches(-PRE, 0), touches(0, POST), touches(POST, DOWN_TO)
 
 
 # ----------------------------------------------------------------------------
@@ -215,6 +241,7 @@ def window_stats(ev: pd.DataFrame, monitoring: np.ndarray, u: np.ndarray, i0: in
         monitored_share_post=float(monitoring[i0 : i0 + POST].mean()),
         any_post=bool(post.any()),
         up_post=bool(up_post.any()),
+        up_post_1h=bool((up_post & (rel <= HOUR)).any()),
         n_up_post=int(up_post.sum()),
         down_post=bool((post & (d == "down")).any()),
         first_up_delay_min=int(rel[first]) if first is not None else np.nan,
@@ -255,12 +282,30 @@ def fresh_window(name: str, u: np.ndarray, i0: int) -> tuple[dict, pd.DataFrame]
 # ----------------------------------------------------------------------------
 
 
-def poisson_binomial_tail(ps, k: int) -> float:
-    """P(T >= k) for T a sum of independent Bernoulli(p_i), computed exactly by convolution."""
+def poisson_binomial_tail(ps, k: int, lower: bool = False) -> float:
+    """P(T >= k) (or P(T <= k) with ``lower``) for T a sum of independent Bernoulli(p_i), exactly by convolution."""
     dist = np.array([1.0])
     for p in ps:
         dist = np.convolve(dist, [1.0 - p, p])
+    if lower:
+        return float(dist[: k + 1].sum())
     return float(dist[k:].sum()) if k < dist.size else 0.0
+
+
+def stratified_fisher_tail(groups) -> float:
+    """Exact stratified (Cochran-Mantel-Haenszel, conditional) test, one-sided for MORE events with the outcome.
+
+    ``groups`` holds (events with, events, controls with, controls) per weekday-and-clock-time group. Events of one
+    group share the same control windows, and groups do not share windows. Under the null the event labels are
+    exchangeable within a group, so the number of events with the outcome is hypergeometric given the group's total,
+    and the groups are independent; the null distribution of the total is their convolution. This replaces the pooled
+    Fisher test, which put all weekdays in one table (iteration 4, review round 2a M2).
+    """
+    dist, obs = np.array([1.0]), 0
+    for e_with, e_n, c_with, c_n in groups:
+        pmf = stats.hypergeom.pmf(np.arange(e_n + 1), e_n + c_n, e_with + c_with, e_n)
+        dist, obs = np.convolve(dist, pmf), obs + e_with
+    return float(min(1.0, dist[obs:].sum()))
 
 
 def holm(pvals) -> np.ndarray:
@@ -285,13 +330,21 @@ def wilson(k: int, n: int, z: float = 1.959964) -> tuple[float, float]:
 
 
 def stratified_tests(coin, det, design, events, estats, cstats, controls) -> list[dict]:
+    """Event windows against their matched control windows (same weekday and US Eastern clock time).
+
+    Control rates are MATCHED: for each event, the share of its own control windows with the outcome, averaged over
+    events (iteration 4, review round 2a M2). The rate over the union of all events' control windows mixes weekdays in
+    proportion to the number of control days rather than to the events (FOMC: 65 Wednesdays and 69 Thursdays for 15
+    Wednesday statements and one Thursday statement), and Thursday and Friday windows reach into the weekend; that
+    rate and the pooled Fisher test built on it are kept only as columns marked ``_superseded``.
+    """
     rows = []
     samples = ("all", "monitoring at start") if design == "streaming" else ("all",)
     for etype in TYPES:
         sub = events[events["event_type"] == etype]
         for outcome in OUTCOMES:
             for sample in samples:
-                ys, ps, union = [], [], {}
+                ys, ps, cr, union, groups = [], [], [], {}, {}
                 for _, row in sub.iterrows():
                     st = estats[int(row["i0"])]
                     cs = controls(row)
@@ -301,23 +354,36 @@ def stratified_tests(coin, det, design, events, estats, cstats, controls) -> lis
                         cs = [i for i in cs if cstats[i]["monitoring_at_start"]]
                     if not cs:
                         continue
-                    pool = [st[outcome]] + [cstats[i][outcome] for i in cs]
+                    c_out = [bool(cstats[i][outcome]) for i in cs]
                     ys.append(bool(st[outcome]))
-                    ps.append(float(np.mean(pool)))
-                    for i in cs:
-                        union[i] = bool(cstats[i][outcome])
+                    ps.append(float(np.mean([st[outcome]] + c_out)))  # stratum: the event window and its controls
+                    cr.append(float(np.mean(c_out)))  # matched control rate of this event
+                    key = (row["date"].weekday(), row["release_time_et"])
+                    g = groups.setdefault(key, [0, 0, int(sum(c_out)), len(cs)])
+                    if g[2:] != [int(sum(c_out)), len(cs)]:
+                        raise ValueError("events of one weekday-and-time group must share their control windows")
+                    g[0] += int(bool(st[outcome]))
+                    g[1] += 1
+                    for i, y in zip(cs, c_out):
+                        union[i] = y
                 k1, n1 = int(sum(ys)), len(ys)
                 k0, n0 = int(sum(union.values())), len(union)
-                p_strat = poisson_binomial_tail(ps, k1) if n1 else np.nan
-                p_fisher = stats.fisher_exact([[k1, n1 - k1], [k0, n0 - k0]], alternative="greater")[1] if n1 and n0 else np.nan
+                rate_matched = float(np.mean(cr)) if cr else np.nan
                 lo, hi = wilson(k1, n1)
-                lo0, hi0 = wilson(k0, n0)
-                rows.append(dict(coin=coin, detector=det, design=design, event_type=etype, outcome=outcome, sample=sample,
-                                 events=n1, events_with=k1, rate_event=k1 / n1 if n1 else np.nan, rate_event_lo=lo, rate_event_hi=hi,
-                                 expected_under_null=float(np.sum(ps)), control_windows=n0, control_windows_with=k0,
-                                 rate_control=k0 / n0 if n0 else np.nan, rate_control_lo=lo0, rate_control_hi=hi0,
-                                 rate_ratio=(k1 / n1) / (k0 / n0) if n1 and n0 and k0 else np.nan,
-                                 p_stratified_permutation=p_strat, p_fisher_pooled=p_fisher))
+                rows.append(dict(
+                    coin=coin, detector=det, design=design, event_type=etype, outcome=outcome, sample=sample,
+                    events=n1, events_with=k1, rate_event=k1 / n1 if n1 else np.nan, rate_event_lo=lo, rate_event_hi=hi,
+                    control_windows=n0, weekday_time_groups=len(groups),
+                    rate_control_matched=rate_matched, expected_from_matched_controls=float(np.sum(cr)),
+                    rate_ratio_matched=(k1 / n1) / rate_matched if n1 and rate_matched > 0 else np.nan,
+                    expected_under_null=float(np.sum(ps)),
+                    p_stratified_permutation=poisson_binomial_tail(ps, k1) if n1 else np.nan,
+                    p_stratified_permutation_fewer=poisson_binomial_tail(ps, k1, lower=True) if n1 else np.nan,
+                    p_stratified_fisher=stratified_fisher_tail(groups.values()) if n1 else np.nan,
+                    union_control_windows_with_superseded=k0,
+                    union_rate_control_superseded=k0 / n0 if n0 else np.nan,
+                    p_fisher_pooled_superseded=(stats.fisher_exact([[k1, n1 - k1], [k0, n0 - k0]], alternative="greater")[1]
+                                                if n1 and n0 else np.nan)))
     return rows
 
 
@@ -426,6 +492,15 @@ def main():
             return cache[key]
 
         events["n_controls"] = [len(controls(r)) for _, r in events.iterrows()]
+        # Matching on weekday and clock time also matches whether each window reaches into the weekend; check it.
+        flags = []
+        for _, row in events.iterrows():
+            fl = weekend_flags(index, int(row["i0"]))
+            if any(weekend_flags(index, i) != fl for i in controls(row)):
+                raise ValueError(f"an event and its controls differ in weekend overlap: {row['date'].date()}")
+            flags.append(fl)
+        events["pre_window_touches_weekend"], events["post_window_touches_weekend"], \
+            events["follow_window_touches_weekend"] = map(list, zip(*flags))
         anchors = sorted({i for _, row in events.iterrows() for i in controls(row)})
         a = np.abs(u)
         for det in DETECTORS:
@@ -460,6 +535,7 @@ def main():
                     windows.append(dict(coin=coin, detector=det, design=design, date=row["date"].date(), event_type=row["event_type"],
                                         release_utc=row["release_utc"], weekday=row["weekday"], n_controls=len(cs), **st,
                                         control_up_post_rate=float(np.mean([c["up_post"] for c in cs])),
+                                        control_up_post_1h_rate=float(np.mean([c["up_post_1h"] for c in cs])),
                                         control_up_pre_rate=float(np.mean([c["up_pre"] for c in cs])),
                                         control_down_follow_rate=float(np.mean([c["down_follow"] for c in cs])),
                                         control_down_after_up_given_up_rate=float(np.mean([c["down_after_up"] for c in cs_up])) if cs_up else np.nan,
@@ -483,7 +559,8 @@ def main():
     # ---- save
     OUT.mkdir(parents=True, exist_ok=True)
     chk = events[["date", "event_type", "release_time_et", "release_time_utc", "eastern_zone", "weekday", "status",
-                  "original_date", "i0", "n_controls", "source_url"]].copy()
+                  "original_date", "i0", "n_controls", "pre_window_touches_weekend", "post_window_touches_weekend",
+                  "follow_window_touches_weekend", "source_url"]].copy()
     chk["date"] = chk["date"].dt.date
     chk.to_csv(OUT / "e12_events_checked.csv", index=False)
     win = pd.DataFrame(windows)
@@ -504,15 +581,20 @@ def main():
     pd.DataFrame(summary).to_csv(OUT / "e12_monitor_summary.csv", index=False)
     alarms_df = pd.concat(all_alarms, ignore_index=True)
     alarms_df.to_csv(OUT / "e12_all_alarms.csv", index=False)
-    # ---- Q12b and Q12c: delay table
+    # ---- Q12b and Q12c: delay table. Every control_* rate here is matched: the mean over events of the rate among
+    # that event's own control windows (same weekday and clock time).
     drows = []
     for (coin, det, design, etype), g in win.groupby(["coin", "detector", "design", "event_type"], sort=False):
         dl = g["first_up_delay_min"].dropna()
+        awake = g["monitoring_at_start"].astype(bool)
         drows.append(dict(coin=coin, detector=det, design=design, event_type=etype, events=len(g),
-                          monitoring_at_release=int(g["monitoring_at_start"].sum()),
+                          monitoring_at_release=int(awake.sum()),
                           control_monitoring_at_start_rate=float(g["control_monitoring_at_start_rate"].mean()),
                           with_up_in_6h=int(g["up_post"].sum()), control_up_in_6h_rate=float(g["control_up_post_rate"].mean()),
-                          with_up_in_first_30min=int((dl <= 30).sum()), with_up_in_first_60min=int((dl <= 60).sum()),
+                          with_up_in_6h_when_monitoring_at_release=int((g["up_post"].astype(bool) & awake).sum()),
+                          with_up_in_first_30min=int((dl <= 30).sum()), with_up_in_first_60min=int((dl <= HOUR).sum()),
+                          with_up_in_first_60min_when_monitoring_at_release=int((g["up_post_1h"].astype(bool) & awake).sum()),
+                          control_up_in_first_60min_rate=float(g["control_up_post_1h_rate"].mean()),
                           median_delay_min=float(dl.median()) if len(dl) else np.nan,
                           q25_delay_min=float(dl.quantile(0.25)) if len(dl) else np.nan,
                           q75_delay_min=float(dl.quantile(0.75)) if len(dl) else np.nan,
@@ -570,8 +652,8 @@ def main():
     with pd.option_context("display.width", 250, "display.max_columns", 40):
         print(pd.DataFrame(summary).round(3).to_string(index=False))
         show = ["coin", "detector", "design", "event_type", "outcome", "sample", "events", "events_with", "rate_event",
-                "expected_under_null", "control_windows", "rate_control", "p_stratified_permutation", "p_fisher_pooled", "family",
-                "p_holm_primary", "p_holm_six_coins_types"]
+                "control_windows", "rate_control_matched", "rate_ratio_matched", "p_stratified_permutation",
+                "p_stratified_fisher", "family", "p_holm_primary", "p_holm_six_coins_types"]
         print(tst[tst.outcome == "up_post"][show].round(4).to_string(index=False))
         print(tst[tst.outcome != "up_post"][show].round(4).to_string(index=False))
         print(delay.round(3).to_string(index=False))
