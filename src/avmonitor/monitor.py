@@ -237,11 +237,10 @@ class VolatilityMonitor:
             if not self._cs.rel_width <= self.target_rel_width:
                 return
         if self._cs.t < max(1, (self.cal_len - self.n_tau) // 2):  # too few finite returns in the second part
-            if len(self.buffer) < self.cal_max:
+            if len(self.buffer) < self.cal_max or self._cs.t == 0:
+                # Keep collecting. A sequence that has started is never restarted, so each segment uses exactly
+                # one confidence sequence and its error probability stays at delta (docs/math.md, 6.3).
                 self._extended = True
-                return
-            if self._cs.t == 0:
-                self._restart()
                 return
         rr = np.asarray(self.buffer)
         rr = rr[np.isfinite(rr)]
