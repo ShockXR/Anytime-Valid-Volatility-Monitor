@@ -17,8 +17,8 @@ the CSV disagrees. Rows marked cancelled (the October 2025 CPI, a casualty of th
 federal government shutdown) or outside the sample are documentation only.
 
 Settings are FROZEN from E5c (chosen on Bitstamp BTC, Jul to Dec 2025) and not
-tuned here: A = 28,800 per side (at most a 5% chance of any false alarm per day
-when the null holds), c = 3, cal_len = 1440 minutes, null band 0.25, returns
+tuned here: A = 28,800, each side alarming at 2A (together at most a 5% chance
+of any false alarm per day when the null holds), c = 3, cal_len = 1440 minutes, null band 0.25, returns
 divided by the predictable intraday profile ``intraday_scale`` (20-day lookback).
 Benchmark: the Gaussian likelihood ratio monitor (band 0), which reacts to single
 large returns because it does not truncate. Because the band alone changes the
