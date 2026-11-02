@@ -1,0 +1,3 @@
+setting,A,alarms_per_10000_steps,bound_per_10000_steps
+"true baseline, two-sided SR, restarts",300.0,26.537916666666668,33.333333333333336
+"streaming monitor, plug-in recalibration, cal_len 390",300.0,30.13053829944446,33.333333333333336
