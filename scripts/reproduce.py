@@ -56,6 +56,7 @@ EXPERIMENTS = [
     ("E10 forecast-relative", ["experiments/e10_forecast_relative.py"], True, "full"),
     ("E10d signal cap", ["experiments/e10_forecast_relative.py", "d"], False, "quick"),
     ("E11 delay theory", ["experiments/e11_delay_theory.py"], False, "full"),
+    ("E11f decrease-side clip", ["experiments/e11f_split_c.py"], True, "full"),
     ("E12 crypto events", ["experiments/e12_crypto_events.py"], True, "full"),
     ("E13 benchmarks", ["experiments/e13_benchmarks.py"], False, "full"),
     ("E14 running truncation", ["experiments/e14_running_tau.py"], False, "full"),

@@ -106,7 +106,7 @@ Each experiment is one script in `experiments/` that writes CSV files to `result
 | E8 | Confidence-sequence baseline | `e08_cs_baseline.py` | SYNTHETIC and REAL |
 | E9 | Stress tests of the guarantee, runtime | `e09_stress_guarantee.py` | SYNTHETIC |
 | E10 | Clustering and forecast-relative monitoring | `e10_forecast_relative.py` | SYNTHETIC and REAL |
-| E11 | Detection delay theory and bet design | `e11_delay_theory.py` | SYNTHETIC |
+| E11 | Detection delay theory and bet design; a tighter clip for decreases | `e11_delay_theory.py`, `e11f_split_c.py` | SYNTHETIC and REAL |
 | E12 | FOMC and CPI event study on crypto | `e12_crypto_events.py` | REAL |
 | E13 | Benchmark against published change-point methods | `e13_benchmarks.py` | SYNTHETIC |
 
