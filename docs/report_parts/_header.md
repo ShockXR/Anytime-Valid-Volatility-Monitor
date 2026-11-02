@@ -18,7 +18,7 @@ To rerun: `pip install -r requirements.txt && pip install -e .`, then `python sc
 | E4 | False alarms and delay against parametric and classical detectors | The robust e-detector is the only valid one under jumps and fat tails, 10% to 70% slower on clean Gaussian data. The plug-in baseline roughly triples the false alarm rate with short calibration (E4e). |
 | E5 | Real data, Bitstamp BTC | 81% and 90% of up and down alarms are followed by volatility in the flagged direction, but clustering explains much of the up figure. |
 | E6 | The paper's five coins on Binance | Published tables imply unnormalised weights, the raw MAD and about 2,000 missing minutes; an ETH sign slip and a DOGE contradiction. Alarms beat EWMA and HAR forecasts, but a hindsight-tuned ratio rule is as precise. |
-| E7 | Nifty 50 and India VIX | Out of sample, 78% of up alarms are followed by higher volatility (47% at random); every budget day watched from the open raised an alarm; the monitor answers "has volatility changed?", not "is it high?". |
+| E7 | Nifty 50 and India VIX | Out of sample, 78% of up alarms are followed by higher volatility (47% at random); every budget day watched from the open raised an alarm; the monitor answers "has volatility changed?", not "is it high?". India VIX moves with the alarms on the same day but the alarms do not lead it. |
 | E8 | A guarantee with an estimated baseline | Proved: P(false alarm within m steps) ≤ δ + m / A with a confidence-sequence baseline; observed at most 0.27% against 5%. |
 | E9 | How tight is the guarantee, and when does it fail? | About 4 times conservative and distribution free; persistent GARCH clustering breaks it. |
 | E10 | Monitoring relative to a volatility forecast | Restores the guarantee under clustering; a frozen persistent forecast lets through at most (1 - β)/α of any break, and an information bound puts the delay near two days. |
@@ -29,6 +29,6 @@ To rerun: `pip install -r requirements.txt && pip install -e .`, then `python sc
 | E15 | Panel monitoring with false discovery control | In progress. |
 | ALT1 | Quarticity stream; pre-averaging for noise | Price noise breaks the raw-return guarantee; non-overlapping pre-averaged blocks restore it. |
 | ALT2 | Risk switch | Tails on par with daily volatility targeting, worse tracking, no Sharpe difference; the robust trigger beats the Gaussian one. |
-| ALT3 | Robust local IQ estimator | In progress. |
+| ALT3 | Robust local IQ estimator | Squaring a local variance is 95% efficient against 74% for RQ-type estimators; one daily MAD stops converging when volatility moves within the day; on BTC and DOGE large returns come in bursts and scale-truncated estimators remove a third to a half of IQ. |
 | ALT4 | Correlation monitor | Sign concordance gives a valid correlation monitor that volatility changes cannot fool. |
 | ALT5 | Two-sample betting test | In progress. |

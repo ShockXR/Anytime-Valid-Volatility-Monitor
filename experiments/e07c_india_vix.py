@@ -5,7 +5,7 @@ https://archives.nseindia.com/content/indices/ind_close_all_DDMMYYYY.csv
 (one file per trading day; the file has an "India VIX" row with open, high,
 low and close, and a "Nifty 50" row used here to cross-check the minute data).
 India VIX is computed by NSE from Nifty option prices, so it measures the volatility
-the options market expects over the next 30 days. It is a forward-looking quantity
+the options market expects in the coming weeks. It is a forward-looking quantity
 that the monitor never sees.
 
 Research question
@@ -91,9 +91,12 @@ def parse() -> pd.DataFrame:
             if len(vix) != 1 or len(nifty) != 1:
                 bad.append(p.name)
                 continue
-            num = lambda r, c: float(r[c].iloc[0])  # noqa: E731
+            def num(r, c):
+                x = str(r[c].iloc[0]).strip()
+                return np.nan if x in ("-", "") else float(x)
+
             rows.append(dict(date=pd.to_datetime(p.stem[-8:], format="%d%m%Y"),
-                             file_date=pd.to_datetime(vix["Index Date"].iloc[0], dayfirst=True),
+                             file_date_text=str(vix["Index Date"].iloc[0]).strip(),
                              vix_open=num(vix, "Open Index Value"), vix_high=num(vix, "High Index Value"),
                              vix_low=num(vix, "Low Index Value"), vix_close=num(vix, "Closing Index Value"),
                              nifty_open=num(nifty, "Open Index Value"), nifty_high=num(nifty, "High Index Value"),
@@ -101,6 +104,11 @@ def parse() -> pd.DataFrame:
         except Exception:
             bad.append(p.name)
     d = pd.DataFrame(rows).sort_values("date").reset_index(drop=True)
+    # A VIX row with no open, high and low repeats the previous close (change 0): NSE did not
+    # publish a new value that day. Treat it as missing rather than as "no change".
+    stale = d["vix_open"].isna() & d["vix_high"].isna() & d["vix_low"].isna()
+    d["vix_stale"] = stale
+    d.loc[stale, "vix_close"] = np.nan
     d.attrs["unparsed"] = bad
     return d
 
@@ -139,7 +147,7 @@ def analyse(v: pd.DataFrame):
     al = pd.read_csv(OUT / "e07b_alarms.csv", parse_dates=["session"])
     sess = pd.read_csv(OUT / "e07b_session_vol.csv", parse_dates=["session"])["session"]
     v = v.set_index("date")
-    lv = np.log(v["vix_close"])
+    lv = np.log(v["vix_close"].dropna())  # changes are between neighbouring days that have a VIX value
     d_same = lv.diff()  # previous VIX day to alarm day
     d_next = lv.shift(-1) - lv  # alarm day to next VIX day
     s = pd.DataFrame({"session": sess})
@@ -179,7 +187,12 @@ def main():
     v = parse()
     print(f"REAL DATA: {len(v)} NSE daily files parsed, {len(v.attrs['unparsed'])} without a VIX and Nifty row:",
           v.attrs["unparsed"][:10])
-    print("file date equals requested date:", bool((v["date"] == v["file_date"]).all()))
+    # the date inside the file is day-month-year in almost all files and month-day-year in a few
+    dmy = pd.to_datetime(v["file_date_text"], format="%d-%m-%Y", errors="coerce")
+    mdy = pd.to_datetime(v["file_date_text"], format="%m-%d-%Y", errors="coerce")
+    agree = (dmy == v["date"]) | (mdy == v["date"])
+    print("files whose internal date matches the file name:", int(agree.sum()), "of", len(v),
+          "| month-first inside:", int(((mdy == v["date"]) & (dmy != v["date"])).sum()))
     v.to_csv(RAW / "india_vix_daily.csv", index=False)
     log = RAW / "download_log.csv"
     if log.exists():
@@ -187,6 +200,7 @@ def main():
     cc = crosscheck(v)
     cc.to_csv(OUT / "e07c_nse_crosscheck.csv", index=False)
     print(cc.to_string(index=False))
+    print("VIX values missing (stale repeat of the previous close):", v.loc[v["vix_stale"], "date"].dt.date.tolist())
     desc = v["vix_close"].describe()
     print("India VIX close:", desc.round(2).to_dict())
     res = analyse(v)

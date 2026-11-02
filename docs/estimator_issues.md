@@ -5,7 +5,7 @@ This note checks two possible problems that an earlier summary raised about the 
 * **Algebra**: follows directly from the printed formulas.
 * **Simulation**: our own synthetic experiments (scripts in `experiments/`, numbers in `results/`).
 * **Published**: numbers printed in the paper.
-* **Real data**: Bitstamp BTC/USD 1-minute bars, 1 July to 31 December 2025.
+* **Real data**: Bitstamp BTC/USD 1-minute bars, 1 July to 31 December 2025 (E5), and Binance spot 1-minute bars for the paper's five coins (E6, ALT3).
 * **Inference**: a reading of the published numbers that fits the evidence but cannot be confirmed without the author's code.
 
 Plain-language background is in `docs/paper_review.md`. The formal statements are in `docs/math.md`.
@@ -18,6 +18,7 @@ Plain-language background is in `docs/paper_review.md`. The formal statements ar
 | 2 | Truncation at c times MAD leaves a bias that does not vanish | **Genuine limitation of Theorem 1 as stated.** Its size depends on whether the MAD is scaled, which the paper does not say. | Keeps 70.5% of the fourth moment with the raw MAD (bias of about minus 30%), or 96.4% with the scaled MAD (about minus 3.6%), for every n. | Yes: divide by a known constant, or let the threshold shrink more slowly than the returns. |
 | 3 | The averaged estimator (eq. 16) is the same as truncated realized quarticity | **Genuine (algebra).** The kernel and bandwidth only matter for the local estimate. | Correlation 0.98 to 0.99 with plain truncated RQ in every scenario we ran. | Nothing to fix: it means the kernel's real value is local, which is what an online monitor needs. |
 | 4 | Smaller points: weight order in eq. (15), noise model, TPQ and BPQ constants, one claim about Table 7, the real-data RMSE | Mixed: see below. | Mostly minor. | Yes. |
+| 5 | One daily MAD when volatility moves within the day, and bursts of large returns on real data (round 2, ALT3) | **Genuine outside the paper's simulation design**, which keeps volatility constant within the day. | Bias still about minus 14% at n = 23,400 under stochastic volatility with an intraday pattern [SYNTHETIC]; on BTC and DOGE one-minute data, scale-truncated estimators come out at 0.33 to 0.44 times MedRQ [REAL]. | Partly: a local scale restores convergence; bursts need a neighbour guard, still under study. |
 
 None of this undermines the core idea, which is to truncate returns with a robust scale and then kernel-smooth. Points 1 and 2 change the numbers in the simulation tables. Point 3 changes where the method is most useful.
 
@@ -162,8 +163,34 @@ For integrated quarticity, the sensitivity to bandwidth and kernel shown in Tabl
 
 **4h. A result we could not reproduce.** For σ_J = 0.10, the published robust-kernel RMSEs are 1.3 to 22 times larger than ours (median 5.3, quartiles 1.9 to 7.2; median simulated / published ratio 0.19, E1), while the plain kernel matches. Some unreported detail of the large-jump design seems to differ, for example how MAD is computed or how jump sizes are drawn. We report this rather than tune parameters to hide it.
 
+---
+
+## Issue 5. One daily scale when volatility moves within the day (round 2)
+
+This issue comes from the alternative prototype `alternatives/robust_iq_estimator` (ALT3); details, code and every number are in its `RESULTS.md`.
+
+### The concern
+
+The paper truncates every return of a day at 3 times one MAD computed from the whole day. Its simulation design keeps volatility constant within the day, and there this works: the bias is a known constant (Issue 2) and can be divided out. Real one-minute volatility moves during the day (an intraday pattern, news, bursts). Then one daily threshold is too tight in the busy hours and too loose in the quiet ones.
+
+### Simulation (ALT3, Q2) [SYNTHETIC]
+
+With stochastic volatility and an intraday pattern, the daily-MAD rule's bias does not shrink as the sampling gets finer: about minus 14% at n = 23,400 even after the Issue 2 correction, and its RMSE falls like n to the power minus 0.1 instead of minus 0.5. Estimators that truncate against a **local** scale (a few dozen neighbouring returns) converge at the usual square-root-of-n rate (fitted slopes minus 0.50 to minus 0.68). So the robustness idea survives; it needs a local scale when volatility is not constant.
+
+### Real data (ALT3, Q5 and Q6) [REAL]
+
+On Binance BTCUSDT and DOGEUSDT one-minute bars (July to December 2025), the MAD-truncated estimators come out at 0.33 to 0.44 times MedRQ, local plug-ins at 0.66 to 0.73, and a version that does not truncate a large return when its neighbours are also large at 0.95 to 0.96. Large one-minute returns come in bursts: 44% to 65% of them have a large neighbour, which isolated jumps would not. A model with a fast volatility factor (half-life about 3 minutes), calibrated to these diagnostics, reproduces the real ratios. In that model, every estimator that truncates against a scale measured over hours removes 20% to 59% of the true IQ, and even a 5-minute MedRQ is only 0.57 of it. So agreement between two estimators, or with a 5-minute estimate, is not evidence of accuracy on this data.
+
+### Verdict
+
+Outside the paper's design, a daily scale is not enough. This strengthens the case made in Issue 3 for the **local** estimate. The burst reading rests on a fitted model, not a proof, and the neighbour-guarded estimator's settings were chosen after seeing the data, so it still needs an out-of-sample check.
+
+**Question for Prof. Bapat:** in the crypto application, was the MAD computed per day, per coin over the whole sample, or locally?
+
+---
+
 ## What this means for the prototype
 
 * Use **normalised** local estimators with an explicit time scale (`robust.local_variance`, `robust.local_quarticity`).
 * Use the **scaled** MAD, estimated from past data only. E3 shows that a rolling or exponentially weighted MAD costs nothing measurable in accuracy and keeps the jump protection. (The streaming monitor itself estimates the MAD once per calibration window and re-estimates it after each alarm; a running threshold with a proof is studied in E14.)
-* Treat truncation primarily as a way to make the monitored statistic **bounded**. A fall in the variance itself cannot be detected by any nonparametric e-test (`docs/math.md` 5.3, a one-sided form of Bahadur and Savage 1956), so a detector must monitor a bounded functional of the returns. Truncation at c × MAD gives one with a direct volatility meaning: if the shape of the innovations is fixed, the truncated variance falls exactly when σ falls. (Other bounded statistics, such as exceedance indicators or ranks, would also work; E14 studies a rank-based one.) Truncation bias then matters less, because detection compares like with like (truncated variance before against truncated variance after).
+* Treat truncation primarily as a way to make the monitored statistic **bounded**. A fall in the variance itself cannot be detected by any nonparametric e-test (`docs/math.md` 5.3, a one-sided form of Bahadur and Savage 1956), so a detector must monitor a bounded functional of the returns. Truncation at c × MAD gives one with a direct volatility meaning: if the shape of the innovations is fixed, the truncated variance falls exactly when σ falls. (Other bounded statistics, such as exceedance indicators or ranks, would also work; `alternatives/two_sample_betting` (ALT5) studies a rank-based one.) Truncation bias then matters less, because detection compares like with like (truncated variance before against truncated variance after).
