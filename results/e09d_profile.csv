@@ -1,0 +1,12 @@
+task,size,seconds,microseconds_per_unit,machine
+"VolatilityMonitor.run (streaming, one series)",200000,2.0164817150000545,10.082408575000272,"x86_64, Python 3.13.18, shared with other jobs"
+"betting_edetector, 1 paths x 2000 steps",2000,0.019787511999993512,9.893755999996756,"x86_64, Python 3.13.18, shared with other jobs"
+"betting_edetector, 100 paths x 2000 steps",200000,0.026404995000120834,0.13202497500060417,"x86_64, Python 3.13.18, shared with other jobs"
+"betting_edetector, 1000 paths x 2000 steps",2000000,0.09704874499993821,0.048524372499969104,"x86_64, Python 3.13.18, shared with other jobs"
+"betting_edetector, 10000 paths x 2000 steps",20000000,0.763417919000176,0.038170895950008804,"x86_64, Python 3.13.18, shared with other jobs"
+"kernel_iq robust, 200 days of 390 returns",78000,0.00989393800000471,0.12684535897441934,"x86_64, Python 3.13.18, shared with other jobs"
+"med_rq, 200 days of 390 returns",78000,0.003699462999975367,0.047429012820197014,"x86_64, Python 3.13.18, shared with other jobs"
+"kernel_iq robust, 200 days of 1440 returns",288000,0.03755368800011638,0.1303947500004041,"x86_64, Python 3.13.18, shared with other jobs"
+"med_rq, 200 days of 1440 returns",288000,0.012798681000049328,0.04443986458350461,"x86_64, Python 3.13.18, shared with other jobs"
+"kernel_iq robust, 200 days of 23400 returns",4680000,0.7708834620000289,0.16471868846154464,"x86_64, Python 3.13.18, shared with other jobs"
+"med_rq, 200 days of 23400 returns",4680000,0.26515432299993336,0.05665690662391738,"x86_64, Python 3.13.18, shared with other jobs"
