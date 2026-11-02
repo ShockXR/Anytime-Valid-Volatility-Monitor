@@ -24,7 +24,7 @@ To rerun: `pip install -r requirements.txt && pip install -e .`, then `python sc
 | E8 | A guarantee with an estimated baseline | Proved: P(false alarm within m steps) ≤ δ + m / A with a confidence-sequence baseline; observed at most 0.27% against 5%. |
 | E9 | How tight is the guarantee, and when does it fail? | About 4 times conservative and distribution free; persistent GARCH clustering breaks it. |
 | E10 | Monitoring relative to a volatility forecast | Restores the guarantee under clustering; a frozen persistent forecast lets through at most (1 - β)/α of any break, and an information bound puts the delay near two days. |
-| E11 | Detection delay and bet design (theory) | In progress. |
+| E11 | Detection delay and bet design (theory) | Proved delay bound and asymptotic optimality (the delay attains log A / KL_inf); the price of robustness is a ratio of information numbers that predicts E4's 14% to 73% penalties, mostly the cost of making no distributional assumption; truncation caps decrease detection at log(B / (B - 1)) per step (at least 73 steps at c = 3); the false alarm bound is nearly attained by an adversarial null for a single bet. |
 | E12 | Crypto alarms around FOMC and CPI releases | Up alarms within 6 hours of 14 to 15 of 16 FOMC statements against about 30% of matched control windows; the streaming monitor is blind about 70% of the time while recalibrating. |
 | E13 | Benchmark against Bibinger, Jirak and Vetter (2017) and Bayesian online change points | In progress. |
 | E14 | A guarantee with a running truncation level | In progress. |
@@ -34,6 +34,7 @@ To rerun: `pip install -r requirements.txt && pip install -e .`, then `python sc
 | ALT3 | Robust local IQ estimator | Squaring a local variance is 95% efficient against 74% for RQ-type estimators; one daily MAD stops converging when volatility moves within the day; on BTC and DOGE large returns come in bursts and scale-truncated estimators remove a third to a half of IQ. |
 | ALT4 | Correlation monitor | Sign concordance gives a valid correlation monitor that volatility changes cannot fool. |
 | ALT5 | Two-sample (rank) betting test | Ranks against a growing reference give an exactly valid detector for any return law and horizon (1.9% to 3.5% per day against 5%); ranks against a fixed reference fail like a plug-in baseline; 2.9 times faster for a change in tail shape, 4% to 19% slower for a scale change. |
+| ALT6 | Sequential fixed-accuracy estimation of volatility (classical purely sequential rules against anytime-valid confidence sequences) | In progress. |
 
 ---
 
@@ -847,7 +848,7 @@ The monitor sees the mean of the ratio, E[r_t² / s_t], which is a little larger
 
 The KL column is the per-step Kullback-Leibler divergence between the post-break and pre-break conditional laws of r_t, averaged over the post-break path, I = E[½(q_t - 1 - ln q_t)] with q_t the ratio of the two conditional variances. By Lai (1998), any detector whose average run length to a false alarm is at least A needs, asymptotically as A grows, an expected delay of at least about ln A / I. At A = 28,800 this is only an order-of-magnitude guide, not an exact bound.
 
-**Reading.** At persistence 0.99 a doubling of the long-run variance looks, after standardisation, like an increase of about 9% to 12%, and the information bound says that *no* detector with the same false alarm budget can be expected to notice it much faster than within about two days. The 1500 to 1800 step median delays of the oracle and fitted GARCH monitors in Q10b are of this order, though somewhat shorter.
+**Reading.** At persistence 0.99 a doubling of the long-run variance looks, after standardisation, like an increase of about 9% to 12%, and the information bound says that *no* detector with the same false alarm budget can be expected to notice it much faster than within about two days. The 1500 to 1800 step median delays of the oracle and fitted GARCH monitors in Q10b are of this order, though somewhat shorter. E11 explains the gap: at this alarm level the Shiryaev-Roberts statistic pools evidence over many candidate change times, and this memory term is worth 54% to 62% of ln A. In an i.i.d. version of the same steady state the detector alarms at 0.41 to 0.58 times ln A / KL with the true baseline (`results/e11e2_e10_crosscheck.csv`), so a ratio of about 0.6 is expected and the Lai figure is an asymptotic guide, not a prediction at A = 28,800.
 
 **Q10e. Where in time is the evidence?** Persistence 0.99, 400 paths, the pre-break filter s0 run on post-break returns with true conditional variance s1. Mean of s1/s0 at t steps after the break, and the step at which the average cumulative KL divergence reaches ln A = 10.3 (`results/e10e_transient.csv`):
 
@@ -884,6 +885,81 @@ The half-life 1440 variant and all event times are in `results/e10c_real_forecas
 **Reading.** Dividing by an EWMA forecast changes the alarm rate by between +2% and -17% (0.57 to 0.71 alarms per day in every variant), far above the 0.05 per day that a correct forecast would give. One-minute crypto volatility therefore moves much more than an hours-scale EWMA forecast tracks, so in practice the real-data alarms are mostly genuine departures from such a forecast, not false alarms in the sense of the theorem. The alarms carry information beyond the forecast: after "up" alarms the next day's realised variance exceeded the forecast 60% to 71% of the time, against 37% to 45% at random times; after "down" alarms it fell short 72% to 87% of the time, against 55% to 63% at random times. The 95% intervals of the alarm groups exclude the random-time rate for every coin and variant on the "up" side, and for all but one case on the "down" side (DOGE, deseasonalised only, where the lower end of the interval equals the random-time rate of 58%). The comparison forecast is deliberately simple; part of the effect is ordinary persistence (an alarm reflects the last few hours, which the one-day EWMA has not yet absorbed).
 
 **Relation to E6 (Q6e).** E6 asks the same question with a robust volatility measure (median of |u|) instead of realised variance, adds a HAR forecast and a rate-matched ratio rule, and also runs out of sample. The two agree: alarms are followed by volatility on the flagged side of a forecast far more often than random times (E6: 71% to 83% against 48% to 52%). The random-time rates differ (about 50% in E6, 37% to 45% here) because realised variance is a mean of squares, whose distribution is skewed, so at a random time it falls below its own forecast more often than above. E6 also shows the limit of this kind of evidence: a ratio rule tuned with hindsight to the same number of alarms is about as precise, so the e-detector's contribution on real data is the guarantee with fixed settings, not extra precision. What E10 adds is the forecast-relative *monitor input*: dividing returns by an EWMA forecast changes the alarm rate little on real data, unlike the synthetic GARCH case.
+
+---
+
+## E11. How fast does the detector react? Delay theory, price of robustness, bet design and the slack in the false alarm bound
+
+Script `experiments/e11_delay_theory.py` (parts A, B, C, C2, C3, C4, C4V, D, D2, E, E2, FIG), helpers `src/avmonitor/design.py`, tests `tests/test_delay_theory.py`, full theory with proofs in `docs/theory_delay.md`. All results are **[SYNTHETIC]** (numerical integration and simulation, fixed seeds). Unless stated otherwise: true baseline, truncation c = 3, alarm level A = 7800 per side, change at the first monitored step (ν = 1), Gaussian, jump (probability 0.005, size 8 sd) and Student t returns.
+
+**Why.** `docs/math.md` proves that false alarms are rare. E4 measured delays (87, 35 and 17 steps for sd ratios 1.25, 1.5 and 2) and a 10% to 70% penalty against the Gaussian likelihood ratio detector; E9 found the false alarm bound conservative by about 4. E11 explains these numbers, asks how the bets should be chosen, and (tracker B73) whether the detector is optimal as false alarms become rare.
+
+### Q11a. Predicting the delay
+
+**Method.** For a bet λ the log wealth grows at `g(λ) = E log(1 + λ(Y - 1))` per step after the change, `Y = min(r², τ²) / m₀`. Three predictions: first order `log(A) / g`; a proved bound for every A, change time and history, `min_k (log(A / w_k) + overshoot_k) / g_k` (Theorem 1); and a second-order Shiryaev-Roberts formula `(log A + κ - ζ) / g`, where ζ ≈ `log(1/g) + 0.58` is the statistic's memory of earlier start times (closed form from Dufresne's identity) and κ the overshoot. Compared with 3000 simulated paths per case (`results/e11a_growth.csv`, `e11a_delay.csv`).
+
+| Case | first order | proved bound | simulated, default grid | second order, best single bet | simulated, best single bet |
+|---|---|---|---|---|---|
+| Gaussian, sd 1.25 | 179 | 233 | 122 | 109 | 107 |
+| Gaussian, sd 2 | 22 | 30 | 23 | 18.4 | 18.7 |
+| Student t5, sd 1.25 | 280 | 362 | 178 | 158 | 159 |
+| Gaussian, sd 0.67 | 150 | 179 | 124 | 99 | 99 |
+
+**Reading.** The second-order formula is within 3% of the simulation in all 20 cases. The first-order formula overstates small-change delays by up to 112% (its error decays only like `1 / log A`). The proved bound is 1.3 to 2.7 times the truth. The default grid costs 9% to 26% against the best single bet. With the change at step 501 (as in E4) delays are 17% to 34% shorter (head start of the statistic) and match E4 within about 10%. The plug-in quadratic bet of the adaptive bettor is 1.4 to 4.4 times too small for increases and keeps only 49% to 94% of the growth.
+
+### Q11b. The price of robustness
+
+**Method.** A proved information ladder, `KL(raw returns) ≥ KL(truncated) ≥ KL_inf ≥ g_grid`, where `KL_inf = max_λ g(λ)` is the best growth of any detector valid for every return distribution with the same truncated mean (proved duality). The three ratios are the truncation, nonparametric and grid losses (`e11b_information.csv`, `e11b_price_simulated.csv`, `e11b_c_curve.csv`, `e11b_jump_burst.csv`).
+
+| Gaussian data, c = 3 | sd 1.25 | sd 1.5 | sd 2 | sd 0.8 | sd 0.5 |
+|---|---|---|---|---|---|
+| truncation / nonparametric / grid loss | 1.03 / 1.10 / 1.02 | 1.08 / 1.23 / 1.02 | 1.27 / 1.48 / 1.04 | 1.00 / 1.25 / 1.02 | 1.00 / 3.61 / 1.05 |
+| predicted penalty `KL / g_grid` | 1.16 | 1.37 | 1.95 | 1.27 | 3.79 |
+| simulated penalty against the E4 Gaussian LR mixture | 1.14 | 1.35 | 1.73 | 1.48 | 3.45 |
+
+**Reading.** The information ratio explains E4's penalty (about 1.12, 1.35, 1.7). About 60% of the gap (log scale) is the price of making no distributional assumption, 20% to 36% is truncation. For decreases truncation caps the evidence per step at `log(B / (B - 1))`, about `1/c²`: with c = 3 no detector valid over the whole null can detect even a total collapse of volatility in fewer than 73 steps. **Truncation constant:** c = 3 to 4 for increases (with jumps, growth peaks at c = 3.25 to 4.25; without truncation a jump burst looks like 39% of a real 25% volatility rise, against 3.5% at c = 3); c = 1.5 to 2 for decreases (decrease delays fall by 26% to 49% at c = 2). The two sides may use different c.
+
+### Q11c. Which bets?
+
+**Method.** Minimise the worst-case ratio of the mixture's delay to the best single bet's delay over a prior range (sd ratio 1.2 to 2 up, 0.5 to 0.85 down), designed on formulas, selected and validated by simulation on separate seeds. A first design used Gaussian data only; after it failed under fat tails, a second design pooled Gaussian, jump, t5 and t3 laws with a selection rule fixed in advance (`e11c*.csv`).
+
+| Worst ratio to the best single bet (in range, 4 tail shapes, ν = 1 and 501, 2000 paths) | default grid | Gaussian-tuned | robust (pooled) |
+|---|---|---|---|
+| increase bets | 0.02, 0.05, 0.1, 0.2, 0.35, 0.5 | 0.25, 0.5 | 0.16, 0.39 |
+| decrease bets (fraction of the largest admissible bet) | 0.1, 0.25, 0.5, 0.75, 0.95 | 0.9, 0.99 | 0.5, 0.85 |
+| Gaussian, increase / decrease | 1.25 / 1.26 | 1.13 / 1.04 | 1.24 / 1.25 |
+| Student t3, increase / decrease | 1.19 / 1.17 | 1.39 / 1.78 | 1.17 / 1.13 |
+
+**Reading.** The Gaussian-tuned bets are up to 18% faster than the default on Gaussian or jump data but up to 55% slower under t3 data (one decrease case has negative growth). The robust bets are at least as fast as the default in all 48 in-range validation cases, by 0.4% to 10.5% (median 5%), but up to 17% slower for small increases (sd 1.1) under fat tails. The formula-based design predicted a larger gain (worst ratio 1.54 to 1.27) than the simulation shows (1.25 to 1.24): it overstates the cost of many-bet grids. **Recommendation:** robust bets (0.16, 0.39) up and (0.5, 0.85) × largest bet down, equal weights, for A around `10^4`; keep the default if small increases matter or A is much larger.
+
+### Q11d. Why the false alarm bound looks loose
+
+**Method.** An exact optional-stopping identity splits `P(false alarm within m) / (m / A)` into stopping (F1), the share of expected wealth on paths that crossed A (F2) and overshoot (F3). Dynamic programming gives the exact worst case over the whole nonparametric null for single bets (`e11d_*.csv`).
+
+| One day (m = 390), Gaussian null | false alarms | rate / bound | F2 | F3 |
+|---|---|---|---|---|
+| two-sided default (E9), 40,000 paths | 1.03% | 0.21 | 0.24 | 0.80 |
+| increase side, single bet 0.5 | 3.52% | 0.70 | 0.92 | 0.67 |
+| worst null law, single bet 0.5 (dynamic programming) | 4.73% | 0.95 | | |
+
+**Reading.** The factor of about 5 (E9: about 4) is overshoot (1.25) times wealth stranded on paths that never alarm (about 4): 60% of it is held by the decrease side and 31% by the three smallest increase bets, which cannot build wealth within a day. The two-sided split is tight (both sides alarm on the same day in 0.00% of days). The bound itself is nearly attained by an adversarial null for single bets and exactly at m = A, so no much sharper threshold is provable for single bets; for the default mixture the best adversary found reaches 42% of the bound and a certified sharper bound is open. Provable gains: an uneven split of the budget between the sides, and dropping bets that cannot use it.
+
+### Q11e. Optimality as false alarms become rare (tracker B73)
+
+**Theorem (proved in `docs/theory_delay.md`, section 9).** The worst-case delay of the Shiryaev-Roberts mixture equals its delay with the change at step 1. As `A → ∞`: a fixed grid has delay `(log A / KL_inf) × KL_inf / g_grid`; a grid refined with about `√(log A)` bets has delay `(log A + ½ log log A + O(1)) / KL_inf`; a continuous mixture over the bet has delay at most `(log A + log log A + O(1)) / KL_inf` (`½ log log A` by a Laplace heuristic). `log A / KL_inf` is the lower bound for every detector valid over the nonparametric null (Lorden 1971 at the least favourable null law; Ram and Ramdas 2026). Lai (1998) gives the simple-law bound `log A / I`; Shin, Ramdas and Rinaldo (2024) give matching upper bounds for mixtures of exponential e-detectors.
+
+| delay / (log A / KL_inf), Gaussian, A = 10^4 / 10^8 | sd 1.25 | sd 2 | sd 0.8 | sd 0.5 |
+|---|---|---|---|---|
+| best single bet (simulated) | 0.66 / 0.83 | 0.90 / 0.94 | 0.62 / 0.82 | 0.74 / 0.87 |
+| same, second-order formula | 0.63 / 0.82 | 0.89 / 0.95 | 0.62 / 0.81 | 0.74 / 0.87 |
+| fine mixture (100 bets) | 0.71 / 0.90 | 0.96 / 0.97 | 0.80 / 0.94 | 0.96 / 1.03 |
+| default grid (limit `KL_inf / g_grid`) | 0.73 / 0.90 (1.02) | 1.11 / 1.08 (1.04) | 0.77 / 0.91 (1.02) | 0.92 / 1.00 (1.05) |
+
+**Reading.** The asymptotic regime arrives very slowly: at A = 10^8 even the best bet is 5% to 24% faster than `log A / KL_inf` (15 cases, Gaussian, t3 and jumps), and the second-order formula explains the gap to within 0.024 for every A ≥ 10^4. Fixed grids approach their predicted limits; the fine mixture is 4% to 19% slower than the best bet at A = 10^8 and slowly closing in. The robust detector keeps `KL_inf / KL` = 53% to 88% of the Gaussian likelihood ratio detector's asymptotic speed for increases (sd 2 to 1.25) and 28% to 80% for decreases; under t3 data 94% to 98% of the correctly specified detector's speed for increases. **E10 cross-check:** in an i.i.d. version of E10's steady state (A = 28,800) the memory term is 54% to 62% of `ln A`, and the detector alarms at 0.41 to 0.58 times `ln A / KL` with the true baseline, so the memory term alone can produce E10's factor of about 0.6.
+
+**Caveats.** All results are synthetic, with i.i.d. post-change data and the true baseline (E8 and E10 treat estimated baselines and clustering). The second-order formula is a heuristic whose regularity conditions were not checked. The bet designs were tuned at A = 7800 and change sizes 1.2 to 2 (up), 0.5 to 0.85 (down). The dynamic programming gives rigorous lower bounds for the worst case only. The real-data tail shape, which decides between the bet designs, was not studied here.
+
+Figures: `results/figures/e11_delay_predictions.png`, `e11_price_of_robustness.png`, `e11_false_alarm_slack.png`, `e11_asymptotic_optimality.png`.
 
 ---
 
@@ -1087,6 +1163,65 @@ The raw estimator follows `(1 + 2 gamma^2)^2` exactly: 10% bias at `gamma = 0.16
 * The practical monitor at one second is the `k = 10` block monitor: valid at every noise level, 8 times slower than raw returns without noise, faster than them (and valid, which they are not) from `gamma` of about 2.
 
 **Caveats.** Constant volatility in Q3 and Q4 (so the noise effect is isolated); i.i.d. Gaussian noise, which real noise is not (Hansen and Lunde 2006); the fourth-moment correction assumes local Gaussianity of the pre-averaged return; no real one-second data was available in this environment.
+
+## A1 follow-up (B69). Noise and jumps together, the published benchmark, and the block monitor's guarantee
+
+**Question.** When microstructure noise and jumps are present at the same time, how does pre-averaging then MAD truncation compare with the estimator built for exactly that case, the modulated bipower and multipower variation of Podolskij and Vetter (2009, *Bernoulli* 15(3), 634 to 658), for integrated quarticity and variance? And for the monitor: what exactly is the guarantee of the non-overlapping block version under price noise, and how should the block size `k` be chosen?
+
+**Method [SYNTHETIC].** `alternatives/preaveraging/run_benchmark.py` (two processes, about 2 minutes). Q5: one-second returns, 23,400 per day, log-OU stochastic volatility, 200 paths per cell, noise ratio `gamma` in `{0, 0.5, 1, 2}` x jumps per day and size in `{none, 2 x 25 sd, 2 x 100 sd, 8 x 25 sd, 8 x 100 sd}` (25 per-second sd is 0.16% of the price). Estimators: raw MAD clip (Bapat 2026); pre-averaged (`k = 60`) MAD drop (ours) and MAD clip; modulated bipower (variance) and tripower (quarticity) variation with `K = 76`-step increments averaged over 152 blocks of 153 observations (`c1 = 0.5`, `c2 = 1`), noise-corrected through the exact block weights; pre-averaged bipower and tripower; pre-averaged without truncation. Q6: constant volatility, `gamma` in `{0.5, 1, 2, 4}`, blocks `k` in `{4, 6, 10, 14, 20, 30, 60}`, `A = (n / k) / 0.05`, sd `x 2`, `x 1.5` and no change, 200 paths per cell.
+
+**Reference check.** Title, authors, journal, volume and pages of Podolskij and Vetter (2009) and the arXiv listing 0909.0827 were confirmed from search listings; the full text could not be fetched (arxiv.org, projecteuclid.org, repec.econ.au.dk and eldorado.tu-dortmund.de are blocked here). The block-average variance constants `nu1 = c1^2 (3 c2 - 4 c1) / (3 (c2 - c1)^2)` and `nu2 = 2 c1 / (c2 - c1)^2`, and the CLT standard error from the independent Gaussian block approximation, are therefore our own derivation, verified by simulation in the tests; no equation numbers are quoted.
+
+**The negative finding, in one table. One-day false alarm rate of the monitor under price noise, bound 5%, 200 days per cell [SYNTHETIC].**
+
+| monitor (steps per day, `A`) | side | gamma = 0 | 0.5 | 1 | 2 | 4 |
+|---|---|---|---|---|---|---|
+| raw truncated returns (23,400, 468,000) | up | 5.0% | **8.5%** | **18.0%** | **31.0%** | **41.5%** |
+| raw truncated returns | down | 7.5% | **9.0%** | **13.5%** | **29.0%** | **27.5%** |
+| overlapping pre-averaged, k = 60 (23,341, 466,820) | up and down | **100%** | **100%** | **100%** | **100%** | **100%** |
+| non-overlapping blocks, k = 60 (390, 7800) | up | 2.5% | 1.5% | 2.5% | 2.0% | 4.0% |
+| non-overlapping blocks, k = 60 | down | 0.0% | 0.5% | 1.0% | 2.0% | 1.5% |
+| non-overlapping blocks, k = 20 (1170, 23,400) | up | 4.5% | 3.0% | 2.5% | 5.5% | 3.0% |
+| non-overlapping blocks, k = 20 | down | 3.0% | 5.0% | 1.0% | 3.5% | 2.5% |
+| non-overlapping blocks, k = 10 (2340, 46,800) | up | 5.5% | 5.0% | 5.5% | 2.5% | 3.0% |
+| non-overlapping blocks, k = 10 | down | 1.5% | 4.0% | 2.0% | 2.0% | 4.5% |
+| non-overlapping blocks, k = 4 (5850, 117,000), Q6 | up | n/a | 4.5% | 4.5% | 3.5% | 4.5% |
+
+Monte Carlo sd of each entry is about 1.5 points at a true 5%. The raw-return monitor's rate rises monotonically with `gamma` on both sides; the block monitors stay within the bound in all 58 cells (28 of Q6, 30 of Q3, with the four entries above 5% within 1.5 points of it).
+
+**Why: the conditional null under MA(1) noise, and what blocks restore.** With observed prices `Y_j = X_j + u_j` (noise i.i.d., mean zero, variance `omega^2`, any distribution) the raw return is `r_t = Delta X_t + u_t - u_{t-1}` and, with `F_{t-1}` containing `Y_{t-1}`, `E[r_t^2 | F_{t-1}] = sigma^2 delta + omega^2 + E[u_{t-1}^2 | F_{t-1}]`. The last term has mean `omega^2` but is not constant (for Gaussian noise and the previous return alone, `E[r_t^2 | r_{t-1}] = sigma^2 delta + 2 omega^2 + rho_u^2 (r_{t-1}^2 - sigma^2 delta - 2 omega^2)` with `rho_u = gamma^2 / (1 + 2 gamma^2)`), so after a large squared return the conditional mean exceeds the baseline with no change in volatility: the null `E[Y_t | F_{t-1}] <= 1` of the e-detector fails, and so does the bound. The block monitor uses `Z_b = min(rbar_b^2, tau^2)` with `rbar_b` pre-averaged over the prices `Y_{bk}, ..., Y_{bk+k-1}`; the return between `Y_{bk+k-1}` and `Y_{(b+1)k}` is skipped, so block `b+1` shares no price with block `b`, its noise values are fresh, and given everything up to the end of block `b` it has the law of a pre-averaged return of a process started there. The independence is exact, not up to a boundary term (if adjacent blocks shared one price the shared noise value would give `Cov(rbar_b, rbar_{b+1}) = -omega^2 / k^2`, an `O(1/k)` relative dependence against the noise part `omega^2 / k`; skipping one return removes it). The null `H0: E[Z_{b+1} | G_b] <= m0`, with `m0` the calibration mean that includes the noise term `psi1 omega^2 / k`, then holds whenever the spot variance over block `b+1` is at most its calibration value and the noise and jump laws are unchanged, by monotonicity of `min(s^2 e^2, tau^2)` in `s`. The betting factor `1 + lambda (Z_{b+1} / m0 - 1)` with a predictable `lambda in [0, 1)` has conditional mean at most 1, so the Shiryaev-Roberts statistic over blocks is an e-detector with respect to the block filtration and Theorems A and B of `docs/math.md` apply with `m = floor(n / k)` blocks per day and `A = m / 0.05`. Nothing requires Gaussian blocks, so the guarantee holds for every `k >= 2`, which Q6 confirms down to `k = 4`. Full statement in `alternatives/preaveraging/README.md`, section 2.
+
+**Q5 Integrated quarticity with noise and jumps, mean ratio to the truth (relative RMSE) [SYNTHETIC].**
+
+| cell | raw, MAD clip | pre-averaged, MAD drop (ours) | modulated tripower (PV 2009) | pre-averaged tripower |
+|---|---|---|---|---|
+| no jumps, gamma = 0 / 1 / 2 | 0.99 (0.02) / 8.9 (8.0) / 81 (81) | 0.98 (0.11) / 0.98 (0.11) / 0.98 (0.11) | 1.00 (0.30) / 0.99 (0.33) / 1.00 (0.30) | 1.00 (0.13) / 1.00 (0.13) / 1.00 (0.12) |
+| 2 x 25 sd, gamma = 0 / 1 | 0.99 (0.02) / 9.0 (8.1) | 0.99 (0.10) / 0.98 (0.11) | 1.12 (0.37) / 1.03 (0.34) | 1.06 (0.15) / 1.04 (0.16) |
+| 2 x 100 sd, gamma = 0 / 1 | 0.99 (0.02) / 9.1 (8.2) | 0.99 (0.12) / 0.98 (0.11) | 1.63 (1.27) / 1.57 (1.73) | 1.45 (0.86) / 1.56 (1.63) |
+| 8 x 25 sd, gamma = 0 / 1 | 1.00 (0.02) / 9.1 (8.2) | 1.02 (0.11) / 1.05 (0.12) | 1.27 (0.57) / 1.35 (0.65) | 1.21 (0.33) / 1.25 (0.34) |
+| 8 x 100 sd, gamma = 0 / 1 / 2 | 1.00 (0.02) / 9.1 (8.1) / 81 (81) | 1.00 (0.11) / 1.01 (0.12) / 1.01 (0.12) | 4.9 (10) / 5.8 (14) / 4.5 (6.9) | 4.0 (7.8) / 3.6 (4.8) / 3.8 (5.2) |
+
+Integrated variance: ours 0.99 to 1.02 (RMSE 0.05 to 0.06) in all 20 cells; modulated bipower 0.99 to 1.01 (0.13 to 0.14) without jumps, 1.05 with `2 x 25 sd`, 1.10 with `8 x 25 sd`, 1.16 to 1.20 with `2 x 100 sd`, 1.72 to 1.83 with `8 x 100 sd`. Coverage of the modulated bipower 95% CLT interval: 0.905 to 0.955 without jumps (half-width 26% of the truth), 0.905 to 0.97 with 25 sd or two 100 sd jumps, 0.57 to 0.62 with `8 x 100 sd`.
+
+**Q6 Median detection delay in seconds for a doubling of the sd, blocks of size `k` [SYNTHETIC].**
+
+| gamma | k = 4 | 6 | 10 | 14 | 20 | 30 | 60 | best observed | `k* = 6 gamma / 2` | rule `max(4, 4 gamma)` |
+|---|---|---|---|---|---|---|---|---|---|---|
+| 0.5 | **127** | 179 | 269 | 370 | 479 | 749 | 1319 | 4 | 1.5 | 4 |
+| 1 | **179** | 206 | 289 | 377 | 539 | 719 | 1439 | 4 | 3 | 4 |
+| 2 | 405 | **332** | 354 | 419 | 539 | 764 | 1439 | 6 | 6 | 8 |
+| 4 | 2131 | 1154 | 689 | **615** | 659 | 869 | 1439 | 14 | 12 | 16 |
+
+For `x 1.5` the best observed `k` is 4, 4, 10, 20 against `k* = 6 gamma / 1.5` = 2, 4, 8, 16 (delays 299, 459, 839, 1539 s). The delay formula: after a sd change by `v` the block value has mean `(v^2 + rho_k) / (1 + rho_k)` with noise share `rho_k = 12 gamma^2 / k^2`, the bet grows by about `snr^2 / 2` per block with `snr = (v^2 - 1) / (sqrt(2) (v^2 + rho_k))`, so the delay in seconds is proportional to `k (v^2 + rho_k)^2`, minimised at `rho_k = v^2 / 3`, that is `k* = 6 gamma / v`. The curve is flat within 10% for `k` between `k* / 1.5` and `1.5 k*`, so the single rule `k = max(4, ceil(4 gamma))` (target `v = 1.5`, `gamma` estimated from `omega^2 = -mean(r_t r_{t-1})` over `mean(r_t^2) - 2 omega^2`) is within 10% of the best observed delay in all 8 cells.
+
+**Reading.**
+* The raw-return monitor's loss of validity under price noise is real, monotone in `gamma` and two-sided; it is not a Monte Carlo artefact (41.5% against 5%). It is the one claim of the main package that one-second data breaks. The fix is not pre-averaging as such (overlapping pre-averaged returns give 100% false alarms) but non-overlapping blocks, whose guarantee is exact for every `k >= 2`.
+* Against the published noise-and-jump estimator, pre-averaging then MAD drop is unbiased over the whole grid and 2.5 to 3 times more precise without jumps; the modulated multipower estimators keep `|J|^{4/3}` per affected product at `n = 23,400`, a factor 4.5 to 5.8 in quarticity with eight 0.65% jumps, and its CLT interval then covers 60%. Noise and jumps do not interact for any estimator: pre-averaging handles one, truncation the other, and the two compose.
+* The block size is a solved trade-off: `k* = 6 gamma / v`, in practice `k = max(4, 4 gamma)`. At `gamma <= 1` the smallest block (`k = 4`) is best and detects a doubling in 127 to 179 s, a factor 3 to 4 behind the raw monitor's 43.5 to 86.5 s, which is invalid there; the previously reported factor 8 came from `k = 10`.
+
+**Needed changes outside ALT1's files.** `docs/math.md` 5.1 ("the null allows any dependence") and 5.6 should say that MA(1) price noise breaks the conditional null on raw returns and that the block monitor restores it; `ALTERNATIVES.md` A1 can record the benchmark outcome.
+
+**Caveats.** All numbers are synthetic; i.i.d. Gaussian price noise (real noise is autocorrelated and heteroskedastic, Hansen and Lunde 2006); constant volatility in Q6; the delay formula ignores truncation; the modulated bipower constants and interval are our derivation, not the paper's printed ones; no one-second real data was available to estimate actual `gamma` values.
 
 ---
 

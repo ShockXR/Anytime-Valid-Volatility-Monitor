@@ -22,7 +22,7 @@ To rerun: `pip install -r requirements.txt && pip install -e .`, then `python sc
 | E8 | A guarantee with an estimated baseline | Proved: P(false alarm within m steps) ≤ δ + m / A with a confidence-sequence baseline; observed at most 0.27% against 5%. |
 | E9 | How tight is the guarantee, and when does it fail? | About 4 times conservative and distribution free; persistent GARCH clustering breaks it. |
 | E10 | Monitoring relative to a volatility forecast | Restores the guarantee under clustering; a frozen persistent forecast lets through at most (1 - β)/α of any break, and an information bound puts the delay near two days. |
-| E11 | Detection delay and bet design (theory) | In progress. |
+| E11 | Detection delay and bet design (theory) | Proved delay bound and asymptotic optimality (the delay attains log A / KL_inf); the price of robustness is a ratio of information numbers that predicts E4's 14% to 73% penalties, mostly the cost of making no distributional assumption; truncation caps decrease detection at log(B / (B - 1)) per step (at least 73 steps at c = 3); the false alarm bound is nearly attained by an adversarial null for a single bet. |
 | E12 | Crypto alarms around FOMC and CPI releases | Up alarms within 6 hours of 14 to 15 of 16 FOMC statements against about 30% of matched control windows; the streaming monitor is blind about 70% of the time while recalibrating. |
 | E13 | Benchmark against Bibinger, Jirak and Vetter (2017) and Bayesian online change points | In progress. |
 | E14 | A guarantee with a running truncation level | In progress. |
