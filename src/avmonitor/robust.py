@@ -149,9 +149,51 @@ def truncate(r: np.ndarray, tau) -> np.ndarray:
     return np.clip(r, -tau, tau)
 
 
+class DegenerateThresholdWarning(UserWarning):
+    """The MAD threshold is zero although some returns are not, so truncation erases them."""
+
+
 def mad_threshold(r: np.ndarray, c: float = 3.0, scaled: bool = False, floor: float = 0.0) -> np.ndarray:
-    """``tau = c * MAD(r)`` with an optional floor (useful for tick-size assets)."""
-    return np.maximum(c * mad(r, scaled=scaled), floor)
+    """``tau = c * MAD(r)`` with an optional floor (useful for tick-size assets).
+
+    When more than half of the returns are exactly zero (coarse price ticks,
+    frozen prices), the MAD is zero, every return is clipped to zero and any
+    truncated estimator silently returns 0. That case raises a
+    ``DegenerateThresholdWarning``; pass ``floor`` (for example
+    ``tick_floor(prices)``) to avoid it.
+    """
+    tau = np.maximum(c * mad(r, scaled=scaled), floor)
+    r = np.asarray(r, float)
+    nonzero = np.any((r != 0) & np.isfinite(r), axis=-1)
+    if np.any((np.asarray(tau) <= 0) & nonzero):
+        import warnings
+
+        warnings.warn(
+            "MAD threshold is zero (more than half of the returns are exactly zero), so every return is "
+            "truncated to zero; pass a positive floor such as tick_floor(prices)",
+            DegenerateThresholdWarning,
+            stacklevel=2,
+        )
+    return tau
+
+
+def tick_floor(prices: np.ndarray, c: float = 3.0, ticks: float = 1.0) -> float:
+    """A truncation floor of ``c * ticks`` one-tick log returns.
+
+    The tick is estimated as the smallest positive absolute price change and
+    the one-tick log return at the median price. For a coin quoted to 4
+    decimals at 0.20 USD this gives about ``c * 5e-4``. Use it as ``floor`` in
+    ``mad_threshold`` (and ``scale_floor`` in the monitor, divided by ``c``) for
+    assets whose prices move in discrete ticks.
+    """
+    p = np.asarray(prices, float)
+    p = p[np.isfinite(p)]
+    d = np.abs(np.diff(p))
+    d = d[d > 0]
+    if d.size == 0 or p.size == 0:
+        return 0.0
+    tick = float(np.min(d))
+    return float(c * ticks * np.log1p(tick / np.median(p)))
 
 
 def truncated_moment_factor(a: float, power: int = 4) -> float:
@@ -386,21 +428,44 @@ def rolling_mad_zero(r: np.ndarray, window: int, min_periods: int | None = None,
     return out * MAD_NORMAL_SCALE if scaled else out
 
 
-def ew_quantile_scale(r: np.ndarray, halflife: float = 390.0, init: float | None = None, scaled: bool = True) -> np.ndarray:
+def ew_quantile_scale(
+    r: np.ndarray, halflife: float = 390.0, init: float | None = None, scaled: bool = True, floor: float = 0.0
+) -> np.ndarray:
     """Predictable exponentially weighted ``median(|r|)`` by stochastic approximation.
 
     Uses the multiplicative Robbins and Monro update
     ``m_t = m_{t-1} * exp(eta * (1{|r_t| > m_{t-1}} - 1/2))``, which tracks the
     median of ``|r|`` and stays positive. ``eta`` is set from ``halflife``.
     Entry ``t`` uses data before ``t`` only.
+
+    Edge cases (iteration 3 of the log): NaN returns leave the estimate
+    unchanged instead of counting as zeros; the estimate never falls below
+    ``max(floor, 1e-300)``, so it cannot underflow to exactly zero and get
+    stuck there when more than half of the returns are zero; and if the median
+    of the first 50 values is zero, the start value is the median of the
+    non-zero values instead (otherwise the tracker needs hundreds of thousands
+    of steps to climb from 1e-300).
     """
     a = np.abs(np.asarray(r, float))
     n = a.size
     eta = np.log(2) / halflife * 2.0
     out = np.empty(n)
-    m = float(np.median(a[: min(n, 50)])) if init is None else float(init)
-    m = max(m, 1e-300)
+    lo = max(float(floor), 1e-300)
+    if init is None:
+        head = a[: min(n, 50)]
+        head = head[np.isfinite(head)]
+        m = float(np.median(head)) if head.size else 0.0
+        if m <= 0:
+            nz = head[head > 0]
+            m = float(np.median(nz)) if nz.size else lo
+    else:
+        m = float(init)
+    m = max(m, lo)
+    up, down = np.exp(eta * 0.5), np.exp(-eta * 0.5)
     for t in range(n):
         out[t] = m
-        m *= np.exp(eta * ((a[t] > m) - 0.5))
+        at = a[t]
+        if at != at:  # NaN: no information
+            continue
+        m = m * up if at > m else max(m * down, lo)
     return out * MAD_NORMAL_SCALE if scaled else out
