@@ -1687,20 +1687,21 @@ For BTC, ETH and SOL from 21 January 2024 to 31 December 2025, with 16
 FOMC statements, 22 CPI releases and same-weekday, same-clock-time
 control windows, the pre-specified primary test (BTC, the monitor as a
 user would have run it, Holm correction) found an increase alarm within
-six hours after 9 of 16 FOMC statements against 14\% of controls
-(\(p = 0.0002\)); the CPI test was not significant on BTC (\(p = 0.11\))
-but replicated on ETH and SOL. The streaming monitor was recalibrating
-about 70\% of the time; at the FOMC statements at which it was
-monitoring, it alarmed every time. With a fresh calibration before every
-anchor (a secondary design added after the first results), 14 to 15 of
-16 FOMC statements raised an alarm against 29\% to 31\% of controls,
-with a median delay of 23 to 34 minutes. The Gaussian likelihood-ratio
-monitor also alarmed at almost every release, but within a median of 0
-to 2 minutes and on one return of 8 to 9 robust scale units: one large
-minute is enough to trigger it. It also alarmed in 64\% to 77\% of
-control windows, but it ran at band 0 and the robust monitor at band
-0.25, so that contrast is partly the band and is not evidence for
-truncation alone (E12). Details are in Supplement S5.
+six hours after 9 of 16 FOMC statements against 14\% of weekday-matched
+controls (\(p = 0.0002\)); the CPI test was not significant on BTC
+(\(p = 0.11\)) but replicated on ETH and SOL. The streaming monitor was
+recalibrating about 70\% of the time; at the FOMC statements at which it
+was monitoring, it alarmed every time. With a fresh calibration before
+every anchor (a secondary design added after the first results), 14 to
+15 of 16 FOMC statements raised an alarm against 29\% to 32\% of
+controls, with a median delay of 23 to 34 minutes. The Gaussian
+likelihood-ratio monitor also alarmed at almost every release, but
+within a median of 0 to 2 minutes and on one return of 8 to 9 robust
+scale units: one large minute is enough to trigger it. It also alarmed
+in 62\% to 76\% of control windows, but it ran at band 0 and the robust
+monitor at band 0.25, so that contrast is partly the band: run at band 0
+as well, the robust monitor alarmed in 39\% to 51\% of control windows
+(E12). Details are in Supplement S5.
 
 \hypertarget{a-panel-of-assets}{%
 \subsection{6.4 A panel of assets}\label{a-panel-of-assets}}
@@ -3063,40 +3064,44 @@ Eastern) and 22 US CPI releases (08:30 US Eastern) of 2024 and 2025
 inside the monitored period, with every date checked against a published
 schedule. Control windows are all days at least two days away from any
 event day, with the same weekday, at the same Eastern clock time (134
-for FOMC, 299 for CPI). The outcome is an increase alarm within six
-hours of the anchor, and the test is an exact stratified permutation
-test. The primary family, fixed before the first run, is FOMC and CPI on
-BTC in the streaming design (the monitor as a user would have run it),
-with a Holm correction; ETH and SOL are replications, and a design in
-which a fresh monitor is calibrated on the day before every anchor was
-added after the streaming results were seen and is secondary (E12).
+for FOMC, 299 for CPI); each event is compared with the control windows
+of its own weekday, and the control rates below are these matched rates
+averaged over events. The outcome is an increase alarm within six hours
+of the anchor, and the test is an exact stratified permutation test. The
+primary family, fixed before the first run, is FOMC and CPI on BTC in
+the streaming design (the monitor as a user would have run it), with a
+Holm correction; ETH and SOL are replications, and a design in which a
+fresh monitor is calibrated on the day before every anchor was added
+after the streaming results were seen and is secondary (E12).
 
 \textbf{Results.} In the streaming design, 9 of 16 FOMC statements on
 BTC were followed by an increase alarm within six hours, against 14\% of
 control windows (Holm-adjusted \(p = 0.0002\)); the CPI test was not
-significant on BTC (5 of 22 against 11\%, \(p = 0.11\)) but replicated
+significant on BTC (5 of 22 against 12\%, \(p = 0.11\)) but replicated
 on ETH (\(p = 0.003\)) and SOL (\(p = 0.00004\)). The streaming monitor
 was recalibrating after its own alarms about 70\% of the time and was
 awake at only 9 of the 16 FOMC statements on BTC; at those it alarmed
 every time (and at 8 of 8 on ETH and 9 of 9 on SOL). With a fresh
 calibration, 14 to 15 of the 16 FOMC statements raised an alarm within
-six hours, against 29\% to 31\% of controls, and 59\% to 73\% of CPI
-releases, against 25\% to 27\%. The alarms came after the release
+six hours, against 29\% to 32\% of controls, and 59\% to 73\% of CPI
+releases, against 23\% to 28\%. The alarms came after the release
 (median 23 to 34 minutes, never before 14 minutes on BTC and SOL and 10
 minutes on ETH), and there is no sign of more alarms in the hours before
 a release. The Gaussian likelihood-ratio monitor with a fresh
 calibration also alarmed at almost every release, but with a median
 delay of 0 to 2 minutes, on a single return of 8 to 9 robust scale units
 (median): one large minute is enough to trigger it. It also alarmed in
-64\% to 77\% of control windows; because it ran at band 0 and the robust
-monitor at band 0.25, this contrast in control rates mixes the band with
-the truncation and is not credited to truncation here. The truncated
-detector cannot be moved by one minute (one clipped observation
-multiplies its statistic by a bounded factor), and its delays and the
-size of its largest recent return are those of a short volatility
-regime; the share of release alarms classed as ``jump only'' did not
-separate the two monitors, so this reading rests on the delays and the
-return sizes.
+62\% to 76\% of control windows. Because it ran at band 0 and the robust
+monitor at band 0.25, this contrast mixes the band with the truncation;
+run at band 0 as well, the robust monitor with a fresh calibration
+alarmed at 14 to 15 of 16 FOMC statements and 16 to 18 of 22 CPI
+releases, with a median delay of 18 to 22 minutes, and in 39\% to 51\%
+of control windows. The truncated detector cannot be moved by one minute
+(one clipped observation multiplies its statistic by a bounded factor),
+and its delays and the size of its largest recent return are those of a
+short volatility regime; the share of release alarms classed as ``jump
+only'' did not separate the two monitors, so this reading rests on the
+delays and the return sizes.
 
 \hypertarget{s5.3-a-panel-of-assets}{%
 \subsubsection{S5.3 A panel of assets}\label{s5.3-a-panel-of-assets}}
