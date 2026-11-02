@@ -42,7 +42,7 @@ this only matters for robustness of the code).
 
 Outputs: results/e06d_monitor_summary.csv, e06d_events.csv,
 e06d_cross_venue.csv, e06d_cross_coin.csv, e06e_forecast_hits.csv,
-e06e_competitor.csv, e06e_pooled.csv, results/figures/e06_alarm_timelines.png,
+e06e_competitor.csv, e06e_pooled.csv, e06d_pooled.csv, results/figures/e06_alarm_timelines.png,
 results/figures/e06_hit_rates.png. Seeds: 6 (random times), 66 (shifts).
 """
 
@@ -67,7 +67,8 @@ COINS = {"BTC": "BTCUSDT", "ETH": "ETHUSDT", "XRP": "XRPUSDT", "SOL": "SOLUSDT",
 # label -> (monitor start, end, history start used for the intraday profile and the forecasts)
 PERIODS = {
     # History from Jan 2024 (all of it before the monitored period) so that the HAR regression has a long
-    # training sample; with only 3 months of history it was biased low by about 18% for BTC (iteration 2).
+    # training sample; with only 3 months of history its median log(realised / forecast) at random times was
+    # +0.18 for BTC (iteration 5 in docs/iterations/E6.md).
     "Jul-Dec 2025": ("2025-07-01", "2026-01-01", "2024-01-01"),
     "Jan 2024-Jun 2025 (out of sample)": ("2024-01-21", "2025-07-01", "2024-01-01"),
 }
@@ -517,6 +518,29 @@ def fig_hits(hits):
 # ----------------------------------------------------------------------------
 
 
+def pooled_monitor_summary():
+    """Pool the E5c-style validation over the five Binance coins, per period, detector and band."""
+    m = pd.read_csv(OUT / "e06d_monitor_summary.csv")
+    m = m[m.source.isin(list(COINS)) & ~m.detector.str.startswith("control")]
+    rows = []
+    for (period, det, band), g in m.groupby(["period", "detector", "band"], sort=False):
+        rec = dict(period=period, detector=det, band=band, coins=len(g), alarms_per_day_min=g.alarms_per_day.min(),
+                   alarms_per_day_max=g.alarms_per_day.max(), up=int(g.up.sum()), down=int(g.down.sum()))
+        for dn in ("up", "down"):
+            n = int(g[f"{dn}_validated_n"].sum())
+            k = int(np.round(g[f"{dn}_validated_n"] * g[f"{dn}_share_in_flagged_direction"]).sum())
+            p_, lo, hi = wilson(k, n)
+            rec.update({f"{dn}_n": n, f"{dn}_share_in_flagged_direction": p_, f"{dn}_wilson_lo": lo, f"{dn}_wilson_hi": hi,
+                        f"{dn}_matched_delay_control_mean": g[f"{dn}_matched_delay_control_share"].mean(),
+                        f"{dn}_median_post_over_baseline_range": f"{g[f'{dn}_median_post_over_baseline'].min():.2f} to "
+                                                                f"{g[f'{dn}_median_post_over_baseline'].max():.2f}"})
+        rows.append(rec)
+    out = pd.DataFrame(rows)
+    out.to_csv(OUT / "e06d_pooled.csv", index=False)
+    print(out.round(3).to_string(index=False))
+    return out
+
+
 def pooled_summary():
     """Pool the forecast hit counts over the five Binance coins, per period, rule and forecast."""
     h = pd.read_csv(OUT / "e06e_forecast_hits.csv")
@@ -558,6 +582,7 @@ def pooled_summary():
 
 def main():
     if "--summaries-only" in sys.argv:  # rebuild the pooled table and the hit-rate figure from saved results
+        pooled_monitor_summary()
         pooled_summary()
         fig_hits(pd.read_csv(OUT / "e06e_forecast_hits.csv"))
         return
@@ -632,6 +657,7 @@ def main():
     cc.to_csv(OUT / "e06d_cross_coin.csv", index=False)
     print(cc.round(3).to_string(index=False))
 
+    pooled_monitor_summary()
     pooled_summary()
     fig_timelines(series, events)
     fig_hits(hits)
