@@ -1,0 +1,17 @@
+method,change_from,change_to,n_changes,detected,median_delay
+"daily blocks, e-BH",0,390,237,1.0,62.0
+"daily blocks, e-BH",390,1300,530,0.9981132075471698,59.0
+"daily blocks, e-BH",1300,2600,816,0.9963235294117647,54.0
+"daily blocks, e-BH",2600,3900,817,0.9485924112607099,53.0
+"daily blocks, Bonferroni",0,390,237,1.0,64.0
+"daily blocks, Bonferroni",390,1300,530,0.9981132075471698,65.0
+"daily blocks, Bonferroni",1300,2600,816,0.9987745098039216,62.0
+"daily blocks, Bonferroni",2600,3900,817,0.944920440636475,63.0
+"since start, Pareto h = 390, e-BH",0,390,237,1.0,63.0
+"since start, Pareto h = 390, e-BH",390,1300,530,0.9981132075471698,71.0
+"since start, Pareto h = 390, e-BH",1300,2600,816,0.9975490196078431,72.0
+"since start, Pareto h = 390, e-BH",2600,3900,817,0.9265605875152999,76.0
+"since start, window h = 3900, e-BH",0,390,237,1.0,74.0
+"since start, window h = 3900, e-BH",390,1300,530,1.0,71.0
+"since start, window h = 3900, e-BH",1300,2600,816,0.9987745098039216,65.0
+"since start, window h = 3900, e-BH",2600,3900,817,0.9400244798041616,64.0

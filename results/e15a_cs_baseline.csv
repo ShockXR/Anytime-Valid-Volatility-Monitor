@@ -1,0 +1,7 @@
+K,dependence,share_changed,changed,timing,sd_ratio,reps,method,fwer,fdr_end,fdr_end_se,fdr_first,sup_fdp,mean_V,mean_R,power,median_delay,mean_delay
+20,factor+cojumps,0.0,0,none,,400,"panel e-BH, cs baseline",0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,
+20,factor+cojumps,0.0,0,none,,400,"panel Bonferroni, cs baseline",0.0,0.0,0.0,0.0,0.0,0.0,0.0,,,
+20,factor+cojumps,0.2,4,common,1.25,400,"panel e-BH, cs baseline",0.0,0.0,0.0,0.0,0.0,0.0,0.41,0.1025,213.0,202.9451219512195
+20,factor+cojumps,0.2,4,common,1.25,400,"panel Bonferroni, cs baseline",0.0,0.0,0.0,0.0,0.0,0.0,0.355,0.08875,212.5,202.06338028169014
+20,independent,0.2,4,common,1.25,400,"panel e-BH, cs baseline",0.0,0.0,0.0,0.0,0.0,0.0,0.36,0.09,234.0,214.60416666666666
+20,independent,0.2,4,common,1.25,400,"panel Bonferroni, cs baseline",0.0,0.0,0.0,0.0,0.0,0.0,0.33,0.0825,224.5,212.81060606060606

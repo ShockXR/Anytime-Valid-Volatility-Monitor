@@ -249,17 +249,20 @@ class BlockResult:
     value_at_flag: np.ndarray
     set_size_at_flag: np.ndarray  # number of discoveries in the panel right after this one was made
     final_value: np.ndarray  # stopped e-values at the end of the block
-    path: np.ndarray | None = None  # stopped e-values of panel 0 at every step, shape (n, K), if requested
+    path: np.ndarray | None = None  # stopped e-values at every step: (n, K) for panel 0, or (reps, n, K)
+    dir_path: np.ndarray | None = None  # direction (+1 / -1) at every step, same shape as path
 
 
 def run_block(r, tau2, m_up, m_dn, alpha: float = 0.05, rule: str = "ebh", horizon=None, weights: str = "window",
               active=None, up_grid=DEFAULT_UP_GRID, down_fractions=DEFAULT_DOWN_FRACTIONS,
-              return_path: bool = False) -> BlockResult:
+              return_path: bool | str = False) -> BlockResult:
     """Run one block of the panel monitor on returns ``r`` of shape (reps, K, n) or (K, n).
 
     Parameters as in ``PanelEProcess``; ``horizon`` defaults to n (window weights
     spread over the block). Discovered assets are frozen (their e-process is
     stopped), so with ``rule="ebh"`` the discovery set only grows.
+    ``return_path=True`` keeps the stopped e-values and directions of panel 0
+    (shape (n, K)); ``return_path="all"`` keeps them for every panel (shape (reps, n, K)).
     """
     r = np.asarray(r, float)
     if r.ndim == 2:
@@ -272,7 +275,12 @@ def run_block(r, tau2, m_up, m_dn, alpha: float = 0.05, rule: str = "ebh", horiz
     direction = np.zeros((reps, K), int)
     vflag = np.full((reps, K), np.nan)
     size = np.zeros((reps, K), int)
-    path = np.empty((n, K)) if return_path else None
+    keep_all = isinstance(return_path, str)
+    if keep_all and return_path != "all":
+        raise ValueError("return_path must be True, False or 'all'")
+    pshape = (reps, n, K) if keep_all else (n, K)
+    path = np.empty(pshape) if return_path else None
+    dir_path = np.empty(pshape, np.int8) if return_path else None
     for t in range(n):
         ep.step(r[:, :, t])
         v = ep.value
@@ -283,9 +291,13 @@ def run_block(r, tau2, m_up, m_dn, alpha: float = 0.05, rule: str = "ebh", horiz
             vflag[new] = v[new]
             ep.freeze(new)
             size = np.where(new, ep.frozen.sum(axis=1, keepdims=True), size)
-        if path is not None:
+        if path is not None and keep_all:
+            path[:, t] = ep.value
+            dir_path[:, t] = ep.direction
+        elif path is not None:
             path[t] = ep.value[0]
-    return BlockResult(flag_time, direction, vflag, size, ep.value, path)
+            dir_path[t] = ep.direction[0]
+    return BlockResult(flag_time, direction, vflag, size, ep.value, path, dir_path)
 
 
 def fdp_summary(flag_time: np.ndarray, null_until: np.ndarray, n: int) -> dict:
@@ -320,6 +332,55 @@ def fdp_summary(flag_time: np.ndarray, null_until: np.ndarray, n: int) -> dict:
         sup_fdp[i] = fdp.max()
         fdp_first[i] = fdp[0]
     return dict(V=V, R=R, fdp_end=fdp_end, sup_fdp=sup_fdp, fdp_first=fdp_first)
+
+
+# ----------------------------------------------------------------------------
+# Calibration of a panel
+# ----------------------------------------------------------------------------
+
+
+@dataclass
+class PanelBaseline:
+    """Per-asset baselines for one block (arrays of length K)."""
+
+    active: np.ndarray
+    tau2: np.ndarray
+    m_up: np.ndarray
+    m_dn: np.ndarray
+    scale: np.ndarray  # scaled MAD of the calibration window (robust sd)
+    n_cal: np.ndarray
+
+
+def calibrate_panel(windows, cal_len, c: float = 3.0, null_band: float = 0.0, baseline: str = "plugin",
+                    delta: float = 0.01) -> PanelBaseline:
+    """Calibrate each asset on its own window of recent finite returns (``detectors.calibrate``).
+
+    ``windows`` is a list of K arrays (NaN are dropped). An asset is inactive when it has
+    fewer than ``cal_len`` finite returns (int or one per asset) or its window is
+    degenerate (zero scale or zero truncated variance). With ``baseline="cs"`` every asset
+    uses error level ``delta / K``.
+    """
+    K = len(windows)
+    cal_len = np.broadcast_to(np.asarray(cal_len, int), (K,))
+    out = PanelBaseline(np.zeros(K, bool), np.ones(K), np.ones(K), np.full(K, np.inf), np.zeros(K), np.zeros(K, int))
+    for k, w in enumerate(windows):
+        r = np.asarray(w, float)
+        r = r[np.isfinite(r)]
+        out.n_cal[k] = r.size
+        if r.size < cal_len[k] or r.size < 4:
+            continue
+        try:
+            if baseline == "cs":
+                b = calibrate(r, c=c, null_band=null_band, baseline="cs", delta=delta / K)
+            else:
+                b = calibrate(r, c=c, null_band=null_band)
+        except ValueError:
+            continue
+        if not (math.isfinite(b.tau) and b.tau > 0 and math.isfinite(b.m0_up) and b.m0_up > 0):
+            continue
+        out.active[k] = True
+        out.tau2[k], out.m_up[k], out.m_dn[k], out.scale[k] = b.tau**2, b.m0_up, b.m0_down, b.scale
+    return out
 
 
 # ----------------------------------------------------------------------------
@@ -427,37 +488,14 @@ class PanelMonitor:
         self._path_dir: list[np.ndarray] = []
 
     # ------------------------------------------------------------------
-    def _calibrate(self, k: int):
-        r = np.asarray(self.buffers[k], float)
-        if r.size < self.cal_len[k]:
-            return None
-        try:
-            if self.baseline == "cs":
-                b = calibrate(r, c=self.c, null_band=self.band, baseline="cs", delta=self.delta / self.K)
-            else:
-                b = calibrate(r, c=self.c, null_band=self.band)
-        except ValueError:
-            return None
-        if not (math.isfinite(b.tau) and b.tau > 0 and math.isfinite(b.m0_up) and b.m0_up > 0):
-            return None
-        return b
-
     def start_block(self) -> None:
         """Recalibrate every asset on its own recent returns and start fresh e-processes."""
-        K = self.K
-        tau2, m_up, m_dn = np.ones(K), np.ones(K), np.full(K, np.inf)
-        scale, n_cal, active = np.zeros(K), np.zeros(K, int), np.zeros(K, bool)
-        for k in range(K):
-            b = self._calibrate(k)
-            n_cal[k] = len(self.buffers[k])
-            if b is None:
-                continue
-            active[k] = True
-            tau2[k], m_up[k], m_dn[k], scale[k] = b.tau**2, b.m0_up, b.m0_down, b.scale
+        b = calibrate_panel([np.asarray(q, float) for q in self.buffers], self.cal_len, self.c, self.band,
+                            self.baseline, self.delta)
         self.block += 1
-        self.ep = PanelEProcess(tau2[None], m_up[None], m_dn[None], self.horizon[None], self.weights,
-                                active=active[None], up_grid=self.up_grid, down_fractions=self.down_fractions)
-        self.blocks.append(_BlockInfo(self.t + 1, active, tau2, m_up, m_dn, scale, n_cal))
+        self.ep = PanelEProcess(b.tau2[None], b.m_up[None], b.m_dn[None], self.horizon[None], self.weights,
+                                active=b.active[None], up_grid=self.up_grid, down_fractions=self.down_fractions)
+        self.blocks.append(_BlockInfo(self.t + 1, b.active, b.tau2, b.m_up, b.m_dn, b.scale, b.n_cal))
 
     def _threshold(self, values: np.ndarray) -> float:
         if self.rule == "ebh":
