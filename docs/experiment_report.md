@@ -28,7 +28,7 @@ To rerun everything: `pip install -e ".[dev]"`, download the data (see `data/REA
 | Table 8 with σ_α² read as a variance | about 6 times the published RMSE |
 | Table 8 with σ_α² read as a standard deviation | 1.12 (kernel), 0.92 (robust) |
 
-**Reading.** The printed, unnormalised formulas reproduce the published plain-kernel numbers and their growth in h. The raw MAD fits the robust numbers better than the scaled MAD. The σ_J = 0.10 robust rows do **not** reproduce: the published values are about 5 times larger than ours, so some detail of the large-jump design differs. Once the estimators are normalised (`e01_normalised_counterfactual.csv`), the plain kernel beats the raw-MAD robust kernel when jumps are small (relative RMSE 0.17 against 0.32), and loses badly when they are large (10.6 against 0.28). Figures: `e01_table7_reproduction.png` and `e01_scale_factor.png`.
+**Reading.** The printed, unnormalised formulas reproduce the published plain-kernel numbers and their growth in h. The raw MAD fits the robust numbers better than the scaled MAD. The σ_J = 0.10 robust rows do **not** reproduce: the published values are about 5 times larger than ours, so some detail of the large-jump design differs. Once the estimators are normalised (`e01_normalised_counterfactual.csv`), the comparison is fair and the robust idea holds up well. With the raw MAD the robust kernel loses only when jumps are small (σ_J = 0.01: relative RMSE 0.32 against 0.17); it wins in all 15 cells at σ_J = 0.05 (medians 0.29 against 0.83) and at σ_J = 0.10 (0.28 against 10.6). With the scaled MAD it wins in all 45 cells. Figures: `e01_table7_reproduction.png` and `e01_scale_factor.png`.
 
 ## E2. Truncation bias, and a fair comparison on a common scale
 
@@ -62,7 +62,7 @@ The loss does not shrink with n, which matches the theory in `docs/math.md`, sec
 
 **Reading.** Truncation works very well against jumps. The raw-MAD version "wins" the noise columns only because its built-in downward bias (mean 0.68 when clean) cancels the upward noise bias. That is a coincidence of two errors, not robustness. Clipped returns keep τ⁴ per jump, so big jumps still leave a bias (mean ratio 1.21 with the scaled MAD). Dropping returns (TRQ, mean 1.10) removes more of it. No estimator here handles noise, which is expected.
 
-**Q2d [SYNTHETIC].** The normalised robust kernel IQ against plain truncated RQ: correlation 0.982 to 0.990 and mean ratio 0.997 to 1.001 in all seven scenarios. The kernel adds nothing for the integrated quantity (`docs/math.md`, section 4).
+**Q2d [SYNTHETIC].** The normalised robust kernel IQ against plain truncated RQ: correlation 0.982 to 0.989 and mean ratio 0.996 to 1.001 in all seven scenarios. The kernel adds nothing for the integrated quantity (`docs/math.md`, section 4).
 
 ## E3. Can the truncation run online?
 
@@ -96,7 +96,7 @@ The loss does not shrink with n, which matches the theory in `docs/math.md`, sec
 | Page CUSUM (calibrated on Gaussian) | 5.0% | **70.3%** | **97.3%** | 9.7% | 32.3% |
 | Repeated 60-step z-test | **70.7%** | **90.0%** | **100%** | **78.0%** | **95.0%** |
 
-All the e-detectors stay inside their guarantee whenever the null is true, even with jumps, fat tails and noise. The Gaussian methods break as soon as returns are not normal. "Slow SV" is a case where the null is false by construction (volatility genuinely drifts), so every method alarms. E4c addresses this. Figure: `e04_false_alarms.png`.
+All the e-detectors stay inside their guarantee whenever the null is true, even with jumps and fat tails. (Price noise makes returns slightly autocorrelated, so the conditional null is mildly false there, as the independent review pointed out: with noise sd 0.5 the conditional variance exceeds its average on about a third of steps. The 3.7% shows robustness to a mild violation, not a case where the null holds.) The Gaussian methods break as soon as returns are not normal. "Slow SV" is a case where the null is false by construction (volatility genuinely drifts), so every method alarms. E4c addresses this. Figure: `e04_false_alarms.png`.
 
 **Q4b. Change after 500 steps: median delay in steps (share of false alarms before the change).**
 
@@ -104,10 +104,10 @@ Increases (sd ratio 1.25, 1.5, 2):
 
 | Detector | Gaussian | jumps | Student t5 |
 |---|---|---|---|
-| Robust e-detector (grid) | 87, 35, 17 (≤ 4%) | 102, 36, 18 (≤ 4%) | 122, 49, 22 (3%) |
-| Robust e-detector, CUSUM type | 154, 51, 23 (≤ 1%) | 171, 52, 23 (0%) | 215, 72, 32 (0%) |
-| E-detector on raw r² | 84, 33, 15 (≤ 4%) | 246, 60, 23 (≤ 5%) | 134, 51, 21 (≤ 4%) |
-| Gaussian LR e-detector | 78, 26, 10 (≤ 5%) | 61, 20, 9 (**74 to 78%**) | 46, 10, 7 (**96 to 98%**) |
+| Robust e-detector (grid) | 87, 35, 17 (≤ 4.3%) | 102, 36, 18 (≤ 4%) | 122, 49, 22 (3%) |
+| Robust e-detector, CUSUM type | 154, 51, 23 (≤ 1%) | 171, 52, 23 (≤ 0.3%) | 215, 72, 32 (≤ 0.3%) |
+| E-detector on raw r² | 84, 33, 15 (≤ 4.3%) | 246, 60, 23 (≤ 5.3%) | 134, 51, 21 (≤ 4%) |
+| Gaussian LR e-detector | 78, 26, 10 (≤ 5.3%) | 61, 20, 9 (**74 to 78%**) | 46, 10, 7 (**96 to 98%**) |
 | Page CUSUM | 64, 24, 10 (6 to 10%) | 54, 20, 11 (**74 to 79%**) | 50, 9, 6 (**97 to 99%**) |
 
 Decreases (sd ratio 0.5, 0.67, 0.8):
@@ -124,7 +124,7 @@ Decreases (sd ratio 0.5, 0.67, 0.8):
 * Truncation matters for increases under jumps (delay 102 against 246 for a 25% increase) and is essential for decreases.
 * For decreases, the Gaussian LR detector was faster and stayed near its nominal rate in these scenarios, because jumps only add evidence *against* a decrease. That is not guaranteed in general: it assumes normal returns, and real minute returns have many zeros (5.7% for Bitstamp BTC), which look like evidence for low volatility.
 
-**Q4c. Does the quarticity-based adaptive bet help?** Not meaningfully. Delays with the adaptive bet are within a few percent of the fixed grid in every cell (for example 86 against 87, 101 against 102, 74 against 71). We keep it as an option, but the simpler grid is the default. This is a negative result worth reporting.
+**Q4c. Does the quarticity-based adaptive bet help?** No. The adaptive bet was slightly slower than the fixed grid in 14 of 18 cells, by up to 9% (for example Student t5 at sd × 2: 24 against 22 steps), and slightly faster in the other 4. We keep it as an option, but the simpler grid is the default. This is a negative result worth reporting.
 
 **E4c. A null band for drifting volatility [SYNTHETIC].** Slow SV (log-sd 0.15, half-life 390 steps). With band b, the increase side bets against "truncated variance at most (1 + b) times baseline" and the decrease side against "at least (1 - b) times".
 
@@ -134,9 +134,19 @@ Decreases (sd ratio 0.5, 0.67, 0.8):
 | 0.25 | 8.3% / 5.0% | 28 (90%) | 111 (94%) |
 | 0.5 | 1.7% / 0.0% | 35 (97%) | 223 (100%) |
 
-A band of 0.25 to 0.5 brings drift-driven false alarms back to the target range while still catching large regime changes.
+A band of 0.5 brought drift-driven false alarms below 5% in this design (1.7% and 0.0%); a band of 0.25 reduced them from about 25% to 8.3% and 5.0%, still above target on the increase side. Large regime changes are still caught. The band is not a guarantee: slow log-normal drift (log-sd 0.15) puts the variance above 1.25 times its mean on about 19% of steps, so no static band makes the null true here.
 
 **E4d. How long must the calibration window be? [SYNTHETIC]** One-day false alarm rate for the increase side with the baseline estimated from the calibration window (the bound with the true baseline is 5%): 390 steps gives 5.4%, 1440 gives 2.4%, 5000 gives 1.2% and 20,000 gives 1.8%. A margin of one standard error brings all of them to 1.8% or less. The decrease side was at most 1.2% throughout.
+
+**E4e. Plug-in against true baseline, and restarts (added after the independent review) [SYNTHETIC].** The informative comparison for E4d is with the rate under the *true* baseline, not with the bound. Increase side, A = 7800, one 390-step day, 4000 paths (Monte Carlo standard error 0.34 points), `e04e_review_checks.py`:
+
+| Law | true baseline | plug-in, 390 calibration steps | plug-in, 1440 steps |
+|---|---|---|---|
+| Gaussian | 1.75% | 4.58% | 2.75% |
+| Student t3 | 1.73% | 4.68% | 2.55% |
+| Jumps (0.5%, 8 sd) | 1.62% | 5.10% | 2.00% |
+
+With 390 calibration steps the plug-in baseline roughly triples the false alarm rate, and with jumps it reaches the bound; the bound is "kept" only because Ville's inequality has about a factor of 3 of slack (E9). Over longer horizons the effect grows (E10, Q10b2: 44% false alarms in five days against a guaranteed 25%). The confidence-sequence baseline (E8) removes this problem. For restarts after each alarm, the expected number of false alarms per 10,000 monitored steps (A = 300, bound 33.3) was 26.5 with the true baseline (400 paths of 60,000 steps) and 30.1 for the streaming monitor with plug-in recalibration on 390 steps (40 paths), consistent with the restart corollary in `docs/math.md`.
 
 ## E5. Real data: Bitstamp BTC/USD, 1 July to 31 December 2025
 
@@ -161,7 +171,7 @@ The Kernel / RQ ratio is identical in our data and the paper (3.99 against 4.01 
 
 **Q5b. Daily IQ on a common scale [REAL].** Median over 184 days (T = 1 day): MedRQ 2.40 × 10⁻⁷. Ratios to MedRQ: RQ 1.27, Kernel 1.28, TPQ 0.96, MinRQ 1.02, QPQ 0.88, TRQ 0.64, robust kernel (scaled MAD, κ-corrected) 0.33, robust kernel (raw MAD) 0.14. The jump-robust multipower and nearest-neighbour estimators agree with each other. MAD-truncated estimators are 3 to 7 times lower. Real minute returns are fat-tailed and seasonal within the day, so clipping at a few daily MADs removes genuine diffusive variation, not just jumps.
 
-**Q5c. The streaming monitor on real data [REAL].** Returns divided by a predictable intraday profile (20-day rolling median of |r| per minute of day). Calibrate on 1440 minutes, monitor with A = 28,800 per side (at most a 5% chance of any false alarm per day under the null), recalibrate after each alarm. Validation: robust volatility in the 1440 minutes after each alarm, divided by the baseline. As a control, the same ratio at 2000 random times.
+**Q5c. The streaming monitor on real data [REAL].** Returns divided by a predictable intraday profile (20-day rolling median of |r| per minute of day). Calibrate on 1440 minutes, monitor with the two-sided level A = 28,800 (each side runs at 2A = 57,600; at most a 5% chance of any false alarm per day under the null), recalibrate after each alarm. Validation: robust volatility in the 1440 minutes after each alarm, divided by the baseline. As a control, the same ratio at 2000 random times.
 
 | Detector | Band | Alarms (per day) | Up / down | Median post / baseline, up | Share of up alarms followed by higher vol | Median post / baseline, down | Share of down alarms followed by lower vol |
 |---|---|---|---|---|---|---|---|
@@ -171,9 +181,13 @@ The Kernel / RQ ratio is identical in our data and the paper (3.99 against 4.01 
 | Gaussian LR | 0 | 170 (0.92) | 127 / 43 | 1.12 | 63% | 0.65 | 84% |
 | Control: random times | | | | 1.00 | 50% | 1.00 | 50% |
 
-**Reading.** On real data the robust monitor's alarms are followed by a persistent shift in volatility in the direction it flagged, far more often than chance (81% and 90% with band 0.25, against 50%). The Gaussian benchmark raises almost twice as many increase alarms, and they are much weaker (63%, median 1.12). This is consistent with many of them being jump-driven. Alarm frequency is still high (about one every 1.5 days with band 0.25), because crypto volatility genuinely shifts often. The band is the knob that trades sensitivity for fewer alarms. Figure: `e05_btc_alarms.png`.
+(In this round 1 table, alarms with fewer than 1000 post-alarm minutes were left out of the up and down counts, so for bands 0.25 and 0.5 they add up to one less than the total.)
 
-**Caveats.** This is one venue, one asset and six months. "Followed by higher volatility" is a sanity check, not ground truth: volatility clusters, so any detector reacting to a burst will look somewhat predictive. The control helps, but a stronger test would compare against a strong forecasting baseline.
+**Round 2 rerun (`q5c_r2`, after the independent review).** Missing returns passed to the monitor as NaN instead of zeros, the intraday profile computed from past days only with June 2025 as an unmonitored warm-up, and every alarm counted. Band 0.25: 126 alarms (73 up, 53 down), 81% of up alarms followed by higher and 90% of down alarms by lower volatility; band 0: 156 (70 up, 86 down), 79% and 67%; band 0.5: 91 (58 up, 33 down), 83% and 97%; Gaussian LR: 170 (125 up, 45 down), 64% and 84% (`results/e05c_r2_monitor_summary.csv`). The fixes change nothing of substance on this file, which has a single missing value.
+
+**Reading.** On real data the robust monitor's alarms are followed by a persistent shift in volatility in the direction it flagged, far more often than at random times (81% and 90% with band 0.25, against 50%). This comparison is weaker than it looks: an alarm fires when recent volatility has already moved, so random times are not a matched control, and the independent review found that a naive trailing-window rule scores about as well on increases. Rate-matched competitors and out-of-sample forecast comparisons for all five coins are in E6, and forecast-relative checks in E10. The Gaussian benchmark raises almost twice as many increase alarms, and they are much weaker (63%, median 1.12). This is consistent with many of them being jump-driven. Alarm frequency is still high (about one every 1.5 days with band 0.25), because crypto volatility genuinely shifts often. The band is the knob that trades sensitivity for fewer alarms. Figure: `e05_btc_alarms.png`.
+
+**Caveats.** This is one venue, one asset and six months. "Followed by higher volatility" is a sanity check, not ground truth: volatility clusters, so any detector reacting to a burst will look somewhat predictive. Stronger tests (rate-matched rules, forecasts, other coins and Nifty) are in E6, E7, E10 and E13.
 
 ## What was not done (yet)
 
