@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "avmonitor"
-version = "0.1.0"
+version = "0.2.0"
 description = "Anytime-valid online detection of volatility regime changes"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -14,6 +14,9 @@ dependencies = [
     "scipy",
     "matplotlib",
 ]
+
+[project.scripts]
+avmonitor = "avmonitor.cli:main"
 
 [project.optional-dependencies]
 dev = ["pytest", "jupyter"]
