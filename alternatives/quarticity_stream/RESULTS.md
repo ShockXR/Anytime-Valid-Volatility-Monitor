@@ -67,7 +67,7 @@ Theory (`results/q3_theory.csv`), mean of the normalised stream and per-step sig
 
 ## Q4. Real data: Binance BTCUSDT and DOGEUSDT, 1 July to 31 December 2025 [REAL]
 
-264,960 minutes per coin, no missing minutes, zero-return share 4.3% (BTC) and 3.3% (DOGE). Returns deseasonalised by the 20-day intraday profile. `A = 28,800` per side, 1440-minute calibration, recalibration after each alarm. "Post / baseline" compares the next 1440 minutes with the calibration window using the same `tau`.
+264,960 minutes per coin, no missing minutes, zero-return share 4.3% (BTC) and 3.3% (DOGE). Returns deseasonalised by the 20-day intraday profile. `A = 28,800` (each side alarms at 2A), 1440-minute calibration, recalibration after each alarm. "Post / baseline" compares the next 1440 minutes with the calibration window using the same `tau`.
 
 | Coin | Monitor | Band | Alarms (per day) | Up / down | Median post / baseline truncated variance, up | Share of up alarms followed by higher variance | Median post / baseline truncated variance, down | Share of down alarms followed by lower variance | Share within 60 min (240 min) of a variance-monitor alarm |
 |---|---|---|---|---|---|---|---|---|---|

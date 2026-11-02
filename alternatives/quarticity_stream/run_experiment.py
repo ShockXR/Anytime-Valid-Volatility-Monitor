@@ -21,7 +21,7 @@ Research questions
 Settings follow E4 of the main report: per-step units, 2000-step calibration
 window from the same process as the pre-change data, tau = 3 x scaled MAD,
 A = 7800 for synthetic runs (5% false alarm budget per 390-step day) and
-A = 28800 per side on real 1440-minute days. Seeds are fixed. Runs in about
+A = 28800 on real 1440-minute days (each side alarms at 2A). Seeds are fixed. Runs in about
 4 minutes on two cores.
 """
 

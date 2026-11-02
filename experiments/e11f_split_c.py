@@ -52,7 +52,7 @@ def draw(law: str, size, rng: np.random.Generator) -> np.ndarray:
         z = rng.standard_normal(size)
         return z + (rng.random(size) < 0.005) * rng.normal(0.0, 8.0, size)
     if law == "ticks":
-        return np.round(rng.standard_normal(size) / 0.5) * 0.5  # about 38% zero returns
+        return np.round(rng.standard_normal(size) / 0.5) * 0.5  # about 20% zero returns (|z| < 0.25)
     raise ValueError(law)
 
 

@@ -159,7 +159,7 @@ def test_conformal_pvalues_are_uniform_and_independent(law):
     if law == "t3":
         a = np.abs(rng.standard_t(3, (400, 300)))
     else:
-        a = np.abs(np.round(rng.standard_normal((400, 300)) / 0.5))  # about 38% ties at zero
+        a = np.abs(np.round(rng.standard_normal((400, 300)) / 0.5))  # about 20% ties at zero
     p = R.conformal_pvalues(a, rng)
     assert stats.kstest(p[:, -1], "uniform").pvalue > 0.001
     assert stats.kstest(p[:, 5], "uniform").pvalue > 0.001

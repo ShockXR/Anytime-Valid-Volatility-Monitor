@@ -464,7 +464,7 @@ At these small growth rates (`KL_inf` = 0.0031 and 0.0077 per step, 98% and 96% 
 * Honda, J. and Takemura, A. (2010). An asymptotically optimal bandit algorithm for bounded support models. *Proceedings of COLT 2010*.
 * Lai, T. L. (1998). Information bounds and quick detection of parameter changes in stochastic systems. *IEEE Transactions on Information Theory* 44(7), 2917-2929.
 * Lai, T. L. and Siegmund, D. (1977). A nonlinear renewal theory with applications to sequential analysis I. *Annals of Statistics* 5(5), 946-954.
-* Larsson, M., Ramdas, A. and Ruf, J. (2025). The numeraire e-variable and reverse information projection. *Annals of Statistics*; arXiv:2402.18810.
+* Larsson, M., Ramdas, A. and Ruf, J. (2025). The numeraire e-variable and reverse information projection. arXiv:2402.18810 (version 4, February 2025; reported elsewhere as published in the *Annals of Statistics*, journal version not checked).
 * Lorden, G. (1970). On excess over the boundary. *Annals of Mathematical Statistics* 41(2), 520-527.
 * Lorden, G. (1971). Procedures for reacting to a change in distribution. *Annals of Mathematical Statistics* 42(6), 1897-1908.
 * Pollak, M. (1985). Optimal detection of a change in distribution. *Annals of Statistics* 13(1), 206-227.

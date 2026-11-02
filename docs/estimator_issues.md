@@ -137,7 +137,7 @@ Apart from the first and last h returns, the averaged kernel estimator is a cons
 
 ### Simulation (E2d)
 
-The normalised robust kernel IQ and plain truncated RQ have correlation 0.982 to 0.990 and mean ratio 0.997 to 1.001 across all seven scenarios (`results/e02d_kernel_vs_truncated_rq.csv`).
+The normalised robust kernel IQ and plain truncated RQ have correlation 0.982 to 0.990 and mean ratio 0.996 to 1.001 across all seven scenarios (`results/e02d_kernel_vs_truncated_rq.csv`).
 
 ### Consequence
 

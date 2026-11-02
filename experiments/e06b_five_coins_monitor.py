@@ -6,7 +6,7 @@ SOLUSDT, DOGEUSDT) via ``avmonitor.data.load_binance``, and Bitstamp BTC/USD
 cross-venue check.
 
 Settings are FROZEN from E5 (chosen on Bitstamp BTC, Jul to Dec 2025) and not
-tuned here: A = 28,800 per side (at most 5% chance of any false alarm per day
+tuned here: A = 28,800, each side alarming at 2A (at most 5% chance of any false alarm per day
 when the null holds), c = 3, cal_len = 1440 minutes, null_band 0 / 0.25 / 0.5,
 returns divided by the predictable intraday profile ``intraday_scale`` (20-day
 lookback). The Gaussian likelihood ratio monitor (band 0) is the benchmark.
