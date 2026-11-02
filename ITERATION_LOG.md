@@ -1,6 +1,300 @@
 # Iteration log
 
-A record of what was tried, what went wrong and what changed, in order. Dates are UTC on 2 November 2026.
+This log records what was tried, what went wrong and what changed. It follows the ten-step iteration framework of the project brief, in its required format (objective, problem, hypothesis, change, experiments, results, improvements, remaining issues, next step). Each framework iteration below consolidates several concrete rounds of work. Failed attempts are part of the record.
+
+* **Round 1** (2 November 2026, daytime): first prototype, experiments E1 to E5. Its original 16-row log is kept unchanged in the appendix at the end.
+* **Round 2** (night of 2 to 3 November 2026): real data for all five coins of the paper and Nifty 50, an independent review, the confidence-sequence baseline, forecast-relative monitoring, new theory and alternative prototypes (experiments E6 to E15).
+
+Detailed notes per work stream, with every sub-iteration and failure, are in `docs/iterations/`: `MAIN.md` (integration and data), `E6.md` (five-coin reproduction), `E7.md` (Nifty 50 and India VIX), `E8.md` (confidence-sequence baseline), `ALT1.md` to `ALT5.md` (alternative prototypes), `EV1.md` (crypto event study), and the theory and benchmark tracks as they finish. The independent review is `docs/review/independent_review_round1.md`.
+
+| Framework iteration | Primary objective | Main evidence |
+|---|---|---|
+| 1 | Initial implementation and baseline reproduction | E1, E5a, E6a, E6b |
+| 2 | Mathematical correctness and equation verification | `docs/estimator_issues.md`, `docs/math.md` 5 and 6, review C1, E10 Q10d |
+| 3 | Numerical stability and edge cases | `docs/iterations/MAIN.md` R2-2, E8 iteration 1, review M6 and m17 |
+| 4 | Statistical validation and bias analysis | E2, E4d, E4e, E8 |
+| 5 | Benchmarking against alternative methods | E4, E6e, E13, `alternatives/` |
+| 6 | Sensitivity analysis and stress testing | E4c, E9, E10, ALT1 (price noise) |
+| 7 | Larger-scale simulations and profiling | E9, E8 (10,000 paths per cell) |
+| 8 | Architecture and implementation | `docs/iterations/MAIN.md` R2-3, `forecast.py`, `confseq.py` |
+| 9 | Independent verification, regression testing, reproducibility | review round 1 and its fixes, CI, manifest, reruns |
+| 10 | Final research audit and presentation readiness | clean-clone audit, one-command reproduction, review round 2 |
+
+---
+
+ITERATION NUMBER: 1 (initial mathematical implementation and baseline reproduction)
+
+OBJECTIVE: Implement Bapat (2026) exactly as printed, with every benchmark of its Tables 3 and 4, and find out whether the published tables come from the printed formulas.
+
+PROBLEM IDENTIFIED: The paper does not state the volatility used in its simulations, the exchange behind its real-data tables, or whether its kernel weights and MAD are normalised. Without those, "reproduction" could mean anything.
+
+HYPOTHESIS: If the code follows the printed formulas, a single volatility value should reproduce Table 7, and the ratio Kernel / RQ in Table 6 should equal the raw weight sum divided by the sample length, whatever the data.
+
+CHANGES IMPLEMENTED: `robust.py` (printed and normalised estimators, MinRQ, MedRQ, TPQ, QPQ, BPQ, TRQ), `simulate.py` (the paper's return model), `experiments/e01_reproduce_tables.py`, `e05_real_btc.py`; in round 2 `experiments/e06a_five_coins_tables.py` and `paper_tables.py` with all published rows.
+
+EXPERIMENTS PERFORMED: E1 (fit one σ on 15 rows of Table 7, predict the other 75 numbers); E5a (Table 6 BTC column on Bitstamp); E6a and E6b (Tables 5 and 6 for all five coins on Binance, with five falsifiable hypotheses for every mismatch).
+
+RESULTS: σ = 0.0215 reproduces the plain-kernel rows of Table 7 with a typical error of 3.5%, but the robust rows at σ_J = 0.10 come out about 5 times smaller than published (not reproduced; reported as a question). On real data Kernel / RQ equals W(30) / (n - 30) for every coin, so the code uses unnormalised weights and RQ without the factor n. The published ratios imply n between 262,854 and 263,052, about 2,000 returns fewer than a full half year, which fits a venue with missing minutes. The raw (unscaled) MAD fits the robust kernel (ratio 0.81 to 0.96) and the scaled MAD does not (1.86 to 2.48). Binance matches the published BTC and XRP quartiles within 0.4% and 1.7% and four of five means within 2.5%. The ETH mean has the opposite sign with the same size (a sign or ordering slip is consistent). DOGE's Q1 = Q3 = 0 needs a price grid of at least 0.00025 USD, and then the printed robust kernel must be exactly 0, not the published 2.00 × 10⁻¹². The real-data RMSE column is reproduced in 29 of 35 entries by |Q - 2.2 × 10⁻⁶|.
+
+IMPROVEMENTS: A precise, evidence-based list of questions for the author instead of vague doubts. The first DOGE hypothesis (prices rounded to 4 decimals) failed and is recorded as failed.
+
+REMAINING ISSUES: The σ_J = 0.10 robust rows and the DOGE row cannot be explained without the author's code.
+
+NEXT ITERATION: Check the mathematics behind each formula.
+
+---
+
+ITERATION NUMBER: 2 (mathematical correctness and equation verification)
+
+OBJECTIVE: Verify every formula used, in the paper and in our own code and proofs.
+
+PROBLEM IDENTIFIED: Round 1 found that the MinRQ constant in our first implementation was wrong (estimates 1.247 times the truth), and that the paper's eq. (16) is algebraically a truncated RQ. Round 2's review found an omitted cross term in one of our own checks and a proof step that used the wrong condition.
+
+HYPOTHESIS: Each claim can be checked by algebra plus a Monte Carlo test, and the checks will find errors on both sides.
+
+CHANGES IMPLEMENTED: Corrected the MinRQ constant to π / (3π - 8) with a unit test for every constant; `docs/estimator_issues.md` (scale of the kernel estimator, non-vanishing truncation bias, eq. 16 equals truncated RQ, weight order in eq. 15); `docs/math.md` section 5 (test supermartingales, Theorems A and B, the impossibility of detecting a variance decrease nonparametrically); section 6 (Theorem 6.4: P(false alarm within m steps) ≤ δ + m / A with an estimated baseline); `docs/equation_map.md` (paper notation to code). After the review: the RQ bias check now includes the jump cross term 6σ²σ_J² (1.17 × 10⁻⁴, not 1.07 × 10⁻⁴); the proof of Theorem A uses Fatou's lemma; a restart corollary (Corollary C); the impossibility result is stated precisely and attributed (Bahadur and Savage 1956). In E10, a closed form ρ(k) = k(1 - β) / (1 - α - β + αk) for the share of a k-fold break that survives standardisation by a frozen GARCH forecast.
+
+EXPERIMENTS PERFORMED: Monte Carlo checks of every constant; the identity of section 4 to machine precision; the restart corollary (E4e); ρ(k) against simulation (E10, Q10d).
+
+RESULTS: All constants check out after the MinRQ fix. The reviewer confirmed sections 1 to 5 correct apart from precision issues. Corollary C holds numerically (26.5 false alarms per 10,000 steps with the true baseline and 30.1 with plug-in recalibration, against a bound of 33.3). ρ(k) matches simulation to three decimals at persistence 0.95 and 0.99.
+
+IMPROVEMENTS: Every theorem in the docs now has a proof that a referee can check, with its assumptions stated (filtration, independence of the innovation, missing data).
+
+REMAINING ISSUES: The proofs assume a conditional null that real data violate in known ways (iteration 6).
+
+NEXT ITERATION: Edge cases that real data expose.
+
+---
+
+ITERATION NUMBER: 3 (numerical stability and edge-case handling)
+
+OBJECTIVE: Make the estimators and monitor safe on coarse-tick, gappy and frozen data.
+
+PROBLEM IDENTIFIED: With more than half of the returns exactly zero (coarse ticks as in the paper's DOGE, frozen prices during an outage), the MAD is 0, every return is clipped to 0 and estimators silently return 0; the monitor raised `ZeroDivisionError`. The online scale counted NaN as zero and could underflow to exactly 0. The review found that two scripts turned missing returns into zeros (which look like evidence for a volatility fall: a 120-minute gap triggered a false "down" alarm) and that one NaN silently disabled the vectorised detector.
+
+HYPOTHESIS: Warnings, a tick-size floor, window extension and treating missing values as "no bet" fix these without changing any result on clean data.
+
+CHANGES IMPLEMENTED: `robust.DegenerateThresholdWarning`, `robust.tick_floor`, a safe `ew_quantile_scale`; window extension and fallback in the monitor (E8, iteration 1); NaN passed through in E5, E8 and E10 and skipped in `betting_edetector`; `calibrate` drops NaN; a check that decrease bets stay admissible; `data.mark_frozen` for long runs of exact zeros. Earlier (round 1) the raw-r² and Gaussian benchmarks overflowed with large jumps; exponents are now capped.
+
+EXPERIMENTS PERFORMED: `tests/test_edge_cases.py` (9 tests), regression tests that the safe online scale is bit-identical to the old rule on clean data, reruns of E5 and E8 real-data parts.
+
+RESULTS: All tests pass. Reruns changed no real-data result (each file has one missing value). One test first failed for an instructive reason: with 60% zeros the true median of |r| is 0, so the tracker legitimately drifts toward 0 and can climb back by at most a factor e every 562 steps; recovery within a day needs a tick floor.
+
+IMPROVEMENTS: No silent zeros and no crash path; missing data handled by a rule that keeps the guarantee (math.md 5.6, item 5).
+
+REMAINING ISSUES: The tick floor needs the price tick, estimated from the data.
+
+NEXT ITERATION: Validate the statistics and measure bias.
+
+---
+
+ITERATION NUMBER: 4 (statistical validation and bias analysis)
+
+OBJECTIVE: Measure the bias of truncation and the effect of an estimated baseline on the guarantee.
+
+PROBLEM IDENTIFIED: Theorems A and B assume the true null mean m₀. In practice it is estimated, and in round 1 a unit test with 390 calibration steps gave 67% false alarms against a 50% bound.
+
+HYPOTHESIS: The estimation error explains the excess; a confidence-sequence baseline removes it with a proof.
+
+CHANGES IMPLEMENTED: E2 (truncation bias); `margin_z` (round 1); `confseq.py` and `VolatilityMonitor(baseline="cs")` (E8); `experiments/e04e_review_checks.py` (plug-in against the true baseline).
+
+EXPERIMENTS PERFORMED: E2a to E2d; E4d (calibration length); E4e (plug-in against true baseline, 4000 paths); E8 (10,000 paths per null cell, three laws, three calibration lengths, real data); E10 Q10b2 (five-day horizon).
+
+RESULTS: Clipping at 3 raw MADs keeps 70.5% of the fourth moment and at 3 scaled MADs 96.4%, for every n. On real data truncation removes 52% to 85% of the quarticity measured by jump-robust estimators, because one-minute returns are fat-tailed (E6c). With 390 calibration steps the plug-in baseline roughly triples the one-day false alarm rate (4.6% to 5.1% against 1.6% to 1.8% with the true baseline); over five days it gave 44% against a guaranteed 25%. The confidence-sequence baseline kept the one-day rate at or below 0.27% against the proved 5%, at a cost of 1.8 to 7.2 times the plug-in delay with 390 calibration steps and 1.2 to 1.7 times with 5000. On real data it removed 16% to 20% of the alarms, almost all decrease alarms, and raised the share of decrease alarms followed by lower volatility from 90% to 97% (band 0.25).
+
+IMPROVEMENTS: A proved guarantee with an estimated baseline, and a quantitative account of what the default plug-in costs. A first unit test failure (67% against 50%) was the starting point.
+
+REMAINING ISSUES: The cs baseline is very conservative with short calibration windows; a running truncation level is not yet covered (E14).
+
+NEXT ITERATION: Compare with other methods.
+
+---
+
+ITERATION NUMBER: 5 (benchmarking against alternative methods)
+
+OBJECTIVE: Compare the robust e-detector with parametric, classical and naive detectors, and with published change-point methods.
+
+PROBLEM IDENTIFIED: A detector is only interesting if it beats a fair competitor, and on real data "alarms are followed by higher volatility" does not separate a detector from volatility clustering (review M3).
+
+HYPOTHESIS: The robust detector is slower than parametric detectors on clean Gaussian data but the only valid one under jumps and fat tails; on real data its precision is similar to a well-tuned naive rule, and its value is the guarantee.
+
+CHANGES IMPLEMENTED: E4 benchmarks (Gaussian likelihood ratio, Page CUSUM, repeated z-test, raw r²); the quarticity-adaptive bet; E6e (EWMA and HAR forecasts, rate-matched ratio rules); E13 (Bibinger, Jirak and Vetter 2017; Bayesian online change-point detection); alternative prototypes in `alternatives/`.
+
+EXPERIMENTS PERFORMED: E4a and E4b (300 paths per cell); Q4c; E6e (five coins, in and out of sample); E13 (see its report part).
+
+RESULTS: With jumps or Student t returns, Gaussian methods false alarm on 70% to 97% of days; the robust e-detector stays at 0.3% to 2.3% and detects a 50% increase in a median of 36 to 49 steps, about 10% to 70% slower than parametric methods on clean data. The adaptive bet was slightly slower than a fixed grid in 14 of 18 cells (negative result). On real data, alarms beat EWMA and HAR forecasts 71% to 83% of the time against about 50% at random times, but a ratio rule tuned with hindsight to the same number of alarms is about as precise (negative result for precision; the e-detector adds a guarantee with fixed settings).
+
+IMPROVEMENTS: An honest statement of what the method adds.
+
+REMAINING ISSUES: E13 results are integrated when that track finishes.
+
+NEXT ITERATION: Stress the assumptions.
+
+---
+
+ITERATION NUMBER: 6 (sensitivity analysis and parameter stress testing)
+
+OBJECTIVE: Find where the guarantee stops applying and what the knobs (band, calibration length, forecast) do.
+
+PROBLEM IDENTIFIED: Round 1: with slow stochastic volatility every detector alarmed on about 25% of days. Round 2: under persistent GARCH clustering the raw-return monitor alarms on most days; under price-level noise returns become MA(1).
+
+HYPOTHESIS: These are violations of the conditional null, not bugs. A null band absorbs small drift; persistent clustering needs the null to be restated relative to a forecast; noise needs block pre-averaging.
+
+CHANGES IMPLEMENTED: `null_band` (E4c); E9 GARCH stress; `forecast.py` and E10; ALT1's block monitor.
+
+EXPERIMENTS PERFORMED: E4c; E9 Q9c (2000 GARCH paths per cell); E10 Q10a to Q10e; ALT1 noise grid.
+
+RESULTS: A band of 0.5 brought drift-driven false alarms below 5% in E4c (0.25 reduced them from 25% to 8.3%). Under GARCH with a half-life of an hour or more, no band up to 1 restores 5% (12% to 20% of days at band 1). Monitoring returns divided by a fitted GARCH forecast restores 3% to 6% per day, but a frozen persistent forecast passes on only a capped share of any break, (1 - β)/α at most (a doubling looks like +9% at persistence 0.99), and the Kullback-Leibler rate puts any detector's delay near two days. Price noise breaks the raw-return guarantee (8.5% to 41.5% per day); non-overlapping pre-averaged blocks restore it.
+
+IMPROVEMENTS: A precise map of what the guarantee covers (`docs/limitations.md`) and a principled way to restate the null.
+
+REMAINING ISSUES: The band is a heuristic, and the forecast-relative guarantee is only as good as the forecast.
+
+NEXT ITERATION: Scale up the simulations.
+
+---
+
+ITERATION NUMBER: 7 (larger-scale simulations and computational profiling)
+
+OBJECTIVE: Measure the guarantee's tightness at a scale where Monte Carlo error is small, and the cost per step.
+
+PROBLEM IDENTIFIED: E4 used 300 paths per cell and estimated baselines, so it could not separate "the bound is loose" from "the baseline is off". Round 1's strided kernel sums took 30 s for 20,000 paths.
+
+HYPOTHESIS: With the true baseline the false alarm rate is below m / A for every distribution with the right truncated mean, and roughly equal across distributions.
+
+CHANGES IMPLEMENTED: E9 (4000 paths per distribution, 2000 GARCH paths per cell, profiling); E8 (10,000 paths per null cell); a loop over lags for kernel sums (round 1).
+
+EXPERIMENTS PERFORMED: E9 Q9a to Q9d; E8 Q8a; timing of the streaming monitor.
+
+RESULTS: One-day false alarm rates of 1.1% to 1.4% against the 5% bound for Gaussian, Student t3, jump and tick-rounded returns: valid, distribution free and about 4 times conservative. The streaming monitor runs at about 10 microseconds per step, so no compiled code is needed. Kernel sums went from 30 s to 4 s. A first run of the GARCH part crashed on duplicate pivot keys; the grid was fixed.
+
+IMPROVEMENTS: Tight Monte Carlo error bars on every validity claim.
+
+REMAINING ISSUES: Why the bound is 4 times conservative is studied by the theory track (E11).
+
+NEXT ITERATION: Make the prototype usable by someone else.
+
+---
+
+ITERATION NUMBER: 8 (architecture, modularity and implementation)
+
+OBJECTIVE: Make the prototype executable from a clean environment by someone who has not read the code.
+
+PROBLEM IDENTIFIED: No exact dependency list, no command-line entry point, no end-to-end test; new features (forecasts, confidence sequences) needed their own modules.
+
+HYPOTHESIS: A small CLI and file-to-alarm integration tests catch interface mistakes that unit tests miss.
+
+CHANGES IMPLEMENTED: `requirements.txt` with exact versions; `python -m avmonitor simulate | run | estimators`; `tests/test_integration.py`; `forecast.py`, `confseq.py` as separate modules with backward-compatible options in `monitor.py`; `scripts/download_data.py` with a hashed manifest; an executed demo notebook; alternatives kept in `alternatives/` with their own tests.
+
+EXPERIMENTS PERFORMED: CLI runs on synthetic data, on Binance ETHUSDT (October 2025) and on Nifty (May and June 2024, alarm at 09:24 IST on the 2024 general election counting day).
+
+RESULTS: The first integration test failed because, under pandas 3, `DatetimeIndex.asi8` is not in nanoseconds; the fixture was rewritten. 164 tests pass from the repository root.
+
+IMPROVEMENTS: One-command demonstrations and a clean package boundary.
+
+REMAINING ISSUES: None blocking.
+
+NEXT ITERATION: Independent verification.
+
+---
+
+ITERATION NUMBER: 9 (independent verification, regression testing and reproducibility)
+
+OBJECTIVE: Have every claim checked by someone who did not write it, fix what is wrong, and make results reproducible.
+
+PROBLEM IDENTIFIED: Authors check their own work badly. Before the review, several docs overstated claims (the impossibility result, noise robustness, what the monitor takes from the paper, the strength of the real-data check).
+
+HYPOTHESIS: An adversarial review against the CSV files and the paper text will find wording problems and latent bugs, but no wrong mathematics.
+
+CHANGES IMPLEMENTED: Independent review round 1 (2 critical, 7 major, 18 minor findings) and fixes to README, pitch, estimator notes, experiment report and math notes; the strictly predictable intraday profile (`start="past"`); E4e and E5c reruns; GitHub Actions running the full test suite on every push; `data/MANIFEST.csv` with SHA-256 hashes; E6 rerun from scratch after the profile change.
+
+EXPERIMENTS PERFORMED: The reviewer's checks (now `experiments/e04e_review_checks.py`); reruns of E5c, E6 and E8 after the fixes.
+
+RESULTS: No wrong theorem was found; every E1 to E5 and E9 number matched its CSV. The fixes changed wording, one bias figure (C1) and code paths that real data had not yet exercised; E5c, E6 and E8 real-data results moved by at most 2 points.
+
+IMPROVEMENTS: The docs now say exactly what is proved, what is approximate and what is new.
+
+REMAINING ISSUES: A second review round covers the work added overnight.
+
+NEXT ITERATION: Final audit.
+
+---
+
+ITERATION NUMBER: 10 (final research audit, documentation and presentation readiness)
+
+OBJECTIVE: Check that a researcher can reproduce every table from a clean clone, and that the pitch, README and report agree with the results.
+
+PROBLEM IDENTIFIED: Many agents wrote parts of the report in parallel.
+
+HYPOTHESIS: A clean-clone run with hash checks and a second review will catch inconsistencies.
+
+CHANGES IMPLEMENTED: In progress (updated at the end of round 2).
+
+EXPERIMENTS PERFORMED: In progress.
+
+RESULTS: In progress.
+
+IMPROVEMENTS: In progress.
+
+REMAINING ISSUES: In progress.
+
+NEXT ITERATION: Meeting with Prof. Bapat.
+
+---
+
+## Additional iterations (round 2)
+
+ITERATION NUMBER: 11 (real data for all five coins and Nifty 50)
+
+OBJECTIVE: Get real one-minute data for ETH, XRP, SOL, DOGE and Nifty 50.
+
+PROBLEM IDENTIFIED: Every exchange API, Yahoo, Kaggle, Hugging Face, Zenodo, Stooq and www.nseindia.com were refused by the cloud network policy.
+
+HYPOTHESIS: Public GitHub repositories mirror these data, and raw.githubusercontent.com is allowed.
+
+CHANGES IMPLEMENTED: `data.load_binance`, `data.load_nifty`, `regular_sessions`, `scripts/download_data.py` and the hashed manifest (details in `docs/iterations/MAIN.md`, R2-1).
+
+EXPERIMENTS PERFORMED: Offline loader tests; first comparison with Table 5 (followed up in E6).
+
+RESULTS: 140 files: Binance spot one-minute klines for all five coins (2024 to 2025, no missing minutes in July to December 2025) and Nifty 50 one-minute bars (April 2017 to October 2026, 2,369 sessions). India VIX daily data from archives.nseindia.com (E7).
+
+IMPROVEMENTS: Every claim of the paper about its five coins became testable, and an Indian market application became possible.
+
+REMAINING ISSUES: The data are third-party mirrors; the loaders report every check and the manifest pins the bytes.
+
+NEXT ITERATION: E6 and E7.
+
+---
+
+ITERATION NUMBER: 12 (Nifty 50 application)
+
+OBJECTIVE: Apply the monitor to Nifty 50 one-minute data and check alarms against India VIX and scheduled events.
+
+PROBLEM IDENTIFIED: A 375-bar session market has an opening and closing pattern that a 24-hour profile mishandles, and event days need verified dates.
+
+HYPOTHESIS: A session-aware profile and a development and held-out split give an honest test.
+
+CHANGES IMPLEMENTED, EXPERIMENTS, RESULTS: See `docs/report_parts/E7.md` and `docs/iterations/E7.md` (six iterations, including a flawed first control that was replaced).
+
+IMPROVEMENTS, REMAINING ISSUES: As in those files.
+
+NEXT ITERATION: Event studies for crypto (E12).
+
+---
+
+ITERATION NUMBER: 13 (forecast-relative monitoring)
+
+See `docs/iterations/MAIN.md`, R2-5, and `docs/report_parts/E10.md`. In short: dividing returns by a fitted GARCH forecast restores the guarantee under clustering (3% to 6% against 82% to 100%), at the cost of a capped signal for structural breaks, with a closed-form cap and an information bound, both checked by simulation; on real data, alarm rates barely change, and the plug-in baseline was found to break the bound over five days.
+
+---
+
+ITERATION NUMBERS: 14 and later (theory, benchmarks and alternatives)
+
+Detection delay and bet design (E11), the guarantee with a running truncation level (E14), panel monitoring (E15), the benchmark against published change-point methods (E13), and the alternative prototypes (`alternatives/`, logs ALT1 to ALT5) each keep their own iteration notes in `docs/iterations/`. Their main results are summarised in `docs/experiment_report.md` and `alternatives/ALTERNATIVES.md`.
+
+---
+
+## Appendix: round 1 log (2 November 2026, unchanged)
 
 | # | What we tried | What happened | What we changed |
 |---|---|---|---|
@@ -20,3 +314,5 @@ A record of what was tried, what went wrong and what changed, in order. Dates ar
 | 14 | First real-data monitor run reported the share of alarms "followed by higher volatility". | Without a reference, 79% is hard to interpret because volatility clusters. | Added a control: the same ratio at 2000 random times (50%, median 1.00). |
 | 15 | Real-data daily IQ on a common scale. | MAD-truncated estimators came out 3 to 7 times below MedRQ, MinRQ and TPQ. | Interpreted with E2b (truncation bias under intraday seasonality and fat tails). Real data strengthens the case for local, online MAD and for using truncation mainly to bound the monitored statistic. |
 | 16 | Checked all written text for em and en dashes. | Removed every one. | Standing rule for this project. |
+
+Notes added in round 2 to this appendix: row 9's "5% to 8%" is 8.3% and 5.0% for the two sides (E4c); row 10's 5.4% is within Monte Carlo error of 5% and the informative comparison is with the true-baseline rate (E4e); row 11 was refined by the review (slightly slower in 14 of 18 cells).
