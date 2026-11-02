@@ -2,7 +2,7 @@
 
 **An online monitor that watches one-minute returns and raises an alarm when volatility shifts up or down, with a proven limit on false alarms that holds however often you look at it.** It puts the MAD-based truncation used by Bapat (2026), an idea for jump robustness that goes back to Mancini (2009), inside e-detectors, a nonparametric framework for sequential change detection (Shin, Ramdas and Rinaldo 2024).
 
-> Status: research prototype, round 2 (November 2026). About 240 tests, 15 experiments on simulated and real data, eight alternative directions, proofs in [`docs/math.md`](docs/math.md). For the short version read [`PITCH_BAPAT.md`](PITCH_BAPAT.md); for every number read the [experiment report](docs/experiment_report.md).
+> Status: research prototype, round 2 (November 2026). About 240 tests, 16 experiments on simulated and real data, eight alternative directions, proofs in [`docs/math.md`](docs/math.md). For the short version read [`PITCH_BAPAT.md`](PITCH_BAPAT.md); for every number read the [experiment report](docs/experiment_report.md).
 
 Every result in this repository carries a label: **[PUBLISHED]** (taken from a paper), **[SYNTHETIC]** (our simulation) or **[REAL]** (our run on market data). Nothing is reported that was not run.
 
@@ -29,6 +29,7 @@ Sub-questions (status in [`RESEARCH_STRATEGY_BAPAT.md`](RESEARCH_STRATEGY_BAPAT.
 * **Volatility clustering breaks the null, and fixing it caps the signal [SYNTHETIC].** Under persistent GARCH clustering the raw monitor alarms on 82% to 100% of quiet days. Dividing returns by a fitted GARCH forecast brings this back to 3% to 6% per day, close to the rate with the true forecast model, but a forecast that keeps adapting also absorbs most of a real level shift. A doubling of the long-run variance raises the ratio of squared returns to the forecast by only 9% at persistence 0.99, and no shift, however large, can push that ratio above (1 − β)/α = 1.2. We derived this cap in closed form and checked it by simulation (E10).
 * **Alarms on real data carry information, but the main contribution is the guarantee [REAL].** On the five coins, alarms are followed by volatility on the flagged side of EWMA and HAR forecasts 71% to 83% of the time, against about 50% at random times, in and out of sample (E6). A simple ratio rule tuned with hindsight is about as precise (E6e), so what the e-detector adds over the simplest rule is a false-alarm guarantee with fixed settings; the published methods of E13, tuned to the same alarm counts, are less precise on crypto.
 * **Many assets at once [SYNTHETIC and REAL].** A Shiryaev-Roberts statistic divided by time is not an e-value, so the usual multiple-testing recipes do not apply directly. Per-asset e-processes with e-BH give a proved false discovery rate at every stopping time (at most 0.96% observed in 48 designs). On five coins plus Nifty its discoveries are confirmed 78% to 97% of the time against about 50% at random times; its gain over a Bonferroni split is mostly earlier flags, not more of them (E15, `docs/theory_panel.md`).
+* **One monitor for several time scales [proof, SYNTHETIC and REAL].** Averaging e-detectors run on 1, 5 and 15 minute returns is not automatically valid: a coarse detector changes only at the end of its block, so between block ends it is not a fair bet, and the plain average checked every minute has no proof. Counting each coarse detector only at the wealth it is sure to keep gives a proved bound, P(false alarm within m minutes) ≤ Σ w_k ⌈m/k⌉ / A, whenever each frequency's own null holds (for example for independent returns with any tails). In simulation the combination never beats the best single frequency, but stays within 5% (equal weights) to 18% (balanced weights) of it on persistent changes, and catches 95% to 97% of a slow trend that the one-minute detector almost never sees (3.8%). On five coins it behaves like the one-minute monitor (E17, [`docs/theory_multifreq.md`](docs/theory_multifreq.md)).
 * **Events [REAL].** Around the 16 FOMC statements of 2024 and 2025, the streaming monitor (the design fixed in advance) raised an increase alarm within six hours at 9, 8 and 9 statements for BTC, ETH and SOL, against 11% to 17% of control windows on the same weekday at the same clock time. Those are exactly the statements at which it was monitoring rather than recalibrating. The pre-specified primary test (BTC, FOMC) passes after Holm correction (p = 0.0002); the CPI test on BTC does not (p = 0.11). A monitor calibrated on the day before each statement flags 14 to 15 of 16, against 29% to 32% of controls (E12). On Nifty 50, 9 of 11 Union Budget sessions raise an alarm against 25% of ordinary sessions (E7).
 * **Reproducing the paper [PUBLISHED vs SYNTHETIC].** The published tables are consistent with the printed formulas, unnormalised kernel weights, the raw (unscaled) MAD and a crypto sample with about 2,000 missing minutes. Two findings we would like to discuss: the printed kernel estimators are not on the integrated-quarticity scale, and truncation at c × MAD leaves a bias that does not shrink with n. Both have simple fixes under constant volatility (normalise the weights; divide by κ₄). When volatility moves within the day, the truncation also needs a local scale (E2b, ALT3; [`docs/estimator_issues.md`](docs/estimator_issues.md), E1, E6).
 
@@ -114,6 +115,7 @@ Each experiment is one script in `experiments/` that writes CSV files to `result
 | E13 | Benchmark against published change-point methods (BJV, BOCPD) | `e13_benchmarks.py offline-null`, `offline-change`, `online-null`, `online-change 0`, `online-change 1`, `real-calib`, `real-crypto`, `real-crypto-h1-2025`, `real-nifty`, `cost`, `figures` | SYNTHETIC and REAL |
 | E14 | Running truncation level and monitors without a blind period | `e14_running_tau.py` | SYNTHETIC |
 | E15 | Panel of assets with false discovery control | `e15_panel.py synthetic`, `horizon`, `real`, `cs`, `figures` | SYNTHETIC and REAL |
+| E17 | One monitor for 1, 5 and 15 minutes (certified average of e-detectors) | `e17_multifrequency.py baselines levels null change real figures` | SYNTHETIC and REAL |
 
 Then rebuild the report from its parts:
 
@@ -158,6 +160,7 @@ The full list, with what each one affects, is in [`docs/limitations.md`](docs/li
 │   ├── theory_delay.md         detection delay and bet design
 │   ├── theory_panel.md         many assets at once: e-BH and false discovery control
 │   ├── theory_running_tau.md   running truncation level, rank detector, no blind period
+│   ├── theory_multifreq.md     one monitor for several sampling frequencies (certified average)
 │   ├── equation_map.md         symbol to code map
 │   ├── literature_review.md    verified references and the gap
 │   ├── limitations.md          what the results do not show
@@ -178,6 +181,7 @@ The full list, with what each one affects, is in [`docs/limitations.md`](docs/li
 │   ├── forecast.py             EWMA and GARCH variance forecasts for forecast-relative monitoring
 │   ├── competitors.py          published change-point methods used as benchmarks
 │   ├── running.py              running truncation level, rank (conformal) monitor, monitors with no blind period
+│   ├── multifreq.py            certified average of e-detectors at several sampling frequencies
 │   ├── design.py               bet grid design from the delay theory
 │   ├── panel.py                panel monitor with e-BH across assets
 │   ├── simulate.py             paper design, stochastic volatility with jumps and noise, GARCH, change points

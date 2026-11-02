@@ -56,7 +56,7 @@ The paper solves the first problem for a fixed sample. It does not address the s
 ## 6. Minimum scientifically credible implementation, and extensions
 
 1. **Core (done).** Estimators as printed and normalised; the e-detector with a proof; simulation of false alarms and delay against benchmarks; one real-data run.
-2. **Research extensions (done or in progress).** Five coins and Nifty; the confidence-sequence baseline (E8); stress tests (E9); forecast-relative monitoring (E10); event studies (E7, E12); delay theory (E11); running truncation (E14); panel monitoring (E15); benchmark against published change-point methods (E13).
+2. **Research extensions (done or in progress).** Five coins and Nifty; the confidence-sequence baseline (E8); stress tests (E9); forecast-relative monitoring (E10); event studies (E7, E12); delay theory (E11); running truncation (E14); panel monitoring (E15); several sampling frequencies in one monitor (E17); benchmark against published change-point methods (E13).
 3. **Advanced computational improvements.** Not needed: the monitor runs at about 10 microseconds per step in plain NumPy (E9d).
 4. **Optional demonstration features.** CLI, executed notebook; a live dashboard was judged unnecessary.
 

@@ -76,6 +76,8 @@ EXPERIMENTS = [
     ("E15 panel, confidence-sequence baseline", ["experiments/e15_panel.py", "cs"], False, "full"),
     ("E15 panel, real data", ["experiments/e15_panel.py", "real"], True, "full"),
     ("E15 panel, figures", ["experiments/e15_panel.py", "figures"], True, "full"),
+    ("E17 multi-frequency, synthetic", ["experiments/e17_multifrequency.py", "baselines", "levels", "null", "change"], False, "full"),
+    ("E17 multi-frequency, real data and figures", ["experiments/e17_multifrequency.py", "real", "figures"], True, "full"),
 ]
 
 RESULT_DIRS = ["results"] + [str(p.relative_to(ROOT)) for p in sorted((ROOT / "alternatives").glob("*/results"))]
