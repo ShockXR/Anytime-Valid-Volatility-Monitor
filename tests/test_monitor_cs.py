@@ -334,3 +334,19 @@ def test_invalid_options():
         GaussianLRMonitor(baseline="cs")
     with pytest.raises(ValueError):
         VolatilityMonitor(cal_len=100, cal_max=50)
+
+
+def test_recalibration_bound_on_alarm_count():
+    """docs/math.md Corollary 6.6: E[alarms in m monitored steps] <= (delta + m / A) / (1 - delta) with restarts."""
+    rng = np.random.default_rng(46)
+    alarms, monitored, bound = 0, 0, 0.0
+    for _ in range(2):
+        mon = VolatilityMonitor(threshold=100.0, cal_len=200, baseline="cs", delta=0.02)
+        r = rng.standard_normal(50000)
+        mon.run(r)
+        cal = sum(s["cal_len"] for s in mon.segments) + (0 if mon.calibrated else len(mon.buffer))
+        m = r.size - cal
+        alarms += len(mon.events)
+        monitored += m
+        bound += (0.02 + m / 100.0) / (1 - 0.02)
+    assert monitored > 50000 and alarms <= bound

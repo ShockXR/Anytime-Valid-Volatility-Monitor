@@ -351,10 +351,13 @@ def q8e():
     raw = ROOT / "data/raw/crypto/btcusd_bitstamp_1min_latest.csv"
     df = load_bitstamp_csv(raw, "2025-07-01", "2026-01-01")
     r = df.logret
-    s = intraday_scale(r.fillna(0.0), lookback_days=20)
+    # Missing returns stay missing (NaN): the profile medians and the monitor skip them. E5c filled them
+    # with 0, which counts a missing minute as a zero return (independent review, M6); on this file only
+    # the first return is missing, so the two choices give the same results here.
+    s = intraday_scale(r, lookback_days=20)
     u = (r / s).to_numpy(copy=True)
     u[~np.isfinite(u)] = np.nan
-    stream = np.nan_to_num(u, nan=0.0)  # as in E5c
+    stream = u
     A_e5, A_cs = 28800.0, 1440 / (0.05 - DELTA)
     configs = []
     for band in (0.0, 0.25, 0.5):
