@@ -82,6 +82,7 @@ python -m venv .venv
 source .venv/bin/activate        # Windows: .venv\Scripts\activate
 pip install -e ".[dev]"
 python -m pytest -q              # 26 tests
+python experiments/demo.py       # 2-minute synthetic demo, saves results/figures/demo_monitor.png
 python experiments/e04_detection.py
 ```
 
