@@ -15,11 +15,12 @@ HERE = Path(__file__).resolve().parent
 OUT = HERE / "results"
 
 # Reference categorical palette (light mode), fixed slot order.
-SLOT = ["#2a78d6", "#eb6834", "#1baf7a", "#eda100"]
+SLOT = ["#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4"]
 INK, INK2, GRID, SURFACE = "#0b0b0b", "#52514e", "#e4e3df", "#fcfcfb"
 
 SHOW = [("RK", "Robust kernel (c = 3, daily MAD)"), ("RK-k", "Same, kappa-corrected"),
-        ("TRQ-M", "Mancini threshold RQ"), ("PI-LU", "New: local plug-in, sqrt(2 log n), drop")]
+        ("TRQ-M", "Mancini threshold RQ"), ("PI-LU", "New: local plug-in, sqrt(2 log n), drop"),
+        ("PI-NN", "New: same with neighbour guard, k = n^(1/4)")]
 
 
 def _style(ax):
@@ -73,7 +74,7 @@ def fig_real():
         return
     d = pd.read_csv(path)
     d = d[d.bar_minutes == 1]
-    keys = ["RQ", "TPQ", "MinRQ", "TRQ-M", "RK", "RK-k", "TRQ-U", "PI-G3", "PI-L3", "PI-LU", "KPI-L3"]
+    keys = ["RQ", "TPQ", "MinRQ", "TRQ-M", "RK", "RK-k", "TRQ-U", "PI-G3", "PI-L3", "PI-LU", "KPI-L3", "PI-NN"]
     fig, axes = plt.subplots(1, 2, figsize=(9.5, 4.2), sharey=True, facecolor=SURFACE)
     for ax, sym in zip(axes, ("BTCUSDT", "DOGEUSDT")):
         _style(ax)
@@ -83,7 +84,7 @@ def fig_real():
                         medianprops=dict(color=INK, linewidth=1.5), whiskerprops=dict(color=INK2),
                         capprops=dict(color=INK2), boxprops=dict(edgecolor=INK2))
         for k, box in zip(keys, bp["boxes"]):
-            box.set_facecolor(SLOT[0] if k in ("TRQ-U", "PI-L3", "PI-LU", "KPI-L3") else "#c9c8c2")
+            box.set_facecolor(SLOT[0] if k in ("TRQ-U", "PI-L3", "PI-LU", "KPI-L3", "PI-NN") else "#c9c8c2")
         ax.axvline(0, color=INK2, linewidth=1)
         ax.set_yticks(range(1, len(keys) + 1), keys, fontsize=8)
         ax.set_title(f"{sym}, 184 days, 1-minute returns", fontsize=10, color=INK)
@@ -94,9 +95,37 @@ def fig_real():
     plt.close(fig)
 
 
+def fig_fastvol():
+    path = OUT / "q6_fastvol_estimators.csv"
+    if not path.exists():
+        return
+    d = pd.read_csv(path)
+    d = d[d.n == 1440]
+    keys = ["RQ", "TPQ", "MedRQ", "MinRQ", "TRQ-M", "RK", "RK-k", "TRQ-U", "PI-G3", "PI-L3", "PI-LU", "KPI-L3", "PI-NN"]
+    fig, axes = plt.subplots(1, 2, figsize=(9.5, 4.2), sharey=True, facecolor=SURFACE)
+    for ax, model in zip(axes, ("two-factor SV", "two-factor SV + medium jumps")):
+        _style(ax)
+        g = d[d.model == model].set_index("estimator").loc[keys]
+        y = np.arange(len(keys))
+        med = g["median_rel_err"].to_numpy()
+        ax.hlines(y, 0, med, color="#c9c8c2", linewidth=2)
+        cols = [SLOT[0] if k in ("TRQ-U", "PI-L3", "PI-LU", "KPI-L3", "PI-NN") else INK2 for k in keys]
+        ax.scatter(med, y, s=36, color=cols, zorder=3)
+        ax.axvline(0, color=INK2, linewidth=1)
+        ax.set_yticks(y, keys, fontsize=8)
+        ax.set_xlim(-0.75, 0.35)
+        ax.set_title(model + ", n = 1440", fontsize=10, color=INK)
+        ax.set_xlabel("median relative error of the IQ estimate", fontsize=9, color=INK2)
+    fig.suptitle("[SYNTHETIC] Fast volatility bursts calibrated to real 1-minute crypto returns (300 days)", fontsize=10, color=INK)
+    fig.tight_layout()
+    fig.savefig(OUT / "fig3_fastvol_bias.png", dpi=150, facecolor=SURFACE)
+    plt.close(fig)
+
+
 def main():
     fig_convergence()
     fig_real()
+    fig_fastvol()
 
 
 if __name__ == "__main__":

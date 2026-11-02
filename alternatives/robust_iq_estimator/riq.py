@@ -17,6 +17,10 @@ Main pieces
 * ``thresholds``: per-return truncation levels ``tau_i = a_n * s_i`` with either
   a fixed cut-off ``a_n = c`` (Bapat's rule, c = 3) or the slowly growing
   "universal" cut-off ``a_n = sqrt(2 log n)``.
+* ``neighbour_scale``: a nearest-neighbour guard. With
+  ``s_i = max(local scale, neighbour scale)`` a large return is removed only if
+  it is also large relative to its six neighbours, so isolated jumps go and
+  short volatility bursts stay (iteration 3 in docs/iterations/ALT3.md).
 * ``block_plugin``: the block plug-in estimator with an exact finite-sample
   correction under local Gaussianity, an estimate of ``int sigma^8`` and a
   standard error for confidence intervals.
@@ -208,14 +212,45 @@ def local_scale(r, k_s: int | None = None, span: int = 1, floor: float = 0.0, me
     return out[0] if one else out
 
 
-def thresholds(r, rule: str = "universal", c: float = 3.0, scale: str = "local", k_s: int | None = None):
+def neighbour_scale(r, w: int = 3) -> np.ndarray:
+    """Scaled median of ``|r|`` over the ``2w`` nearest neighbours of each return (the return itself excluded).
+
+    This is the nearest-neighbour idea of Andersen, Dobrev and Schaumburg (2012)
+    used as a *guard* for the threshold: inside a volatility burst the
+    neighbours are large too, so a large return is kept; an isolated jump has
+    ordinary neighbours and is still removed. Edges use the neighbours available.
+    """
+    r2, one = _as2d(r)
+    reps, n = r2.shape
+    a = np.abs(r2)
+    pad = np.full((reps, n + 2 * w), np.nan)
+    pad[:, w : w + n] = a
+    st = np.stack([pad[:, w + d : w + d + n] for d in range(-w, w + 1) if d != 0], axis=-1)
+    out = _rowwise_nanmedian(st) * MAD_NORMAL_SCALE
+    return out[0] if one else out
+
+
+def nn_block(n: int) -> int:
+    """Block length ``round(n^(1/4))`` (4, 6 and 12 for n = 390, 1440, 23400) used with the neighbour guard.
+
+    It grows (so efficiency tends to the bound) but the block *duration* shrinks
+    like ``n^(-3/4)``, so ``k sqrt(delta) -> 0`` (the formal centring condition)
+    and short volatility bursts stay inside few blocks.
+    """
+    return max(2, int(round(n**0.25)))
+
+
+def thresholds(r, rule: str = "universal", c: float = 3.0, scale: str = "local", k_s: int | None = None,
+               w: int = 3):
     """Per-return truncation levels ``tau_i = a_n * s_i`` and the cut-off ``a_n``.
 
     ``rule="fixed"``: ``a_n = c`` (Bapat 2026 uses c = 3 times the MAD).
     ``rule="universal"``: ``a_n = sqrt(2 log n)``, which grows slowly with n so
     that the truncation bias vanishes, while ``tau_n -> 0`` still removes jumps.
     ``scale="local"`` uses ``local_scale``; ``scale="global"`` uses one scaled
-    MAD (median centred) for the whole day, as in eq. (11) of the paper.
+    MAD (median centred) for the whole day, as in eq. (11) of the paper;
+    ``scale="local+neighbour"`` uses ``max(local_scale, neighbour_scale(w))``,
+    which never truncates more than ``"local"`` and keeps clustered large returns.
     """
     r2, one = _as2d(r)
     n = r2.shape[-1]
@@ -234,8 +269,10 @@ def thresholds(r, rule: str = "universal", c: float = 3.0, scale: str = "local",
         med = np.nanmedian(x, axis=-1, keepdims=True)
         s = np.nanmedian(np.abs(x - med), axis=-1, keepdims=True) * MAD_NORMAL_SCALE
         s = np.broadcast_to(s, r2.shape)
+    elif scale == "local+neighbour":
+        s = np.fmax(local_scale(r2, k_s), neighbour_scale(r2, w))
     else:
-        raise ValueError("scale must be 'local' or 'global'")
+        raise ValueError("scale must be 'local', 'global' or 'local+neighbour'")
     tau = a * s if np.isfinite(a) else np.full(r2.shape, np.inf)
     return (tau[0] if one else tau), a
 

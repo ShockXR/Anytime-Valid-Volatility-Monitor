@@ -147,3 +147,30 @@ def test_nan_and_one_dimensional_input():
     assert np.isfinite(riq.truncated_rq_local(r, tau, a))
     clean = r[np.isfinite(r)]
     assert np.isfinite(realized_quarticity(clean))
+
+
+def test_neighbour_guard_keeps_bursts_and_removes_isolated_jumps():
+    rng = np.random.default_rng(7)
+    n, reps = 1440, 200
+    r = rng.standard_normal((reps, n)) / np.sqrt(n)
+    burst = r.copy()
+    burst[:, 700:712] *= 5.0  # a 12-minute volatility burst
+    jump = r.copy()
+    jump[:, 300] += 30.0 / np.sqrt(n)  # an isolated jump
+    a = riq.universal_cutoff(n)
+    for x, expect_drop in ((burst, False), (jump, True)):
+        s_loc = riq.local_scale(x)
+        s_nn = np.fmax(s_loc, riq.neighbour_scale(x, 3))
+        dropped_loc = np.mean(np.abs(x[:, 700:712]) > a * s_loc[:, 700:712]) if not expect_drop else None
+        if expect_drop:
+            assert np.mean(np.abs(x[:, 300]) > a * s_nn[:, 300]) > 0.98
+        else:
+            dropped_nn = np.mean(np.abs(x[:, 700:712]) > a * s_nn[:, 700:712])
+            assert dropped_nn < 0.25 * dropped_loc
+    # the guard never truncates more than the local scale alone, and is unbiased for constant volatility
+    tau, a = riq.thresholds(r, rule="universal", scale="local+neighbour")
+    tau0, _ = riq.thresholds(r, rule="universal", scale="local")
+    assert np.all(tau >= tau0)
+    est = riq.block_plugin(r, tau, a, k=riq.nn_block(n), mode="drop")["iq"]
+    assert abs(est.mean() - 1) < 0.03
+    assert [riq.nn_block(m) for m in (390, 1440, 23400)] == [4, 6, 12]

@@ -22,8 +22,13 @@ Research questions
   Q5 [REAL] Binance BTCUSDT and DOGEUSDT, 1 July to 31 December 2025, one day
      = 1440 one-minute returns. Do the new estimators agree with MedRQ and
      MinRQ day by day better than the MAD-truncated ones? Same at 5 minutes.
+  Q6 [REAL + SYNTHETIC] Raised bar after Q5. Are the large one-minute returns
+     isolated (jumps) or clustered (fast volatility bursts)? A two-factor
+     volatility model with a fast factor (half-life of minutes) is calibrated to
+     the real clustering and tail diagnostics; which estimators recover the true
+     IQ on it, and does it reproduce the real 1-minute against 5-minute gaps?
 
-Usage: python run_experiment.py [theory|sim|cv|real|figures|all]
+Usage: python run_experiment.py [theory|ablation|sim|cv|real|fastvol|figures|all]
 All seeds are fixed. Uses at most two processes. Outputs go to results/.
 """
 
@@ -61,7 +66,7 @@ SCENARIOS = {
     "S6 strong SV + pattern + medium jumps": dict(xi=1.0, season=0.6, lam=4.0, js=0.3),
 }
 EST_ORDER = ["RQ", "TPQ", "MedRQ", "MinRQ", "TRQ-M", "RK", "RK-k", "TRQ-U",
-             "PI-G3", "PI-L3", "PI-LUc", "PI-LU", "PI-LU-raw", "KPI-L3"]
+             "PI-G3", "PI-L3", "PI-LUc", "PI-LU", "PI-LU-raw", "KPI-L3", "PI-NN"]
 K_LIST = (2, 5, 10, 20, 40, 80, 160, 320)
 CV_H = (5, 10, 20, 30, 40, 50, 75, 100, 150)
 
@@ -96,8 +101,12 @@ def estimate_all(r: np.ndarray, T: float = 1.0):
     est["PI-LU"] = plu["iq"]
     est["PI-LU-raw"] = riq.block_plugin(r, aU * s, aU, T=T, mode="drop", correct=False)["iq"]
     est["KPI-L3"] = riq.kernel_plugin(r, 3.0 * s, 3.0, h=30, T=T)
+    sn = np.fmax(s, riq.neighbour_scale(r, 3))
+    pnn = riq.block_plugin(r, aU * sn, aU, k=riq.nn_block(n), T=T, mode="drop")
+    est["PI-NN"] = pnn["iq"]
     extras = dict(se_LU=plu["se"], iq8_LU=plu["iq8"], drop_LU=plu["dropped"],
-                  se_L3=pl3["se"], iq8_L3=pl3["iq8"], drop_L3=pl3["dropped"], scale=s, aU=aU)
+                  se_L3=pl3["se"], iq8_L3=pl3["iq8"], drop_L3=pl3["dropped"],
+                  se_NN=pnn["se"], iq8_NN=pnn["iq8"], drop_NN=pnn["dropped"], scale=s, aU=aU)
     return est, extras
 
 
@@ -143,7 +152,7 @@ def part_theory():
         "RQ": 32 / 3, "TPQ": riq.avar_tpq(), "MedRQ": np.nan, "MinRQ": np.nan, "TRQ-M": 32 / 3,
         "RK": np.nan, "RK-k": riq.avar_truncated_rq(3.0, "clip"), "TRQ-U": 32 / 3,
         "PI-G3": riq.avar_block(38), "PI-L3": riq.avar_block(38), "PI-LUc": riq.avar_block(38),
-        "PI-LU": riq.avar_block(38), "PI-LU-raw": np.nan, "KPI-L3": np.nan,
+        "PI-LU": riq.avar_block(38), "PI-LU-raw": np.nan, "KPI-L3": np.nan, "PI-NN": riq.avar_block(riq.nn_block(1440)),
     }
     notes = {
         "RQ": "closed form 32/3 (k = 1 block)", "TPQ": "closed form, 2-dependent summands",
@@ -154,6 +163,7 @@ def part_theory():
         "PI-L3": "Gaussian block formula, k = 38", "PI-LUc": "Gaussian block formula, k = 38",
         "PI-LU": "Gaussian block formula, k = 38", "PI-LU-raw": "biased by about 2/k",
         "KPI-L3": "overlapping Gaussian kernel h = 30, simulation only",
+        "PI-NN": "Gaussian block formula, k = round(n^(1/4)) = 6",
     }
     for key in EST_ORDER:
         av, se, mean = sim_avar(sims[key])
@@ -235,6 +245,31 @@ def part_theory():
     print(f"theory done in {time.time() - t0:.0f} s")
 
 
+def part_scale_ablation():
+    """Iteration 1 check: MAD-only versus two-step local scale, constant Gaussian volatility (no jumps).
+
+    For n = 390 and 1440 and four truncation variants, the mean of IQ_hat / IQ, its
+    AVAR and the share of returns truncated, with the oracle (true) scale, the
+    local scaled MAD, and the two-step scale (MAD then truncated RMS).
+    """
+    rows = []
+    rng = np.random.default_rng(13)
+    for n, reps in ((390, 20000), (1440, 6000)):
+        r = rng.standard_normal((reps, n)) / np.sqrt(n)
+        scales = {"oracle (true sigma)": np.full(r.shape, 1 / np.sqrt(n)),
+                  "local scaled MAD": riq.local_scale(r, method="mad"),
+                  "two-step (MAD then truncated RMS)": riq.local_scale(r, method="trms")}
+        aU = riq.universal_cutoff(n)
+        for sname, s in scales.items():
+            for mode, a in (("clip", 3.0), ("drop", 3.0), ("clip", aU), ("drop", aU)):
+                o = riq.block_plugin(r, a * s, a, mode=mode)
+                rows.append(dict(n=n, scale=sname, mode=mode, a=a, mean_over_truth=o["iq"].mean(),
+                                 mean_se=np.std(o["iq"]) / np.sqrt(reps), avar=n * np.var(o["iq"]),
+                                 se_over_sd=np.mean(o["se"]) / np.std(o["iq"]), share_truncated=o["dropped"].mean(),
+                                 scale_rel_sd=float(np.std(s[:, ::max(1, n // 20)] * np.sqrt(n)))))
+    pd.DataFrame(rows).to_csv(OUT / "q1_scale_ablation.csv", index=False)
+
+
 # ----------------------------------------------------------------------------
 # Q2 and Q4: simulation grid
 # ----------------------------------------------------------------------------
@@ -263,7 +298,7 @@ def run_cell(args):
         est, extras = estimate_all(paths.r)
         for k, v in est.items():
             acc[k].append(v)
-        for key in ("se_LU", "iq8_LU", "drop_LU", "se_L3", "iq8_L3", "drop_L3"):
+        for key in ("se_LU", "iq8_LU", "drop_LU", "se_L3", "iq8_L3", "drop_L3", "se_NN", "iq8_NN", "drop_NN"):
             ex.setdefault(key, []).append(extras[key])
         truth_iq.append(paths.iq)
         truth_iq8.append(np.sum(paths.spot_var**4, axis=-1) / n)
@@ -280,7 +315,8 @@ def run_cell(args):
         rows.append(dict(scenario=scen_name, n=n, estimator=k, **_summ(e)))
     ex = {k: np.concatenate(v) for k, v in ex.items()}
     z = stats.norm.ppf(0.975)
-    for lab, est_key, se_key, i8_key in (("PI-LU", "PI-LU", "se_LU", "iq8_LU"), ("PI-L3", "PI-L3", "se_L3", "iq8_L3")):
+    for lab, est_key, se_key, i8_key in (("PI-LU", "PI-LU", "se_LU", "iq8_LU"), ("PI-L3", "PI-L3", "se_L3", "iq8_L3"),
+                                         ("PI-NN", "PI-NN", "se_NN", "iq8_NN")):
         x = np.concatenate(acc[est_key])
         se = ex[se_key]
         lo, hi = x - z * se, x + z * se
@@ -291,7 +327,7 @@ def run_cell(args):
                         below_plain=np.mean(iq < lo), above_plain=np.mean(iq > hi),
                         mean_rel_halfwidth=np.mean(z * se / x), se_over_sd=np.mean(se / iq) / np.std(x / iq - 1),
                         iq8_rel_bias=e8.mean(), iq8_rel_rmse=np.sqrt(np.mean(e8**2)),
-                        share_truncated=ex["drop_LU" if lab == "PI-LU" else "drop_L3"].mean(), reps=len(x)))
+                        share_truncated=ex["drop_" + lab[3:]].mean(), reps=len(x)))
     for k, v in acc_k.items():
         e = np.concatenate(v) / iq - 1
         blk.append(dict(scenario=scen_name, n=n, k=k, **_summ(e)))
@@ -441,6 +477,7 @@ def part_real():
                 row.update({k: float(v[0]) for k, v in est.items()})
                 row["se_PI-LU"] = float(ex["se_LU"][0])
                 row["iq8_PI-LU"] = float(ex["iq8_LU"][0])
+                row["se_PI-NN"] = float(ex["se_NN"][0])
                 rows.append(row)
                 if minutes == 1:
                     zz = x / ex["scale"][0]
@@ -448,7 +485,8 @@ def part_real():
                     diag.append(dict(symbol=sym, day=row["day"], share_beyond_3=np.mean(np.abs(zz) > 3),
                                      share_beyond_aU=np.mean(np.abs(zz) > aU), kurtosis_local=float(np.mean(zz**4) / np.mean(zz**2) ** 2),
                                      kurtosis_local_trimmed=float(stats.kurtosis(zz[np.abs(zz) <= aU], fisher=False)),
-                                     share_zero=np.mean(x == 0), share_dropped_PI_LU=float(ex["drop_LU"][0])))
+                                     share_zero=np.mean(x == 0), share_dropped_PI_LU=float(ex["drop_LU"][0]),
+                                     share_dropped_PI_NN=float(ex["drop_NN"][0])))
     daily = pd.DataFrame(rows)
     daily.to_csv(OUT / "q5_real_daily.csv", index=False)
     dg = pd.DataFrame(diag)
@@ -519,21 +557,172 @@ def part_real():
                           median_share_beyond_aU=g.share_beyond_aU.median(), gaussian_share_beyond_aU=2 * stats.norm.sf(riq.universal_cutoff(1440)),
                           median_kurtosis_local=g.kurtosis_local.median(), median_kurtosis_trimmed=g.kurtosis_local_trimmed.median(),
                           gaussian_kurtosis_trimmed=riq.trunc_even_moments(riq.universal_cutoff(1440), 2)[2] * riq.trunc_even_moments(riq.universal_cutoff(1440), 2)[0] / riq.trunc_even_moments(riq.universal_cutoff(1440), 2)[1] ** 2,
-                          median_share_zero=g.share_zero.median(), median_share_dropped_PI_LU=g.share_dropped_PI_LU.median()))
+                          median_share_zero=g.share_zero.median(), median_share_dropped_PI_LU=g.share_dropped_PI_LU.median(),
+                          median_share_dropped_PI_NN=g.share_dropped_PI_NN.median()))
     pd.DataFrame(drows).to_csv(OUT / "q5_real_diagnostics.csv", index=False)
     print(summ[(summ.reference == "MedRQ")].pivot_table(index="estimator", columns=["symbol", "bar_minutes"], values="median_ratio").round(3))
+
+
+# ----------------------------------------------------------------------------
+# Q6: fast volatility bursts (raised-bar extension after Q5)
+# ----------------------------------------------------------------------------
+
+FAST_GRID_SD = (0.5, 0.75, 1.0)
+FAST_GRID_HL = (1.0, 3.0, 10.0)  # half-life of the fast factor, minutes
+DIAG_KEYS = ("acf1", "acf5", "acf10", "kurtosis_trimmed", "share_beyond_3", "neighbour_share")
+
+
+def two_factor_sv(reps: int, n: int, rng, s_fast: float, hl_fast_min: float, xi_slow: float = 1.0, kappa_slow: float = 5.0,
+                  season: float = 0.6, lam: float = 0.0, js: float = 0.0):
+    """Two-factor log-OU volatility: the slow factor of S5 plus a fast factor with a half-life of minutes.
+
+    ``log sigma_t^2 = m + x_slow + x_fast + 2 log(pattern)``; x_fast has stationary
+    sd ``s_fast`` and half-life ``hl_fast_min`` minutes (T = 1 day = 1440 minutes);
+    m makes ``E[sigma^2] = SIGMA_BAR^2``. Simulated exactly on a fine grid of
+    about 14,400 steps per day (at least one per observation), so the true IQ
+    includes volatility variation inside each observation interval.
+    Returns (r, iq): returns of shape (reps, n) and the exact IQ of the path.
+    """
+    sub = max(1, 14400 // n)
+    N = n * sub
+    dt = 1.0 / N
+    vs = xi_slow**2 / (2 * kappa_slow)
+    kf = np.log(2) / (hl_fast_min / 1440.0)
+    m = np.log(SIGMA_BAR**2) - vs / 2 - s_fast**2 / 2
+    xs = np.sqrt(vs) * rng.standard_normal(reps)
+    xf = s_fast * rng.standard_normal(reps)
+    a_s, a_f = np.exp(-kappa_slow * dt), np.exp(-kf * dt)
+    sd_s, sd_f = np.sqrt(vs * (1 - a_s**2)), s_fast * np.sqrt(1 - a_f**2)
+    from avmonitor.simulate import intraday_u_shape
+
+    pat = intraday_u_shape(N, season) if season > 0 else np.ones(N)
+    r = np.zeros((reps, n))
+    iq = np.zeros(reps)
+    for k in range(N):
+        v = np.exp(m + xs + xf) * pat[k] ** 2
+        r[:, k // sub] += np.sqrt(v * dt) * rng.standard_normal(reps)
+        iq += v * v * dt
+        xs = a_s * xs + sd_s * rng.standard_normal(reps)
+        xf = a_f * xf + sd_f * rng.standard_normal(reps)
+    if lam > 0:
+        counts = rng.poisson(lam, reps)
+        for i in np.nonzero(counts)[0]:
+            np.add.at(r[i], rng.integers(0, n, counts[i]), rng.normal(0, js * SIGMA_BAR, counts[i]))
+    return r, iq
+
+
+def burst_diagnostics(days) -> dict:
+    """Pooled diagnostics of local tail thickness and clustering for a list of daily return arrays.
+
+    z = r / local scale. acf of min(z^2, 25) at lags 1, 5, 10 (median over days), trimmed
+    kurtosis of z within the universal cut-off (median), share of |z| > 3, and the share of
+    exceedances (|z| > sqrt(2 log n)) that have a neighbour with |z| > 2 (pooled).
+    """
+    acf = {1: [], 5: [], 10: []}
+    kt, b3, nb = [], [], []
+    for x in days:
+        z = x / riq.local_scale(x)
+        z2 = np.minimum(z**2, 25.0)
+        for lag in acf:
+            acf[lag].append(np.corrcoef(z2[:-lag], z2[lag:])[0, 1])
+        aU = riq.universal_cutoff(len(z))
+        kt.append(stats.kurtosis(z[np.abs(z) <= aU], fisher=False))
+        b3.append(np.mean(np.abs(z) > 3))
+        idx = np.nonzero(np.abs(z) > aU)[0]
+        az = np.abs(np.concatenate([[0.0], z, [0.0]]))
+        nb.extend(np.maximum(az[idx], az[idx + 2]) > 2)
+    return dict(acf1=np.median(acf[1]), acf5=np.median(acf[5]), acf10=np.median(acf[10]), kurtosis_trimmed=np.median(kt),
+                share_beyond_3=np.median(b3), neighbour_share=np.mean(nb) if nb else np.nan, exceedances=len(nb))
+
+
+def part_fastvol():
+    """Q6: calibrate a fast volatility factor to the real 1-minute diagnostics, then score every estimator on it."""
+    from avmonitor.data import load_binance
+
+    t0 = time.time()
+    rows = []
+    real = {}
+    for sym in ("BTCUSDT", "DOGEUSDT"):
+        df = load_binance(sym, "2025-07-01", "2026-01-01", download=False)
+        real[sym] = burst_diagnostics(list(_daily_returns(df, 1).values()))
+        rows.append(dict(source=f"[REAL] {sym}", s_fast=np.nan, hl_fast_min=np.nan, **real[sym]))
+    # Calibration grid (no jumps), 100 days of n = 1440 each. Criterion: sum of squared
+    # standardised differences to the average of the two coins, over DIAG_KEYS.
+    target = {k: np.mean([real[s][k] for s in real]) for k in DIAG_KEYS}
+    spread = {k: abs(real["BTCUSDT"][k] - real["DOGEUSDT"][k]) + 0.1 * abs(target[k]) for k in DIAG_KEYS}
+    rng = np.random.default_rng(6000)
+    best = None
+    for s_f in (0.0,) + FAST_GRID_SD:
+        for hl in FAST_GRID_HL if s_f > 0 else (1.0,):
+            r, _ = two_factor_sv(100, 1440, rng, s_f, hl)
+            d = burst_diagnostics(list(r))
+            dist = sum(((d[k] - target[k]) / spread[k]) ** 2 for k in DIAG_KEYS)
+            rows.append(dict(source="[SYNTHETIC] calibration grid", s_fast=s_f, hl_fast_min=hl, distance=dist, **d))
+            if s_f > 0 and (best is None or dist < best[0]):
+                best = (dist, s_f, hl)
+    pd.DataFrame(rows).to_csv(OUT / "q6_burst_diagnostics.csv", index=False)
+    _, s_f, hl = best
+    print(f"calibrated fast factor: sd {s_f}, half-life {hl} min ({time.time() - t0:.0f} s)", flush=True)
+    # Score every estimator on the calibrated model, with and without jumps.
+    erows, krows, frows = [], [], []
+    for jumps in (False, True):
+        for n in NS:
+            rng = np.random.default_rng(6100 + NS.index(n) + 10 * jumps)
+            reps = 300
+            batch = 100 if n == 23400 else reps
+            acc, acck, ivals = {}, {}, []
+            agg = {}
+            for _ in range(reps // batch):
+                r, iq = two_factor_sv(batch, n, rng, s_f, hl, lam=4.0 if jumps else 0.0, js=0.3)
+                est, ex = estimate_all(r)
+                for k, v in est.items():
+                    acc.setdefault(k, []).append(v)
+                aU, s = ex["aU"], ex["scale"]
+                sn = np.fmax(s, riq.neighbour_scale(r, 3))
+                for kk in (2, 5, 10, 20, 40):
+                    acck.setdefault(f"local scale, k={kk}", []).append(riq.block_plugin(r, aU * s, aU, k=kk, mode="drop")["iq"])
+                    acck.setdefault(f"neighbour guard, k={kk}", []).append(riq.block_plugin(r, aU * sn, aU, k=kk, mode="drop")["iq"])
+                acck.setdefault("k=5, no truncation", []).append(riq.block_plugin(r, k=5)["iq"])
+                ivals.append(iq)
+                if n == 1440:  # same days at 5 minutes
+                    e5, _ = estimate_all(r.reshape(batch, 288, 5).sum(axis=2))
+                    for k, v in e5.items():
+                        agg.setdefault(k, []).append(v)
+            iq = np.concatenate(ivals)
+            for k in EST_ORDER:
+                e = np.concatenate(acc[k]) / iq - 1
+                erows.append(dict(model="two-factor SV" + (" + medium jumps" if jumps else ""), n=n, estimator=k, **_summ(e)))
+            for kk, v in acck.items():
+                e = np.concatenate(v) / iq - 1
+                krows.append(dict(model="two-factor SV" + (" + medium jumps" if jumps else ""), n=n, k=kk, **_summ(e)))
+            if n == 1440:
+                for k in EST_ORDER:
+                    one_ = np.concatenate(acc[k])
+                    five_ = np.concatenate(agg[k])
+                    frows.append(dict(model="two-factor SV" + (" + medium jumps" if jumps else ""), estimator=k,
+                                      median_ratio_1min_over_5min=float(np.exp(np.median(np.log(one_ / five_)))),
+                                      median_ratio_1min_over_MedRQ_1min=float(np.exp(np.median(np.log(one_ / np.concatenate(acc["MedRQ"]))))),
+                                      median_5min_over_truth=float(np.median(five_ / iq))))
+            print(f"fast-vol model jumps={jumps} n={n} done ({time.time() - t0:.0f} s)", flush=True)
+    pd.DataFrame(erows).to_csv(OUT / "q6_fastvol_estimators.csv", index=False)
+    pd.DataFrame(krows).to_csv(OUT / "q6_fastvol_block_length.csv", index=False)
+    pd.DataFrame(frows).to_csv(OUT / "q6_fastvol_frequency.csv", index=False)
 
 
 if __name__ == "__main__":
     which = sys.argv[1] if len(sys.argv) > 1 else "all"
     if which in ("theory", "all"):
         part_theory()
+    if which in ("ablation", "theory", "all"):
+        part_scale_ablation()
     if which in ("sim", "all"):
         part_sim()
     if which in ("cv", "all"):
         part_cv()
     if which in ("real", "all"):
         part_real()
+    if which in ("fastvol", "all"):
+        part_fastvol()
     if which in ("figures", "all"):
         import make_figures
 
