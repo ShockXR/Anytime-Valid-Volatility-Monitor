@@ -17,7 +17,7 @@ Statistics
 Procedures (vectorised over independent paths, streamed block by block)
 -----------------------------------------------------------------------
 * ``CR``: Chow and Robbins (1965), ``N = inf{n >= m : n >= (z/d)^2 (nu_n + 1/n)}`` with
-  the sample variance ``nu_n``; relative version (Nadas 1969)
+  the sample variance ``nu_n``; relative version (Nadas 1967)
   ``n >= (z/d)^2 (nu_n + 1/n) / Xbar_n^2``. Estimate ``Xbar_N``.
 * ``CR-BM``: the same rule with a batch-means long-run variance (batches of fixed
   length, rule checked at batch ends): a fix for serial dependence.
@@ -723,10 +723,11 @@ class _CS(_Proc):
     ``bets`` in ``{"wsr", "tuned", "opt"}``: predictable plug-in empirical Bernstein
     bounds (``docs/math.md`` 6.2) with one-sided ranges. ``bets="bet"``: capital
     processes ``prod (1 + lam (m - Z))`` (upper) and ``prod (1 + lam (Z - m))`` (lower)
-    on a log grid of candidate means ``m`` fixed from the pilot, with one bet per side
-    shared by all grid points (so log-capital is nondecreasing, resp. nonincreasing,
-    and concave in m, which makes linear interpolation between grid points a valid
-    bound). Bounds are intersected over time.
+    on a grid of candidate means ``m`` fixed from the pilot (a fine log grid around the
+    pilot mean plus coarse extensions to 1e-6 and 1 - 1e-6), with one bet per side shared
+    by all grid points (so log-capital is nondecreasing, resp. nonincreasing, and concave
+    in m, which makes interpolation between grid points a valid bound; above the fine grid
+    the lower bet is capped per point). Bounds are intersected over time.
 
     ``init="pilot"``: the running centre and variance start from the pilot Z values with
     weight ``m`` (known when the sequence starts, so the bets stay predictable).
@@ -766,20 +767,36 @@ class _CS(_Proc):
         self.U_at = np.full(reps, np.nan)
         self.cm_at = np.full((3, reps), np.nan)
         if bets == "bet":
-            # log grid on [zhat0 / span, span zhat0]; between grid points a second-order bound is used
-            G = s.bet_grid
+            # core: log grid on [zhat0 / span, span zhat0], where the bounds normally lie; between grid points
+            # a second-order bound is used. Extensions: 8 log-spaced points down to 1e-6 and 32 log-spaced
+            # points up to 1 - 1e-6, so that a pilot far from the truth cannot leave the true mean outside the
+            # grid (the sequence would then never shrink). The bets are chosen for the core; above the core
+            # the lower side's bet is capped per point at cs_cap / m (its factors stay positive and its log
+            # capital stays nonincreasing in m, but it is no longer concave there, so the bound there is the
+            # largest rejected grid point, without interpolation).
+            G, NL, NH = s.bet_grid, 8, 32
             f = np.geomspace(1.0 / s.bet_span, s.bet_span, G)
-            self.grid = np.clip(self.z0[:, None] * f[None, :], 1e-6, 1 - 1e-6)
+            core = np.clip(self.z0[:, None] * f[None, :], 1e-6, 1 - 1e-6)
+            tl = np.arange(NL)[None, :] / NL
+            low = np.exp(np.log(1e-6) + tl * (np.log(core[:, :1]) - np.log(1e-6)))
+            th = np.arange(1, NH + 1)[None, :] / NH
+            high = np.exp(np.log(core[:, -1:]) + th * (np.log(1 - 1e-6) - np.log(core[:, -1:])))
+            self.grid = np.concatenate([low, core, high], axis=1)
+            self.core_lo, self.core_hi = NL, NL + G - 1  # indices of the first and last core points
+            Gt = self.grid.shape[1]
             # per grid point: log capital F, slope sum D = sum lam / x, curvature sum C = sum (lam / x)^2,
             # x = 1 + lam (m - Z) (upper) or 1 + lam (Z - m) (lower)
-            self.logK_up = np.zeros((reps, G))
-            self.logK_lo = np.zeros((reps, G))
-            self.D_up = np.zeros((reps, G))
-            self.D_lo = np.zeros((reps, G))
-            self.C_up = np.zeros((reps, G))
-            self.C_lo = np.zeros((reps, G))
-            self.cap_up = s.cs_cap / (1.0 - self.grid[:, 0])  # 1 + lam (m - Z) > 0 for every m on the grid
-            self.cap_lo = s.cs_cap / self.grid[:, -1]  # 1 + lam (Z - m) > 0 for every m on the grid
+            self.logK_up = np.zeros((reps, Gt))
+            self.logK_lo = np.zeros((reps, Gt))
+            self.D_up = np.zeros((reps, Gt))
+            self.D_lo = np.zeros((reps, Gt))
+            self.C_up = np.zeros((reps, Gt))
+            self.C_lo = np.zeros((reps, Gt))
+            # upper side: lam (1 - m) <= cs_cap / (1 - core_0) < 1 for every m in [0, 1) since core_0 <= 0.2
+            self.cap_up = s.cs_cap / (1.0 - core[:, 0])
+            # lower side: lam m <= cs_cap on the core; above it the per-point cap cs_cap / m applies
+            self.cap_lo = s.cs_cap / core[:, -1]
+            self.lmax_lo = np.zeros(reps)  # largest lower bet so far (where the per-point cap has bitten)
             # binned law of Z for the bets: bins of width zhat0 / 8 up to 10 zhat0, one overflow bin and
             # one bin for Z = 1 (clipped returns); per-bin sums keep the binned mean exact
             self.nbins = 82
@@ -919,7 +936,9 @@ class _CS(_Proc):
         Lower side: ``F(m) = sum log(1 + lam (Z_i - m))`` is nonincreasing and concave, ``|F''|``
         is nondecreasing in m, so ``F(m) >= max(chord, F(m1) + |F'(m1)| y - |F''(m1)| y^2 / 2)``
         with ``y = m1 - m``. Every candidate mean where a lower bound reaches ``log(2/alpha)``
-        is rejected, so the reported bounds are conservative.
+        is rejected, so the reported bounds are conservative. Above the core of the grid the lower bet is
+        capped per point (``cs_cap / m``); there the log capital is still nonincreasing in m but not
+        concave, so the bound is the largest rejected grid point, without interpolation.
         """
         k = z.shape[1]
         lu, ll = self._gro_bets(g, zprev[:, 0])  # bets fixed for the block (predictable)
@@ -933,7 +952,10 @@ class _CS(_Proc):
         thr = self.logd
         G = grid.shape[1]
         ar = np.arange(g.size)
-        lu2, ll2 = lu[:, None], ll[:, None]
+        lu2 = lu[:, None]
+        ll2 = np.minimum(ll[:, None], self.s.cs_cap / grid)  # per-point cap (binds only above the core)
+        self.lmax_lo[g] = np.maximum(self.lmax_lo[g], ll)
+        m_conc = self.s.cs_cap / self.lmax_lo[g]  # lower log capital is concave in m on [0, m_conc]
         for j in range(k):
             zj = z[:, j][:, None]
             xu = 1.0 + lu2 * (grid - zj)
@@ -979,7 +1001,9 @@ class _CS(_Proc):
                 h = m1 - m0
                 y_ch = (thr - F1) / (F0 - F1) * h  # distance from m1 down to the chord crossing
                 y_q = self._quad_root(F1, Dl[r_, i0 + 1], Cl[r_, i0 + 1], thr, h)
-                lb[mid] = m1 - np.minimum(y_ch, y_q)
+                # interpolate only where the bet was never capped (concave part); else the rejected grid point
+                conc = m1 <= m_conc[r_]
+                lb[mid] = np.where(conc, m1 - np.minimum(y_ch, y_q), m0)
             Uo = np.minimum(Uo, ub) if self.s.intersect else ub
             Lo = np.maximum(Lo, lb) if self.s.intersect else lb
             U[:, j] = Uo

@@ -232,10 +232,28 @@ def test_betting_bounds_are_conservative_and_tight():
         f_up = lambda m: np.sum(np.log1p(lu[i] * (m - zz[i]))) - thr  # noqa: E731
         f_lo = lambda m: np.sum(np.log1p(ll[i] * (zz[i] - m))) - thr  # noqa: E731
         from scipy.optimize import brentq
-        u_exact = brentq(f_up, cs.grid[i, 0], cs.grid[i, -1])
-        l_exact = brentq(f_lo, cs.grid[i, 0], cs.grid[i, -1])
+        a, b = cs.grid[i, cs.core_lo], cs.grid[i, cs.core_hi]
+        u_exact = brentq(f_up, a, b)
+        l_exact = brentq(f_lo, a, b)
         assert cs.U[i] >= u_exact - 1e-12 and cs.U[i] <= u_exact * 1.0005
         assert cs.L[i] <= l_exact + 1e-12 and cs.L[i] >= l_exact * 0.9995
+
+
+def test_betting_sequence_recovers_from_a_bad_pilot():
+    """A pilot mean 20 times too small (true mean far above the fine grid): the sequence still covers and shrinks."""
+    rng = np.random.default_rng(10)
+    reps, n = 200, 3000
+    z = rng.beta(2.0, 2.0, (reps, n))  # mean 1/2
+    pilot = z[:, :30] / 20.0
+    st = S.Setup(d=0.05, alpha=0.05, block=100, intersect=True)
+    cs = S._CS(st, pilot, bets="bet", dz=np.full(reps, 0.05))
+    assert np.all(cs.grid[:, cs.core_hi] < 0.5)  # the truth is outside the fine grid
+    miss = np.zeros(reps, bool)
+    for b in range(0, n, 100):
+        cs.update(z[:, b:b + 100], np.arange(reps))
+        miss |= (cs.U < 0.5) | (cs.L > 0.5)
+    assert miss.mean() <= 0.05 + 3 * math.sqrt(0.05 * 0.95 / reps)
+    assert np.all(cs.T > 0)  # every path stopped (width at most 0.1) within n steps
 
 
 def test_confidence_sequences_cover_at_all_times():

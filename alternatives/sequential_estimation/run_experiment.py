@@ -17,6 +17,9 @@ Parts (run any subset: ``python alternatives/sequential_estimation/run_experimen
          over the sample; batch-means (long-run variance) Chow-Robbins.
   minrisk [SYNTHETIC] Robbins (1959) minimum risk point estimation, raw and truncated:
          risk efficiency E[loss] / (2 n0) and regret E[loss] - 2 n0.
+  verify [SYNTHETIC] E[N] / n* of the confidence sequences (Gaussian, relative accuracy, pilot
+         100) with and without the running intersection, against the per-path first-order
+         prediction, the limit 2 log(2/alpha) / z^2 and the Brownian limit with intersection.
   map    [SYNTHETIC, closed form and simulation] Mapping the truncated variance back to
          sigma^2 under a Gaussian shape: bias when the shape is wrong, and coverage of
          sigma^2 by the mapped betting interval.
@@ -76,7 +79,7 @@ def _cell(args):
     """One simulation cell: every procedure on the same paths; returns summary rows."""
     part, lawname, d, alpha, m, relative, procs, reps, n_max, extra = args
     law = law_of(lawname)
-    key = f"{part}|{lawname}|{d}|{alpha}|{m}|{relative}"
+    key = f"{part}|{lawname}|{d}|{alpha}|{m}|{relative}" + ("" if extra.get("intersect", True) else "|nointersect")
     st = S.Setup(d=d, alpha=alpha, m=m, relative=relative, procs=tuple(procs), n_max=n_max, **extra)
     t0 = time.time()
     gt = None
@@ -87,7 +90,8 @@ def _cell(args):
     for p in procs:
         res = out[p]
         sm = S.summarise(res, d, relative, alpha)
-        row = dict(part=part, law=lawname, d=d, alpha=alpha, m=m, relative=relative, proc=p, reps=reps, **sm)
+        row = dict(part=part, law=lawname, d=d, alpha=alpha, m=m, relative=relative, proc=p, reps=reps,
+                   intersect=st.intersect, **sm)
         if res.cond_target is not None:
             row["cover_cond_avg"] = float(S.covered(res, d, relative, target=res.cond_target).mean())
             row["cond_over_uncond"] = float(np.mean(res.cond_target / res.target))
@@ -140,7 +144,7 @@ def garch_targets(lawname):
 def run_cells(cells, out_name):
     with Pool(WORKERS) as pool:
         rows = [r for rs in pool.imap_unordered(_cell, cells) for r in rs]
-    df = pd.DataFrame(rows).sort_values(["law", "d", "alpha", "m", "proc"])
+    df = pd.DataFrame(rows).sort_values(["law", "d", "alpha", "m", "proc", "intersect"])
     df.to_csv(RES / out_name, index=False)
     log(f"wrote {out_name} ({len(df)} rows)")
     return df
@@ -227,6 +231,10 @@ def part_garch():
         for d in (0.2, 0.1):
             procs = ["CR-raw", "CR-trunc", "CR-BM-trunc", "Oracle-trunc", "CS-opt", "CS-bet"]
             cells.append(("garch", lawname, d, 0.05, 30, True, procs, 1000, 200_000, {"batch": batch}))
+            # without the running intersection the empirical Bernstein sequence covers the bet-weighted
+            # average of the conditional truncated variances (docs/math.md Theorem 6.2); with it, not exactly
+            cells.append(("garch", lawname, d, 0.05, 30, True, ["CS-opt", "CS-bet"], 1000, 200_000,
+                          {"batch": batch, "intersect": False}))
     run_cells(cells, "e_garch.csv")
 
 
@@ -304,6 +312,46 @@ def part_map():
     log("wrote g_mapping.csv")
 
 
+def _verify_cell(args):
+    d, intersect, reps = args
+    law = law_of("gauss")
+    alpha, m = 0.05, 100
+    procs = ("CR-trunc", "CS-tuned", "CS-opt", "CS-bet")
+    key = f"verify|{d}|{intersect}"
+    st = S.Setup(d=d, alpha=alpha, m=m, relative=True, procs=procs, n_max=400_000, intersect=intersect)
+    t0 = time.time()
+    out = S.run(law, st, reps, seed_of(key))
+    tau = out["_meta"]["tau"]
+    m2, m4 = law.trunc_moments(tau)
+    mz, vz = m2 / tau**2, (m4 - m2**2) / tau**4
+    lim_b = S.brownian_limit(alpha, 1.0, reps=20_000, seed=1)["ratio"]
+    rows = []
+    for p in procs:
+        res = out[p]
+        sm = S.summarise(res, d, True, alpha)
+        row = dict(d=d, intersect=intersect, proc=p, reps=reps, m=m, **sm)
+        if p in ("CS-tuned", "CS-opt"):
+            # first-order prediction per path (this path's tau), N = m + predicted sequence length
+            pred = np.array([S.cs_n_predict(a, b, d * a, alpha, bets=p.split("-")[1], relative=True, d_rel=d)
+                             for a, b in zip(mz, vz)])
+            row["pred_EN_over_nstar"] = float(np.mean((m + pred) / res.nstar))
+        row["limit_not_intersected"] = S.cs_ratio_limit(alpha)
+        row["limit_intersected_kappa1"] = lim_b
+        rows.append(row)
+    log(f"{key} done in {time.time() - t0:.0f}s")
+    return rows
+
+
+def part_verify():
+    """[SYNTHETIC] E[N] / n* of the confidence sequences against the closed forms, with and without intersection."""
+    cells = [(d, inter, 1000) for d in (0.025, 0.05, 0.1) for inter in (False, True)]
+    with Pool(WORKERS) as pool:
+        rows = [r for rs in pool.imap_unordered(_verify_cell, cells) for r in rs]
+    df = pd.DataFrame(rows).sort_values(["intersect", "d", "proc"])
+    df.to_csv(RES / "j_verify_limits.csv", index=False)
+    log("wrote j_verify_limits.csv")
+
+
 # ----------------------------------------------------------------------------- real data
 
 
@@ -342,7 +390,7 @@ def part_real():
     log(f"{R.shape[0]} windows (start hours), median span of {m + cap} returns: {np.median(elapsed):.0f} minutes")
     rows, summ = [], []
     for alpha in (0.05, 0.10):
-        for d in (0.5, 0.3, 0.2):
+        for d in (0.5, 0.4, 0.3, 0.2):
             procs = ("CR-raw", "CR-trunc", "Stein-trunc", "CS-opt", "CS-bet")
             st = S.Setup(d=d, alpha=alpha, m=m, relative=True, procs=procs, n_max=m + cap)
             out = S.run(S.Windows(R), st, R.shape[0], 0)
@@ -444,6 +492,9 @@ def part_figs():
         ax.plot(ca.d, ca.eb_opt, "--", color=colors["CS-opt"], label="CS-opt (predicted)")
         ax.plot(ca.d, ca.bet_oracle, "--", color=colors["CS-bet"], label="best betting bound (predicted)")
         ax.axhline(S.cs_ratio_limit(alpha), color="k", lw=0.8, ls=":", label="limit 2 log(2/alpha) / z^2")
+        bl = pd.read_csv(RES / "a_brownian_limit.csv")
+        bl = bl[(bl.alpha == alpha) & (bl.kappa == 1.0)].ratio_intersected.iloc[0]
+        ax.axhline(bl, color="k", lw=0.8, ls="--", label="limit with intersection (Brownian)")
         ax.axhline(1.0, color="k", lw=0.5)
         ax.set_xscale("log")
         ax.set_xlabel("relative half-width d")
@@ -497,7 +548,7 @@ def part_figs():
 
 
 PARTS = dict(limit=part_limit, main=part_main, abs=part_abs, pilot=part_pilot, garch=part_garch,
-             minrisk=part_minrisk, map=part_map, real=part_real, boot=part_boot, figs=part_figs)
+             minrisk=part_minrisk, map=part_map, verify=part_verify, real=part_real, boot=part_boot, figs=part_figs)
 
 if __name__ == "__main__":
     names = sys.argv[1:] or [p for p in PARTS if p != "figs"] + ["figs"]
