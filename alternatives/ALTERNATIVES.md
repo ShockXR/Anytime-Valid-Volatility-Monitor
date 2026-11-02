@@ -42,7 +42,7 @@ For comparison, the main direction (the robust volatility monitor itself) scores
 
 **Question.** The default monitor plugs in an estimated baseline, which voids the proof. Can a running confidence sequence for the pre-change level restore it?
 
-**Results.** Yes, with a proof: P(false alarm within m steps) ≤ δ + m / A (`docs/math.md`, Theorem 6.4). In simulation the false alarm rate is at most 0.27% against a 5% bound, at a cost of 1.8 to 7.2 times the delay with a 390-step calibration (E8). On real data the share of decrease alarms followed by lower volatility rose from 90% to 97%.
+**Results.** Yes, with a proof: P(false alarm within m steps) ≤ δ + m / A (`docs/math.md`, Theorem 6.4). In simulation the false alarm rate is at most 0.27% against a 5% bound, at a cost of 1.8 to 7.6 times the delay with a 390-step calibration (E8). On real data the share of decrease alarms followed by lower volatility rose from 90% to 97%.
 
 **Scores.** Novelty 6 (betting confidence sequences exist; their use as a detector baseline with this bound is ours), Validity 10, Relevance 7, Feasibility 9, Demonstration 6, Interest 8.
 

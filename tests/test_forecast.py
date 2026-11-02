@@ -58,3 +58,12 @@ def test_oracle_standardisation_removes_clustering():
         return float(np.dot(x[1:], x[:-1]) / np.dot(x, x))
     assert ac1(r**2) > 0.1
     assert abs(ac1(z**2)) < 0.02
+
+
+def test_ewma_variance_rejects_nan_start():
+    import numpy as np
+    import pytest
+    from avmonitor.forecast import ewma_variance
+
+    with pytest.raises(ValueError):
+        ewma_variance(np.ones(10), halflife=5, init=float("nan"))

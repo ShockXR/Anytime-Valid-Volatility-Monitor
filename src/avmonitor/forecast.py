@@ -34,6 +34,8 @@ def ewma_variance(r: np.ndarray, halflife: float, init: float | None = None, flo
         head = r[: min(r.size, 100)]
         head = head[np.isfinite(head)]
         init = float(np.mean(head**2)) if head.size else 1.0
+    if not np.isfinite(init):
+        raise ValueError("init must be finite (a NaN start value would make every forecast NaN)")
     out = np.empty(r.size)
     v = max(float(init), floor)
     for t in range(r.size):

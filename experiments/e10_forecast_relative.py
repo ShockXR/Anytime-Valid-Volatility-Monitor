@@ -199,6 +199,12 @@ def _alarm_validation(z_alarm_stream, u, fc_var, index, band, spd=DAY, label="")
     return pd.DataFrame(out), len(ev)
 
 
+def _first_day_var(u_all: np.ndarray) -> float:
+    """Mean square over the first day that has data (the past-only profile leaves the first days NaN)."""
+    i0 = int(np.argmax(np.isfinite(u_all)))
+    return float(np.nanmean(u_all[i0:i0 + DAY] ** 2))
+
+
 def q10c():
     rows, events = [], []
     for sym in ("BTCUSDT", "ETHUSDT", "XRPUSDT", "SOLUSDT", "DOGEUSDT"):
@@ -208,7 +214,7 @@ def q10c():
         u_all = (r / s).to_numpy(copy=True)
         u_all[~np.isfinite(u_all)] = np.nan
         keep = df.index >= pd.Timestamp("2025-07-01", tz="UTC")  # June is warm-up for the profile and the EWMA
-        fc_all = F.ewma_variance(u_all, 1440, init=float(np.nanmean(u_all[:DAY] ** 2)))
+        fc_all = F.ewma_variance(u_all, 1440, init=_first_day_var(u_all))
         u, fc, idx = u_all[keep], fc_all[keep], df.index[keep]
         days = keep.sum() / DAY
         rng = np.random.default_rng(SEED + 7)
@@ -216,7 +222,7 @@ def q10c():
         ctrl = np.array([np.nanmean(u[t + 1: t + 1 + DAY] ** 2) / fc[t + 1] for t in rand])
         variants = {"deseasonalised only (as E5)": u}
         for hl in (360, 1440):
-            fch = F.ewma_variance(u_all, hl, init=float(np.nanmean(u_all[:DAY] ** 2)))[keep]
+            fch = F.ewma_variance(u_all, hl, init=_first_day_var(u_all))[keep]
             variants[f"divided by EWMA forecast, half-life {hl} min"] = F.standardise(u, fch)
         for name, z in variants.items():
             ev, n_alarms = _alarm_validation(np.where(np.isfinite(z), z, np.nan), u, fc, idx, 0.25)
@@ -298,23 +304,35 @@ def q10d(reps=200, n=20000):
     the pre-break GARCH variance s: it stays bounded however large the break.
     """
     rng = np.random.default_rng(SEED + 21)
+    boot_rng = np.random.default_rng(SEED + 22)  # separate stream, so the simulated paths do not change
     rows = []
     for a, b in SETTINGS:
         omega = 1 - a - b
         for k in (1.5, 2.0, 4.0, 10.0, 1000.0):
             r, v1 = garch_paths(reps, n, k * omega, a, b, rng, burn=5000)  # post-break steady state
-            rom, mor, kl = [], [], []
+            rom, mor, kl, m1, m0 = [], [], [], [], []
             for i in range(reps):
                 s0 = F.garch11_filter(r[i], omega, a, b, init=float(v1[i, 0]) / k)
                 s1 = v1[i]
                 s0, s1 = s0[2000:], s1[2000:]  # the pre-break filter forgets its start value
                 q = s1 / s0
                 rom.append(np.mean(s1) / np.mean(s0))
+                m1.append(np.mean(s1))
+                m0.append(np.mean(s0))
                 mor.append(np.mean(q))
                 kl.append(np.mean(0.5 * (q - 1 - np.log(q))))
             I = float(np.mean(kl))
+            # A mean of per-path ratios is a biased estimate of a ratio of means (visible at
+            # persistence 0.999, where per-path means are noisy). The pooled ratio, sum of
+            # path means of s1 over sum of path means of s0, estimates rho(k) itself; its
+            # standard error is a bootstrap over paths.
+            m1a, m0a = np.asarray(m1), np.asarray(m0)
+            pooled = float(m1a.sum() / m0a.sum())
+            idx = boot_rng.integers(0, reps, size=(1000, reps))
+            pooled_se = float(np.std(m1a[idx].sum(axis=1) / m0a[idx].sum(axis=1), ddof=1))
             rows.append(dict(alpha=a, beta=b, persistence=round(a + b, 6), k=k,
                              rho_formula=rho(k, a, b), ratio_of_means_sim=float(np.mean(rom)),
+                             ratio_of_means_pooled=pooled, ratio_of_means_pooled_se=pooled_se,
                              mean_of_ratio_sim=float(np.mean(mor)), mean_of_ratio_se=float(np.std(mor) / np.sqrt(reps)),
                              ratio_of_means_cap=(1 - b) / a,
                              kl_rate_per_step=I, lai_delay_steps=float(np.log(A) / I) if I > 0 else np.inf,

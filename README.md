@@ -1,8 +1,8 @@
 # Anytime-Valid Volatility Monitor
 
-**An online monitor that watches one-minute returns and raises an alarm when volatility shifts up or down, with a proven limit on false alarms that holds however often you look at it.** It puts the jump-robust truncation of Bapat (2026) inside e-detectors, a nonparametric framework for sequential change detection (Shin, Ramdas and Rinaldo 2024).
+**An online monitor that watches one-minute returns and raises an alarm when volatility shifts up or down, with a proven limit on false alarms that holds however often you look at it.** It puts the MAD-based truncation used by Bapat (2026), an idea for jump robustness that goes back to Mancini (2009), inside e-detectors, a nonparametric framework for sequential change detection (Shin, Ramdas and Rinaldo 2024).
 
-> Status: research prototype, round 2 (November 2026). About 190 tests, 15 experiments on simulated and real data, five alternative directions, proofs in [`docs/math.md`](docs/math.md). For the short version read [`PITCH_BAPAT.md`](PITCH_BAPAT.md); for every number read the [experiment report](docs/experiment_report.md).
+> Status: research prototype, round 2 (November 2026). About 240 tests, 15 experiments on simulated and real data (E13 and E14 still running), seven alternative directions, proofs in [`docs/math.md`](docs/math.md). For the short version read [`PITCH_BAPAT.md`](PITCH_BAPAT.md); for every number read the [experiment report](docs/experiment_report.md).
 
 Every result in this repository carries a label: **[PUBLISHED]** (taken from a paper), **[SYNTHETIC]** (our simulation) or **[REAL]** (our run on market data). Nothing is reported that was not run.
 
@@ -23,24 +23,24 @@ Sub-questions (status in [`RESEARCH_STRATEGY_BAPAT.md`](RESEARCH_STRATEGY_BAPAT.
 
 * **The guarantee holds where classical detectors break [SYNTHETIC].** With jumps or fat tails, Gaussian likelihood-ratio and CUSUM detectors raise a false alarm within a day on 70% to 97% of paths. The robust e-detector stays at 0.3% to 2.3% against its 5% bound, and detects a 50% volatility increase in a median of 36 to 49 steps (E4). Across four very different return laws the measured rate is 1.1% to 1.4% (E9), so the bound is valid but about four times conservative.
 * **Why truncation matters for sequential testing.** No nonparametric e-test can detect a *fall* in the variance (a one-sided form of Bahadur and Savage 1956, [`docs/math.md`](docs/math.md) 5.3). A bounded functional can, and the truncated variance is one with a direct volatility meaning.
-* **Estimated baselines need care [SYNTHETIC].** Plugging in an estimated "normal" level roughly triples false alarms with a 390-step calibration window and gives 44% against a guaranteed 25% over five days (E4e, E10). A confidence-sequence baseline restores a proof, P(false alarm within m) ≤ δ + m / A, at a cost of 1.8 to 7.2 times the delay with short calibration (E8).
-* **Volatility clustering breaks the null, and fixing it caps the signal [SYNTHETIC].** Under persistent GARCH clustering the raw monitor alarms on 82% to 100% of quiet days. Dividing returns by a fitted GARCH forecast brings this back to 3% to 6%, but a forecast that keeps adapting passes at most (1 − β)/α of any level shift: a doubling of volatility looks like a 9% rise at persistence 0.99. We derived this cap in closed form and checked it by simulation (E10).
+* **Estimated baselines need care [SYNTHETIC].** Plugging in an estimated "normal" level roughly triples false alarms with a 390-step calibration window and gives 44% against a guaranteed 25% over five days (E4e, E10). A confidence-sequence baseline restores a proof, P(false alarm within m) ≤ δ + m / A, at a cost of 1.8 to 7.6 times the delay with short calibration (E8).
+* **Volatility clustering breaks the null, and fixing it caps the signal [SYNTHETIC].** Under persistent GARCH clustering the raw monitor alarms on 82% to 100% of quiet days. Dividing returns by a fitted GARCH forecast brings this back to 3% to 6% per day, close to the rate with the true forecast model, but a forecast that keeps adapting also absorbs most of a real level shift. A doubling of the long-run variance raises the ratio of squared returns to the forecast by only 9% at persistence 0.99, and no shift, however large, can push that ratio above (1 − β)/α = 1.2. We derived this cap in closed form and checked it by simulation (E10).
 * **Alarms on real data carry information, but the main contribution is the guarantee [REAL].** On the five coins, alarms are followed by volatility on the flagged side of EWMA and HAR forecasts 71% to 83% of the time, against about 50% at random times, in and out of sample (E6). A simple ratio rule tuned with hindsight is about as precise (E6e), so what the e-detector adds is a false-alarm guarantee with fixed settings, not extra precision.
 * **Many assets at once [SYNTHETIC and REAL].** A Shiryaev-Roberts statistic divided by time is not an e-value, so the usual multiple-testing recipes do not apply directly. Per-asset e-processes with e-BH give a proved false discovery rate at every stopping time (at most 0.96% observed in 48 designs). On five coins plus Nifty its discoveries are confirmed 78% to 97% of the time against about 50% at random times; its gain over a Bonferroni split is mostly earlier flags, not more of them (E15, `docs/theory_panel.md`).
-* **Events [REAL].** 14 to 15 of 16 FOMC statements are flagged within six hours, against about 30% of matched control times (E12). On Nifty 50, Union Budget days are flagged (E7).
-* **Reproducing the paper [PUBLISHED vs SYNTHETIC].** The published tables are consistent with the printed formulas, unnormalised kernel weights, the raw (unscaled) MAD and a crypto sample with about 2,000 missing minutes. Two findings we would like to discuss: the printed kernel estimators are not on the integrated-quarticity scale, and truncation at c × MAD leaves a bias that does not shrink with n. Both have one-line fixes ([`docs/estimator_issues.md`](docs/estimator_issues.md), E1, E6).
+* **Events [REAL].** With a monitor calibrated on the day before each statement, 14 to 15 of 16 FOMC statements are flagged within six hours, against about 30% of matched control times. The streaming monitor, the design fixed in advance, flags 8 to 9 of 16: every statement at which it was monitoring rather than recalibrating (E12). On Nifty 50, 9 of 11 Union Budget sessions raise an alarm against 25% of ordinary sessions (E7).
+* **Reproducing the paper [PUBLISHED vs SYNTHETIC].** The published tables are consistent with the printed formulas, unnormalised kernel weights, the raw (unscaled) MAD and a crypto sample with about 2,000 missing minutes. Two findings we would like to discuss: the printed kernel estimators are not on the integrated-quarticity scale, and truncation at c × MAD leaves a bias that does not shrink with n. Both have simple fixes under constant volatility (normalise the weights; divide by κ₄). When volatility moves within the day, the truncation also needs a local scale (E2b, ALT3; [`docs/estimator_issues.md`](docs/estimator_issues.md), E1, E6).
 
-We do **not** claim to have improved the estimator. Once both kernels are put on the same scale, the robust kernel beats the plain kernel in most simulation cells (E1).
+The main project does **not** claim to improve the estimator. Once both kernels are put on the same scale, the robust kernel beats the plain kernel in most simulation cells (E1). One alternative direction (ALT3, `alternatives/robust_iq_estimator/`) explores a different quarticity estimator: in simulation it is somewhat more efficient than the κ-corrected robust kernel under constant volatility and stays consistent when volatility moves within the day. It is a proposal for discussion, not a correction.
 
 ## Method in brief
 
 | Step | What | Where |
 | --- | --- | --- |
-| 1 | Truncation level τ = c × MAD × 1.4826 from past data only (rolling or exponentially weighted), c = 3 by default; optionally a tighter c_down = 2 for the decrease side, which detects falls faster (E11f) | `robust.py`, `monitor.py` |
+| 1 | Truncation level τ = c × MAD × 1.4826, estimated on each calibration window from past data only and held fixed until the next recalibration (a running level is studied in E3 and E14), c = 3 by default; optionally a tighter c_down = 2 for the decrease side, which detects falls faster (E11f) | `robust.py`, `monitor.py` |
 | 2 | Bounded statistic X_t = min(r_t², τ²), after an intraday profile estimated from past days only | `robust.py`, `data.py` |
 | 3 | Baseline μ₀ = mean of X on a calibration window: plug-in, plug-in with a margin (band), or a confidence sequence | `detectors.py`, `confseq.py` |
-| 4 | Betting e-detector (Shiryaev-Roberts form): wealth M_t = Σ_j Π_{i=j..t} (1 + λ (X_i − μ₀)) over start times j, averaged over a grid of bets λ; separate detectors for increases and decreases | `detectors.py` |
-| 5 | Alarm when M_t ≥ A; A = (steps per day) / (false alarm budget per day); then recalibrate | `monitor.py` |
+| 4 | Betting e-detectors (Shiryaev-Roberts form): wealth M_t = Σ_j Π_{i=j..t} (1 + λ (X_i / μ₀ − 1)) over start times j for increases, with λ in [0, 1), and the same with factors 1 + λ (1 − X_i / μ₀), λ < 1 / (B − 1), B = τ² / μ₀, for decreases; each averaged over a grid of bets λ | `detectors.py` |
+| 5 | Alarm when either side's wealth reaches 2A (so the two sides together keep the budget); A = (steps per day) / (false alarm budget per day); then recalibrate | `monitor.py` |
 | 6 | Optional forecast-relative mode: divide returns by a GARCH or EWMA variance forecast first | `forecast.py` |
 
 The proofs (Theorem A: average run length ≥ A; Theorem B: P(false alarm within m) ≤ m / A; Corollary C for restarts; Theorem 6.4 for the confidence-sequence baseline) and the exact conditions are in [`docs/math.md`](docs/math.md). [`docs/equation_map.md`](docs/equation_map.md) maps every symbol to the line of code that computes it.
@@ -64,7 +64,7 @@ Python 3.10 or newer.
 python -m venv .venv
 source .venv/bin/activate        # Windows: .venv\Scripts\activate
 pip install -e ".[dev]"
-python -m pytest -q              # about 190 tests, no data needed
+python -m pytest -q              # about 240 tests, no data needed
 ```
 
 ## Run
@@ -124,9 +124,9 @@ Most scripts take part names as arguments (for example `python experiments/e10_f
 
 ## How to read the output
 
-* **An alarm** means the running evidence against "volatility is at its calibrated level" has reached A. The direction says whether volatility moved up or down. The guarantee is about false alarms: with budget 0.05 per day, a monitor on a stream with no change raises a false alarm on at most about 5% of days in the long run.
-* **The guarantee is conditional.** It needs the clipped squared returns to have the calibrated conditional mean while nothing changes. Strong volatility clustering and price-level noise violate this; the forecast-relative mode and non-overlapping blocks restore it (E10, ALT1).
-* **Delay** is measured in steps (minutes). It grows like ln A divided by an information rate that we compute in closed form (E10, E11).
+* **An alarm** means the running evidence against "volatility is at its calibrated level" has reached A. The direction says whether volatility moved up or down. The guarantee is about false alarms: with budget 0.05 per day, a monitor on a stream with no change raises a false alarm on at most about 5% of days in the long run. This is proved for the true baseline and the confidence-sequence baseline (Corollary C and Theorem 6.4 in `docs/math.md`); for the default plug-in baseline it holds only approximately (E4e).
+* **The guarantee is conditional.** It needs the clipped squared returns to have the calibrated conditional mean while nothing changes. Strong volatility clustering and price-level noise violate this; the forecast-relative mode (when the forecast model is right) and non-overlapping blocks restore it (E10, ALT1).
+* **Delay** is measured in steps (minutes). It grows like ln A divided by an information rate, which we compute in closed form for the e-detector's own bets (E11) and by simulation for forecast-relative monitoring (E10).
 * **Real-data hit rates** compare the next day's realised volatility with a forecast. They are compared with random times and with a rate-matched rule, never read alone.
 
 ## Known limitations
@@ -146,7 +146,7 @@ The full list, with what each one affects, is in [`docs/limitations.md`](docs/li
 ├── PITCH_BAPAT.md              short brief: ten questions answered
 ├── RESEARCH_STRATEGY_BAPAT.md  questions, hypotheses, scores, risks, roadmap
 ├── ITERATION_LOG.md            iterations in a fixed format: problem, hypothesis, change, result
-├── alternatives/               five other directions, each with its own README and RESULTS
+├── alternatives/               seven other directions, each with its own README and RESULTS
 ├── data/                       raw data (git-ignored), MANIFEST.csv with hashes, README
 ├── docs/
 │   ├── paper_review.md         the paper in plain words
