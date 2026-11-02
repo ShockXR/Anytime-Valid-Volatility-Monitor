@@ -36,7 +36,7 @@ Owner: TH2. Files: `src/avmonitor/running.py`, `tests/test_running.py`, `experim
 
 **CHANGES IMPLEMENTED.** `dense_ranks`, a per-row Fenwick tree (`_RowFenwick`) for vectorised exact ranks with ties, `conformal_pvalues`, `lr_bet_factory`, `indicator_bet_factory`, `bet_family`, `family_factors` (one-pass evaluation; `scipy.special.ndtri` instead of `stats.norm.isf` made the streaming monitor several times faster), `conformal_detector` (with warm-up, null band f / (1 + b), optional heuristic freeze), streaming `ConformalMonitor`.
 
-**EXPERIMENTS PERFORMED.** Unit tests: p-values equal a brute-force computation with many ties; uniformity (Kolmogorov-Smirnov) and lag-1 independence for Student t3 and for coarse ticks (38% ties at zero); betting functions integrate to 1; exact false alarm bound under ties and jumps; agreement between the detector and the p-value function.
+**EXPERIMENTS PERFORMED.** Unit tests: p-values equal a brute-force computation with many ties; uniformity (Kolmogorov-Smirnov) and lag-1 independence for Student t3 and for coarse ticks (about 20% of values tied at zero); betting functions integrate to 1; exact false alarm bound under ties and jumps; agreement between the detector and the p-value function.
 
 **RESULTS.** All tests pass. The test bound of one test was first written as "the clipped bet is below 15"; the actual maximum factor for ρ = 2 is about 16 (the test was wrong, not the code, and now checks the exact value `g(u0) / C`).
 
@@ -70,6 +70,44 @@ Owner: TH2. Files: `src/avmonitor/running.py`, `tests/test_running.py`, `experim
 
 ---
 
-## Iteration 4. Full E14 runs
+## Iteration 4. Full E14 runs, and a negative result for the plug-in
 
-(Filled in after the runs; see below.)
+**OBJECTIVE.** Validity at scale, delay, robustness, real data and cost for every method (E14 Q14a to Q14g, Q14w), with the settings fixed in iterations 1 to 3.
+
+**PROBLEM IDENTIFIED.** E8 judged the plug-in on one day of monitoring only, where it sits at its nominal 5%.
+
+**HYPOTHESIS.** (1) Route B uses its budget and stays within it; route A and E8 are conservative. (2) Over longer horizons the plug-in's error does not average out, because one estimated mean is used for the whole segment: a window that underestimates the mean gives the increase bets a positive drift, a window that overestimates it does the same for the decrease bets.
+
+**CHANGES IMPLEMENTED.** The validity runs report five-day as well as one-day rates. Part w was extended with `plugin_drift` (the share of calibration windows with positive null drift, by quadrature on 4 million draws, and the run length bound). The theory note gained Proposition A.6 with a proof: for a fixed calibration length, `E[T_A | W] ≤ (log(2AK) + log f_max) / g(W)` whenever the window W gives some bet a positive drift g, so no bound of the form C m / A can hold for the plug-in. The labels of the rank-bet extremes in `e14w_constants.csv` were corrected (for ρ < 1 the largest factor is at u = 1, not at u0), and the run was repeated, with identical bands and drift files.
+
+**EXPERIMENTS PERFORMED.** Q14a (5000 paths per cell), Q14b (1000), Q14c (1000), Q14f (4000 null, 1000 per delay cell), Q14w (2000 windows), Q14d (six real series, 15 monitor settings), Q14e.
+
+**RESULTS.** (Numbers from `results/e14*.csv`; details in `docs/report_parts/E14.md`.) Hypothesis 2 confirmed. The plug-in alarms on 40.6% to 42.9% of null paths within five days after 390 calibration steps, against the 25% bound; 77% to 83% of windows give it a positive drift. Hypothesis 1 confirmed: B-lr 1.7% to 3.2% per day; route A and cs at most 0.26% over five days. Unexpected: B-lr is faster than the plug-in on every decrease (by a factor of two to three for x0.5). A bet-design confound is noted in the report. The awake route A monitor is valid but cannot detect changes in the first few dozen steps of a segment (iteration 3); awake-B can.
+
+**IMPROVEMENTS.** A proved negative result that explains a numerical one, and a clear recommendation: the rank route, restarted with no warm-up, for a monitor with no blind period.
+
+**REMAINING ISSUES.** The coordinator asked for blind time and false alarms per day on streams, and for the E12 releases.
+
+**NEXT ITERATION.** Streaming measurements.
+
+---
+
+## Iteration 5. Streaming: blind time, false alarms per day, macro releases
+
+**OBJECTIVE.** Measure the share of time blind, false alarms per day under a true null, and delays on streams; rerun E12's streaming design with the awake monitors.
+
+**PROBLEM IDENTIFIED.** Q14f measures one segment after one restart; a stream with repeated alarms and restarts is what a user runs.
+
+**HYPOTHESIS.** In a stream whose volatility moves about once a day, the standard protocol is blind most of the time and misses many changes. The awake monitors are almost never blind; their false alarm rate per day stays within the Corollary A.5 bound under a true null.
+
+**CHANGES IMPLEMENTED.** E14 Q14h (`h_job`, `regime_path`: 30-day minute-scale streams, null and regime-switching, five streaming monitors); Q14g (`g_job`: E12's data, events, control windows and stratified test, with the monitor swapped); an option to set the pool size (`--procs`) so the runs respect the two-process limit.
+
+**EXPERIMENTS PERFORMED.** Q14h, 40 paths of 30 days per cell; Q14g, three coins and four monitors.
+
+**RESULTS.** Blind time: the standard protocol is blind 57% to 71% of the time, the awake monitors 0.28%. Under the null, awake-B raises 0.029 to 0.035 false alarms per day (bound 0.050) and awake-A none; the plug-in raises 0.084 to 0.094 per day, with 95% lower limits above its nominal 0.05, which confirms iteration 4 on streams. Under regime switching, awake-B detects 98.0% to 99.6% of the changes within a day (median delay 34 to 60 steps), against 56% to 66% for the standard protocol. E12 rerun: the plug-in column reproduces E12 (awake at 9, 8, 9 FOMC and 9, 8, 12 CPI releases). The awake monitors watch all 114 releases. Up alarms within 6 hours rise from 21 to 25 (awake-A) and 31 (awake-B) of 66 CPI releases, and from 26 to 30 and 35 of 48 FOMC statements. BTC CPI goes from p = 0.11 to 0.003 and 0.0003. The awake monitors flag a smaller share of the releases at which they are awake than the plug-in does. A possible reason is a restart shortly before a release; this was not tested.
+
+**IMPROVEMENTS.** The no-blind-period deliverable now has synthetic and real evidence.
+
+**REMAINING ISSUES.** Without a null band, awake-B alarms 3.6 to 4.3 times per crypto day. The rank reference set costs O(n) per insertion when no alarm comes for a long time. The bet-design confound in the B-lr speed comparison remains.
+
+**NEXT ITERATION.** None planned in this task; needed changes in files owned by others are listed in the handback.

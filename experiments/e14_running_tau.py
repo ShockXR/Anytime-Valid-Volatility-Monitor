@@ -940,22 +940,26 @@ def figures():
         meths = ["awake-A", "awake-B", "plugin (1440-step recalibration)", "cs (1440-step recalibration)",
                  "B-lr (1440-step recalibration)"]
         ratios = [2.0, 1.5, 0.667, 0.5]
-        fig, axes = plt.subplots(1, len(ratios), figsize=(14, 3.8), sharey=True)
-        for ax, ratio in zip(axes, ratios):
+        fig, axes = plt.subplots(2, len(ratios), figsize=(14, 6.5), sharey="row", sharex=True)
+        for col, ratio in enumerate(ratios):
             g = d[(d.law == "student_t3") & (np.isclose(d.sd_ratio, ratio, atol=1e-3))]
             for m in meths:
                 gg = g[g.method == m].sort_values("change_after_restart")
-                ax.plot(gg.change_after_restart, gg.median_delay, marker="o", ms=3, lw=1, label=m)
-            ax.set_xscale("log")
-            ax.set_yscale("log")
-            ax.set_xticks([30, 120, 360])
-            ax.set_xticklabels(["30", "120", "360"])
-            ax.set_xlabel("change this many steps after the restart")
-            ax.set_title(f"sd x{ratio:g} (Student t3)", fontsize=10)
-            ax.grid(lw=0.4, color="#dddddd")
-        axes[0].set_ylabel("median delay (steps), detected paths")
-        axes[0].legend(fontsize=7)
-        fig.suptitle("Q14f [synthetic]: delay after a restart, awake monitors against 1440-step recalibration", fontsize=10)
+                axes[0, col].plot(gg.change_after_restart, 100 * gg.detected_within_2000, marker="o", ms=3, lw=1, label=m)
+                axes[1, col].plot(gg.change_after_restart, gg.median_delay, marker="o", ms=3, lw=1, label=m)
+            axes[0, col].set_title(f"sd x{ratio:g} (Student t3)", fontsize=10)
+            axes[1, col].set_yscale("log")
+            axes[1, col].set_xlabel("change this many steps after the restart")
+            for ax in axes[:, col]:
+                ax.set_xscale("log")
+                ax.minorticks_off()
+                ax.set_xticks([30, 120, 360])
+                ax.set_xticklabels(["30", "120", "360"])
+                ax.grid(lw=0.4, color="#dddddd")
+        axes[0, 0].set_ylabel("detected within 2000 steps (%)")
+        axes[1, 0].set_ylabel("median delay (steps), detected paths")
+        axes[0, 0].legend(fontsize=7)
+        fig.suptitle("Q14f [synthetic]: detection after a restart, awake monitors against 1440-step recalibration", fontsize=10)
         fig.tight_layout()
         fig.savefig(FIG / "e14_awake.png", dpi=130)
         plt.close(fig)
