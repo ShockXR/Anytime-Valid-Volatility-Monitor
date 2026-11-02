@@ -27,7 +27,7 @@ To rerun: `pip install -r requirements.txt && pip install -e .`, then `python sc
 | E11 | Detection delay and bet design (theory) | Proved delay bound and asymptotic optimality (the delay attains log A / KL_inf); the price of robustness is a ratio of information numbers that predicts E4's 14% to 73% penalties, mostly the cost of making no distributional assumption; truncation caps decrease detection at log(B / (B - 1)) per step (at least 73 steps at c = 3); the false alarm bound is nearly attained by an adversarial null for a single bet. |
 | E12 | Crypto alarms around FOMC and CPI releases | Streaming monitor (fixed in advance): up alarms within 6 hours of 8 to 9 of 16 FOMC statements (all at which it was monitoring) against 11% to 17% of weekday-matched controls; primary test passes for FOMC, not for CPI on BTC. Fresh calibration: 14 to 15 of 16 against 29% to 32%. The streaming monitor is blind about 70% of the time while recalibrating. |
 | E13 | Benchmark against Bibinger, Jirak and Vetter (2017) and Bayesian online change points | In progress. |
-| E14 | A guarantee with a running truncation level | In progress. |
+| E14 | A guarantee with a running truncation level, and no blind period | The plug-in has no bound of the form C m / A (Proposition A.6; 41% to 43% over five days against 25%). A band over all truncation levels allows any running τ with a proof; an exact rank detector needs no baseline (1.7% to 3.2% per day) and, restarted at once, catches 98% to 99.6% of changes against 56% to 66% for the default protocol. On E12's releases it watches 114 of 114 instead of 55. |
 | E15 | Panel monitoring with false discovery control | Proved FDR control at every stopping time with e-BH on per-asset e-processes (a Shiryaev-Roberts statistic divided by t is not an e-value); FDR at most 0.96% in 48 designs; on five coins plus Nifty, discoveries are confirmed 78% to 97% of the time against about 50% at random, and e-BH's gain over Bonferroni is mostly earlier flags. |
 | ALT1 | Quarticity stream; pre-averaging for noise | Price noise breaks the raw-return guarantee; non-overlapping pre-averaged blocks restore it. |
 | ALT2 | Risk switch | Tails on par with daily volatility targeting, worse tracking, no Sharpe difference; the robust trigger beats the Gaussian one. |
@@ -615,6 +615,7 @@ How often the null value of the increase side lies on the wrong side of the trut
 * The cs baseline keeps its guarantee with a wide margin: at most 0.27% false alarms per day against a proved 5%, and the confidence bound itself failed on at most 0.08% of paths against an allowed 1%. Figure: `e08_false_alarms.png`.
 * With 10,000 paths, the plug-in at 390 steps is at 4.5% (Gaussian and jumps) and 4.9% (t5) on the increase side, and 5.07% (t5) for either side, so it sits at the bound without exceeding it beyond Monte Carlo error. E4d's 5.4% (2000 paths, standard error about 0.5 points) is about 1.6 combined standard errors above our Gaussian value, so the "break" it reported was not confirmed. Over the 500 pre-change steps of Q8b (bound 500 / 7800 = 6.4%), the plug-in increase side at 390 steps under t5 alarmed on 7.0% to 7.5% of 2000 paths in three rows that share their calibration windows (`e08b_change.csv`), 1 to 2 standard errors above the bound. So the plug-in is close to its bound at short calibration, with no proof either way.
 * margin_z = 1 brings every rate to 1.5% or less, but it is on the wrong side of the truth on 17% to 19% of paths: it is a heuristic safety margin, not a guarantee.
+* Sitting at the bound within one day does not make the plug-in safe over longer runs. E14 (Q14a, Q14h) finds 41% to 43% false alarms within five days after 390 calibration steps (bound 25%) and 0.084 to 0.094 false alarms per day over 30-day streams, and proves that no bound of the form C m / A can hold for the plug-in at a fixed calibration length (Proposition A.6 in `docs/theory_running_tau.md`).
 
 ### Q8b. The price in detection delay [SYNTHETIC]
 
@@ -1142,7 +1143,7 @@ The "jump only" column does not support that reading on its own. At releases the
 * The alarms come after the release, not before: median 23 to 34 minutes with a fresh calibration (10 to 33 minutes for a running monitor at FOMC statements), never earlier than 14 minutes with a fresh calibration on BTC and SOL (10 on ETH). There is no sign of more alarms in the hours before a release.
 * Down alarms within two days: after FOMC statements they are 13 to 27 points more common than on matched control days, in every coin and both designs, but no test is significant after correction (fresh calibration p = 0.17 to 0.21; streaming p = 0.02 to 0.09 raw, Holm at least 0.15). After CPI releases there is no clear excess. The earlier explanation, that a high base rate hides any effect, came from comparing with control days of the wrong weekday. The protocol itself limits this question: the recalibration after the up alarm absorbs the burst.
 * The Gaussian benchmark "detects" releases by reacting to the first big minute (median delay 0 to 2 minutes, on a return of 8 to 9 scale units), and with a fresh calibration it also alarms in 62% to 76% of ordinary 6-hour windows. Compared like for like, both at band 0, the robust monitor alarms in 39% to 51% of those windows, needs at least 8 minutes, and has a higher event-to-control ratio in every cell (1.7 to 2.4 against 1.3 to 1.6). About a third of the difference between the frozen settings comes from the band and two thirds from the detector. The Gaussian monitor's detection is detection for the wrong reason: the same mechanism gives its false alarms in E4 and E6.
-* A practical finding about the protocol, not about the news: a monitor that recalibrates for a full day after every alarm is blind about 70% of the time when alarms come every 1.4 days. A shorter recalibration, or a warm restart from the last baseline, would be the first thing to change for live use.
+* A practical finding about the protocol, not about the news: a monitor that recalibrates for a full day after every alarm is blind about 70% of the time when alarms come every 1.4 days. A shorter recalibration, or a warm restart from the last baseline, would be the first thing to change for live use. E14 (Q14g) reruns this design with monitors that have no blind period and a proof: they watch all 114 releases instead of 55, and the BTC CPI cell gives p = 0.003 and 0.0003 instead of 0.11. That rerun was designed after seeing these results, so it is a check of the protocol, not a new pre-registered test.
 
 **Caveats.**
 * Small numbers of events: 16 FOMC statements and 22 CPI releases. Rates per coin have Wilson 95% intervals of roughly plus or minus 20 points (`e12_tests.csv`), and the three coins are not independent replications.
@@ -1155,6 +1156,126 @@ The "jump only" column does not support that reading on its own. At releases the
 * Binance data come from a third-party mirror (checked for gaps and duplicates, none found).
 
 **Revision after review round 2a.** (1) The counts "within the hour" were the 6-hour counts; the 1-hour counts are now given separately (streaming 9/9, 6/8, 8/9 among the FOMC statements at which the monitor was awake; fresh calibration 14, 13 and 11 of 16). (2) Control rates are now matched on weekday and clock time, and the pooled Fisher test is replaced by an exact stratified one; the old union rates (for example 71%, 66%, 65% for FOMC down alarms) are superseded, and with them the Q12c explanation "because the base rate is high". The stratified permutation p-values are unchanged. (3) The Gaussian against robust comparison is now also made at equal band. (4) Two sentences that the data did not support were replaced ("the pre-release hours are quieter than usual" and the reliance on the "jump only" column). Three rounding errors were corrected (BTC FOMC down-alarm p 0.20, not 0.21; SOL jump-only and above-5 shares at releases 34%, not 35%; BTC Gaussian control alarms followed by higher volatility 47%, not 48%), and the share of releases at which the streaming monitor was recalibrating is 44% to 64%, not 40% to 60%.
+
+---
+
+## E13. Benchmarks against strong published competitors
+
+Script `experiments/e13_benchmarks.py`; code `src/avmonitor/competitors.py` (tests in `tests/test_competitors.py`); outputs `results/e13*.csv` and `results/figures/e13_*.png`. Seeds are fixed in the script. Every tuning constant was fixed before the reported runs (a Gaussian pilot with its own seed, `docs/iterations/E13.md`, iteration 2).
+
+**Question.** Until now the e-detector was compared only with weak or non-robust benchmarks (a Gaussian likelihood ratio detector, Page's CUSUM, a repeated z-test, raw r²), and the independent review (point M3) showed that a naive trailing-window rule matches its real-data validation score. How does it compare with the two strongest relevant published methods: the nonparametric volatility jump test of Bibinger, Jirak and Vetter (2017), the reference *offline* (after-the-fact) method for this question in high-frequency econometrics, and Bayesian online change-point detection (Adams and MacKay 2007), the reference *online* method in machine learning?
+
+### The competitors and how they were made comparable
+
+**BJV (adjacent-window volatility jump test).** For each candidate change point, compare the realised variance (mean squared return) of the k returns before it with that of the k returns after it, standardise the difference so that it is approximately standard normal when volatility does not jump, and take the maximum over the sample. Under no change, the maximum follows an extreme value (Gumbel) law, which gives the critical value. The jump-robust version drops returns larger than 4 times a local bipower scale (bipower variation, (π/2) mean |r_i||r_{i-1}|, is a variance estimate that a single price jump cannot inflate much), and the location of the maximum estimates the change point. Two versions: non-overlapping blocks (the paper's main statistic) and overlapping windows (the paper's second statistic, reported as more powerful). We also add a *studentised* version (our modification, not in the paper) that standardises with the sample variance of the squared returns instead of the Gaussian value 2σ⁴.
+
+*Verification gap, stated plainly.* The paper text could not be opened from this environment (arxiv.org, its ar5iv mirror and the authors' university repository were blocked by the network policy). Web search verified the paper's metadata and its structure (rescaled differences of local spot volatility estimates on adjacent windows, a non-overlapping and an overlapping statistic, a Gumbel-type limit, k_n = 125 in its simulations), but not its exact normalisation or equation numbers. Our Gumbel constants come from standard extreme value theory for maxima of Gaussian sequences (Leadbetter, Lindgren and Rootzén 1983) and, for overlapping windows, from the moving-sum limit as coded in the CRAN package `mosum` (Eichinger and Kirch 2018). To make the conclusions independent of these constants, **every comparison below also uses critical values calibrated by simulation**. The implementation should be checked against the paper's equations before it is cited as "the BJV test".
+
+**BOCPD.** Inside a regime, returns are N(0, σ²) with an inverse gamma prior on σ² (a conjugate prior, so the posterior and the predictive Student t density are exact). With a constant hazard H (the prior probability of a change at each step), Algorithm 1 of Adams and MacKay updates the posterior of the *run length* (time since the last change) exactly. We cap run lengths at 512 (a unit test checks the capped filter against the exact recursion) and alarm when the posterior probability of a run shorter than w = 250 steps exceeds a threshold. Settings: α₀ = 2, prior mean of σ² from the calibration window, H = 1 / A (one change per 20 days a priori). We also run BOCPD on returns clipped at the e-detector's truncation level τ = 3 × scaled MAD ("BOCPD on truncated returns", our modification), to separate what truncation buys from what betting buys.
+
+**Our method.** The two-sided robust e-detector of E4 (each side at level 2A, c = 3), with the default plug-in baseline and with the confidence-sequence (CS) baseline of E8 (δ = 0.01), whose false alarm bound is proved with an estimated baseline.
+
+**Fair comparisons.**
+* *Offline (Q13a).* A fixed window of 2000 steps, change (if any) at step 1000. BJV uses the whole window. BOCPD and the e-detector use the first 500 steps as a change-free calibration window and monitor the remaining 1500, so they get one piece of information BJV does not use: where a clean stretch is. Each method's statistic is its maximum over the window. Critical values are set to give exactly 5% rejections on 2000 clean Gaussian windows ("matched size"); we also report the nominal levels (Gumbel for BJV; A = 1500 / 0.05 for the plug-in e-detector, A = 1500 / 0.04 for CS so that δ + m / A = 5%).
+* *Online (Q13b, Q13c).* The E4 design: 2000 calibration steps, then monitoring; A = 7800 (at most 5% false alarms per 390-step "day"). BJV becomes a rolling test: at each step, compare the last k = 120 returns with the 120 before them and alarm when |statistic| exceeds a threshold. BOCPD alarms on its posterior rule. The competitor thresholds are set so that their false alarm rate per 390-step day on 4000 clean Gaussian paths equals the e-detector's (1.55% on that calibration set). Neither competitor has an anytime guarantee, so their false alarm rates are measured, not assumed. We also report BJV with its nominal daily Gumbel level and BOCPD with the natural rule "probability above one half".
+
+All simulated results are [SYNTHETIC]. "Jumps": probability 0.005 per step, size N(0, 8²). "Student t5": unit-variance t innovations with 5 degrees of freedom. "Price noise": i.i.d. N(0, 0.5²) noise on log prices. "Ticks": returns rounded to 0.5 sd (about 20% zeros). "Slow SV": log-volatility AR(1) with sd 0.15 and half-life 390. "GARCH 0.99": GARCH(1,1), α = 0.05, β = 0.94. Under slow SV and GARCH the e-detector's null is false by design (E4c, E9c): volatility does move.
+
+### Q13a. Offline test on a fixed window [SYNTHETIC]
+
+Rejection rate with no change (1000 windows per column; Monte Carlo standard error about 0.7 points at 5%), critical values matched to 5% on clean Gaussian data (a separate set of 2000 windows):
+
+| Method | Gaussian | jumps | Student t5 | price noise | ticks | slow SV | GARCH 0.99 |
+|---|---|---|---|---|---|---|---|
+| BJV blocks, k = 50, truncated | 4.3% | 5.5% | **37.0%** | 5.2% | 3.9% | 8.0% | 84.5% |
+| BJV overlap, k = 50, truncated | 3.9% | 7.8% | **53.4%** | 6.8% | 4.9% | 8.7% | 90.7% |
+| BJV overlap, k = 50, plain | 3.9% | **97.5%** | **86.7%** | 6.8% | 4.9% | 8.7% | 90.7% |
+| BJV overlap, k = 125, truncated | 4.0% | 6.6% | **45.8%** | 6.9% | 4.7% | 39.8% | 100% |
+| BJV overlap, k = 50, truncated, studentised* | 5.2% | 3.7% | 1.7% | 7.4% | 4.3% | 7.7% | 88.2% |
+| BOCPD | 4.8% | **97.7%** | **94.0%** | 6.3% | 4.2% | 66.5% | 99.8% |
+| e-detector, plug-in | 5.4% | 6.1% | 7.5% | 6.9% | 4.4% | 80.9% | 97.8% |
+| e-detector, CS baseline | 6.5% | 5.1% | 6.0% | 7.0% | **11.3%** | 80.0% | 99.2% |
+
+\* our modification. Same rejection rates at the **nominal** critical values (5% intended):
+
+| Method | Gaussian | jumps | Student t5 | price noise | ticks |
+|---|---|---|---|---|---|
+| BJV blocks, k = 50, truncated (Gumbel) | 1.5% | 2.8% | 23.8% | 2.0% | 1.8% |
+| BJV overlap, k = 50, truncated (MOSUM Gumbel) | 0.3% | 0.3% | 12.8% | 0.4% | 0.1% |
+| BJV overlap, k = 125, truncated (MOSUM Gumbel) | 0.3% | 1.6% | 17.3% | 1.0% | 0.3% |
+| e-detector, plug-in (A = 30,000) | **14.7%** | **16.0%** | **16.7%** | **18.6%** | **11.4%** |
+| e-detector, CS baseline (δ + m / A = 5%) | 0.0% | 0.0% | 0.0% | 0.0% | 0.0% |
+
+Power at matched size (300 windows per cell; standard error at most 2.9 points), change at step 1000 by the given sd ratio:
+
+| Method | Gaussian 1.25 | 1.5 | 2 | 0.8 | 0.67 | 0.5 | jumps 1.25 | jumps 0.8 | t5 1.25 | t5 0.8 |
+|---|---|---|---|---|---|---|---|---|---|---|
+| BJV blocks, k = 50, truncated | 8% | 37% | 96% | 7% | 35% | 94% | 10% | 11% | (41%) | (37%) |
+| BJV overlap, k = 125, truncated | 30% | 93% | 100% | 33% | 91% | 100% | 38% | 30% | (61%) | (64%) |
+| BJV overlap, k = 50, truncated, studentised* | 6% | 22% | 66% | 5% | 19% | 63% | 8% | 5% | 3% | 3% |
+| BOCPD | 79% | 100% | 100% | 81% | 100% | 100% | (99%) | (100%) | (98%) | (99%) |
+| e-detector, plug-in | 100% | 100% | 100% | 100% | 100% | 100% | 100% | 99% | 99% | 96% |
+| e-detector, CS baseline | 97% | 100% | 100% | 100% | 100% | 100% | 92% | 99% | 76% | 94% |
+
+Numbers in brackets come from a method whose size in that scenario is far above 5% (table above), so they are not power. Change-point estimate of BJV (overlap, k = 125, truncated, Gaussian): within 25 steps of the truth in 94% to 95% of rejections for sd ratios 2 and 0.5, and in 63% to 65% for ratios 1.25 and 0.8. (The block version's exact hits for large changes are an artefact: the change sits on a block boundary.) Under jumps the *plain* BJV "detects" in 93% to 100% of windows, but its median location error is 269 to 522 steps: it finds the price jumps, not the volatility change.
+
+### Q13b. Online use: false alarms per day [SYNTHETIC]
+
+Share of 1000 paths with an alarm within the first 390 monitored steps; competitor thresholds matched to the e-detector on clean Gaussian data. The e-detector's bound is 5% (proved for the CS baseline; for the plug-in only with the true baseline).
+
+| Method | Gaussian | jumps | Student t5 | price noise | ticks | slow SV | GARCH 0.99 |
+|---|---|---|---|---|---|---|---|
+| e-detector, plug-in | 1.9% | 1.3% | 1.2% | 1.9% | 1.9% | 43.9% | 81.6% |
+| e-detector, CS baseline | 0.1% | 0.1% | 0.0% | 0.0% | 0.0% | 10.7% | 30.9% |
+| BOCPD (matched) | 1.0% | **73.2%** | **53.2%** | 2.4% | 1.6% | 39.0% | 83.6% |
+| BOCPD, p ≥ 0.5 | 1.6% | **76.9%** | **60.6%** | 3.8% | 2.5% | 43.5% | 86.9% |
+| BOCPD on truncated returns* (matched) | 0.9% | 1.6% | **7.5%** | 2.3% | 1.0% | 37.3% | 81.3% |
+| BJV rolling, k = 120 (matched) | 1.5% | 1.5% | **14.9%** | 2.2% | 1.8% | 10.1% | 80.8% |
+| BJV rolling, nominal 5% per day | 0.7% | 0.1% | **6.5%** | 0.2% | 0.6% | 4.4% | 70.7% |
+| BJV rolling, studentised* (matched) | 1.6% | 0.7% | 0.6% | 2.4% | 2.4% | 7.7% | 79.3% |
+
+Wilson 95% intervals for the Gaussian column are about ±0.8 points. Over two days the e-detector (plug-in) is at 4.7% to 7.6% in the first five columns and BOCPD at 79% to 91% under jumps and t5 (`results/e13b_online_null.csv`).
+
+### Q13c. Online detection [SYNTHETIC]
+
+Change at step 500 of monitoring, 1500 steps observed after it, 200 paths per cell. Median delay in steps (share of paths whose first alarm comes after the change), with the share of paths that raised a false alarm before the change in bold when it is 5% or more. All methods see the same paths.
+
+**Gaussian**
+
+| Method | 1.25 | 1.5 | 2.0 | 0.8 | 0.67 | 0.5 |
+|---|---|---|---|---|---|---|
+| e-detector (plug-in) | 104 (98%) | 37 (98%) | 20 (96%) | 169 (98%) | 109 (98%) | 81 (98%) |
+| e-detector (CS baseline) | 201 (100%) | 55 (100%) | 25 (100%) | 336 (100%) | 178 (100%) | 136 (100%) |
+| BOCPD | 120 (90%) | 35 (98%) | 13 (98%) | 137 (86%) | 51 (98%) | 26 (98%) |
+| BOCPD on truncated returns* | 130 (85%) | 44 (98%) | 19 (98%) | 137 (88%) | 50 (98%) | 26 (97%) |
+| BJV rolling | 113 (30%) | 78 (94%) | 40 (97%) | 112 (32%) | 96 (85%) | 75 (98%) |
+| BJV rolling, studentised* | 115 (29%) | 88 (90%) | 55 (98%) | 114 (25%) | 98 (76%) | 80 (98%) |
+
+**Jumps**
+
+| Method | 1.25 | 1.5 | 2.0 | 0.8 | 0.67 | 0.5 |
+|---|---|---|---|---|---|---|
+| e-detector (plug-in) | 104 (99%) | 43 (98%) | 18 (98%) | 188 (98%) | 117 (98%) | 81 (98%) |
+| e-detector (CS baseline) | 252 (100%) | 65 (100%) | 24 (100%) | 344 (100%) | 204 (100%) | 128 (100%) |
+| BOCPD | 180 (18%, **FA 82%**) | 64 (22%, **FA 78%**) | 19 (20%, **FA 80%**) | 84 (18%, **FA 82%**) | 39 (18%, **FA 82%**) | 22 (17%, **FA 83%**) |
+| BOCPD on truncated returns* | 132 (81%) | 49 (98%) | 18 (98%) | 117 (89%) | 51 (100%) | 25 (96%) |
+| BJV rolling | 111 (28%) | 83 (88%) | 38 (98%) | 117 (35%) | 100 (90%) | 79 (96%) |
+| BJV rolling, studentised* | 108 (18%) | 94 (83%) | 56 (97%) | 118 (28%) | 105 (84%) | 85 (98%) |
+
+**Student t5**
+
+| Method | 1.25 | 1.5 | 2.0 | 0.8 | 0.67 | 0.5 |
+|---|---|---|---|---|---|---|
+| e-detector (plug-in) | 161 (99%) | 50 (97%) | 25 (96%) | 206 (96%) | 107 (96%) | 74 (98%) |
+| e-detector (CS baseline) | 413 (100%) | 86 (100%) | 32 (100%) | 473 (99%) | 174 (100%) | 116 (100%) |
+| BOCPD | 108 (37%, **FA 63%**) | 43 (42%, **FA 58%**) | 15 (38%, **FA 62%**) | 93 (40%, **FA 60%**) | 34 (40%, **FA 60%**) | 23 (41%, **FA 59%**) |
+| BOCPD on truncated returns* | 170 (61%, **FA 8%**) | 67 (91%, **FA 9%**) | 27 (88%, **FA 12%**) | 146 (86%, **FA 10%**) | 51 (88%, **FA 12%**) | 25 (90%, **FA 10%**) |
+| BJV rolling | 138 (56%, **FA 16%**) | 80 (74%, **FA 14%**) | 45 (82%, **FA 18%**) | 171 (52%, **FA 14%**) | 101 (78%, **FA 16%**) | 76 (78%, **FA 22%**) |
+| BJV rolling, studentised* | 117 (11%) | 109 (50%) | 78 (97%) | 137 (9%) | 110 (40%) | 98 (94%) |
+
+**Price noise and ticks** (full tables in `results/e13c_online_change.csv`). With price noise, BOCPD halves the e-detector's delay for decreases (66 against 122 steps for sd × 0.5; 123 against 166 for × 0.67) but detects only 53% to 66% of the small changes (sd × 1.25 or × 0.8) against 97% to 98%. With ticks, BOCPD is faster for decreases (28 against 53 steps for × 0.5); it detects 84% to 98% of the changes and the e-detector 96% to 99%; BOCPD on truncated returns detects only 46% of a 25% increase.
+
+REAL_DATA_PLACEHOLDER
 
 ---
 
@@ -1171,6 +1292,14 @@ Script `experiments/e14_running_tau.py`; outputs `results/e14*.csv` and `results
 * **No blind period.** `awake-A`: after an alarm the grid band is learned from the post-alarm returns while monitoring; the Shiryaev-Roberts chain started at step j bets against the band snapshot taken before j; each chain is multiplied by the indicator that the band has not failed by its snapshot time, an event known when the chain starts, which keeps it a supermartingale without conditioning on the unobservable event "the band never fails" (Theorem A.4, the structure of `docs/math.md` Theorem 6.4). `awake-B`: route B with the reference set restarted empty and betting from the first post-alarm return (Remark B.3). Both resume at once; only the very first segment needs 120 returns.
 
 Comparators: `plugin` (the default monitor: fixed τ, plug-in mean; no proof), `plugin-run` (plug-in mean at the running level; no proof), `cs` (E8), `oracle` (true τ and true m(τ)). A = 7800 for methods with bound m / A and 390 / (0.05 - 0.01) = 9750 for methods with bound δ + m / A (δ = 0.01), so every proved bound is 5% per 390-step day. Two-sided rule as in the monitor (each side at 2A).
+
+**Summary.**
+* **The default plug-in monitor has no false alarm guarantee, and it fails in the long run.** Within one day it stays under the nominal 5%, but within five days it alarms on 41% to 43% of null paths after 390 calibration steps (bound 25%). In 30-day streams it raises 0.084 to 0.094 false alarms per day against a nominal 0.05. Proposition A.6 explains why: for a fixed calibration length, the plug-in drifts upward under the null on a fixed share of calibration windows (77% to 83% at 390 steps), so no bound of the form C m / A can hold for it.
+* **Route B is exact, and fast.** The rank detector has a proved m / A bound with no baseline, no δ and no truncation level. It uses its budget (1.7% to 3.2% per day) without exceeding it. It is faster than the unproved plug-in on every decrease (x0.5: 25 to 34 steps against 69 to 77) and comparable on increases, except under Student t3 tails. Part of this speed comes from its likelihood-ratio bets.
+* **Route A allows any predictable τ_t with a proof.** It integrates a band that holds at all truncation levels at once. On 13 levels, the grid band is as tight as E8's single-level bound at 1440 calibration steps (1.20 / 0.85 against 1.19 / 0.86 times the truth). It is valid with a wide margin but slow after short calibration. The integrated DKW band of Howard and Ramdas is too wide to be useful.
+* **No blind period.** The awake rank monitor (awake-B) keeps its guarantee from the first return after an alarm. In streams where volatility moves about once a day, it detects 98% to 99.6% of the changes, with median delays of 34 to 60 steps. The standard 1440-step recalibration protocol is blind 57% to 71% of the time and catches 56% to 66% of the changes. Route A with a learning band (awake-A) is also proved, but it cannot detect a change that comes within the first few dozen returns after a restart.
+* **Real data.** In E12's design (BTC, ETH, SOL, 2024 to 2025), the awake monitors watch all 114 macro releases, against 55 for the plug-in. Up alarms within 6 hours rise from 21 to 25 (awake-A) and 31 (awake-B) of 66 CPI releases, and from 26 to 30 and 35 of 48 FOMC statements. The BTC CPI cell, not significant in E12 (p = 0.11), gives p = 0.003 and 0.0003.
+* **Cost.** At most about 0.1 ms per return on a shared machine: plug-in 13 µs, route A 16 µs, rank monitor 44 µs, awake-A 47 µs (up to 115 µs on real data, where it restarts its learning phase after every alarm).
 
 [SYNTHETIC] Unit-scale returns: Gaussian, Student t3 (unit variance), jumps (probability 0.005 per step, size N(0, 10²)), price ticks (Gaussian rounded to 0.5, about 20% zeros: P(|Z| < 0.25) = 0.197), as in E9.
 
@@ -1297,6 +1426,52 @@ Within five days:
 
 **Reading.** With no null band every monitor reacts to an undeseasonalised intraday profile and to slow stochastic volatility, the rank detectors and the plug-in most (they spend their budget), route A and cs least (their bands absorb some drift). With the null band 0.25 (E12's frozen setting) the rank detectors are the most tolerant of slow drift (slow SV, five days: 5.9% and 4.0% against 53.8% for the plug-in and 15% to 21% for route A and cs), probably because their reference set keeps growing and so follows the long-run level rather than the calibration day. Under GARCH(1,1) every monitor alarms on half or more of the paths within five days even with the band, as in E8: these alarms describe volatility clustering, which every null here excludes.
 
+### Q14w. Why: band widths, plug-in drift and dilution [SYNTHETIC]
+
+**Band widths.** Median of bound / true m over 2000 calibration windows, as upper / lower, at the grid centre (τ = 3 × the calibration scale), at the lowest and the highest grid level, and for the other bands at the centre (`e14w_bands.csv`). No band failed at any level on more than 0.05% of windows (allowed: 1%).
+
+| Returns | Calibration | grid, centre | grid, 0.35 x centre | grid, 2.83 x centre | DKW time-uniform, centre | DKW fixed n, centre | E8, one level |
+|---|---|---|---|---|---|---|---|
+| Gaussian | 390 | 1.46 / 0.68 | 1.20 / 0.80 | 3.20 / 0.49 | 2.17 / 0.49 | 1.74 / 0.62 | 1.40 / 0.72 |
+| Gaussian | 1440 | 1.20 / 0.85 | 1.09 / 0.91 | 1.56 / 0.82 | 1.62 / 0.66 | 1.39 / 0.75 | 1.19 / 0.86 |
+| Student t3 | 390 | 1.50 / 0.64 | 1.20 / 0.80 | 2.28 / 0.33 | 1.83 / 0.40 | 1.52 / 0.54 | 1.44 / 0.68 |
+| Student t3 | 1440 | 1.20 / 0.83 | 1.09 / 0.91 | 1.47 / 0.68 | 1.43 / 0.60 | 1.27 / 0.73 | 1.18 / 0.84 |
+| Jumps | 390 | 1.47 / 0.67 | 1.20 / 0.80 | 2.95 / 0.26 | 2.16 / 0.48 | 1.73 / 0.60 | 1.41 / 0.71 |
+| Jumps | 1440 | 1.21 / 0.84 | 1.09 / 0.91 | 1.57 / 0.64 | 1.60 / 0.65 | 1.38 / 0.74 | 1.19 / 0.85 |
+| Ticks | 390 | 1.45 / 0.70 | 1.18 / 0.82 | 2.26 / 0.59 | 1.67 / 0.53 | 1.42 / 0.64 | 1.37 / 0.74 |
+| Ticks | 1440 | 1.17 / 0.86 | 1.08 / 0.92 | 1.36 / 0.82 | 1.35 / 0.69 | 1.22 / 0.80 | 1.15 / 0.87 |
+
+The grid band costs almost nothing against E8's single level at 1440 steps (1.20 / 0.85 against 1.19 / 0.86, Gaussian) and a little at 390 (1.46 / 0.68 against 1.40 / 0.72), while it covers 13 levels and needs no sample split. It is tight at low levels (what the decrease side needs) and loose at the highest levels, where an upper bound for a [0, 1] variable with mostly tiny values cannot be sharp (theory note 3.5). The integrated DKW band is much wider: at the centre its upper bound exceeds the truth by 1.5 to 3.1 times as much as the grid band's, and at high levels by far more; its time-uniform radius is 0.131 at 390 and 0.068 at 1440 observations (constant C = 9.28 for α = 0.01, solved numerically as in the authors' code; the closed form 0.8 log(1612 / α) gives 9.59), against 0.082 and 0.043 for Massart's fixed-n DKW radius (`e14w_constants.csv`).
+
+**Plug-in drift (Proposition A.6).** For each calibration window, the expected log growth of every bet given the window, computed by quadrature on 4 million draws from the true law; "positive drift" means some bet on that side has `E log f > 0`, so that the detector reaches any threshold in finite expected time, bounded by `(log(2AK) + log f_max) / g` (`e14w_plugin_drift.csv`).
+
+| Returns | Calibration | sd of m̂ / m - 1 | positive drift, increase side | decrease side | either | median run length bound, A = 7800 | A = 10⁶ | lower bound on P(alarm within 7800), A = 10⁶ | 7800 / A |
+|---|---|---|---|---|---|---|---|---|---|
+| Gaussian | 390 | 7.2% | 40.6% | 42.5% | 83.2% | 13,701 | 19,472 | 7.95% | 0.78% |
+| Gaussian | 1440 | 3.7% | 30.9% | 37.0% | 68.0% | 37,014 | 52,834 | 0.26% | 0.78% |
+| Student t3 | 390 | 8.1% | 37.8% | 39.1% | 76.9% | 13,114 | 18,658 | 7.64% | 0.78% |
+| Student t3 | 1440 | 4.2% | 30.0% | 26.2% | 56.2% | 29,313 | 41,656 | 0.36% | 0.78% |
+| Jumps | 390 | 7.3% | 42.4% | 40.4% | 82.7% | 13,948 | 19,813 | 7.90% | 0.78% |
+| Jumps | 1440 | 3.7% | 32.0% | 32.6% | 64.7% | 35,524 | 50,689 | 0.22% | 0.78% |
+| Ticks | 390 | 6.6% | 41.4% | 36.3% | 77.7% | 12,762 | 18,177 | 7.97% | 0.78% |
+| Ticks | 1440 | 3.4% | 33.2% | 27.5% | 60.7% | 29,929 | 42,619 | 0.32% | 0.78% |
+
+At 390 calibration steps 77% to 83% of calibration windows give the plug-in detector a positive drift under the null, at 1440 steps 56% to 68%. The bound on the expected run length grows only from about 13,000 to about 19,000 steps when A grows 128-fold (7800 to 10⁶), which is the log A behaviour of the proposition. At A = 10⁶ the bound m / A for 7800 steps (20 days of 390 steps) would be 0.78%; Markov's inequality applied to the run length bound proves a false alarm probability of at least 7.6% to 8.0% at 390 calibration steps. This crude lower bound uses only the chain started at the first step; the simulated rates of Q14a are much higher.
+
+**Dilution of the rank detector after a change** (`e14w_dilution.csv`). Expected log growth per step of the matching rank bet k steps after a normal scale change by ρ, with 1940 pre-change values in the reference set (1440 calibration + 500 monitored, as in Q14b), from the formula of theory note 4.3 by numerical integration; and the number of steps a chain started at the change needs to gain log(2A) = log(15600) with and without dilution.
+
+| ρ | growth per step, k = 0 | k = 500 | k = 1940 | k = 5000 | steps to log(2A), no dilution | with dilution |
+|---|---|---|---|---|---|---|
+| 1.25 | 0.055 | 0.029 | -0.001 | -0.019 | 175 | 199 |
+| 1.5 | 0.194 | 0.086 | -0.008 | -0.057 | 50 | 53 |
+| 2 | 0.573 | 0.195 | -0.028 | -0.129 | 17 | 18 |
+| 0.8 | 0.043 | 0.028 | 0.005 | -0.016 | 225 | 249 |
+| 0.667 | 0.126 | 0.085 | 0.013 | -0.054 | 76 | 79 |
+| 0.5 | 0.313 | 0.206 | 0.010 | -0.173 | 31 | 32 |
+
+
+The growth falls to about zero once the post-change values are as many as the pre-change values (k ≈ 1940), as the theory predicts (g_k → a limit ≤ 0). Within the time a chain needs to gain log(2A), dilution costs 3% to 14% (for example 199 steps against 175 for ρ = 1.25). These numbers are for one chain started at the change; the Shiryaev-Roberts statistic also carries the evidence of earlier chains, which is why the medians of Q14b are shorter.
+
 ### Q14f. No blind period: guarantee and delay after a restart [SYNTHETIC]
 
 A segment starts at a restart (for example right after an alarm). `awake-A` takes its grid centre from the 120 returns before the restart and learns its band from the segment; `awake-B` starts its rank reference set empty. Both bet from the first return of the segment.
@@ -1350,51 +1525,40 @@ False alarms before the change: at most 3.0% (awake-B, change after 360 steps; b
 * **awake-B detects changes that the standard protocol cannot see.** A change 120 steps after a restart is found in 20 to 70 steps (Gaussian) and 42 to 115 steps (Student t3), on 65% to 99% of paths; the standard protocol is still calibrating and finds at most 61% of them within 2000 steps, 1660 to 1830 steps after the change. Even a change 30 steps after the restart is often caught (x0.5: 91% Gaussian, 70% t3), although with 30 reference values the p-values are coarse and the post-change values soon dominate the reference set (dilution, theory note 4.3).
 * **awake-A is valid but slow early in a segment, a real limitation of the learning band.** With a change 30 steps after a restart it detects nothing: the band from fewer than 30 returns is very wide, and every later snapshot contains post-change returns, so the band learns the new level instead of testing against the old one. With a change after 120 steps it detects the halving of the standard deviation (x0.5: 100% Gaussian, 81% t3) but at most 34% of the other changes; after 360 steps it detects 58% to 100%. Where awake-A detects, awake-B is about 3 to 10 times faster (median delays). The rank route is the one to use for the no-blind-period monitor.
 
-### Q14w. Why: band widths, plug-in drift and dilution [SYNTHETIC]
+### Q14h. Streaming: blind time, false alarms per day and changes caught [SYNTHETIC]
 
-**Band widths.** Median of bound / true m over 2000 calibration windows, as upper / lower, at the grid centre (τ = 3 × the calibration scale), at the lowest and the highest grid level, and for the other bands at the centre (`e14w_bands.csv`). No band failed at any level on more than 0.05% of windows (allowed: 1%).
+The coordinator's measurement request, on synthetic minute-scale streams: 40 paths of 30 days (1440 steps per day, 1200 days per cell), the streaming monitors with E12's thresholds (A = 28800 for m / A, 36000 for δ + m / A, null band 0), restarting after every alarm: plug-in, cs and B-lr after 1440 steps of calibration (the standard protocol), awake-A and awake-B at once. "Blind" is the share of steps not monitored (calibrating, or the first 120 steps of a path for the awake monitors).
 
-| Returns | Calibration | grid, centre | grid, 0.35 x centre | grid, 2.83 x centre | DKW time-uniform, centre | DKW fixed n, centre | E8, one level |
-|---|---|---|---|---|---|---|---|
-| Gaussian | 390 | 1.46 / 0.68 | 1.20 / 0.80 | 3.20 / 0.49 | 2.17 / 0.49 | 1.74 / 0.62 | 1.40 / 0.72 |
-| Gaussian | 1440 | 1.20 / 0.85 | 1.09 / 0.91 | 1.56 / 0.82 | 1.62 / 0.66 | 1.39 / 0.75 | 1.19 / 0.86 |
-| Student t3 | 390 | 1.50 / 0.64 | 1.20 / 0.80 | 2.28 / 0.33 | 1.83 / 0.40 | 1.52 / 0.54 | 1.44 / 0.68 |
-| Student t3 | 1440 | 1.20 / 0.83 | 1.09 / 0.91 | 1.47 / 0.68 | 1.43 / 0.60 | 1.27 / 0.73 | 1.18 / 0.84 |
-| Jumps | 390 | 1.47 / 0.67 | 1.20 / 0.80 | 2.95 / 0.26 | 2.16 / 0.48 | 1.73 / 0.60 | 1.41 / 0.71 |
-| Jumps | 1440 | 1.21 / 0.84 | 1.09 / 0.91 | 1.57 / 0.64 | 1.60 / 0.65 | 1.38 / 0.74 | 1.19 / 0.85 |
-| Ticks | 390 | 1.45 / 0.70 | 1.18 / 0.82 | 2.26 / 0.59 | 1.67 / 0.53 | 1.42 / 0.64 | 1.37 / 0.74 |
-| Ticks | 1440 | 1.17 / 0.86 | 1.08 / 0.92 | 1.36 / 0.82 | 1.35 / 0.69 | 1.22 / 0.80 | 1.15 / 0.87 |
+**No change** (i.i.d. Gaussian or Student t3 returns). False alarms per day with a 95% upper confidence limit (Poisson), and the per-day bound of Corollary A.5 (for E8 Corollary 6.6 of `docs/math.md`; for the rank monitors Remark B.3), (δ + m / A) / (1 - δ) with m = 30 days, or m / A:
 
-The grid band costs almost nothing against E8's single level at 1440 steps (1.20 / 0.85 against 1.19 / 0.86, Gaussian) and a little at 390 (1.46 / 0.68 against 1.40 / 0.72), while it covers 13 levels and needs no sample split. It is tight at low levels (what the decrease side needs) and loose at the highest levels, where an upper bound for a [0, 1] variable with mostly tiny values cannot be sharp (theory note 3.5). The integrated DKW band is much wider: at the centre its upper bound exceeds the truth by 1.5 to 3.1 times as much as the grid band's, and at high levels by far more; its time-uniform radius is 0.131 at 390 and 0.068 at 1440 observations (constant C = 9.28 for α = 0.01, solved numerically as in the authors' code; the closed form 0.8 log(1612 / α) gives 9.59), against 0.082 and 0.043 for Massart's fixed-n DKW radius (`e14w_constants.csv`).
+| Method | bound per day | Gaussian: false alarms per day (95% upper) | blind | Student t3: false alarms per day (95% upper) | blind |
+|---|---|---|---|---|---|
+| plugin | 0.050 (no proof) | 0.094 (0.113) | 12.6% | 0.084 (0.102) | 11.5% |
+| cs | 0.041 | 0.000 (0.003) | 3.3% | 0.001 (0.005) | 3.4% |
+| B-lr | 0.050 | 0.028 (0.039) | 6.0% | 0.033 (0.044) | 6.5% |
+| awake-A | 0.041 | 0.000 (0.003) | 0.3% | 0.000 (0.003) | 0.3% |
+| awake-B | 0.050 | 0.029 (0.041) | 0.3% | 0.035 (0.047) | 0.3% |
 
-**Plug-in drift (Proposition A.6).** For each calibration window, the expected log growth of every bet given the window, computed by quadrature on 4 million draws from the true law; "positive drift" means some bet on that side has `E log f > 0`, so that the detector reaches any threshold in finite expected time, bounded by `(log(2AK) + log f_max) / g` (`e14w_plugin_drift.csv`).
+**Volatility that moves about once a day.** The standard deviation is multiplied by 2, 1.5, 0.67 or 0.5 at random times (gaps of 240 steps plus an exponential with mean 1200; log2 of the volatility kept in [-2, 2]), 1173 changes (Gaussian) and 1105 (t3) in 1200 days. A change counts as detected if the first alarm in the right direction comes within 1440 steps and before the next change; delay in steps; per factor: share detected, median delay. "Other alarms" are all alarms except the first correct one after each change (they include genuine second alarms, so they are not all false).
 
-| Returns | Calibration | sd of m̂ / m - 1 | positive drift, increase side | decrease side | either | median run length bound, A = 7800 | A = 10⁶ | lower bound on P(alarm within 7800), A = 10⁶ | 7800 / A |
-|---|---|---|---|---|---|---|---|---|---|
-| Gaussian | 390 | 7.2% | 40.6% | 42.5% | 83.2% | 13,701 | 19,472 | 7.95% | 0.78% |
-| Gaussian | 1440 | 3.7% | 30.9% | 37.0% | 68.0% | 37,014 | 52,834 | 0.26% | 0.78% |
-| Student t3 | 390 | 8.1% | 37.8% | 39.1% | 76.9% | 13,114 | 18,658 | 7.64% | 0.78% |
-| Student t3 | 1440 | 4.2% | 30.0% | 26.2% | 56.2% | 29,313 | 41,656 | 0.36% | 0.78% |
-| Jumps | 390 | 7.3% | 42.4% | 40.4% | 82.7% | 13,948 | 19,813 | 7.90% | 0.78% |
-| Jumps | 1440 | 3.7% | 32.0% | 32.6% | 64.7% | 35,524 | 50,689 | 0.22% | 0.78% |
-| Ticks | 390 | 6.6% | 41.4% | 36.3% | 77.7% | 12,762 | 18,177 | 7.97% | 0.78% |
-| Ticks | 1440 | 3.4% | 33.2% | 27.5% | 60.7% | 29,929 | 42,619 | 0.32% | 0.78% |
-
-At 390 calibration steps 77% to 83% of calibration windows give the plug-in detector a positive drift under the null, at 1440 steps 56% to 68%. The bound on the expected run length grows only from about 13,000 to about 19,000 steps when A grows 128-fold (7800 to 10⁶), which is the log A behaviour of the proposition. At A = 10⁶ the bound m / A for 7800 steps (20 days of 390 steps) would be 0.78%; Markov's inequality applied to the run length bound proves a false alarm probability of at least 7.6% to 8.0% at 390 calibration steps. This crude lower bound uses only the chain started at the first step; the simulated rates of Q14a are much higher.
-
-**Dilution of the rank detector after a change** (`e14w_dilution.csv`). Expected log growth per step of the matching rank bet k steps after a normal scale change by ρ, with 1940 pre-change values in the reference set (1440 calibration + 500 monitored, as in Q14b), from the formula of theory note 4.3 by numerical integration; and the number of steps a chain started at the change needs to gain log(2A) = log(15600) with and without dilution.
-
-| ρ | growth per step, k = 0 | k = 500 | k = 1940 | k = 5000 | steps to log(2A), no dilution | with dilution |
-|---|---|---|---|---|---|---|
-| 1.25 | 0.055 | 0.029 | -0.001 | -0.019 | 175 | 199 |
-| 1.5 | 0.194 | 0.086 | -0.008 | -0.057 | 50 | 53 |
-| 2 | 0.573 | 0.195 | -0.028 | -0.129 | 17 | 18 |
-| 0.8 | 0.043 | 0.028 | 0.005 | -0.016 | 225 | 249 |
-| 0.667 | 0.126 | 0.085 | 0.013 | -0.054 | 76 | 79 |
-| 0.5 | 0.313 | 0.206 | 0.010 | -0.173 | 31 | 32 |
+| Returns | Method | blind | awake at the change | detected within a day | median delay | x0.5 | x0.67 | x1.5 | x2 | other alarms per day |
+|---|---|---|---|---|---|---|---|---|---|---|
+| Gaussian | plugin | 71% | 31% | 65.9% | 157 | 72%, 199 | 64%, 170 | 60%, 96 | 68%, 120 | 0.046 |
+| Gaussian | cs | 61% | 43% | 58.2% | 140 | 61%, 142 | 54%, 227 | 52%, 107 | 66%, 48 | 0.018 |
+| Gaussian | B-lr | 69% | 35% | 65.6% | 78 | 74%, 52 | 64%, 99 | 57%, 68 | 68%, 39 | 0.023 |
+| Gaussian | awake-A | 0% | 100% | 94.3% | 97 | 99%, 96 | 93%, 181 | 88%, 100 | 97%, 36 | 0.002 |
+| Gaussian | awake-B | 0% | 100% | 99.6% | 34 | 100%, 31 | 99%, 68 | 100%, 42 | 100%, 17 | 0.035 |
+| Student t3 | plugin | 67% | 38% | 65.4% | 150 | 72%, 115 | 63%, 194 | 62%, 139 | 65%, 65 | 0.045 |
+| Student t3 | cs | 57% | 49% | 56.2% | 166 | 63%, 144 | 51%, 270 | 51%, 187 | 61%, 76 | 0.022 |
+| Student t3 | B-lr | 65% | 41% | 65.1% | 111 | 75%, 72 | 64%, 138 | 60%, 129 | 62%, 60 | 0.022 |
+| Student t3 | awake-A | 0% | 100% | 77.9% | 153 | 94%, 118 | 67%, 324 | 61%, 343 | 90%, 93 | 0.008 |
+| Student t3 | awake-B | 0% | 100% | 98.0% | 60 | 100%, 44 | 95%, 98 | 97%, 100 | 100%, 38 | 0.032 |
 
 
-The growth falls to about zero once the post-change values are as many as the pre-change values (k ≈ 1940), as the theory predicts (g_k → a limit ≤ 0). Within the time a chain needs to gain log(2A), dilution costs 3% to 14% (for example 199 steps against 175 for ρ = 1.25). These numbers are for one chain started at the change; the Shiryaev-Roberts statistic also carries the evidence of earlier chains, which is why the medians of Q14b are shorter.
+**Reading.**
+* **Blind time.** With volatility moving about once a day, the standard protocol is blind 57% to 71% of the time (E12 measured about 70% on crypto) and is awake at only 31% to 49% of the changes. The awake monitors are blind 0.28% of the time (the first 120 steps of each path).
+* **False alarms per day under a true null.** The proved monitors stay within their bounds: awake-B 0.029 and 0.035 per day (bound 0.050), B-lr 0.028 and 0.033, awake-A, cs essentially 0. **The plug-in does not: 0.094 and 0.084 false alarms per day, about twice the nominal 0.05, with 95% lower limits above 0.05** (113 and 101 alarms in 1200 days; per monitored day the excess is larger). This is Proposition A.6 at work over a month of monitoring.
+* **Changes caught.** awake-B detects 99.6% (Gaussian) and 98.0% (t3) of the changes within a day, with median delays of 34 and 60 steps; awake-A 94.3% and 77.9% (median 97 and 153); the standard protocol 56% to 66% (median 78 to 166). awake-B gains this with 0.032 to 0.035 other alarms per day, fewer than the plug-in's 0.045 to 0.046.
 
 ### Q14d. Real data: alarms, awake time and the E5c check [REAL]
 
@@ -1430,6 +1594,72 @@ Null band 0:
 * **The awake monitors watch 100% of the time** (99.9% for Nifty, whose first 120 minutes are a warm-up). With the band 0.25 they raise 0.66 to 0.88 alarms per crypto day and 0.23 to 0.25 per Nifty day, about as many as the plug-in, which spends two thirds of the day blind. Their alarms are as often confirmed by the next day's volatility (awake-A: 80% up, 85% down; awake-B: 74% and 90%; plug-in: 82% and 90%).
 * **Without a band, awake-B alarms 3.6 to 4.3 times per crypto day.** Right after a restart its reference set is small, so it is quickly sure that the returns are not exchangeable, which is true under volatility clustering; the alarms are confirmed less often (67% and 73%). The band (or a larger A) is needed on real data, as E12 found for the plug-in.
 * Among the monitors that recalibrate, the proved ones (cs, route A, rank) alarm less than the plug-in and are confirmed about as often after up alarms (78% to 83% against 82%) and more often after down alarms (94% to 97% against 90%); the DKW band alarms least (0.31 to 0.40 per crypto day) and has the highest confirmation rate of up alarms (93%), consistent with its low power.
+
+### Q14g. E12 rerun: how many releases are caught when the monitor is awake [REAL]
+
+E12's streaming design unchanged (`experiments/e12_crypto_events.py`: BTC, ETH, SOL, 21 January 2024 to 31 December 2025, 711 days, minute returns over the predictable intraday profile, A = 28800, null band 0.25, 1440-minute calibration; the 16 FOMC statements and 22 CPI releases of `data/events/us_macro_events.csv`; outcome: an up alarm within 6 hours of the release; matched control windows at the same Eastern clock time and weekday, away from event days; exact stratified test of E12). Only the monitor changes: the plug-in of E12, the rank monitor with E12's recalibration protocol (B-lr, 1440 returns of warm-up after each alarm), and the two monitors with no blind period (awake-A with A = 36000 and δ = 0.01; awake-B with A = 28800, null band 0.25 dividing each rank payoff by 1.25).
+
+Each cell: releases at which the monitor was monitoring / releases with an up alarm within 6 hours (matched control rate; one-sided stratified p-value, not adjusted for multiplicity):
+
+| Release | Coin | plugin | B-lr | awake-A | awake-B |
+|---|---|---|---|---|---|
+| FOMC (16) | BTC | 9 / 9 (14%; p 0.0001) | 10 / 8 (14%; p 0.0008) | 16 / 10 (7%; p < 0.0001) | 16 / 13 (19%; p < 0.0001) |
+| FOMC (16) | ETH | 8 / 8 (11%; p 0.0002) | 11 / 7 (11%; p 0.0013) | 16 / 8 (8%; p < 0.0001) | 16 / 10 (19%; p 0.0002) |
+| FOMC (16) | SOL | 9 / 9 (17%; p 0.0005) | 12 / 10 (12%; p < 0.0001) | 16 / 12 (14%; p < 0.0001) | 16 / 12 (18%; p < 0.0001) |
+| FOMC, all | 3 coins | **26 / 26** of 48 | **33 / 25** of 48 | **48 / 30** of 48 | **48 / 35** of 48 |
+| CPI (22) | BTC | 9 / 5 (12%; p 0.1098) | 16 / 7 (8%; p 0.0011) | 22 / 7 (9%; p 0.0032) | 22 / 10 (13%; p 0.0003) |
+| CPI (22) | ETH | 8 / 7 (9%; p 0.0032) | 16 / 8 (12%; p 0.0035) | 22 / 10 (10%; p < 0.0001) | 22 / 11 (17%; p 0.0004) |
+| CPI (22) | SOL | 12 / 9 (8%; p < 0.0001) | 14 / 7 (9%; p 0.0028) | 22 / 8 (10%; p 0.0013) | 22 / 10 (14%; p 0.0004) |
+| CPI, all | 3 coins | **29 / 21** of 66 | **46 / 22** of 66 | **66 / 25** of 66 | **66 / 31** of 66 |
+
+Alarms per day (share of minutes monitored) over the whole stream:
+
+| Coin | plugin | B-lr | awake-A | awake-B |
+|---|---|---|---|---|
+| BTC | 0.70 (30%) | 0.54 (46%) | 0.80 (100%) | 0.93 (100%) |
+| ETH | 0.69 (31%) | 0.49 (51%) | 0.80 (100%) | 0.80 (100%) |
+| SOL | 0.67 (33%) | 0.44 (56%) | 0.70 (100%) | 0.65 (100%) |
+
+The plug-in column reproduces E12: awake at 9, 8 and 9 of the 16 FOMC statements and at 9, 8 and 12 of the 22 CPI releases, the same FOMC counts, and E12's 4, 6 and 9 CPI alarms among the releases at which it was awake (the CPI counts here, 5, 7 and 9, also include one release each on BTC and ETH at which the monitor woke up within the 6 hours).
+
+**Reading.**
+* **No blind period means more releases caught.** awake-A and awake-B monitor at every release (114 of 114) against 55 of 114 for the plug-in. CPI releases with an up alarm within 6 hours go from 21 of 66 (plug-in) to 25 (awake-A) and 31 (awake-B); FOMC statements from 26 of 48 to 30 and 35. Of the 37 CPI releases at which the plug-in was blind, awake-A caught 15 and awake-B 17; of the 22 such FOMC statements, 11 and 12.
+* **The contrast with control times survives in every cell.** BTC CPI, the cell that failed in E12 (p = 0.11), becomes p = 0.003 (awake-A) and 0.0003 (awake-B); every awake cell has p ≤ 0.004. awake-B pays with a higher control rate (13% to 19% of matched control windows against 7% to 14% for awake-A and 8% to 17% for the plug-in), so its gain is partly more alarms everywhere.
+* **Awake does not mean every release is flagged.** At the releases where it was awake the plug-in flagged 26 of 26 FOMC statements; the awake monitors flag 30 and 35 of 48. A monitor that restarted shortly before a release compares the release against a short or volatile baseline (awake-A takes its grid centre from the 120 returns before the restart; awake-B starts with an empty reference set), which may explain part of the gap; we did not test this. E12's fresh-calibration design (a monitor calibrated on the day before each release, which is not a streaming monitor) flagged 14 to 15 of 16 FOMC statements.
+* The awake monitors alarm 0.65 to 0.93 times per day, against 0.67 to 0.70 for the plug-in; awake-A's first up alarm after a release comes later (median 18 to 44 minutes) than awake-B's (8 to 20 minutes).
+
+### Q14e. Computational cost [SYNTHETIC]
+
+Wall-clock time per return on Gaussian returns (`e14e_cost.csv`; x86_64, Python 3.13.18, 4 cores shared with other jobs; the four cores were shared with other jobs during the run, so the absolute numbers are inflated and only the ratios are informative). Streaming monitors are plain Python with NumPy, one return at a time, with an infinite threshold so that no alarm resets them. Vectorised rows are the experiment engine (many paths at once).
+
+| Task | steps | µs per step |
+|---|---|---|
+| VolatilityMonitor plugin, one series, no alarm | 200,000 | 12.94 |
+| VolatilityMonitor cs, one series, no alarm | 200,000 | 11.88 |
+| RunningTauMonitor grid (route A), one series, no alarm | 200,000 | 15.83 |
+| RunningTauMonitor dkw (route A), one series, no alarm | 200,000 | 14.98 |
+| ConformalMonitor lr (route B), one series, no alarm | 200,000 | 44.18 |
+| AwakeRunningTauMonitor (route A, no blind period), one series, no alarm | 200,000 | 47.44 |
+| AwakeRunningTauMonitor, learning phase (first 1560 steps) | 1,560 | 76.99 |
+| vectorised plugin (calibration + monitoring), 1000 paths x 3390 steps | 3,390,000 | 0.17 |
+| vectorised cs (calibration + monitoring), 1000 paths x 3390 steps | 3,390,000 | 0.26 |
+| vectorised A-grid-run (calibration + monitoring), 1000 paths x 3390 steps | 3,390,000 | 1.35 |
+| vectorised A-dkw-run (calibration + monitoring), 1000 paths x 3390 steps | 3,390,000 | 0.28 |
+| vectorised B-lr (calibration + monitoring), 1000 paths x 3390 steps | 3,390,000 | 0.76 |
+| vectorised awake-A, 1000 paths x 3270 steps | 3,270,000 | 3.81 |
+
+**Reading.** Every monitor costs well under a millisecond per return, so cost is not a constraint for minute or second data. The running level costs about 20% over the plug-in (route A: 15 to 16 µs against 13); the awake route A monitor costs about 4 times the plug-in (47 µs; 77 µs in its learning phase, which updates 13 confidence sequences per return). The rank monitor costs 44 µs per return on this 200,000-step series because its sorted reference set grows without bound when there is no alarm and each insertion moves O(n) entries; on the real series of Q14d, where restarts keep the reference set short, the measured cost was 3.4 to 28.7 µs per return for the monitors that recalibrate (band 0.25; `us_per_step` in `e14d_real_summary.csv`; their blind steps are cheap and included), 34 to 55 µs for awake-B and 81 to 115 µs for awake-A, which restarts its learning phase after every alarm. A balanced tree or a blocked sorted list would make the rank monitor O(log n) per return; we did not need it.
+
+### Caveats and open issues
+
+* Every guarantee here is for its stated null: i.i.d. calibration (route A), exchangeable returns within a segment (route B, awake monitors). Volatility clustering violates all of them, so the real-data alarm rates are statements about the data, not false alarm rates (Q14c, Q14d).
+* The speed of B-lr against the X-based detectors mixes two effects, ranks and likelihood-ratio bets; we did not run an X-based detector with likelihood-ratio bets.
+* awake-A is valid but weak right after a restart (Q14f). For a no-blind-period monitor, the rank route is the one we recommend.
+* Without a null band, awake-B alarms 3.6 to 4.3 times per crypto day (Q14d). It needs the band, or a larger A, on real data.
+* Proposition A.6's numerical lower bound (Q14w) uses Markov's inequality on a single chain and quadrature for the expectations. It demonstrates the failure clearly at A = 10⁶ and 390 calibration steps (at least 7.6% against 0.78%), but not at 1440 steps; the simulated rates (Q14a, Q14h) are the direct evidence.
+* The rank monitor's sorted reference set costs O(n) per insertion when there are no alarms for a long time (Q14e).
+* Some alarms are left out of the E5c check in Q14d: alarms in the last day of a series, which have no next-day window, and awake-B alarms raised with fewer than 30 reference values, for which no baseline scale is defined. That is at most 6 per series and monitor (`e14d_real_alarms.csv`).
+* In the Q14g windows, some alarms had a zero baseline scale (a reference set with a median absolute return of 0), which gives infinite diagnostic ratios in E12's alarm frame (a warning in the log). The release counts and tests do not use those ratios.
 
 ---
 

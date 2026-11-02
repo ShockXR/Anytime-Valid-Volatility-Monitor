@@ -2,7 +2,7 @@
 
 **An online monitor that watches one-minute returns and raises an alarm when volatility shifts up or down, with a proven limit on false alarms that holds however often you look at it.** It puts the MAD-based truncation used by Bapat (2026), an idea for jump robustness that goes back to Mancini (2009), inside e-detectors, a nonparametric framework for sequential change detection (Shin, Ramdas and Rinaldo 2024).
 
-> Status: research prototype, round 2 (November 2026). About 240 tests, 15 experiments on simulated and real data (E13 and E14 still running), seven alternative directions, proofs in [`docs/math.md`](docs/math.md). For the short version read [`PITCH_BAPAT.md`](PITCH_BAPAT.md); for every number read the [experiment report](docs/experiment_report.md).
+> Status: research prototype, round 2 (November 2026). About 240 tests, 15 experiments on simulated and real data (E13 being written up), seven alternative directions, proofs in [`docs/math.md`](docs/math.md). For the short version read [`PITCH_BAPAT.md`](PITCH_BAPAT.md); for every number read the [experiment report](docs/experiment_report.md).
 
 Every result in this repository carries a label: **[PUBLISHED]** (taken from a paper), **[SYNTHETIC]** (our simulation) or **[REAL]** (our run on market data). Nothing is reported that was not run.
 
@@ -23,7 +23,8 @@ Sub-questions (status in [`RESEARCH_STRATEGY_BAPAT.md`](RESEARCH_STRATEGY_BAPAT.
 
 * **The guarantee holds where classical detectors break [SYNTHETIC].** With jumps or fat tails, Gaussian likelihood-ratio and CUSUM detectors raise a false alarm within a day on 70% to 97% of paths. The robust e-detector stays at 0.3% to 2.3% against its 5% bound, and detects a 50% volatility increase in a median of 36 to 49 steps (E4). Across four very different return laws the measured rate is 1.1% to 1.4% (E9), so the bound is valid but about four times conservative.
 * **Why truncation matters for sequential testing.** No nonparametric e-test can detect a *fall* in the variance (a one-sided form of Bahadur and Savage 1956, [`docs/math.md`](docs/math.md) 5.3). A bounded functional can, and the truncated variance is one with a direct volatility meaning.
-* **Estimated baselines need care [SYNTHETIC].** Plugging in an estimated "normal" level roughly triples false alarms with a 390-step calibration window and gives 44% against a guaranteed 25% over five days (E4e, E10). A confidence-sequence baseline restores a proof, P(false alarm within m) ≤ δ + m / A, at a cost of 1.8 to 7.6 times the delay with short calibration (E8).
+* **Estimated baselines need care [SYNTHETIC].** Plugging in an estimated "normal" level roughly triples false alarms with a 390-step calibration window and gives 41% to 44% against a guaranteed 25% over five days (E4e, E10, E14); over 30-day streams it raises 0.084 to 0.094 false alarms per day against a nominal 0.05. We proved that no bound of the form C m / A can hold for it (Proposition A.6 in [`docs/theory_running_tau.md`](docs/theory_running_tau.md)). A confidence-sequence baseline restores a proof, P(false alarm within m) ≤ δ + m / A, at a cost of 1.8 to 7.6 times the delay with short calibration (E8).
+* **A monitor with no blind period [SYNTHETIC and REAL].** After each alarm the default monitor spends a day recalibrating, and on real crypto data it is blind about 70% of the time (E12). A rank-based e-detector, restarted with an empty reference set right after each alarm, keeps an exact m / A bound with no baseline at all (at most 3.5% false alarms per day in simulation, against a 5% bound) and catches 98% to 99.6% of changes in streams where volatility moves about once a day, against 56% to 66% for the default protocol. Rerun on the FOMC and CPI design of E12, it watches all 114 releases instead of 55; this rerun was done after E12, so it is a check, not a pre-registered test (E14).
 * **Volatility clustering breaks the null, and fixing it caps the signal [SYNTHETIC].** Under persistent GARCH clustering the raw monitor alarms on 82% to 100% of quiet days. Dividing returns by a fitted GARCH forecast brings this back to 3% to 6% per day, close to the rate with the true forecast model, but a forecast that keeps adapting also absorbs most of a real level shift. A doubling of the long-run variance raises the ratio of squared returns to the forecast by only 9% at persistence 0.99, and no shift, however large, can push that ratio above (1 − β)/α = 1.2. We derived this cap in closed form and checked it by simulation (E10).
 * **Alarms on real data carry information, but the main contribution is the guarantee [REAL].** On the five coins, alarms are followed by volatility on the flagged side of EWMA and HAR forecasts 71% to 83% of the time, against about 50% at random times, in and out of sample (E6). A simple ratio rule tuned with hindsight is about as precise (E6e), so what the e-detector adds is a false-alarm guarantee with fixed settings, not extra precision.
 * **Many assets at once [SYNTHETIC and REAL].** A Shiryaev-Roberts statistic divided by time is not an e-value, so the usual multiple-testing recipes do not apply directly. Per-asset e-processes with e-BH give a proved false discovery rate at every stopping time (at most 0.96% observed in 48 designs). On five coins plus Nifty its discoveries are confirmed 78% to 97% of the time against about 50% at random times; its gain over a Bonferroni split is mostly earlier flags, not more of them (E15, `docs/theory_panel.md`).
@@ -133,9 +134,9 @@ Most scripts take part names as arguments (for example `python experiments/e10_f
 
 The full list, with what each one affects, is in [`docs/limitations.md`](docs/limitations.md). The main ones:
 
-* The guarantee is proved for a known baseline and for the confidence-sequence baseline. The default plug-in baseline is only approximately valid (E4e).
+* The guarantee is proved for a known baseline, for the confidence-sequence baseline and for the rank monitor of E14. The default plug-in baseline is only approximately valid within a day and fails over several days (E4e, E10, E14).
 * Volatility clustering is itself a change in the conditional variance; without a forecast the monitor alarms on it. With a forecast it is valid but much slower to see level shifts (E10).
-* The monitor is blind for about 70% of the time on real data while it recalibrates after alarms (E12).
+* With the default protocol the monitor is blind for about 70% of the time on real data while it recalibrates after alarms (E12). The rank monitor of E14 (`ConformalMonitor` and `AwakeRunningTauMonitor` in `running.py`) removes the blind period with a proof, but without a null band it raises 3.6 to 4.3 alarms per crypto day.
 * The Binance and Nifty data come from public mirrors, not from the exchanges. The paper does not name its crypto data source, so our five-coin data may differ from the paper's.
 * The bound is about four times conservative (E9).
 
@@ -154,6 +155,7 @@ The full list, with what each one affects, is in [`docs/limitations.md`](docs/li
 │   ├── math.md                 derivations and proofs
 │   ├── theory_delay.md         detection delay and bet design
 │   ├── theory_panel.md         many assets at once: e-BH and false discovery control
+│   ├── theory_running_tau.md   running truncation level, rank detector, no blind period
 │   ├── equation_map.md         symbol to code map
 │   ├── literature_review.md    verified references and the gap
 │   ├── limitations.md          what the results do not show
@@ -162,6 +164,7 @@ The full list, with what each one affects, is in [`docs/limitations.md`](docs/li
 │   ├── iterations/             per-workstream iteration notes
 │   └── review/                 independent reviews and responses
 ├── experiments/                one script per experiment
+├── paper/                      short paper draft (Markdown source, LaTeX, verified BibTeX)
 ├── notebooks/demo.ipynb        executed demonstration
 ├── results/                    CSV outputs and figures
 ├── scripts/                    data download, report build, notebook build
@@ -172,7 +175,7 @@ The full list, with what each one affects, is in [`docs/limitations.md`](docs/li
 │   ├── monitor.py              streaming calibrate, monitor, alarm, recalibrate loop
 │   ├── forecast.py             EWMA and GARCH variance forecasts for forecast-relative monitoring
 │   ├── competitors.py          published change-point methods used as benchmarks
-│   ├── running.py              running truncation level
+│   ├── running.py              running truncation level, rank (conformal) monitor, monitors with no blind period
 │   ├── design.py               bet grid design from the delay theory
 │   ├── panel.py                panel monitor with e-BH across assets
 │   ├── simulate.py             paper design, stochastic volatility with jumps and noise, GARCH, change points
@@ -191,8 +194,8 @@ The full list, with what each one affects, is in [`docs/limitations.md`](docs/li
 - [x] Confidence-sequence baseline with a proof
 - [x] Forecast-relative monitoring under clustering, with the signal cap
 - [x] Risk switch backtest (alternatives/risk_switch)
-- [ ] Warm restart after alarms to remove the blind period
-- [ ] Short paper draft
+- [x] Monitors with no blind period after alarms, with a proof (E14)
+- [x] Short paper draft (`paper/`)
 - [ ] Discussion with Prof. Bapat of the open questions in [`docs/estimator_issues.md`](docs/estimator_issues.md)
 
 ## References
