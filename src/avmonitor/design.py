@@ -323,8 +323,16 @@ def renewal_constants(lam: float, draw_y, direction: str = "up", n_walks: int = 
     start times). ``draw_y(size, rng)`` returns i.i.d. post-change draws of Y.
     Returns a dict with both constants and their Monte Carlo standard errors.
     """
-    rng = np.random.default_rng() if rng is None else rng
     sign = 1.0 if direction == "up" else -1.0
+    return renewal_constants_increments(lambda size, r: np.log1p(lam * sign * (draw_y(size, r) - 1.0)),
+                                        n_walks, max_steps, rng)
+
+
+def renewal_constants_increments(draw_z, n_walks: int = 4000, max_steps: int = 20000,
+                                 rng: np.random.Generator | None = None):
+    """``renewal_constants`` for a random walk with i.i.d. increments ``draw_z(size, rng)`` (positive mean),
+    for example the log likelihood ratio of a parametric detector."""
+    rng = np.random.default_rng() if rng is None else rng
     # ladder heights
     H = np.full(n_walks, np.nan)
     S = np.zeros(n_walks)
@@ -333,8 +341,7 @@ def renewal_constants(lam: float, draw_y, direction: str = "up", n_walks: int = 
         idx = np.flatnonzero(alive)
         if idx.size == 0:
             break
-        z = np.log1p(lam * sign * (draw_y(idx.size, rng) - 1.0))
-        S[idx] += z
+        S[idx] += draw_z(idx.size, rng)
         done = S[idx] > 0
         H[idx[done]] = S[idx[done]]
         alive[idx[done]] = False
@@ -353,8 +360,7 @@ def renewal_constants(lam: float, draw_y, direction: str = "up", n_walks: int = 
         idx = np.flatnonzero(alive)
         if idx.size == 0:
             break
-        z = np.log1p(lam * sign * (draw_y(idx.size, rng) - 1.0))
-        S[idx] += z
+        S[idx] += draw_z(idx.size, rng)
         V[idx] += np.exp(-S[idx])
         alive[idx[S[idx] > 40.0]] = False
     logV = np.log(V)

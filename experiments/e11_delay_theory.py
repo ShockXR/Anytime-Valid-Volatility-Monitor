@@ -154,7 +154,167 @@ def part_a():
     return df
 
 
-PARTS = {"A": part_a}
+# ----------------------------------------------------------------------------
+# Part B: price of robustness
+# ----------------------------------------------------------------------------
+
+C_VALUES = (2.0, 3.0, 4.0, 5.0, np.inf)
+
+
+def info_row(model, nm, c, direction, rho, rng=None):
+    tau, m0 = G.baseline(model, c)
+    law = G.y_law(model, rho, tau, m0)
+    if direction == "down" and not np.isfinite(law.B):
+        return None
+    grid, w = default_grid(direction, law.B)
+    g = G.growth_rate(grid, law, direction)
+    k = int(np.argmax(g))
+    lam_o, g_o = G.best_bet(law, direction)
+    kl_raw = G.kl_truncated(model, rho, np.inf)
+    kl_x = G.kl_truncated(model, rho, tau)
+    _, s2_o = G.log_factor_moments(lam_o, law, direction) if g_o > 0 else (0, np.nan)
+    _, s2_k = G.log_factor_moments(grid[k], law, direction)
+    if direction == "up":
+        cap = 1 + grid * (law.B - 1) if np.isfinite(law.B) else np.full(len(grid), np.inf)
+        ceiling = np.log(law.B) if np.isfinite(law.B) else np.inf
+    else:
+        cap = 1 + grid
+        ceiling = np.log(law.B / (law.B - 1))
+    limit = G.speed_limit(A, cap, w) if np.all(np.isfinite(cap)) else 1
+    # second-order delays (Monte Carlo overshoot and memory constants) for the oracle bet and for the
+    # dominant grid bet with its weight 1/K (the latter ignores help from the other grid bets)
+    d2_rob = d2_grid = np.inf
+    if rng is not None and g_o > 0:
+        rc_o = G.renewal_constants(lam_o, draw_fn(model, rho, tau, m0), direction, 2000, rng=rng)
+        rc_k = G.renewal_constants(grid[k], draw_fn(model, rho, tau, m0), direction, 2000, rng=rng)
+        d2_rob = G.delay_second_order(A, 1.0, g_o, rc_o["kappa"], rc_o["zeta"])
+        d2_grid = G.delay_second_order(A, w[k], g[k], rc_k["kappa"], rc_k["zeta"])
+    return dict(scenario=nm, c=c, direction=direction, ratio=rho, tau=tau, m0=m0, B=law.B,
+                clip_share_pre=float(model.sf_abs(tau, 1.0)) if np.isfinite(tau) else 0.0,
+                clip_share_post=float(model.sf_abs(tau, rho)) if np.isfinite(tau) else 0.0,
+                mean_Y=law.mean, kl_raw=kl_raw, kl_trunc=kl_x, kl_inf=g_o, lam_oracle=lam_o,
+                growth_grid=g[k], best_grid_lam=grid[k],
+                loss_truncation=kl_raw / kl_x if kl_x > 0 else np.inf,
+                loss_nonparametric=kl_x / g_o if g_o > 0 else np.inf,
+                loss_grid=g_o / g[k] if g[k] > 0 else np.inf,
+                kl_ratio_total=kl_raw / g[k] if g[k] > 0 else np.inf,
+                growth_ceiling=ceiling, speed_limit_grid=limit,
+                max_log_factor_one_step=float(np.log(cap.max())) if np.all(np.isfinite(cap)) else np.inf,
+                pred2_oracle_robust=d2_rob, pred2_grid_robust=d2_grid)
+
+
+def run_lr_sr(r, ratios, threshold):
+    """SR mixture of Gaussian likelihood ratios for sd = ratio (sigma0 = 1), alarm index per path."""
+    from avmonitor.detectors import gaussian_lr_edetector
+
+    return gaussian_lr_edetector(r, 1.0, ratios=ratios, threshold=threshold).alarm
+
+
+def part_b():
+    rng = np.random.default_rng(SEED + 1)
+    rows = []
+    for nm, model in MODELS.items():
+        for c in C_VALUES:
+            for rho in (1.1, 1.25, 1.5, 2.0, 3.0):
+                rows.append(info_row(model, nm, c, "up", rho, rng))
+            for rho in (0.5, 0.67, 0.8, 0.9):
+                row = info_row(model, nm, c, "down", rho, rng)
+                if row is not None:
+                    rows.append(row)
+    info = pd.DataFrame(rows)
+    # parametric reference: second-order delay of the Gaussian LR oracle (Gaussian data)
+    lr_rows = []
+    for rho in (1.1, 1.25, 1.5, 2.0, 3.0, 0.5, 0.67, 0.8, 0.9):
+        kl = float(G.kl_gaussian_scale(rho))
+        a = 0.5 * (1 - 1 / rho**2)
+        rc = G.renewal_constants_increments(lambda size, r_: -np.log(rho) + a * r_.standard_normal(size) ** 2 * rho**2,
+                                            4000, rng=rng)
+        s2 = (rho**2 - 1) ** 2 / 2
+        lr_rows.append(dict(ratio=rho, kl=kl, kappa_lr=rc["kappa"], zeta_lr=rc["zeta"],
+                            zeta_lr_bm=G.zeta_brownian(kl, s2),
+                            pred2_lr=G.delay_second_order(A, 1.0, kl, rc["kappa"], rc["zeta"]),
+                            pred1_lr=G.delay_first_order(A, kl)))
+    lr = pd.DataFrame(lr_rows)
+    info = info.merge(lr[["ratio", "kl", "pred2_lr"]].rename(columns={"kl": "kl_gauss"}), on="ratio", how="left")
+    info.to_csv(OUT / "e11b_information.csv", index=False)
+    lr.to_csv(OUT / "e11b_lr_reference.csv", index=False)
+    show = info[(info.scenario == "gaussian")][["c", "direction", "ratio", "kl_raw", "kl_trunc", "kl_inf", "growth_grid",
+                                                 "loss_truncation", "loss_nonparametric", "loss_grid", "kl_ratio_total",
+                                                 "speed_limit_grid"]]
+    print(show.round(3).to_string())
+
+    # simulated price on clean Gaussian data, common random numbers across c and detectors
+    sims = []
+    model = MODELS["gaussian"]
+    for direction, ratios, horizons in (("up", (1.25, 1.5, 2.0), (2500, 800, 400)),
+                                        ("down", (0.8, 0.67, 0.5), (2500, 1200, 1200))):
+        for rho, horizon in zip(ratios, horizons):
+            reps = 3000
+            r = rho * rng.standard_normal((reps, horizon))
+            a_or = run_lr_sr(r, (rho,), A)
+            mix = (1.25, 1.5, 2.0) if direction == "up" else (0.5, 0.7, 0.8)
+            a_mix = run_lr_sr(r, mix, A)
+            base = dict(direction=direction, ratio=rho, reps=reps, horizon=horizon)
+            for det, a in (("Gaussian LR oracle", a_or), ("Gaussian LR mixture (E4)", a_mix)):
+                d = a[a >= 0] + 1.0
+                sims.append(dict(base, detector=det, c=np.nan, mean_delay=d.mean(), se=d.std(ddof=1) / np.sqrt(d.size),
+                                 median_delay=np.median(d), missing=float(np.mean(a < 0))))
+            for c in C_VALUES:
+                if direction == "down" and not np.isfinite(c):
+                    continue
+                tau, m0 = G.baseline(model, c)
+                y = np.minimum(r**2, tau**2) / m0
+                law = G.y_law(model, rho, tau, m0)
+                grid, w = default_grid(direction, law.B)
+                lam_o, _ = G.best_bet(law, direction)
+                for det, gr, ww in (("robust grid", grid, w), ("robust oracle bet", [lam_o], [1.0])):
+                    a = G.run_mixture(y, gr, ww, direction, A)["alarm"]
+                    d = a[a >= 0] + 1.0
+                    sims.append(dict(base, detector=det, c=c, mean_delay=d.mean(), se=d.std(ddof=1) / np.sqrt(d.size),
+                                     median_delay=np.median(d), missing=float(np.mean(a < 0))))
+            print(direction, rho, "done", flush=True)
+    sim = pd.DataFrame(sims)
+    sim.to_csv(OUT / "e11b_price_simulated.csv", index=False)
+    print(sim.round(2).to_string())
+
+    # jump bursts: sd unchanged, jump probability rises from 0.005 to 0.02 (calibrated on 0.005)
+    burst = []
+    calm = MODELS["jumps"]
+    hot = G.ReturnModel("jumps", p_jump=0.02, jump_sd=8.0)
+    for c in C_VALUES:
+        tau, m0 = G.baseline(calm, c)
+        law = G.y_law(hot, 1.0, tau, m0)
+        grid, w = default_grid("up", law.B)
+        g = G.growth_rate(grid, law, "up")
+        lam_o, g_o = G.best_bet(law, "up")
+        law_ref = G.y_law(calm, 1.25, tau, m0)
+        g_ref = G.growth_rate(grid, law_ref, "up").max()
+        burst.append(dict(c=c, mean_Y_burst=law.mean, growth_grid_burst=g.max(), kl_inf_burst=g_o,
+                          growth_grid_sd125=g_ref, burst_over_sd125=g.max() / g_ref))
+    burst = pd.DataFrame(burst)
+    burst.to_csv(OUT / "e11b_jump_burst.csv", index=False)
+    print(burst.round(4).to_string())
+
+    # fine curve in c: efficiency of the robust detector relative to the full-information KL
+    curve = []
+    for nm, model in MODELS.items():
+        for c in list(np.round(np.arange(1.0, 8.01, 0.25), 2)) + [np.inf]:
+            for direction, ratios in (("up", (1.25, 1.5, 2.0)), ("down", (0.5, 0.67, 0.8, 0.9))):
+                for rho in ratios:
+                    row = info_row(model, nm, c, direction, rho)
+                    if row is not None:
+                        curve.append({k_: row[k_] for k_ in ("scenario", "c", "direction", "ratio", "B", "kl_raw",
+                                                             "kl_trunc", "kl_inf", "growth_grid", "speed_limit_grid")})
+    curve = pd.DataFrame(curve)
+    curve["eff_grid"] = curve.growth_grid / curve.kl_raw
+    curve["eff_oracle"] = curve.kl_inf / curve.kl_raw
+    curve.to_csv(OUT / "e11b_c_curve.csv", index=False)
+    best = curve.loc[curve.groupby(["scenario", "direction", "ratio"]).growth_grid.idxmax()]
+    print(best[["scenario", "direction", "ratio", "c", "growth_grid", "eff_grid"]].round(3).to_string())
+    return info, sim, burst
+
+
+PARTS = {"A": part_a, "B": part_b}
 
 if __name__ == "__main__":
     which = sys.argv[1:] or list(PARTS)
