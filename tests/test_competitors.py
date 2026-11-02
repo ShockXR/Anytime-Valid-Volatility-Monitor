@@ -173,3 +173,69 @@ def test_scan_alarms_dead_time_and_matching():
     hu, hd = C.match_alarm_counts(s, -s, 7, 4, start=0, dead=50, lo_hi=(0.0, 10.0))
     ev = C.scan_alarms(s, -s, hu, hd, 0, 50)
     assert sum(e[1] == "up" for e in ev) == 7 and sum(e[1] == "down" for e in ev) == 4
+
+
+def test_overlap_sums_method_matches_the_window_loop():
+    rng = np.random.default_rng(10)
+    paths = (rng.standard_normal((6, 900)), rng.standard_t(3, (6, 900)), np.round(rng.standard_normal((6, 900)) / 0.8) * 0.8)
+    for r in paths:
+        r[1, 100:110] = np.nan
+        r[2, 450] = 40.0  # a jump that the truncation drops
+        for k, norm in ((30, "gaussian"), (120, "gaussian"), (120, "empirical")):
+            a = C.bjv_overlap_statistics(r, k, 4.0, norm)
+            b = C.bjv_overlap_statistics(r, k, 4.0, norm, method="sums")
+            assert np.array_equal(np.isfinite(a), np.isfinite(b))
+            assert np.allclose(np.nan_to_num(a), np.nan_to_num(b), rtol=0, atol=1e-8)
+    res_w = C.bjv_test(paths[1], 120, 0.05, "overlap", 4.0)
+    res_s = C.bjv_test(paths[1], 120, 0.05, "overlap", 4.0, method="sums")
+    assert np.allclose(res_w.stat, res_s.stat) and np.array_equal(res_w.cp_index, res_s.cp_index)
+    with pytest.raises(ValueError):
+        C.bjv_overlap_statistics(paths[0], 30, 4.0, method="fast")
+
+
+def _capped_reference(x, H, a0, b0, r_max):
+    """Independent run-length recursion with the documented cap: bucket r_max - 1 holds every run of at least
+    r_max - 1 steps; when run r_max - 2 grows into it the probabilities add and the merged bucket keeps the
+    statistics (alpha, beta) of whichever of the two had more mass."""
+    logR = np.full(r_max, -np.inf)
+    logR[0] = 0.0
+    al, be = np.full(r_max, a0), np.full(r_max, b0)
+    for v in x:
+        lj = logR + stats.t.logpdf(v, df=2 * al, scale=np.sqrt(be / al))
+        g = lj + np.log1p(-H)
+        new = np.empty(r_max)
+        new[0] = logsumexp(lj) + np.log(H)
+        new[1:-1] = g[:-2]
+        new[-1] = np.logaddexp(g[-2], g[-1])
+        heavy = -2 if g[-2] > g[-1] else -1
+        al_last, be_last = al[heavy] + 0.5, be[heavy] + v * v / 2
+        al = np.r_[a0, al[:-2] + 0.5, al_last]
+        be = np.r_[b0, be[:-2] + v * v / 2, be_last]
+        logR = new - logsumexp(new)
+    return logR, al, be
+
+
+def test_bocpd_run_length_cap_binds_and_follows_the_merge_rule():
+    rng = np.random.default_rng(11)
+    x = rng.standard_normal(120) * np.r_[np.ones(60), 2.0 * np.ones(60)]
+    H, a0, b0, r_max, w = 0.02, 2.0, 1.0, 12, 4
+    f = C.BOCPDVariance(1, H, a0, b0, r_max=r_max, short=w)
+    short_capped = np.array([f.update(v)[0][0] for v in x])
+    logR, al, be = _capped_reference(x, H, a0, b0, r_max)
+    # the cap binds: the last bucket carries most of the mass, so the merge rule has been applied many times
+    assert np.exp(logR[-1]) > 0.1
+    assert np.allclose(f.logR[0], logR, atol=1e-10)
+    assert np.allclose(f.beta[0], be) and f.alpha_last[0] == pytest.approx(al[-1])
+    assert np.exp(logsumexp(f.logR[0])) == pytest.approx(1.0)
+    # the cap is an approximation: once runs reach it, the short-run mass (the alarm statistic) differs from
+    # the exact recursion without a cap, although the two agree exactly before the cap is reached
+    lr, alx, bex, short_exact = np.array([0.0]), np.array([a0]), np.array([b0]), []
+    for v in x:
+        lj = lr + stats.t.logpdf(v, df=2 * alx, scale=np.sqrt(bex / alx))
+        new = np.r_[logsumexp(lj) + np.log(H), lj + np.log1p(-H)]
+        lr = new - logsumexp(new)
+        alx, bex = np.r_[a0, alx + 0.5], np.r_[b0, bex + v * v / 2]
+        short_exact.append(np.exp(logsumexp(lr[:w])))
+    diff = np.abs(short_capped - np.array(short_exact))
+    assert diff[: r_max - 1].max() < 1e-12
+    assert diff[r_max - 1 :].max() > 1e-3

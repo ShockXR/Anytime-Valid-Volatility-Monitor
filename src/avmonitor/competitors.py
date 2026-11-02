@@ -187,15 +187,91 @@ def bjv_block_statistics(r, k: int, trunc_c: float | None = 4.0, norm: str = "ga
     return z, positions
 
 
+def _cumsum0(a):
+    """Cumulative sums along axis 1 with a leading zero column: ``out[:, m] = a[:, :m].sum(1)``."""
+    return np.concatenate([np.zeros((a.shape[0], 1)), np.cumsum(a, axis=1)], axis=1)
+
+
+def _truncated_window_sums(rz, fin, k: int, trunc_c: float, max_pairs: int = 4_000_000):
+    """Exact window sums of the truncated statistic, computed from cumulative sums plus a correction.
+
+    Same quantities as the window-by-window loop in ``bjv_overlap_statistics``, for every
+    window ``w`` (returns ``r[w : w + 2k]``, boundary ``b = w + k``): the sums of the kept
+    squared returns and of their squares on each half, and the numbers of finite returns.
+    First every finite return is counted (cumulative sums, O(n)); then the returns that the
+    truncation drops are subtracted. A return ``i`` can be dropped only in a window that
+    contains it and whose truncation level ``u2_w = trunc_c^2 max(BPV_left, BPV_right)`` is
+    below ``r_i^2``, so only the returns above the smallest level of the ``2k`` windows that
+    contain them are visited, each against those ``2k`` windows. The cost is
+    O(n + (number of such returns) x 2k) instead of O(n x 2k), which matters for long windows.
+    """
+    import pandas as pd  # local import: pandas is only needed for the rolling minimum
+
+    reps, n = rz.shape
+    n_win = n - 2 * k + 1
+    x = rz**2  # zero where the return is missing
+    C1, C2, Cn = _cumsum0(x), _cumsum0(x**2), _cumsum0(fin.astype(float))
+    p = np.zeros((reps, n))
+    p[:, 1:] = np.abs(rz[:, 1:] * rz[:, :-1])  # p[j] = |r_j r_{j-1}|, zero if either is missing
+    ok = np.zeros((reps, n))
+    ok[:, 1:] = fin[:, 1:] & fin[:, :-1]
+    Cp, Co = _cumsum0(p), _cumsum0(ok)
+    w = np.arange(n_win)
+    # bipower within each half (pairs fully inside it): left pairs j = w+1 .. w+k-1, right pairs j = w+k+1 .. w+2k-1
+    bl = BPV_CONST * (Cp[:, w + k] - Cp[:, w + 1]) / np.maximum(Co[:, w + k] - Co[:, w + 1], 1)
+    br = BPV_CONST * (Cp[:, w + 2 * k] - Cp[:, w + k + 1]) / np.maximum(Co[:, w + 2 * k] - Co[:, w + k + 1], 1)
+    u2 = trunc_c**2 * np.maximum(bl, br)
+    S1L, S1R = C1[:, w + k] - C1[:, w], C1[:, w + 2 * k] - C1[:, w + k]
+    S2L, S2R = C2[:, w + k] - C2[:, w], C2[:, w + 2 * k] - C2[:, w + k]
+    NL, NR = Cn[:, w + k] - Cn[:, w], Cn[:, w + 2 * k] - Cn[:, w + k]
+    # smallest truncation level over the windows that contain return i (windows i - 2k + 1 .. i)
+    u2pad = np.full((reps, n), np.inf)
+    u2pad[:, :n_win] = u2
+    lo = pd.DataFrame(u2pad.T).rolling(2 * k, min_periods=1).min().to_numpy().T
+    rows, idx = np.nonzero(fin & (x > lo))
+    if rows.size:
+        off = np.arange(2 * k)
+        per = max(1, max_pairs // (2 * k))
+        size = reps * n_win
+        corr = {key: np.zeros(size) for key in ("1L", "1R", "2L", "2R")}
+        for s in range(0, rows.size, per):
+            rr, ii = rows[s : s + per], idx[s : s + per]
+            ww = ii[:, None] - 2 * k + 1 + off[None, :]
+            valid = (ww >= 0) & (ww < n_win)
+            wc = np.clip(ww, 0, n_win - 1)
+            xi = x[rr, ii][:, None]
+            drop = valid & (xi > u2[rr[:, None], wc])
+            left = ii[:, None] < ww + k
+            flat = (rr[:, None] * n_win + wc)
+            xb = np.broadcast_to(xi, drop.shape)
+            for side, m in (("L", drop & left), ("R", drop & ~left)):
+                corr["1" + side] += np.bincount(flat[m], weights=xb[m], minlength=size)
+                corr["2" + side] += np.bincount(flat[m], weights=xb[m] ** 2, minlength=size)
+        S1L = S1L - corr["1L"].reshape(reps, n_win)
+        S1R = S1R - corr["1R"].reshape(reps, n_win)
+        S2L = S2L - corr["2L"].reshape(reps, n_win)
+        S2R = S2R - corr["2R"].reshape(reps, n_win)
+    return S1L, S1R, S2L, S2R, NL, NR
+
+
 def bjv_overlap_statistics(r, k: int, trunc_c: float | None = 4.0, norm: str = "gaussian", chunk: int = 16,
-                           max_cells: int = 40000):
+                           max_cells: int = 40000, method: str = "windows", max_elems: int = 10_000_000):
     """Standardised comparisons of OVERLAPPING adjacent windows, one per possible change point.
 
     ``D[:, b]`` compares the left window ``r[b-k : b]`` with the right window
     ``r[b : b+k]`` exactly as in ``bjv_block_statistics`` (same normalisation, same
     pairwise truncation rule). It is defined for ``k <= b <= n - k`` and NaN
     elsewhere. Online use: ``D[:, b]`` is known at time ``b + k - 1``.
+
+    With truncation, ``method="windows"`` (the default, used for every run with k <= 125)
+    recomputes each window pair; ``method="sums"`` gives the same values from cumulative
+    sums plus an exact correction for the dropped returns (``_truncated_window_sums``),
+    equal up to floating point rounding (checked in ``tests/test_competitors.py``) and much
+    faster for long windows. ``max_elems`` bounds the size of the temporary arrays of the
+    window-by-window method (it only changes how windows are grouped, not the values).
     """
+    if method not in ("windows", "sums"):
+        raise ValueError("method must be 'windows' or 'sums'")
     r = np.atleast_2d(np.asarray(r, float))
     reps, n = r.shape
     if n < 2 * k + 1:
@@ -204,6 +280,10 @@ def bjv_overlap_statistics(r, k: int, trunc_c: float | None = 4.0, norm: str = "
     D = np.full((reps, n), np.nan)
     fin_all = np.isfinite(r)
     rz_all = np.where(fin_all, r, 0.0)
+    if trunc_c is not None and method == "sums":
+        n_win = n - 2 * k + 1
+        D[:, k : k + n_win] = _pair_z(*_truncated_window_sums(rz_all, fin_all, k, trunc_c), rho, norm)
+        return D
     if trunc_c is None:  # cumulative sums: O(n)
         x = rz_all**2
         C1 = np.concatenate([np.zeros((reps, 1)), np.cumsum(x, axis=1)], axis=1)
@@ -219,7 +299,7 @@ def bjv_overlap_statistics(r, k: int, trunc_c: float | None = 4.0, norm: str = "
     for i0 in range(0, reps, chunk):
         rows = slice(i0, i0 + chunk)
         n_rows = rz_all[rows].shape[0]
-        step = max(1, max_cells // n_rows)
+        step = max(1, min(max_cells // n_rows, max_elems // (n_rows * 2 * k)))
         for w0 in range(0, n_win, step):
             w1 = min(n_win, w0 + step)
             W = sliding_window_view(rz_all[rows, w0 : w1 + 2 * k - 1], 2 * k, axis=1)  # (rows, w1 - w0, 2k)
@@ -241,7 +321,7 @@ def bjv_overlap_statistics(r, k: int, trunc_c: float | None = 4.0, norm: str = "
 
 def bjv_test(
     r, k: int, alpha: float = 0.05, variant: str = "blocks", trunc_c: float | None = 4.0, norm: str = "gaussian",
-    crit: float | None = None,
+    crit: float | None = None, method: str = "windows",
 ) -> BJVResult:
     """Offline (a posteriori) test for a volatility jump in a fixed window, with a change-point estimate.
 
@@ -251,7 +331,7 @@ def bjv_test(
     ``mosum_crit(n, k, alpha)``. ``crit`` overrides the asymptotic value (for example
     a value calibrated by simulation). The change-point estimate is the boundary
     with the largest ``|Z|`` (the first index after the estimated change) and the
-    direction is the sign of Z there.
+    direction is the sign of Z there. ``method`` is passed to ``bjv_overlap_statistics``.
     """
     r = np.atleast_2d(np.asarray(r, float))
     n = r.shape[1]
@@ -259,7 +339,7 @@ def bjv_test(
         z, pos = bjv_block_statistics(r, k, trunc_c, norm)
         c = gumbel_crit_max_abs_normal(z.shape[1], alpha) if crit is None else crit
     elif variant == "overlap":
-        D = bjv_overlap_statistics(r, k, trunc_c, norm)
+        D = bjv_overlap_statistics(r, k, trunc_c, norm, method=method)
         pos = np.arange(k, n - k + 1)
         z = D[:, pos]
         c = mosum_crit(n, k, alpha) if crit is None else crit
@@ -272,15 +352,16 @@ def bjv_test(
     return BJVResult(stat, float(c), stat > c, pos[j], direction, z, pos)
 
 
-def bjv_online_statistic(r, k: int, trunc_c: float | None = 4.0, norm: str = "gaussian") -> np.ndarray:
+def bjv_online_statistic(r, k: int, trunc_c: float | None = 4.0, norm: str = "gaussian",
+                         method: str = "windows") -> np.ndarray:
     """Online version: entry t compares the last k returns ``r[t-k+1 .. t]`` with the k before them.
 
     ``out[:, t] = D[:, t - k + 1]`` from ``bjv_overlap_statistics`` (NaN for t < 2k - 1). It uses
     data up to time t only, so ``|out[:, t]| >= h`` is a valid online alarm rule. It is a
     repeated significance test with no anytime guarantee: its false alarm rate per day
-    must be measured, not assumed.
+    must be measured, not assumed. ``method`` is passed to ``bjv_overlap_statistics``.
     """
-    D = bjv_overlap_statistics(r, k, trunc_c, norm)
+    D = bjv_overlap_statistics(r, k, trunc_c, norm, method=method)
     out = np.full_like(D, np.nan)
     out[:, k - 1 :] = D[:, : D.shape[1] - k + 1]
     return out
@@ -310,8 +391,12 @@ class BOCPDVariance:
     Pruning: run lengths are capped at ``r_max - 1``. The last bucket means "a run of at
     least r_max - 1 steps"; when the run of length ``r_max - 2`` grows into it, the two are
     merged (probabilities added) and the merged bucket keeps the sufficient statistics of
-    whichever of the two had more posterior mass. This only touches very long runs and
-    never the short runs the alarm rule looks at.
+    whichever of the two had more posterior mass. This is an approximation of the exact
+    recursion once a run reaches the cap. The merge itself touches only the long runs, but
+    the merged bucket's predictive density enters the normalisation and the change
+    probability of every later step, so the short runs that the alarm rule looks at are
+    affected too: little while volatility does not change, much more after a change (see
+    ``tests/test_competitors.py`` and ``docs/report_parts/E13.md``).
 
     Works on ``reps`` independent paths at once. ``update(x)`` takes one return per path
     (NaN means "no observation", the state is unchanged) and returns
