@@ -1037,8 +1037,25 @@ class _CS(_Proc):
 
 
 def pilot_scale(r_pilot):
-    """Scaled MAD about zero of each row (``1.4826 * median |r|``)."""
-    return np.median(np.abs(r_pilot), axis=1) * MAD_NORMAL_SCALE
+    """Scaled MAD about zero of each row (``1.4826 * median |r|``).
+
+    Where more than half of a row is exactly zero (price discreteness on real one-minute
+    data) the median is zero; the scaled median of the nonzero ``|r|`` is used instead, as
+    in the package's monitor (``VolatilityMonitor._fallback_scale``). Rows with no nonzero
+    value get 0.
+    """
+    a = np.abs(np.asarray(r_pilot, float))
+    sc = np.median(a, axis=1) * MAD_NORMAL_SCALE
+    bad = sc <= 0
+    if np.any(bad):
+        ab = a[bad]
+        has = (ab > 0).any(axis=1)
+        fb = np.zeros(ab.shape[0])
+        if np.any(has):
+            nz = np.where(ab[has] > 0, ab[has], np.nan)
+            fb[has] = np.nanmedian(nz, axis=1) * MAD_NORMAL_SCALE
+        sc[bad] = fb
+    return sc
 
 
 def run(law: Law, setup: Setup, reps: int, seed: int, garch_targets=None) -> dict:

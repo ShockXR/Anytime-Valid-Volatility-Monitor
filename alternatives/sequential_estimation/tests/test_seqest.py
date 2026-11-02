@@ -309,3 +309,16 @@ def test_minimum_risk_rule_brute_force():
                 want = n
                 break
         assert out["MinRisk-raw"].N[i] == want
+
+
+def test_pilot_scale_falls_back_to_nonzero_median():
+    # real one-minute returns are often exactly zero; a pilot with a zero median absolute return
+    # uses the median of the nonzero absolute returns, as the package's monitor does
+    k = S.MAD_NORMAL_SCALE
+    rp = np.array([[1.0, -2.0, 3.0, -4.0, 5.0],  # ordinary row
+                   [0.0, 0.0, 0.0, 2.0, -6.0],  # median |r| = 0 -> median of {2, 6}
+                   [0.0, 0.0, 0.0, 0.0, 0.0]])  # nothing to use -> 0
+    sc = S.pilot_scale(rp)
+    assert sc[0] == pytest.approx(3.0 * k)
+    assert sc[1] == pytest.approx(4.0 * k)
+    assert sc[2] == 0.0

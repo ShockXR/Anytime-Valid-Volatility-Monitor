@@ -388,33 +388,53 @@ def part_real():
     m, cap = 30, 1440
     R, starts, elapsed, tidx = real_windows(u, m, cap)
     log(f"{R.shape[0]} windows (start hours), median span of {m + cap} returns: {np.median(elapsed):.0f} minutes")
+    fallback = float((np.median(np.abs(R[:, :m]), axis=1) == 0).mean())
+    zero_share = float((R == 0).mean())
+    log(f"share of zero returns {zero_share:.3f}; pilots with median |r| = 0 (nonzero fallback): {fallback:.4f}")
+    # in-window proxy for n*: z^2 CV^2 / d^2 with CV^2 of min(r^2, tau^2) over the returns after the pilot.
+    # It is a descriptive yardstick only: within a window the volatility is not constant.
+    tau = 3.0 * S.pilot_scale(R[:, :m])  # c = 3, as in Setup
+    xt = np.minimum(R[:, m:] ** 2, tau[:, None] ** 2)
+    with np.errstate(all="ignore"):
+        cv2 = xt.var(axis=1, ddof=1) / xt.mean(axis=1) ** 2
+    log(f"in-window CV^2 of truncated squares: median {np.nanmedian(cv2):.3f} (Gaussian value 1.921)")
     rows, summ = [], []
+    configs = ((("CR-raw", "CR-trunc", "Stein-trunc", "CS-opt", "CS-bet"), True), (("CS-opt", "CS-bet"), False))
     for alpha in (0.05, 0.10):
+        z = S.zq(alpha)
         for d in (0.5, 0.4, 0.3, 0.2):
-            procs = ("CR-raw", "CR-trunc", "Stein-trunc", "CS-opt", "CS-bet")
-            st = S.Setup(d=d, alpha=alpha, m=m, relative=True, procs=procs, n_max=m + cap)
-            out = S.run(S.Windows(R), st, R.shape[0], 0)
-            for p in procs:
-                res = out[p]
-                N = res.N
-                # minutes on the clock from the hour's start to the stopping return (gaps make it longer than N)
-                minutes = (tidx[np.arange(N.size), np.minimum(N, m + cap) - 1] - starts.values) / np.timedelta64(1, "m") + 1
-                df = pd.DataFrame(dict(hour=starts.hour, N=N, minutes=minutes, capped=res.capped,
-                                       est=res.est, lo=res.lo, hi=res.hi))
-                for h, g in df.groupby("hour"):
-                    rows.append(dict(alpha=alpha, d=d, proc=p, hour=h, windows=len(g), N_median=g.N.median(),
-                                     N_mean=g.N.mean(), N_q90=g.N.quantile(0.9),
-                                     minutes_median=g.minutes.median(),
-                                     stop_within_60=float((g.minutes <= 60).mean()),
-                                     stop_within_240=float((g.minutes <= 240).mean()),
-                                     no_stop_within_cap=float(g.capped.mean())))
-                summ.append(dict(alpha=alpha, d=d, proc=p, windows=len(df), N_median=df.N.median(),
-                                 N_mean=df.N.mean(), N_q90=df.N.quantile(0.9),
-                                 stop_within_60=float((df.minutes <= 60).mean()),
-                                 no_stop_within_cap=float(df.capped.mean()),
-                                 hour_with_largest_median=int(df.groupby("hour").N.median().idxmax()),
-                                 largest_hour_median=float(df.groupby("hour").N.median().max()),
-                                 smallest_hour_median=float(df.groupby("hour").N.median().min())))
+            nstar_proxy = z ** 2 * cv2 / d ** 2
+            for procs, inter in configs:
+                st = S.Setup(d=d, alpha=alpha, m=m, relative=True, procs=procs, n_max=m + cap, intersect=inter)
+                out = S.run(S.Windows(R), st, R.shape[0], 0)
+                for p in procs:
+                    res = out[p]
+                    N = res.N
+                    # minutes on the clock from the hour's start to the stopping return (gaps make it longer than N)
+                    minutes = (tidx[np.arange(N.size), np.minimum(N, m + cap) - 1] - starts.values) / np.timedelta64(1, "m") + 1
+                    df = pd.DataFrame(dict(hour=starts.hour, N=N, minutes=minutes, capped=res.capped,
+                                           est=res.est, lo=res.lo, hi=res.hi, ratio=N / nstar_proxy))
+                    for h, g in df.groupby("hour"):
+                        rows.append(dict(alpha=alpha, d=d, proc=p, intersect=inter, hour=h, windows=len(g),
+                                         N_median=g.N.median(), N_mean=g.N.mean(), N_q90=g.N.quantile(0.9),
+                                         minutes_median=g.minutes.median(),
+                                         stop_within_60=float((g.minutes <= 60).mean()),
+                                         stop_within_240=float((g.minutes <= 240).mean()),
+                                         no_stop_within_cap=float(g.capped.mean())))
+                    byh = df.groupby("hour").minutes.median()
+                    summ.append(dict(alpha=alpha, d=d, proc=p, intersect=inter, windows=len(df),
+                                     pilot_fallback_share=fallback, zero_return_share=zero_share,
+                                     cv2_median=float(np.nanmedian(cv2)),
+                                     nstar_proxy_median=float(np.nanmedian(nstar_proxy)),
+                                     N_median=df.N.median(), N_mean=df.N.mean(), N_q90=df.N.quantile(0.9),
+                                     N_over_nstar_proxy_median=float(np.nanmedian(df.ratio)),
+                                     minutes_median=df.minutes.median(),
+                                     stop_within_60=float((df.minutes <= 60).mean()),
+                                     no_stop_within_cap=float(df.capped.mean()),
+                                     hour_with_largest_median=int(byh.idxmax()),
+                                     largest_hour_median_minutes=float(byh.max()),
+                                     hour_with_smallest_median=int(byh.idxmin()),
+                                     smallest_hour_median_minutes=float(byh.min())))
             log(f"real alpha={alpha} d={d} done")
     pd.DataFrame(rows).to_csv(RES / "h_real_hourly.csv", index=False)
     pd.DataFrame(summ).to_csv(RES / "h_real_summary.csv", index=False)
@@ -514,6 +534,9 @@ def part_figs():
         ax.axhline(0.95, color="k", lw=0.8, ls=":")
         ax.set_xscale("log")
         ax.set_ylim(0.4, 1.01)
+        ax.set_xticks([0.05, 0.1, 0.2, 0.4])
+        ax.set_xticks([], minor=True)
+        ax.set_xticklabels(["0.05", "0.1", "0.2", "0.4"])
         ax.set_title(f"{lawname} [SYNTHETIC]")
         ax.set_xlabel("relative half-width d")
     axes[0].set_ylabel("coverage at N (alpha = 0.05)")
@@ -521,26 +544,37 @@ def part_figs():
     fig.tight_layout()
     fig.savefig(RES / "fig2_coverage_by_law.png", dpi=130)
     plt.close(fig)
-    # Figure 3: real data, median minutes by start hour
+    # Figure 3: real data, median minutes by start hour and share not stopped within the hour
     h = RES / "h_real_hourly.csv"
     if h.exists():
-        r = pd.read_csv(h)
-        fig, axes = plt.subplots(1, 2, figsize=(11, 3.8))
-        sub = r[(r.alpha == 0.05) & (r.d == 0.3)]
-        for p in ("CR-raw", "CR-trunc", "CS-opt", "CS-bet"):
-            s = sub[sub.proc == p].sort_values("hour")
-            axes[0].plot(s.hour, s.N_median, "o-", color=colors[p], label=p)
-        axes[0].set_xlabel("start hour (UTC)")
-        axes[0].set_ylabel("median returns until stop")
-        axes[0].set_title("BTCUSDT, +/- 30%, alpha 0.05 [REAL]")
-        axes[0].legend(fontsize=7)
-        sub = r[(r.alpha == 0.05) & (r.d == 0.5)]
-        for p in ("CR-raw", "CR-trunc", "CS-opt", "CS-bet"):
-            s = sub[sub.proc == p].sort_values("hour")
-            axes[1].plot(s.hour, 1 - s.stop_within_60, "o-", color=colors[p], label=p)
-        axes[1].set_xlabel("start hour (UTC)")
-        axes[1].set_ylabel("share not stopped within 60 minutes")
-        axes[1].set_title("BTCUSDT, +/- 50%, alpha 0.05 [REAL]")
+        r_all = pd.read_csv(h)
+        r = r_all[r_all.intersect.astype(str) == "True"]
+        r_ni = r_all[r_all.intersect.astype(str) == "False"]
+        fig, axes = plt.subplots(1, 3, figsize=(15, 3.9))
+        for ax, d, lab in ((axes[0], 0.4, "d = 0.4 (about +/- 20% on volatility)"),
+                           (axes[1], 0.2, "d = 0.2 (+/- 20% on variance)")):
+            sub = r[(r.alpha == 0.05) & (r.d == d)]
+            for p in ("CR-raw", "CR-trunc", "Stein-trunc", "CS-opt", "CS-bet"):
+                s_ = sub[sub.proc == p].sort_values("hour")
+                ax.plot(s_.hour, s_.minutes_median, "o-", ms=3, color=colors[p], label=p)
+            s_ = r_ni[(r_ni.alpha == 0.05) & (r_ni.d == d) & (r_ni.proc == "CS-bet")].sort_values("hour")
+            ax.plot(s_.hour, s_.minutes_median, "o--", ms=3, color=colors["CS-bet"], mfc="white",
+                    label="CS-bet, no intersection")
+            if d == 0.4:
+                ax.axhline(60, color="k", lw=0.6, ls=":")
+            ax.set_xlabel("start hour (UTC)")
+            ax.set_ylabel("median minutes until stop")
+            ax.set_title(f"BTCUSDT, {lab}, alpha 0.05 [REAL]", fontsize=9)
+        hnd, lab = axes[0].get_legend_handles_labels()
+        axes[2].legend(hnd, lab, fontsize=7, ncol=2, loc="upper right", bbox_to_anchor=(1.0, 0.93))
+        sub = r[(r.alpha == 0.05) & (r.d == 0.4)]
+        for p in ("CR-raw", "CR-trunc", "Stein-trunc", "CS-opt", "CS-bet"):
+            s_ = sub[sub.proc == p].sort_values("hour")
+            axes[2].plot(s_.hour, 1 - s_.stop_within_60, "o-", ms=3, color=colors[p], label=p)
+        axes[2].set_ylim(0, 1.02)
+        axes[2].set_xlabel("start hour (UTC)")
+        axes[2].set_ylabel("share not stopped within 60 minutes")
+        axes[2].set_title("BTCUSDT, d = 0.4, alpha 0.05 [REAL]", fontsize=9)
         fig.tight_layout()
         fig.savefig(RES / "fig3_real_minutes_by_hour.png", dpi=130)
         plt.close(fig)
