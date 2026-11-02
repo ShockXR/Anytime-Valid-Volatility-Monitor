@@ -378,7 +378,9 @@ def delay_second_order(A: float, weight: float, g: float, kappa: float, zeta: fl
 
 def speed_limit(A: float, factors, weights) -> int:
     """Smallest n at which the SR mixture can reach ``A`` when every bet earns its largest possible
-    factor at every step (``factors[k] = sup f``). No detector of this form can alarm sooner."""
+    factor at every step (``factors[k] = sup f``). This mixture, with these bets and weights, cannot
+    alarm sooner. For the floor of every valid decrease detector of SR form see
+    ``decrease_speed_limit``."""
     factors = np.asarray(factors, float)
     weights = np.asarray(weights, float)
     M = np.zeros_like(factors)
@@ -387,6 +389,36 @@ def speed_limit(A: float, factors, weights) -> int:
         if float(M @ weights) >= A:
             return n
     return -1
+
+
+def sr_steps_constant_factor(A: float, F: float) -> int:
+    """Steps a Shiryaev-Roberts statistic started at 0 needs to reach ``A`` when every step multiplies
+    by the same factor ``F > 1``.
+
+    ``M_n = sum_{j=1}^{n} F^(n-j+1) = F (F^n - 1) / (F - 1)``, so ``M_n >= A`` exactly when
+    ``F^n >= 1 + A (F - 1) / F`` (docs/theory_delay.md, Corollary 4).
+    """
+    if not F > 1:
+        raise ValueError("F must exceed 1")
+    n = int(np.ceil(np.log1p(A * (F - 1.0) / F) / np.log(F)))
+    while F * (F**n - 1.0) / (F - 1.0) < A:  # guard against rounding at an exact integer
+        n += 1
+    return max(n, 1)
+
+
+def decrease_speed_limit(A: float, B: float) -> int:
+    """Fewest steps in which any Shiryaev-Roberts e-detector whose factors are valid for the whole
+    nonparametric null can reach ``A`` against a decrease, ``B = tau^2 / m0``.
+
+    Every such factor is at most ``B / (B - 1)`` (Lemma 2a and Corollary 4 of docs/theory_delay.md),
+    so ``M_n <= B ((B / (B - 1))^n - 1)`` for every mixture of bets, fixed or chosen predictably.
+    The floor is ``ceil(log(1 + A / B) / log(B / (B - 1)))``, reached in the limit by a single bet
+    at ``lam_max`` when every return is zero. A grid that puts weight on smaller bets is slower
+    (``speed_limit``).
+    """
+    if not (np.isfinite(B) and B > 1):
+        raise ValueError("B must be finite and above 1")
+    return sr_steps_constant_factor(A, B / (B - 1.0))
 
 
 # ----------------------------------------------------------------------------
