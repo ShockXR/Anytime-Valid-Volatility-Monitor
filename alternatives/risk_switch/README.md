@@ -145,8 +145,9 @@ alternatives/risk_switch/
 ├── strategies.py           exposure rules (EWMA, robust rolling, switch), data preparation
 ├── backtest.py             accounting, metrics, block bootstrap
 ├── run_experiment.py       the experiment (research questions in its docstring)
+├── summarise.py            renders results/summary_tables.md from the CSV files
 ├── tests/test_risk_switch.py   synthetic tests, about 4 seconds, no data needed
-└── results/                CSV tables, frozen_parameters.json, figures/
+└── results/                CSV tables, summary_tables.md, frozen_parameters.json, figures/
 ```
 
 The code imports `avmonitor` (the monitor, the data loaders, the intraday
@@ -192,8 +193,10 @@ rule's exposure before that bar moves.
   by circular block bootstrap. Nifty is also broken down by calendar year.
 
 Run everything with `python alternatives/risk_switch/run_experiment.py` (about
-seven minutes on two cores; `--quick` runs one coin in two minutes). Tests:
-`python -m pytest -q alternatives/risk_switch/tests`.
+nine minutes on one core; `--quick` runs one coin in two minutes), then
+`python alternatives/risk_switch/summarise.py` for the tables. Tests:
+`python -m pytest -q alternatives/risk_switch/tests` (synthetic data only, so
+they also run in CI without `data/raw`).
 
 ## 7. Limitations
 

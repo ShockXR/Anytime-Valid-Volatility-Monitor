@@ -41,3 +41,23 @@ One entry per substantial iteration, in order. All dates are 2 November 2026 (UT
 **REMAINING ISSUES.** None blocking.
 
 **NEXT ITERATION.** Full run and write-up.
+
+## Iteration 3: full run, five coins and nine years of Nifty
+
+**OBJECTIVE.** Produce the frozen out-of-sample results and write them up.
+
+**PROBLEM IDENTIFIED.** With all five coins in the selection sample, the switch family does have variants within the 2% cost budget (band 0.75, "hold"), so the flagged fallback was only needed for the Gaussian-driven switch. The frozen set: EWMA half-lives 3 days (minute, hour) and 1 day (day), robust rolling 3-day window, robust switch with 5% budget, band 0.75, no provisional trade; `k = 1.216`.
+
+**HYPOTHESIS.** Before the run, the expected finding was "the switch matches EWMA targeting with fewer trades".
+
+**CHANGES IMPLEMENTED.** `summarise.py` renders every table in `RESULTS.md` from the CSV files, so no number is typed by hand.
+
+**EXPERIMENTS PERFORMED.** `run_experiment.py` (551 s on one core): 34 variants on 5 coins in 2024, the frozen 7 rules on 2025 per coin and as an equal-weight portfolio, the same on Nifty 2017 to 2026 with a by-year breakdown, paired block-bootstrap Sharpe differences, cost sensitivity, alarm counts.
+
+**RESULTS.** [REAL] Out of sample the switch's tails match daily EWMA targeting (crypto equal-weight portfolio 2025: maximum drawdown 34.4% against 33.8%, worst day 8.6% against 9.0%; Nifty: 28.1% against 30.8%) with 93 trades a year against 365 on crypto and 12 against 246 on Nifty. Its tracking RMS is worse (0.271 against 0.205 on crypto, 0.402 against 0.242 on Nifty). Crypto turnover is equal (31.5 against 29.9 units a year) because each alarm-driven trade is about four times larger. All paired Sharpe differences have intervals containing zero. The Gaussian-driven switch alarms 3.3 to 5 times as often, costs twice as much and has worse tails on both markets. The alarm rate barely depends on the false-alarm budget (5% against 1%: 6% to 14% fewer alarms), so the alarms reflect real volatility moves.
+
+**IMPROVEMENTS.** The write-up (`RESULTS.md`, `docs/report_parts/ALT2.md`) reports the negative tracking result and the positive trigger result side by side.
+
+**REMAINING ISSUES.** (1) The regime estimate is a one-day robust scale times a fixed factor; it ignores the jump days that dominate realised variance, so robust rules run above target on crypto (robust rolling 47.8% against a 40% target). (2) The hold-until-alarm design cannot follow slow drifts, which is the whole gap in tracking. (3) One crypto test year and one index; the cost model is one number per unit of turnover.
+
+**NEXT ITERATION.** Two cheap variants worth testing before giving up on the idea: (a) a hybrid that uses the alarm only as a permission to trade and the EWMA as the size, which would cap trade counts without freezing exposure; (b) a direction-aware switch that moves exposure at the alarm by the monitor's own evidence (the best-performing bet in the grid tells roughly how large the change is), which would remove the one-day lag of the "hold" variant without the noisy 120-minute provisional estimate. Neither is implemented here.
