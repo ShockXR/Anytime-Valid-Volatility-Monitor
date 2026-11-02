@@ -123,17 +123,18 @@ def test_update_frequency_limits_trades(prepared):
 
 
 def test_switch_cuts_exposure_after_volatility_doubles():
-    df = synthetic_frame(n_days=14, sd=5e-4, change_day=8, ratio=2.0, seed=2)
+    # 10 extra warm-up days: the intraday profile is NaN until enough past days exist (start="past")
+    df = synthetic_frame(n_days=24, sd=5e-4, change_day=18, ratio=2.0, seed=2)
     P = S.prepare(df, S.CRYPTO)
     k = S.robust_to_sd_factor(P)
     assert 0.8 < k < 1.2  # Gaussian data: robust scale is already a standard deviation
     mon = S.make_monitor("robust", 1440.0, 720, 0.0)
     ev = S.monitor_events(P.u, mon)
     alarms = [e for e in ev if e["kind"] == "alarm"]
-    assert any(e["direction"] == "up" and 8 * 1440 <= e["index"] < 9 * 1440 for e in alarms)
+    assert any(e["direction"] == "up" and 18 * 1440 <= e["index"] < 19 * 1440 for e in alarms)
     w = S.switch_exposure(P, ev, k, 0.3, 3.0, fast_window=120)
-    before = w[5 * 1440 : 8 * 1440].mean()
-    after = w[10 * 1440 :].mean()
+    before = w[15 * 1440 : 18 * 1440].mean()
+    after = w[20 * 1440 :].mean()
     assert 0.35 < after / before < 0.7
     # exposure is piecewise constant: it changes only at events
     n_changes = int((np.abs(np.diff(w)) > 0).sum())
