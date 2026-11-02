@@ -49,9 +49,9 @@ from collections import deque
 from dataclasses import dataclass, field
 
 import numpy as np
-from scipy import optimize, stats
+from scipy import optimize, special, stats
 
-from .confseq import eb_confseq
+from .confseq import eb_confseq, psi_coef
 from .detectors import DEFAULT_DOWN_FRACTIONS, DEFAULT_UP_GRID
 from .monitor import Event
 from .robust import MAD_NORMAL_SCALE
@@ -460,8 +460,8 @@ def conformal_pvalues(a, rng: np.random.Generator) -> np.ndarray:
 
 
 def _abs_normal_quantile(u):
-    """``q(u)``: the value with ``P(|Z| > q) = u`` for a standard normal Z."""
-    return stats.norm.isf(np.asarray(u, float) / 2.0)
+    """``q(u)``: the value with ``P(|Z| > q) = u`` for a standard normal Z (``-Phi^-1(u / 2)``)."""
+    return -special.ndtri(np.asarray(u, float) / 2.0)
 
 
 def lr_bet_factory(rho: float, u0: float = 2 * stats.norm.sf(3.0), lam: float = 1.0):
@@ -520,6 +520,36 @@ def bet_family(name: str):
     return up, dn
 
 
+def family_factors(name: str):
+    """Vectorised evaluator ``p -> (factors of the increase bets, factors of the decrease bets)``.
+
+    Same functions as ``bet_family(name)``, computed in one pass (for speed); p may be a
+    scalar or a 1-d array, the output arrays have shape (len(p), K).
+    """
+    up, dn = bet_family(name)
+    if name == "ind":
+        lu = np.array([a for a, _ in IND_UP]); wu = np.array([l for _, l in IND_UP])
+        ld = np.array([b for b, _ in IND_DOWN]); wd = np.array([l for _, l in IND_DOWN])
+
+        def ev(p):
+            p = np.atleast_1d(np.asarray(p, float))[:, None]
+            return 1.0 + wu * ((p <= lu) / lu - 1.0), 1.0 + wd * ((p > 1.0 - ld) / ld - 1.0)
+
+        return ev
+    u0 = up[0].u0
+    ku = np.array([f.rho**-2 - 1.0 for f in up]); cu = np.array([1.0 / (f.rho * f.norm_const) for f in up])
+    lu = np.array([f.lam for f in up])
+    kd = np.array([f.rho**-2 - 1.0 for f in dn]); cd = np.array([1.0 / (f.rho * f.norm_const) for f in dn])
+    ld = np.array([f.lam for f in dn])
+
+    def ev(p):
+        p = np.atleast_1d(np.asarray(p, float))
+        q2 = (-special.ndtri(np.maximum(p, u0) / 2.0))[:, None] ** 2
+        return 1.0 + lu * (cu * np.exp(-q2 * ku / 2.0) - 1.0), 1.0 + ld * (cd * np.exp(-q2 * kd / 2.0) - 1.0)
+
+    return ev
+
+
 def conformal_detector(a, rng: np.random.Generator, warmup: int, levels, family: str = "lr",
                        freeze_at: float | None = None, kind: str = "SR", band: float = 0.0):
     """Route B on rows of ``a`` (scores ``|r|``): first alarms of the increase and the decrease statistic.
@@ -538,6 +568,7 @@ def conformal_detector(a, rng: np.random.Generator, warmup: int, levels, family:
     a = np.atleast_2d(np.asarray(a, float))
     reps, n = a.shape
     up, dn = bet_family(family)
+    fam = family_factors(family)
     rk = dense_ranks(a)
     fw = _RowFenwick(reps, int(rk.max()))
     theta = rng.random((reps, n))
@@ -555,8 +586,7 @@ def conformal_detector(a, rng: np.random.Generator, warmup: int, levels, family:
             le = fw.count_le(q)
             lt = fw.count_le(q - 1)
             p = (size - le + theta[:, t] * (le - lt + 1)) / (size + 1.0)
-            fu = np.column_stack([f(p) for f in up])
-            fd = np.column_stack([f(p) for f in dn])
+            fu, fd = fam(p)
             if band:
                 fu = 1.0 + (fu - 1.0 - band) / (1.0 + band)
                 fd = 1.0 + (fd - 1.0 - band) / (1.0 + band)
@@ -720,14 +750,22 @@ class ConformalMonitor:
     the Shiryaev-Roberts statistics of the increase and the decrease family (each at
     ``2 A``) and adds ``|r_t|`` to the reference set. Under exchangeability within each
     segment, P(false alarm within m monitored steps) <= m / A exactly. ``baseline_scale``
-    in an event is the scaled MAD of the warm-up returns (for the E5c validation).
+    in an event is the scaled MAD of the reference set at the alarm (the returns the alarm
+    compares against; the warm-up returns if fewer than 30), for the E5c validation.
+
+    ``restart_len`` (default ``cal_len``) is the warm-up after an alarm. ``restart_len=0``
+    gives a monitor with no blind period: after an alarm it bets from the very next
+    return, against a reference set that starts empty and grows; the guarantee is
+    unchanged because the p-values are exact from the first one.
     """
 
     def __init__(self, threshold: float = 28800.0, cal_len: int = 1440, family: str = "lr", band: float = 0.0,
-                 seed: int = 0, kind: str = "SR"):
+                 seed: int = 0, kind: str = "SR", restart_len: int | None = None):
         self.A = float(threshold)
         self.cal_len = int(cal_len)
+        self.restart_len = self.cal_len if restart_len is None else int(restart_len)
         self.up, self.dn = bet_family(family)
+        self.fam = family_factors(family)
         self.band = band
         self.kind = kind
         self.rng = np.random.default_rng(seed)
@@ -736,11 +774,20 @@ class ConformalMonitor:
         self.segments: list[dict] = []
         self._reset()
 
-    def _reset(self):
+    def _reset(self, warm: int | None = None):
         self.ref: list[float] = []
         self.calibrated = False
+        self.warm = self.cal_len if warm is None else warm
         self.S_up = np.zeros(len(self.up))
         self.S_dn = np.zeros(len(self.dn))
+        if self.warm == 0:
+            self._start()
+
+    def _start(self):
+        self.calibrated = True
+        self.start = self.t + 1
+        self.scale = float(np.median(self.ref) * MAD_NORMAL_SCALE) if self.ref else float("nan")
+        self.segments.append(dict(start=self.start, scale=self.scale))
 
     def pvalue(self, a: float) -> float:
         n = len(self.ref)
@@ -755,15 +802,12 @@ class ConformalMonitor:
         a = abs(r)
         if not self.calibrated:
             bisect.insort(self.ref, a)
-            if len(self.ref) >= self.cal_len:
-                self.calibrated = True
-                self.start = self.t + 1
-                self.scale = float(np.median(self.ref) * MAD_NORMAL_SCALE)
-                self.segments.append(dict(start=self.start, scale=self.scale))
+            if len(self.ref) >= self.warm:
+                self._start()
             return None
         p = self.pvalue(a)
-        fu = np.array([f(p) for f in self.up], float).ravel()
-        fd = np.array([f(p) for f in self.dn], float).ravel()
+        fu, fd = self.fam(p)
+        fu, fd = fu[0], fd[0]
         if self.band:
             fu = 1.0 + (fu - 1.0 - self.band) / (1.0 + self.band)
             fd = 1.0 + (fd - 1.0 - self.band) / (1.0 + self.band)
@@ -773,16 +817,324 @@ class ConformalMonitor:
         else:
             self.S_up = fu * np.maximum(self.S_up, 1.0)
             self.S_dn = fd * np.maximum(self.S_dn, 1.0)
-        bisect.insort(self.ref, a)
         mu, md = self.S_up.mean(), self.S_dn.mean()
         ev = None
-        if mu >= 2 * self.A:
-            ev = Event(self.t, "up", self.start, self.scale, float(mu))
-        elif md >= 2 * self.A:
-            ev = Event(self.t, "down", self.start, self.scale, float(md))
+        if mu >= 2 * self.A or md >= 2 * self.A:
+            scale = float(np.median(self.ref) * MAD_NORMAL_SCALE) if len(self.ref) >= 30 else self.scale
+            if mu >= 2 * self.A:
+                ev = Event(self.t, "up", self.start, scale, float(mu))
+            else:
+                ev = Event(self.t, "down", self.start, scale, float(md))
+        bisect.insort(self.ref, a)
         if ev is not None:
             self.events.append(ev)
-            self._reset()
+            self._reset(self.restart_len)
+        return ev
+
+    def run(self, returns) -> list[Event]:
+        for r in np.asarray(returns, float):
+            self.update(r)
+        return self.events
+
+
+# ----------------------------------------------------------------------------
+# 7. Monitoring with no blind period (route A "awake", staggered bands)
+# ----------------------------------------------------------------------------
+
+AWAKE_PRE = 120  # finite returns before a (re)start that centre the grid of truncation levels
+AWAKE_LEARN = 1440  # the band learns from the first 1440 monitored returns of a segment, then is frozen
+AWAKE_N_PLAN = 300  # bet schedule of the learning confidence sequences (tightest near 300 observations)
+AWAKE_FIRST_EPOCH = 16
+AWAKE_EPOCH_RATIO = 2.0 ** 0.5
+
+
+def awake_epochs(n_learn: int = AWAKE_LEARN, first: int = AWAKE_FIRST_EPOCH, ratio: float = AWAKE_EPOCH_RATIO):
+    """Snapshot sizes ``0 = e_0 < e_1 < ... < e_last = n_learn`` (observations in the band at each snapshot).
+
+    The chain started at segment step s (s = 0, 1, ...) bets against the band built from the
+    first ``e(s)`` returns of the segment, ``e(s)`` = the largest snapshot size ``<= s``, so the
+    band uses only returns before s. Geometric sizes keep the number of snapshots at
+    O(log n_learn) while each chain uses at least ``s / ratio`` returns.
+    """
+    sizes = {0, int(n_learn)}
+    e = float(first)
+    while e < n_learn:
+        sizes.add(int(round(e)))
+        e *= ratio
+    return np.array(sorted(sizes), dtype=np.int64)
+
+
+class _LevelsCS:
+    """``confseq.StreamingEBConfSeq`` for K truncation levels at once (vectorised over levels).
+
+    Observation ``z_k = min(r^2, s_k^2) / s_k^2``; upper and lower sequences at level
+    ``delta_each`` each. Reproduces ``eb_confseq`` exactly (tested).
+    """
+
+    def __init__(self, levels, delta_each: float, n_plan: float | None = AWAKE_N_PLAN, c: float = 0.75):
+        self.s2 = np.asarray(levels, float) ** 2
+        K = self.s2.size
+        self.log_d = math.log(1.0 / delta_each)
+        self.n_plan = n_plan
+        self.c = c
+        self.t = 0
+        self.sum_z = np.zeros(K)
+        self.sum_dev2 = np.zeros(K)
+        self.zhat = np.full(K, 0.5)
+        self.var = np.full(K, 0.25)
+        self.acc = np.zeros((6, K))  # sl_u, slz_u, spe_u, sl_l, slz_l, spe_l
+
+    def update(self, r: float):
+        z = np.minimum(r * r, self.s2) / self.s2
+        self.t += 1
+        t = self.t
+        zprev, vprev = self.zhat, self.var
+        d = float(self.n_plan) if self.n_plan is not None else t * math.log1p(t)
+        e = (z - zprev) ** 2
+        base = np.sqrt(2.0 * self.log_d / (d * vprev))
+        a_u = 1.0 - zprev
+        lu = np.minimum(base, self.c / a_u)
+        a_l = zprev
+        ll = np.minimum(base, self.c / a_l)
+        acc = self.acc
+        acc[0] += lu
+        acc[1] += lu * z
+        acc[2] += lu * lu * psi_coef(lu * a_u) * e
+        acc[3] += ll
+        acc[4] += ll * z
+        acc[5] += ll * ll * psi_coef(ll * a_l) * e
+        self.sum_z += z
+        self.zhat = (0.5 + self.sum_z) / (t + 1.0)
+        self.sum_dev2 += (z - self.zhat) ** 2
+        self.var = (0.25 + self.sum_dev2) / (t + 1.0)
+
+    def bounds(self):
+        """(upper, lower) for ``m(s_k)`` in units of r^2; ``(s_k^2, 0)`` before any observation."""
+        if self.t == 0:
+            return self.s2.copy(), np.zeros_like(self.s2)
+        a = self.acc
+        up = np.minimum((a[1] + self.log_d + a[2]) / a[0], 1.0) * self.s2
+        lo = np.maximum((a[4] - self.log_d - a[5]) / a[3], 0.0) * self.s2
+        return up, lo
+
+
+def awake_band_snapshots(r_seg, center, epochs=None, delta: float = 0.01, n_plan=AWAKE_N_PLAN, cs_c: float = 0.75,
+                         ratio: float = GRID_RATIO, kmin: int = GRID_KMIN, kmax: int = GRID_KMAX, chunk: int = 100):
+    """Vectorised snapshots of the learning band for many segments.
+
+    ``r_seg`` (reps, n): the segment's returns (no NaN); ``center`` (reps,): grid centre known
+    before the segment starts. Returns ``levels`` (reps, K) and ``upper``, ``lower`` of shape
+    (reps, E, K): the band after ``epochs[e]`` observations (``epochs[0] = 0`` gives the trivial
+    band ``(s_k^2, 0)``). Each one-sided sequence has level ``delta / (2 K)``.
+    """
+    r_seg = np.atleast_2d(np.asarray(r_seg, float))
+    reps, n = r_seg.shape
+    epochs = awake_epochs() if epochs is None else np.asarray(epochs)
+    epochs = epochs[epochs <= n]
+    levels = grid_levels(center, ratio, kmin, kmax)
+    K = levels.shape[1]
+    d_each = delta / (2 * K)
+    E = epochs.size
+    upper = np.empty((reps, E, K))
+    lower = np.empty((reps, E, K))
+    upper[:, 0, :] = levels**2
+    lower[:, 0, :] = 0.0
+    m = int(epochs[-1])
+    if m > 0:
+        x2 = r_seg[:, :m] ** 2
+        for a in range(0, reps, chunk):
+            sl = slice(a, a + chunk)
+            lv2 = levels[sl] ** 2
+            b = lv2.shape[0]
+            xx = np.minimum(x2[sl][:, None, :], lv2[:, :, None]).reshape(b * K, m)
+            cs = eb_confseq(xx, lv2.reshape(-1), d_each, d_each, n_plan=n_plan, c=cs_c)
+            idx = epochs[1:] - 1
+            upper[sl, 1:, :] = cs.upper[:, idx].reshape(b, K, E - 1).transpose(0, 2, 1)
+            lower[sl, 1:, :] = cs.lower[:, idx].reshape(b, K, E - 1).transpose(0, 2, 1)
+    return levels, upper, lower, epochs
+
+
+def awake_route_a(r_pre, r_seg, levels_list, delta: float = 0.01, c: float = 3.0, null_band: float = 0.0,
+                  running: bool = True, up_grid=DEFAULT_UP_GRID, down_fracs=DEFAULT_DOWN_FRACTIONS,
+                  epochs=None, n_plan=AWAKE_N_PLAN, window: int = RUN_WINDOW, every: int = RUN_EVERY):
+    """Route A with no blind period, vectorised: first alarms of both sides from segment step 0 on.
+
+    ``r_pre`` (reps, n_pre): returns before the segment start (they centre the grid and seed
+    the running window; they are NOT part of the band). ``r_seg`` (reps, n): the segment.
+    The chain started at step s bets against the band snapshot of size ``e(s)``
+    (``awake_epochs``); chains with the same snapshot share one Shiryaev-Roberts statistic,
+    and the alarm statistic is the sum over snapshots (docs/theory_running_tau.md, Theorem A.4).
+    Returns (dict level -> (up alarms, down alarms), centre).
+    """
+    r_pre = np.atleast_2d(np.asarray(r_pre, float))
+    r_seg = np.atleast_2d(np.asarray(r_seg, float))
+    reps, n = r_seg.shape
+    center = c * scaled_mad(r_pre[:, -AWAKE_PRE:])
+    levels, U, L, ep = awake_band_snapshots(r_seg, center, epochs, delta, n_plan)
+    U = U * (1.0 + null_band)
+    L = L * (1.0 - null_band)
+    hist = np.concatenate([r_pre, r_seg], axis=1)
+    k = running_level_index(hist, r_pre.shape[1], n, center, c=c, fixed=not running, window=window, every=every)
+    E = ep.size
+    which = np.searchsorted(ep, np.arange(n), side="right") - 1  # snapshot index of a chain started at s
+    ug = np.asarray(up_grid, float)
+    df = np.asarray(down_fracs, float)
+    Su = np.zeros((reps, E, ug.size))
+    Sd = np.zeros((reps, E, df.size))
+    rows = np.arange(reps)
+    levels_list = sorted(levels_list)
+    out = {Lv: [np.full(reps, -1), np.full(reps, -1)] for Lv in levels_list}
+    top = levels_list[-1]
+    for t in range(n):
+        e_now = which[t]
+        kt = k[:, t]
+        tau2 = levels[rows, kt] ** 2  # (reps,)
+        x = np.minimum(r_seg[:, t] ** 2, tau2)
+        cols = np.arange(e_now + 1)[None, :]
+        u = U[rows[:, None], cols, kt[:, None]]  # (reps, e_now + 1): each snapshot's bound at tau_t
+        l_ = L[rows[:, None], cols, kt[:, None]]
+        fu = 1.0 + ug[None, None, :] * ((x[:, None] / u)[:, :, None] - 1.0)
+        on = (l_ > 0) & (tau2[:, None] > l_)
+        ls = np.where(on, l_, 1.0)
+        B = np.where(on, tau2[:, None] / ls, 2.0)
+        lam = np.where(on[:, :, None], df[None, None, :] / (B[:, :, None] - 1.0), 0.0)
+        fd = 1.0 + lam * (1.0 - (x[:, None] / ls)[:, :, None])
+        add = np.zeros((1, e_now + 1, 1))
+        add[0, e_now, 0] = 1.0
+        with np.errstate(over="ignore"):
+            Su[:, : e_now + 1] = fu * (Su[:, : e_now + 1] + add)
+            Sd[:, : e_now + 1] = fd * (Sd[:, : e_now + 1] + add)
+        Mu = Su.mean(axis=2).sum(axis=1)
+        Md = Sd.mean(axis=2).sum(axis=1)
+        for Lv in levels_list:
+            au, ad = out[Lv]
+            au[(au < 0) & (Mu >= Lv)] = t
+            ad[(ad < 0) & (Md >= Lv)] = t
+        if t % 64 == 0 and (out[top][0] >= 0).all() and (out[top][1] >= 0).all():
+            break
+    return out, center
+
+
+class AwakeRunningTauMonitor:
+    """Route A with no blind period after an alarm (streaming).
+
+    Start-up: the first ``n_pre`` finite returns of the stream centre the grid (the only
+    blind stretch). A segment then monitors from its first return: a K-level learning band
+    (``_LevelsCS``, total failure probability ``delta``, bet schedule ``n_plan``) is updated
+    with each of the first ``n_learn`` returns and then frozen; snapshots are taken at the
+    sizes ``awake_epochs(n_learn)``; the chain started at step s bets against the latest
+    snapshot taken before s, with the running ``tau_t`` of ``RunningTauMonitor``; one
+    Shiryaev-Roberts statistic per snapshot, summed; each side alarms at ``2 A``. After an
+    alarm a new segment starts at the next return, its grid centred on ``c`` x the scaled MAD
+    of the last ``n_pre`` finite returns (all before the new segment). Guarantee (per segment,
+    i.i.d. returns within the segment): P(false alarm within m) <= delta + m / A.
+    """
+
+    def __init__(self, threshold: float = 36000.0, c: float = 3.0, delta: float = 0.01, null_band: float = 0.0,
+                 running: bool = True, window: int = RUN_WINDOW, every: int = RUN_EVERY, n_pre: int = AWAKE_PRE,
+                 n_learn: int = AWAKE_LEARN, n_plan: float | None = AWAKE_N_PLAN, up_grid=DEFAULT_UP_GRID,
+                 down_fractions=DEFAULT_DOWN_FRACTIONS):
+        self.A = float(threshold)
+        self.c = c
+        self.delta = delta
+        self.band = null_band
+        self.running = running
+        self.window = window
+        self.every = every
+        self.n_pre = n_pre
+        self.n_learn = n_learn
+        self.n_plan = n_plan
+        self.epochs = set(int(e) for e in awake_epochs(n_learn))
+        self.up_grid = np.asarray(up_grid, float)
+        self.down_fractions = np.asarray(down_fractions, float)
+        self.K = GRID_KMAX - GRID_KMIN + 1
+        self.t = -1
+        self.events: list[Event] = []
+        self.segments: list[dict] = []
+        self.recent: deque = deque(maxlen=max(window, n_pre))
+        self.calibrated = False
+
+    def _center(self):
+        r = np.asarray(self.recent)[-self.n_pre :]
+        s = scaled_mad(r)
+        if not s > 0:
+            nz = np.abs(r[r != 0])
+            s = float(np.median(nz) * MAD_NORMAL_SCALE) if nz.size else 0.0
+        return self.c * s
+
+    def _start(self):
+        center = self._center()
+        if not center > 0:
+            self.calibrated = False
+            return
+        self.center = center
+        self.levels = grid_levels(np.array([center]))[0]
+        self.cs = _LevelsCS(self.levels, self.delta / (2 * self.K), self.n_plan)
+        self.snaps_U: list[np.ndarray] = []
+        self.snaps_L: list[np.ndarray] = []
+        self.S_up = np.zeros((0, self.up_grid.size))
+        self.S_dn = np.zeros((0, self.down_fractions.size))
+        self.n_seg = 0
+        self.seg_returns: list[float] = []
+        self.start = self.t + 1
+        self.calibrated = True
+        self._set_level()
+        self.segments.append(dict(start=self.start, center=center))
+
+    def _set_level(self):
+        if not self.running:
+            self.k = -GRID_KMIN
+            return
+        s = self.c * scaled_mad(np.asarray(self.recent)[-self.window :])
+        k = round(math.log(s / self.center) / math.log(GRID_RATIO)) if s > 0 else GRID_KMIN
+        self.k = int(min(max(k, GRID_KMIN), GRID_KMAX)) - GRID_KMIN
+
+    def update(self, r: float) -> Event | None:
+        self.t += 1
+        if not math.isfinite(r):
+            return None
+        if not self.calibrated:
+            self.recent.append(r)
+            if len(self.recent) >= self.n_pre:
+                self._start()
+            return None
+        s = self.n_seg
+        if s > 0 and s % self.every == 0:
+            self._set_level()
+        if s in self.epochs:
+            u, l_ = self.cs.bounds()
+            self.snaps_U.append(u * (1.0 + self.band))
+            self.snaps_L.append(l_ * (1.0 - self.band))
+            self.S_up = np.vstack([self.S_up, np.zeros(self.up_grid.size)])
+            self.S_dn = np.vstack([self.S_dn, np.zeros(self.down_fractions.size)])
+        k = self.k
+        tau2 = self.levels[k] ** 2
+        x = min(r * r, tau2)
+        U = np.array([v[k] for v in self.snaps_U])
+        L = np.array([v[k] for v in self.snaps_L])
+        fu = 1.0 + self.up_grid[None, :] * (x / U[:, None] - 1.0)
+        on = (L > 0) & (tau2 > L)
+        Ls = np.where(on, L, 1.0)
+        lam = np.where(on[:, None], self.down_fractions[None, :] / (np.where(on, tau2 / Ls, 2.0)[:, None] - 1.0), 0.0)
+        fd = 1.0 + lam * (1.0 - (x / Ls)[:, None])
+        self.S_up[-1] += 1.0
+        self.S_dn[-1] += 1.0
+        self.S_up *= fu
+        self.S_dn *= fd
+        if s < self.n_learn:
+            self.cs.update(r)
+            self.seg_returns.append(r)
+        self.recent.append(r)
+        self.n_seg += 1
+        mu = float(self.S_up.mean(axis=1).sum())
+        md = float(self.S_dn.mean(axis=1).sum())
+        ev = None
+        if mu >= 2 * self.A or md >= 2 * self.A:
+            seg = np.asarray(self.seg_returns)
+            scale = float(scaled_mad(seg)) if seg.size >= 30 else self.center / self.c
+            ev = Event(self.t, "up" if mu >= 2 * self.A else "down", self.start, scale, max(mu, md))
+            self.events.append(ev)
+            self._start()
         return ev
 
     def run(self, returns) -> list[Event]:

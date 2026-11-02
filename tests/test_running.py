@@ -264,3 +264,62 @@ def test_streaming_monitors_handle_missing_and_zero_returns():
                 R.ConformalMonitor(threshold=1e6, cal_len=500)):
         mon.run(r)
         assert mon.calibrated
+
+
+# ----------------------------------------------------------------------------
+# No blind period
+# ----------------------------------------------------------------------------
+
+
+def test_levels_cs_matches_eb_confseq():
+    rng = np.random.default_rng(17)
+    r = rng.standard_t(4, 500)
+    levels = R.grid_levels(np.array([3.0]))[0]
+    cs = R._LevelsCS(levels, 0.001, n_plan=300)
+    ups, los = [], []
+    for v in r:
+        cs.update(v)
+        u, l_ = cs.bounds()
+        ups.append(u)
+        los.append(l_)
+    ups, los = np.array(ups).T, np.array(los).T
+    x = np.minimum(r[None, :] ** 2, (levels**2)[:, None])
+    ref = R.eb_confseq(x, levels**2, 0.001, 0.001, n_plan=300)
+    np.testing.assert_allclose(ups, ref.upper, rtol=1e-10)
+    np.testing.assert_allclose(los, ref.lower, rtol=1e-10, atol=1e-14)
+
+
+def test_awake_streaming_matches_vectorised():
+    rng = np.random.default_rng(18)
+    pre, n = 120, 2500
+    r = rng.standard_normal(pre + n)
+    r[pre + 300 :] *= 1.8  # change soon after the start, while the band is still learning
+    A = 400.0
+    mon = R.AwakeRunningTauMonitor(threshold=A, delta=0.01)
+    ev = mon.run(r)
+    out, _ = R.awake_route_a(r[None, :pre], r[None, pre:], [2 * A], delta=0.01)
+    au, ad = out[2 * A]
+    first = min(v for v in (au[0], ad[0]) if v >= 0)
+    assert ev and ev[0].index == pre + first and ev[0].direction == "up"
+    assert mon.segments[0]["start"] == pre
+
+
+def test_awake_route_a_false_alarms_respect_delta_plus_m_over_A():
+    rng = np.random.default_rng(19)
+    reps, pre, m, A, delta = 500, 120, 300, 3000.0, 0.05
+    r = rng.standard_t(3, (reps, pre + m))
+    out, _ = R.awake_route_a(r[:, :pre], r[:, pre:], [2 * A], delta=delta)
+    au, ad = out[2 * A]
+    rate = np.mean((au >= 0) | (ad >= 0))
+    bound = delta + m / A
+    assert rate <= bound + 3 * math.sqrt(bound * (1 - bound) / reps)
+
+
+def test_conformal_monitor_restarts_without_warmup():
+    rng = np.random.default_rng(20)
+    r = rng.standard_normal(4000)
+    r[1500:] *= 3.0
+    mon = R.ConformalMonitor(threshold=50000.0, cal_len=500, restart_len=0)
+    ev = mon.run(r)
+    assert ev and ev[0].direction == "up" and 1500 <= ev[0].index < 1600
+    assert len(mon.segments) >= 2 and mon.segments[1]["start"] == ev[0].index + 1
