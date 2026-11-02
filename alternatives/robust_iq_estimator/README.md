@@ -2,6 +2,8 @@
 
 A corrected and more efficient version of the robust quarticity estimator of Bapat (2026). It keeps the paper's two ideas, truncation of returns at a multiple of a robust scale and local smoothing, but changes three things: the scale is estimated **locally**, the local estimates are **aggregated by squaring a local variance** (the plug-in principle of Jacod and Rosenbaum 2013) instead of averaging local fourth powers, and every truncation and squaring bias is removed with an **exact finite-sample correction**. A growing cut-off `sqrt(2 log n)` makes the estimator consistent while jumps are still removed. The same machinery gives an estimate of `int sigma^8` and therefore a confidence interval, and it extends to any power of volatility, which the paper names as future work.
 
+A second finding came from the real data. Large one-minute crypto returns arrive in short bursts, not as isolated jumps, so any estimator that truncates against a scale measured over hours (Bapat's included) removes real volatility along with the jumps. A neighbour-guarded variant (`PI-NN`, section 2.9) keeps the bursts and still removes isolated jumps; it is the best robust estimator on a burst model calibrated to the data, and the first proposal (`PI-LU`) remains the best one when volatility is smooth.
+
 Results are in `RESULTS.md`. Every number there comes from `run_experiment.py` and is labelled [SYNTHETIC] or [REAL]. Iteration notes are in `docs/iterations/ALT3.md`.
 
 ## 1. Research problem
@@ -176,7 +178,7 @@ alternatives/robust_iq_estimator/
   README.md            this file
   RESULTS.md           every number, labelled [SYNTHETIC] or [REAL], and the ranking paragraph
   riq.py               estimators and theory helpers
-  run_experiment.py    Q1 to Q5 (python run_experiment.py [theory|sim|cv|real|figures|all])
+  run_experiment.py    Q1 to Q6 (python run_experiment.py [theory|ablation|sim|cv|real|fastvol|figures|all])
   make_figures.py      figures from the CSV files
   tests/test_robust_iq_estimator.py   synthetic tests, about 3 seconds, no data files needed
   results/             CSV outputs and figures
