@@ -142,3 +142,49 @@ def test_aggregate_returns_requires_full_bars():
     out = C.aggregate_returns(s, 5)
     assert out.iloc[0] == pytest.approx(0 + 1 + 2 + 3 + 4)
     assert np.isnan(out.iloc[1]) and np.isnan(out.iloc[2])  # a missing minute and an incomplete bar
+
+
+def test_garch_multiplier_keeps_the_sign_mean_and_moves_the_product_mean():
+    from simulate_pairs import _garch_multiply
+
+    rng = np.random.default_rng(8)
+    clean = pair_returns(1, 300_000, rho=0.3, rng=rng)
+    garch = pair_returns(1, 300_000, rho=0.3, garch=(0.05, 0.94), rng=rng)
+    m_clean = np.mean(C.sign_concordance(clean.r1[0], clean.r2[0]))
+    m_garch = np.mean(C.sign_concordance(garch.r1[0], garch.r2[0]))
+    assert abs(m_garch - m_clean) < 0.01
+    # unit unconditional variance, persistent clustering
+    z = _garch_multiply(rng.standard_normal((4, 50_000)), (0.05, 0.94), rng)
+    assert abs(z.var() - 1.0) < 0.1
+    r2 = z[0] ** 2
+    assert np.corrcoef(r2[:-1], r2[1:])[0, 1] > 0.05
+
+
+def test_basket_concordance_bounds_mean_and_invariance():
+    from simulate_pairs import basket_returns, equicorrelation
+
+    rng = np.random.default_rng(9)
+    k = 4
+    b = basket_returns(1, 200_000, equicorrelation(k, 0.3), rng=rng)
+    y = C.basket_concordance(b.r[0])
+    lo, hi = C.basket_bounds(k)
+    assert lo == pytest.approx(-1 / 3) and y.min() >= lo - 1e-12 and y.max() <= hi + 1e-12
+    assert abs(y.mean() - C.gaussian_sign_mean(0.3)) < 0.01  # average Blomqvist beta = the common value
+    scaled = b.r[0] * np.array([3.0, 0.1, 1.0, 7.0])
+    assert np.array_equal(C.basket_concordance(scaled), y)
+    # the worst configuration (two up, two down) hits the lower bound exactly
+    assert C.basket_concordance(np.array([[1.0, 1.0, -1.0, -1.0]]))[0] == pytest.approx(lo)
+
+
+def test_basket_monitor_detects_a_basket_wide_increase_and_ignores_one_asset_volatility():
+    from simulate_pairs import basket_returns, equicorrelation
+
+    rng = np.random.default_rng(10)
+    k = 4
+    b = basket_returns(1, 6000, equicorrelation(k, 0.3), nu=4000, corr1=equicorrelation(k, 0.8), rng=rng)
+    mon = C.BasketMonitor(k, threshold=5760.0, cal_len=1000, null_band=0.1)
+    ev = mon.run(b.r[0])
+    assert len(ev) == 1 and ev[0].direction == "up" and 4000 <= ev[0].index < 4500
+    v = basket_returns(1, 6000, equicorrelation(k, 0.3), nu=1500, vol_post=np.array([4.0, 1.0, 1.0, 1.0]), rng=rng)
+    mon2 = C.BasketMonitor(k, threshold=5760.0, cal_len=1000, null_band=0.1)
+    assert mon2.run(v.r[0]) == []

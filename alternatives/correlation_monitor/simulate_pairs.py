@@ -46,8 +46,13 @@ def pair_returns(
     p_cojump: float = 0.0,
     sigma1: float = 1.0,
     sigma2: float = 1.0,
+    garch: tuple[float, float] | None = None,
     rng: np.random.Generator | None = None,
 ) -> PairPaths:
+    """See the module docstring. ``garch=(alpha, beta)`` multiplies each asset by its own GARCH(1,1)
+    volatility with unit unconditional variance (``h_t = 1 - alpha - beta + alpha r_{t-1}^2 + beta h_{t-1}``),
+    independent across the two assets, so the correlation of the innovations is unchanged while the
+    conditional variances cluster persistently."""
     rng = np.random.default_rng() if rng is None else rng
     e1 = rng.standard_normal((reps, n))
     e2 = rng.standard_normal((reps, n))
@@ -68,6 +73,9 @@ def pair_returns(
     if nu is not None:
         s1[nu:] *= vol1_post
         s2[nu:] *= vol2_post
+    if garch is not None:
+        z1 = _garch_multiply(z1, garch, rng)
+        z2 = _garch_multiply(z2, garch, rng)
     r1 = s1[None, :] * z1
     r2 = s2[None, :] * z2
     if p_jump > 0:
@@ -78,3 +86,62 @@ def pair_returns(
         r1 = r1 + hit * rng.normal(0, jump_scale * sigma1, (reps, n))
         r2 = r2 + hit * rng.normal(0, jump_scale * sigma2, (reps, n))
     return PairPaths(r1, r2, nu, float(rho), None if rho1 is None else float(rho1))
+
+
+def _garch_multiply(z: np.ndarray, garch: tuple[float, float], rng: np.random.Generator) -> np.ndarray:
+    """Scale innovations ``z`` (reps, n) by a GARCH(1,1) volatility path with unit unconditional variance."""
+    alpha, beta = garch
+    if alpha < 0 or beta < 0 or alpha + beta >= 1:
+        raise ValueError("need alpha, beta >= 0 and alpha + beta < 1")
+    omega = 1.0 - alpha - beta
+    reps, n = z.shape
+    out = np.empty_like(z)
+    h = np.ones(reps)  # start at the unconditional variance
+    for t in range(n):
+        out[:, t] = np.sqrt(h) * z[:, t]
+        h = omega + alpha * out[:, t] ** 2 + beta * h
+    return out
+
+
+@dataclass
+class BasketPaths:
+    r: np.ndarray  # shape (reps, n, k)
+    nu: int | None
+    corr0: np.ndarray
+    corr1: np.ndarray | None
+
+
+def equicorrelation(k: int, rho: float) -> np.ndarray:
+    return np.full((k, k), float(rho)) + (1.0 - rho) * np.eye(k)
+
+
+def basket_returns(
+    reps: int,
+    n: int,
+    corr0: np.ndarray,
+    nu: int | None = None,
+    corr1: np.ndarray | None = None,
+    vol_post: np.ndarray | None = None,
+    df: float | None = None,
+    rng: np.random.Generator | None = None,
+) -> BasketPaths:
+    """``k`` assets with correlation matrix ``corr0``, switching to ``corr1`` at step ``nu``.
+
+    ``vol_post`` (length k) multiplies each asset's standard deviation from step ``nu`` on.
+    Innovations are Gaussian or multivariate Student t (common mixing variable), unit variances.
+    """
+    rng = np.random.default_rng() if rng is None else rng
+    corr0 = np.asarray(corr0, float)
+    k = corr0.shape[0]
+    e = rng.standard_normal((reps, n, k))
+    L0 = np.linalg.cholesky(corr0)
+    z = e @ L0.T
+    if nu is not None and corr1 is not None:
+        L1 = np.linalg.cholesky(np.asarray(corr1, float))
+        z[:, nu:, :] = e[:, nu:, :] @ L1.T
+    if df is not None:
+        w = rng.chisquare(df, (reps, n, 1)) / df
+        z = z * np.sqrt((df - 2) / df) / np.sqrt(w)
+    if nu is not None and vol_post is not None:
+        z[:, nu:, :] = z[:, nu:, :] * np.asarray(vol_post, float)[None, None, :]
+    return BasketPaths(z, nu, corr0, None if corr1 is None else np.asarray(corr1, float))

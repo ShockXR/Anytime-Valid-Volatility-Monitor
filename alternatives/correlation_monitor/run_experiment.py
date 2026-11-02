@@ -24,11 +24,16 @@ Research questions
      after each alarm against random times, whether alarms coincide with volatility changes
      (BTC robust scale after / before), and whether increase alarms cluster in BTC sell-offs
      (BTC return over the 24 hours before and after the alarm against random times).
+  Q4 [SYNTHETIC and REAL] A basket of k = 4 assets. One e-detector on the average pairwise sign
+     concordance (bounded in [-1/(k-1), 1]) against six pairwise monitors at level 6A: false
+     alarms under Gaussian, t4 and one- or all-asset volatility changes with the correlations
+     fixed; delay for basket-wide and single-pair correlation changes. Then the basket monitor on
+     BTC, ETH, SOL and DOGE 5-minute returns, 2024 to 2025.
 
 Settings follow E4 of the main report: per-step units, calibration from the same process as
 the pre-change data, tau = c x scaled MAD per asset, A = 7800 for 390-step synthetic days and
-A = 5760 for 288-bar real days (5-minute bars). All seeds are fixed. Runs in about 6 minutes
-on one core (use ``--only q0,q1,q2`` or ``--only q3`` to run parts).
+A = 5760 for 288-bar real days (5-minute bars). All seeds are fixed. Runs in about 8 minutes
+on one core (use ``--only q0,q1,q2``, ``--only q3`` or ``--only q4`` to run parts).
 """
 
 from __future__ import annotations
@@ -64,6 +69,7 @@ NULLS = {
     "vol x2 asset 1 (rho 0.3 fixed)": dict(rho=0.3, nu=500, vol1_post=2.0),
     "vol x0.5 asset 1 (rho 0.3 fixed)": dict(rho=0.3, nu=500, vol1_post=0.5),
     "vol x2 both (rho 0.3 fixed)": dict(rho=0.3, nu=500, vol1_post=2.0, vol2_post=2.0),
+    "garch(0.05, 0.94) each asset (rho 0.3 fixed)": dict(rho=0.3, garch=(0.05, 0.94)),
 }
 TRANSITIONS = [(0.3, 0.6), (0.6, 0.3), (0.0, 0.3), (0.3, 0.0), (0.5, 0.9), (0.6, 0.0)]
 INNOVATIONS = {"gaussian": dict(), "student t4": dict(df=4.0), "jumps": dict(p_jump=0.005, jump_scale=8.0)}
@@ -182,7 +188,7 @@ def q0_theory(A=A_SYN, n=400_000, seed=0):
 def true_null_means(seed=5, n=2_000_000):
     out = {}
     for name, kw in NULLS.items():
-        if "nu" in kw:
+        if "nu" in kw or "garch" in kw:  # (a GARCH path of 2 million steps would be slow; its sign mean is the Gaussian one)
             continue
         rng = np.random.default_rng(seed)
         p = pair_returns(1, n, rng=rng, **kw)
@@ -503,11 +509,154 @@ def fig_real(des, events):
 
 
 # ----------------------------------------------------------------------------
+# Q4: a basket of k assets
+# ----------------------------------------------------------------------------
+
+K = 4
+PAIRS_K = [(i, j) for i in range(K) for j in range(i + 1, K)]
+
+
+def _basket_split(reps, n, seed, corr0, nu=None, corr1=None, vol_post=None, df=None):
+    from simulate_pairs import basket_returns
+
+    rng = np.random.default_rng(seed)
+    b = basket_returns(reps, CAL + n, corr0, None if nu is None else CAL + nu, corr1, vol_post, df, rng)
+    return b.r[:, :CAL, :], b.r[:, CAL:, :]
+
+
+def run_basket(cal, mon, A, band=0.0):
+    """Two-sided basket e-detector at level A (each side at 2A); returns first alarm and side per path."""
+    lo, hi = C.basket_bounds(K)
+    y = C.basket_concordance(mon)
+    m0 = np.mean(C.basket_concordance(cal), axis=1)
+    up = C.bounded_edetector(y, m0 + band, lo, hi, "up", threshold=2 * A)
+    dn = C.bounded_edetector(y, m0 - band, lo, hi, "down", threshold=2 * A)
+    both = C.two_sided_alarm(up, dn)
+    side = np.where(both < 0, "", np.where((up.alarm >= 0) & ((dn.alarm < 0) | (up.alarm <= dn.alarm)), "up", "down"))
+    return both, side
+
+
+def run_any_pair(cal, mon, A, band=0.0):
+    """Six pairwise sign e-detectors, each two-sided at level 6A (sides at 12A), first alarm of any."""
+    m = len(PAIRS_K)
+    best = np.full(mon.shape[0], -1)
+    for i, j in PAIRS_K:
+        y = C.sign_concordance(mon[:, :, i], mon[:, :, j])
+        m0 = np.mean(C.sign_concordance(cal[:, :, i], cal[:, :, j]), axis=1)
+        up = C.bounded_edetector(y, m0 + band, -1.0, 1.0, "up", threshold=2 * m * A)
+        dn = C.bounded_edetector(y, m0 - band, -1.0, 1.0, "down", threshold=2 * m * A)
+        a = C.two_sided_alarm(up, dn)
+        take = (a >= 0) & ((best < 0) | (a < best))
+        best[take] = a[take]
+    return best
+
+
+def q4_basket_synthetic(reps=2000, horizon=5 * DAY, seed=400):
+    from simulate_pairs import equicorrelation
+
+    E = equicorrelation
+    rows = []
+    nulls = {
+        "gaussian equicorrelation 0.3": dict(corr0=E(K, 0.3)),
+        "student t4 equicorrelation 0.3": dict(corr0=E(K, 0.3), df=4.0),
+        "vol x2 asset 1 at step 500 (correlations fixed)": dict(corr0=E(K, 0.3), nu=500, vol_post=np.array([2.0, 1, 1, 1])),
+        "vol x2 all assets at step 500 (correlations fixed)": dict(corr0=E(K, 0.3), nu=500, vol_post=np.full(K, 2.0)),
+    }
+    for i, (name, kw) in enumerate(nulls.items()):
+        cal, mon = _basket_split(reps, horizon, seed + i, **kw)
+        for band in (0.0, 0.05):
+            a, side = run_basket(cal, mon, A_SYN, band)
+            fa = a >= 0
+            rows.append(dict(scenario=name, detector="basket", band=band, fa_1day=float((fa & (a < DAY)).mean()),
+                             fa_5days=float(fa.mean()), share_up=float((side == "up").sum() / max(fa.sum(), 1)), paths=reps))
+            a = run_any_pair(cal, mon, A_SYN, band)
+            fa = a >= 0
+            rows.append(dict(scenario=name, detector="any of 6 pairs at 6A", band=band, fa_1day=float((fa & (a < DAY)).mean()),
+                             fa_5days=float(fa.mean()), share_up=np.nan, paths=reps))
+    val = pd.DataFrame(rows)
+    val.to_csv(OUT / "q4_basket_validity.csv", index=False)
+    # detection: basket-wide change, one-pair change, basket-wide decrease
+    one = E(K, 0.3)
+    one[0, 1] = one[1, 0] = 0.8
+    changes = {
+        "all pairs 0.3 to 0.6": dict(corr0=E(K, 0.3), corr1=E(K, 0.6)),
+        "all pairs 0.3 to 0.0": dict(corr0=E(K, 0.3), corr1=E(K, 0.0)),
+        "one pair 0.3 to 0.8, others fixed": dict(corr0=E(K, 0.3), corr1=one),
+        "all pairs 0.3 to 0.9": dict(corr0=E(K, 0.3), corr1=E(K, 0.9)),
+    }
+    rows = []
+    nu, post = 500, 3500
+    for i, (name, kw) in enumerate(changes.items()):
+        cal, mon = _basket_split(1000, nu + post, seed + 50 + i, nu=nu, **kw)
+        for det in ("basket", "any of 6 pairs at 6A"):
+            a = run_basket(cal, mon, A_SYN)[0] if det == "basket" else run_any_pair(cal, mon, A_SYN)
+            early = (a >= 0) & (a < nu)
+            ok = a >= nu
+            d = a[ok] - nu + 1
+            rows.append(dict(change=name, detector=det, false_alarm_before_change=float(early.mean()), detected=float(ok.mean()),
+                             median_delay=float(np.median(d)) if d.size else np.nan, q90_delay=float(np.quantile(d, 0.9)) if d.size else np.nan,
+                             paths=1000))
+    delay = pd.DataFrame(rows)
+    delay.to_csv(OUT / "q4_basket_delay.csv", index=False)
+    return val, delay
+
+
+def q4_basket_real(minutes, seed=500):
+    syms = ("BTCUSDT", "ETHUSDT", "SOLUSDT", "DOGEUSDT")
+    five = {s: C.aggregate_returns(minutes[s], BAR) for s in syms}
+    R = np.column_stack([five[s].to_numpy() for s in syms])  # raw 5-minute returns: the statistic is scale-free
+    idx = five["BTCUSDT"].index
+    btc = five["BTCUSDT"].to_numpy()
+    y = C.basket_concordance(R)
+    days = (idx[-1] - idx[0]).total_seconds() / 86400
+    rng = np.random.default_rng(seed)
+    ctrl = rng.integers(CAL_REAL, len(y) - CAL_REAL - 1, 2000)
+    c_before = np.array([np.nansum(btc[max(0, i - 288) : i]) for i in ctrl])
+    p10 = float(np.quantile(c_before, 0.1))
+    c_change = np.array([np.nanmean(y[i + 1 : i + 1 + CAL_REAL]) - np.nanmean(y[i - CAL_REAL : i]) for i in ctrl])
+    rows, ev_rows = [], []
+    for band in (0.05, 0.1, 0.2):
+        mon = C.BasketMonitor(K, threshold=A_REAL, cal_len=CAL_REAL, null_band=band)
+        events = mon.run(R)
+        recs = []
+        for e in events:
+            ok = np.isfinite(y[: e.monitored_since])
+            cal_pos = np.nonzero(ok)[0][-CAL_REAL:]
+            y_cal = float(np.mean(y[cal_pos]))
+            y_post = float(np.nanmean(y[e.index + 1 : e.index + 1 + CAL_REAL])) if e.index + 1 + CAL_REAL <= len(y) else np.nan
+            recs.append(dict(band=band, time=idx[e.index], index=e.index, direction=e.direction, m0=e.m0,
+                             basket_cal=y_cal, basket_post=y_post, btc_ret_24h_before=float(np.nansum(btc[max(0, e.index - 288) : e.index])),
+                             btc_ret_24h_after=float(np.nansum(btc[e.index + 1 : e.index + 289]))))
+        edf = pd.DataFrame(recs)
+        ev_rows.append(edf)
+        row = dict(band=band, alarms=len(events), per_day=len(events) / days, up=int((edf.direction == "up").sum()) if len(edf) else 0,
+                   down=int((edf.direction == "down").sum()) if len(edf) else 0)
+        for d in ("up", "down"):
+            s = edf[(edf.direction == d) & edf.basket_post.notna()] if len(edf) else edf
+            if len(s) == 0:
+                continue
+            moved = (s.basket_post > s.basket_cal) if d == "up" else (s.basket_post < s.basket_cal)
+            row[f"{d}_n"] = len(s)
+            row[f"{d}_share_moved_as_flagged"] = float(moved.mean())
+            row[f"{d}_median_change_post_minus_cal"] = float((s.basket_post - s.basket_cal).median())
+            row[f"{d}_mean_btc_ret_24h_before"] = float(s.btc_ret_24h_before.mean())
+            row[f"{d}_share_btc_down_24h_before"] = float((s.btc_ret_24h_before < 0).mean())
+            row[f"{d}_share_btc_below_p10_24h_before"] = float((s.btc_ret_24h_before < p10).mean())
+            row[f"{d}_mean_btc_ret_24h_after"] = float(s.btc_ret_24h_after.mean())
+        rows.append(row)
+        print(f"  basket band {band}: {len(events)} alarms ({row['up']} up, {row['down']} down)", flush=True)
+    summary = pd.DataFrame(rows)
+    summary.to_csv(OUT / "q4_basket_real_summary.csv", index=False)
+    pd.concat(ev_rows).to_csv(OUT / "q4_basket_real_events.csv", index=False)
+    pd.DataFrame([dict(n=len(ctrl), share_up=float((c_change > 0).mean()), median_change=float(np.median(c_change)),
+                       mean_btc_ret_24h_before=float(c_before.mean()), share_btc_down_24h_before=float((c_before < 0).mean()),
+                       p10_btc_ret_24h_before=p10, basket_mean_full_sample=float(np.nanmean(y)))]).to_csv(OUT / "q4_basket_real_control.csv", index=False)
+    return summary
 
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--only", default="q0,q1,q2,q3")
+    ap.add_argument("--only", default="q0,q1,q2,q3,q4")
     args = ap.parse_args()
     parts = args.only.split(",")
     t0 = time.time()
@@ -532,6 +681,12 @@ def main():
         summary, events, cd = q3b_monitor(minutes)
         print(summary.to_string(), flush=True)
         print(cd.to_string(), flush=True)
+    if "q4" in parts:
+        val, delay = q4_basket_synthetic()
+        print(val.to_string(), flush=True)
+        print(delay.to_string(), flush=True)
+        minutes = _load_minutes() if "q3" not in parts else minutes
+        print(q4_basket_real(minutes).to_string(), flush=True)
     print(f"all done in {time.time() - t0:.0f} s")
 
 

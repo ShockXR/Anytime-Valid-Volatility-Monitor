@@ -52,6 +52,7 @@ Gaussian pairs, 400,000 draws per state. `m0`, `m1`: mean of the statistic befor
 | Volatility x2 in asset 1 at step 500, rho fixed | 2.6% / 23.6% (48%) | 0.0% / **98.3%** (100% up) | 5.1% / **99.9%** (3% up) | 3.8% / **100%** (98% up) |
 | Volatility x0.5 in asset 1 at step 500, rho fixed | 3.1% / 23.8% (52%) | 0.0% / **100%** (0% up) | 4.6% / **79.6%** (95% up) | 2.7% / **48.2%** (7% up) |
 | Volatility x2 in both at step 500, rho fixed | 3.0% / 23.7% (52%) | 0.0% / **100%** (100% up) | 4.9% / **100%** (5% up) | 3.6% / **100%** (94% up) |
+| GARCH(1,1) clustering in each asset (alpha 0.05, beta 0.94, half-life about 70 steps), rho fixed | 2.9% / 23.9% (51%) | 2.1% / **63.6%** (45%) | **25.4% / 83.7%** (40%) | **33.3% / 87.2%** (82%) |
 
 ### Q1b. Estimated baseline, band 0.05 (e-detectors only)
 
@@ -65,6 +66,7 @@ Gaussian pairs, 400,000 draws per state. `m0`, `m1`: mean of the statistic befor
 | Volatility x2 in asset 1 | 0.4% / 3.7% | 0.0% / 89.4% |
 | Volatility x0.5 in asset 1 | 0.6% / 4.0% | 0.0% / 96.9% |
 | Volatility x2 in both | 0.5% / 4.5% | 0.0% / 100% |
+| GARCH(1,1) clustering in each asset | 0.6% / 4.4% | 0.9% / 26.9% |
 
 ### Q1c. True null mean (2 million draws), band 0: the guarantee without baseline error
 
@@ -82,6 +84,7 @@ Gaussian pairs, 400,000 draws per state. `m0`, `m1`: mean of the statistic befor
 2. The sign monitor **does not react to a volatility change** (23.6% to 23.8% per 5 days, identical to the no-change rows). The product monitor raises a "dependence up" alarm on 98% of paths when the volatility of one asset doubles and a "dependence down" alarm on 100% when it halves; the band does not help (89% to 100%). The Gaussian LR also alarms on almost every path, and in the **opposite direction** (97% of its alarms say "down" when asset 1 becomes more volatile): for a large idiosyncratic move the Gaussian quadratic form favours a smaller correlation. This is Proposition 2 of the README made visible.
 3. The Gaussian LR and the naive CUSUM are unusable under fat tails or jumps (57% to 96% false alarms per day). Note the Student t4 pairs here are elliptical, so their sign mean is exactly `(2 / pi) arcsin(0.3)`, the same as for the Gaussian pairs (0.194 in Q1c), while the product's mean moves from 0.298 to 0.383: the product statistic also confuses a change of tail shape with a change of correlation.
 4. The product e-detector is very conservative (0% per day, 11% to 16% per 5 days with band 0) because its bets are capped (Q0).
+5. Persistent volatility clustering is the case in which the main package's own strict null fails (E9, Q9c: 77% to 100% of GARCH days with an alarm at band 0). The sign correlation monitor is untouched by it (2.9% per day, 23.9% per 5 days, the same as under constant volatility), because its null is invariant to any predictable volatility path. The product monitor's 5-day rate rises from 11% to 64% (27% with band 0.05), the Gaussian LR's to 84% and the naive CUSUM's to 87%: with clustering, products of returns have a conditional mean that moves with the two variances even though the correlation never moves.
 
 ## Q2. Detection delay [SYNTHETIC] (`q2_delay.csv`, `fig1_synthetic_delays.png`)
 
@@ -201,24 +204,65 @@ The mean BTC return over the 24 hours *after* a sign up alarm is +0.2%, +0.5% an
 3. Dependence-up alarms cluster after BTC sell-offs: 80% of them follow a negative 24-hour BTC return, and 36% to 50% follow a 24-hour return in the worst decile (10% by construction). Dependence-down alarms follow positive 24-hour returns. This is the Longin and Solnik (2001) asymmetry at the intraday scale, detected online with a false alarm guarantee, and it is the practical case for the monitor: diversification between these coins weakens exactly after the market falls.
 4. The naive 5-day comparison can partly reflect mean reversion of the rolling correlation (up alarms start from low calibration correlations), as the main report's E5 also cautioned for volatility. The control at random times sets the base rate, and the Pearson yardstick (not used by the monitor) confirms the moves, but a stronger test would compare against a forecast of the correlation rather than against its calibration value.
 
+## Q4. A basket of four assets (`q4_basket_validity.csv`, `q4_basket_delay.csv`, `q4_basket_real_*.csv`)
+
+The basket concordance `B_t` (README 2.7) is the average of the six pairwise sign statistics, bounded in [-1/3, 1] for k = 4. One e-detector at level A on `B_t` is compared with "any of the six pairwise sign monitors, each two-sided at level 6A" (same overall guarantee by a union bound).
+
+### Q4a. Validity [SYNTHETIC] (2000 paths, 2000-step calibration, equicorrelation 0.3)
+
+| Scenario | basket, band 0: 1 day / 5 days | any pair at 6A, band 0 | basket, band 0.05 | any pair at 6A, band 0.05 |
+|---|---|---|---|---|
+| Gaussian | 1.7% / 19.3% | 2.5% / 27.1% | 0.0% / 0.2% | 0.4% / 2.5% |
+| Student t4 | 2.2% / 21.9% | 3.3% / 27.5% | 0.0% / 0.5% | 0.7% / 3.0% |
+| Volatility x2 in asset 1 at step 500, correlations fixed | 2.8% / 23.6% | 3.1% / 27.0% | 0.0% / 0.6% | 0.6% / 2.5% |
+| Volatility x2 in all assets at step 500, correlations fixed | 2.3% / 22.9% | 2.7% / 28.2% | 0.1% / 0.6% | 0.7% / 2.6% |
+
+The basket monitor is inside its bounds (5% and 25%) in every row and ignores the volatility changes. The union of six plug-in pairwise monitors sits at 27% to 28% per 5 days, 2 to 3 points above the 25% bound: the bound assumes the true baselines, and six estimated baselines (each from the same 2000 steps) push the union over it, as Q1c against Q1a showed for one pair. A band of 0.05 removes the excess in both designs.
+
+### Q4b. Delay [SYNTHETIC] (1000 paths, change at step 500; median delay, 90th percentile in brackets, false alarms before the change 2.8% to 4.7% in every row)
+
+| Change | basket | any of 6 pairs at 6A |
+|---|---|---|
+| All six correlations 0.3 to 0.6 | **72** (136) | 132 (235) |
+| All six correlations 0.3 to 0.0 | **77** (131) | 150 (267) |
+| All six correlations 0.3 to 0.9 | **21** (32) | 37 (54) |
+| One pair 0.3 to 0.8, the other five fixed | 451 (1088) | **91** (148) |
+
+**Reading.** The basket statistic averages six noisy pair statistics, so for a basket-wide change it is about twice as fast as the best pairwise monitor (72 against 132 steps) and needs no Bonferroni split. For a change confined to one pair it is five times slower (451 against 91), because the pair's shift of 0.33 on the sign scale becomes 0.33 / 6 = 0.055 in the basket mean. The two designs answer different questions: "did the basket start moving together?" (basket) and "did any pair change?" (any pair); a user who wants both can run both at level 2A each.
+
+### Q4c. Real data [REAL]: BTC, ETH, SOL and DOGE, raw 5-minute returns, 2024 to 2025
+
+No deseasonalisation, no scales, no truncation: the basket statistic needs none of them. Full-sample mean of `B_t` 0.573 (an average implied pairwise correlation of about 0.78). `A = 5760`, calibration 1440 bars, control at 2000 random times (47.6% higher after than before, median change -0.003; BTC 24-hour return before: mean +0.06%, 48.7% negative, 10th percentile -2.65%).
+
+| Band | Alarms (up / down), per day | Up: share with higher basket concordance in the next 5 days than in the calibration window, median change | Up: mean BTC 24h return before, share negative, share below the 10th percentile | Down: share confirmed, median change | Down: mean BTC 24h return before, share negative |
+|---|---|---|---|---|---|
+| 0.05 | 72 (31 / 41), 0.10 | 87%, +0.070 | -1.1%, 77%, 13% | 88%, -0.045 | +1.6%, 15% |
+| 0.1 | 31 (15 / 16), 0.04 | **93%, +0.078** | **-2.5%, 80%, 53%** | **94%, -0.060** | +1.7%, 19% |
+| 0.2 | 1 (0 / 1), 0.001 | | | 100%, -0.038 | +4.7%, 0% |
+
+Increase alarms of the band-0.1 basket monitor (UTC): 5 March 2024, 15 March 2024, 10 April 2024, 28 May 2024, 13 June 2024, 6 August 2024, 15 November 2024, 27 November 2024, 10 December 2024, 10 January 2025, 23 January 2025, 31 March 2025, 1 August 2025, 19 August 2025, 16 October 2025. Eight of the fifteen follow a 24-hour BTC return below the unconditional 10th percentile. The March, June, August and November 2024 dates coincide with the pairwise clusters of Q3b.
+
+**Reading.** The basket version behaves like the pairwise sign monitor and is the natural "multivariate" deliverable: one guarantee for the whole basket, about one alarm a month at band 0.1, confirmed in 93% to 94% of cases against 48% at random, with increase alarms concentrated after BTC sell-offs (53% in the worst decile of 24-hour returns). The mean BTC return in the 24 hours after an increase alarm is +1.2% (control +0.06%, from `q4_basket_real_summary.csv`), with 15 alarms this is not evidence of anything and is reported only for completeness.
+
 ## Negative results and open issues
 
 * The sign monitor is 2 to 3 times slower than the Gaussian-optimal detector on Gaussian data (Q2). This is the expected price of a sign statistic; a rank-based statistic such as a running Spearman or a winsorised product with a *predictable* scale could recover part of it while staying bounded, and was not tried.
 * The product e-detector at `c = 3` is both the slowest robust option and sensitive to volatility; it has no advantage over the sign statistic in any experiment here. Its only merit is being the literal "truncated covariance" of the A7 proposal.
 * With band 0, the plug-in baseline from 2000 steps leaves the 5-day false alarm rate near the bound (23% against 25%) and in the streaming test a one-standard-error baseline error produced a pre-change alarm (iteration notes). A band of 0.05 to 0.1 or the confidence-sequence baseline of the main package (`docs/math.md`, section 6) is needed in practice; the latter was not ported.
 * On real data the alarms are rare with band 0.2 (1 to 4 in two years), so the band is a coarse dial on the sign scale; a finer choice (0.05, 0.15) was not explored to avoid tuning on the reported data.
-* No multi-asset version: with k assets there are k(k-1)/2 pairs and the two-sided trick at `2A` becomes a Bonferroni-style split at `k(k-1) A`; a single e-detector on a bounded portfolio-level dependence statistic (for example the sign concordance between each asset and an equal-weight index) was not built.
+* The basket statistic (Q4) covers k assets with one guarantee but dilutes a single-pair change by a factor k(k-1)/2 (five times slower than the pairwise union for one changed pair out of six). A weighted or index-based version (each asset against the equal-weight index of the others) and the k-asset analogue of the Gaussian LR benchmark were not built.
+* The union of six plug-in pairwise monitors at level 6A exceeded its 5-day bound by 2 to 3 points with band 0 (27% to 28% against 25%): baseline estimation error adds up over pairs. A band of 0.05 fixes it; the confidence-sequence baseline would fix it with a proof.
 * Event attribution for the alarm dates is deliberately left out (no verified news sources were consulted).
 
 ## Honest ranking of this direction
 
 | Criterion | Score (1 to 5) | Why |
 |---|---|---|
-| Novelty | 4 | The e-detector framework and sign-based correlation measures are both classical, but their combination for online correlation-break detection with a finite-sample, model-free guarantee, and the explicit volatility-invariance argument for choosing the sign statistic, are not something we found in the literature. The observation that Bapat's truncation bound caps the bets of a product-based monitor (Q0) is small but new. |
-| Validity | 5 | The guarantee is proved in two lines from the main package's theorems and holds in every synthetic scenario, including the volatility changes that break every other detector tested. |
+| Novelty | 4 | The e-detector framework and sign-based correlation measures are both classical, but their combination for online correlation-break detection with a finite-sample, model-free guarantee, and the explicit volatility-invariance argument for choosing the sign statistic, are not something we found in the literature. The observation that Bapat's truncation bound caps the bets of a product-based monitor (Q0) is small but new, and the bounded basket concordance (Q4) is a simple multivariate statement of the same idea. |
+| Validity | 5 | The guarantee is proved in two lines from the main package's theorems and holds in every synthetic scenario, including the volatility changes and the persistent GARCH clustering that break every other detector tested (and that break the volatility monitor's own strict null, E9). |
 | Practical relevance | 4 | Correlation breaks after sell-offs are the risk that diversification does not cover; the monitor finds them online, about once a month per pair, with confirmed persistence. Minus one point because the 5-day confirmation is a weak yardstick and no portfolio decision rule was tested. |
-| Feasibility | 5 | About 500 lines of numpy, no scale estimate needed for the recommended statistic, 15 microseconds per step, the whole study runs in 6 minutes. |
+| Feasibility | 5 | About 500 lines of numpy, no scale estimate needed for the recommended statistic, 15 microseconds per step, the whole study runs in about 8 minutes. |
 | Demonstration value | 4 | The "pure volatility change does not trigger it, but triggers everything else" table (Q1) and the volatility-ratio table on real data (Q3b) make the point in one glance. The sell-off clustering is a memorable real-data finding. |
-| Interest to a sequential-analysis and high-frequency econometrics researcher | 4 | For sequential analysis: a clean example where the choice of a bounded, scale-free statistic buys invariance at a quantified efficiency cost, with delays matching a growth-rate calculation. For high-frequency econometrics: an online, jump-robust answer to the correlation-break question that the retrospective fluctuation tests address offline, plus a measured Epps effect on crypto pairs. The multivariate (k > 2) case and the efficiency gap are the natural follow-ups. |
+| Interest to a sequential-analysis and high-frequency econometrics researcher | 4 | For sequential analysis: a clean example where the choice of a bounded, scale-free statistic buys invariance at a quantified efficiency cost, with delays matching a growth-rate calculation, and a basket-against-union comparison that makes the dilution trade-off explicit. For high-frequency econometrics: an online, jump-robust answer to the correlation-break question that the retrospective fluctuation tests address offline, plus a measured Epps effect on crypto pairs. The efficiency gap, weighted basket statistics and a forecast-relative null are the natural follow-ups. |
 
-Overall: a strong second direction after the main volatility monitor. It reuses the same machinery, answers the paper's "multivariate" future-work item in its most useful form (dependence rather than covariation of volatility), and the key design choice (sign over truncated product) is backed by a proof, a theory table, simulations and real data that all point the same way.
+Overall: a strong second direction after the main volatility monitor. It reuses the same machinery, answers the paper's "multivariate" future-work item in its most useful form (dependence rather than covariation of volatility, for pairs and for a basket), and the key design choice (sign over truncated product) is backed by a proof, a theory table, simulations and real data that all point the same way.

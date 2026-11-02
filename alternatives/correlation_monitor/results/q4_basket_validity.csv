@@ -1,0 +1,17 @@
+scenario,detector,band,fa_1day,fa_5days,share_up,paths
+gaussian equicorrelation 0.3,basket,0.0,0.0165,0.1925,0.4961038961038961,2000
+gaussian equicorrelation 0.3,any of 6 pairs at 6A,0.0,0.025,0.271,,2000
+gaussian equicorrelation 0.3,basket,0.05,0.0,0.002,0.5,2000
+gaussian equicorrelation 0.3,any of 6 pairs at 6A,0.05,0.004,0.0245,,2000
+student t4 equicorrelation 0.3,basket,0.0,0.0215,0.2185,0.4805491990846682,2000
+student t4 equicorrelation 0.3,any of 6 pairs at 6A,0.0,0.033,0.275,,2000
+student t4 equicorrelation 0.3,basket,0.05,0.0,0.0045,0.4444444444444444,2000
+student t4 equicorrelation 0.3,any of 6 pairs at 6A,0.05,0.007,0.03,,2000
+vol x2 asset 1 at step 500 (correlations fixed),basket,0.0,0.028,0.2355,0.4819532908704883,2000
+vol x2 asset 1 at step 500 (correlations fixed),any of 6 pairs at 6A,0.0,0.0305,0.2695,,2000
+vol x2 asset 1 at step 500 (correlations fixed),basket,0.05,0.0,0.006,0.75,2000
+vol x2 asset 1 at step 500 (correlations fixed),any of 6 pairs at 6A,0.05,0.0055,0.025,,2000
+vol x2 all assets at step 500 (correlations fixed),basket,0.0,0.023,0.229,0.45633187772925765,2000
+vol x2 all assets at step 500 (correlations fixed),any of 6 pairs at 6A,0.0,0.0265,0.282,,2000
+vol x2 all assets at step 500 (correlations fixed),basket,0.05,0.0005,0.006,0.5833333333333334,2000
+vol x2 all assets at step 500 (correlations fixed),any of 6 pairs at 6A,0.05,0.0065,0.026,,2000

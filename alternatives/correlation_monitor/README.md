@@ -77,6 +77,14 @@ A jump in one asset changes one `S_t` by at most 2 and the log-wealth of a bet b
 
 The betting speed is governed by the admissible bet. For the sign statistic the largest increase bet is `1 / (1 + m0)`, about 0.84 at `rho = 0.3`. For the product at `c = 3` it is `1 / (9 + m0)`, about 0.11, far below the growth-optimal bet `(m1 - m0) / (var + (m1 - m0)^2)` of about 0.25 for a shift from 0.3 to 0.6. So the bound that makes the product valid also throttles it. The theory table (Q0 in `RESULTS.md`) quantifies this: on clean Gaussian data the sign monitor is predicted to be about as fast as the product with `c = 3` for moderate changes and faster for large ones, and the product with `c = 2` is fastest. This is a concrete reason to prefer the scale-free statistic: it gives up little speed and gains invariance.
 
+### 2.7 More than two assets: basket concordance
+
+For k assets let `s_i,t = sign(r_i,t)` and define the **basket concordance**
+
+`B_t = 2 / (k (k - 1)) sum_{i<j} s_i,t s_j,t = [ (sum_i s_i,t)^2 - sum_i s_i,t^2 ] / (k (k - 1))`.
+
+It is the average pairwise sign concordance, its mean is the average Blomqvist beta over the pairs ("how much the basket moves together"), it is invariant to any positive predictable rescaling of every asset (Proposition 2 applies asset by asset), and it is bounded: `B_t <= 1` and, since `sum_{i<j} s_i s_j >= -sum_i s_i^2 / 2 >= -k / 2`, `B_t >= -1 / (k - 1)`. So one e-detector at level A monitors the whole basket with the validity theorem of 2.3, and no Bonferroni-type split over the k(k - 1)/2 pairs is needed. The price is dilution: a change confined to one pair moves the basket mean by 1/(k(k - 1)/2) of the pair's shift. Q4 measures both sides of this trade against "any of the six pairwise monitors at level 6A" (which keeps the same overall guarantee by a union bound).
+
 ## 3. Why it matters
 
 * **Portfolios.** Diversification relies on correlations staying moderate. In sell-offs they rise (Longin and Solnik 2001 for equity markets), which is when the diversification is needed. A monitor that flags "dependence has increased" early, with a controlled false alarm rate, is a risk control input: it can trigger a hedge review, a reduction of gross exposure or a switch of the risk model.
@@ -107,8 +115,9 @@ Related estimation literature that this prototype does not replace: realized cov
 * `gaussian_corr_lr_edetector` and `cusum_additive` + `calibrate_cusum_threshold`: the two benchmarks.
 * `CorrelationMonitor(threshold, stat, c, cal_len, null_band, benchmark)`: the streaming calibrate, monitor, alarm, recalibrate loop, same protocol as `avmonitor.monitor.VolatilityMonitor`, each side at `2A`, events as `PairEvent` (index, direction, `m0`, implied correlation, scales).
 * `aggregate_returns(logret, bars)`: non-overlapping 5-minute (or any) bars from 1-minute log returns, NaN unless every minute is present.
+* `basket_concordance(r)`, `basket_bounds(k)` and `BasketMonitor(k, ...)`: the k-asset statistic of 2.7 and its streaming monitor (same protocol).
 
-`simulate_pairs.py`: Gaussian or multivariate Student t pairs (common mixing variable, so tail dependence), a correlation change at a known step, independent volatility changes per asset, independent jumps and co-jumps.
+`simulate_pairs.py`: Gaussian or multivariate Student t pairs (common mixing variable, so tail dependence), a correlation change at a known step, independent volatility changes per asset, independent jumps and co-jumps, an optional GARCH(1,1) volatility path per asset (persistent clustering with the correlation of the innovations fixed), and `basket_returns` for k assets with a correlation-matrix change.
 
 Cost: one step of the streaming monitor is a handful of numpy operations on a 6-vector, about 15 microseconds; two years of 5-minute bars for one pair take about 3 seconds. The vectorised detector handles 2000 paths at once.
 
@@ -117,9 +126,11 @@ Cost: one step of the streaming monitor is a handful of numpy operations on a 6-
 Synthetic settings mirror E4 of the main report: per-step units, a 2000-step calibration window drawn from the same process as the pre-change data (so jumps and fat tails are part of "normal"), `A = 7800` for 390-step days (at most 5% false alarms per day), both sides at `2A`, fixed seeds.
 
 * **Q0 theory table [SYNTHETIC].** Null mean, variance, admissible bet, best grid bet and the predicted delay `log(2A) / growth rate` for six correlation changes, for the sign statistic and the product at `c = 3` and `c = 2`. Says which statistic should win before any detection run.
-* **Q1 validity [SYNTHETIC].** 2000 paths of 5 days under eight scenarios: Gaussian (`rho` 0.3 and 0.6), Student t4, independent jumps, co-jumps, and three pure volatility changes at step 500 (asset 1 x2, asset 1 x0.5, both x2) with the correlation fixed. Reported: P(false alarm within 1 day) against the bound 5%, P(within 5 days) against 25%, and the share of alarms that are "up". Four detectors: sign, product (`c = 3`), Gaussian LR, naive CUSUM (threshold tuned on Gaussian pairs to 2.5% per side per day). The e-detectors are run with band 0 and 0.05 and, in a second table, with the true null mean (2 million draws) to check the guarantee free of baseline error.
+* **Q1 validity [SYNTHETIC].** 2000 paths of 5 days under nine scenarios: Gaussian (`rho` 0.3 and 0.6), Student t4, independent jumps, co-jumps, three pure volatility changes at step 500 (asset 1 x2, asset 1 x0.5, both x2) with the correlation fixed, and persistent GARCH(1,1) volatility clustering in each asset (alpha 0.05, beta 0.94, half-life of about 70 steps) with the correlation of the innovations fixed (the case in which the volatility monitor's own strict null fails, E9 of the main report). Reported: P(false alarm within 1 day) against the bound 5%, P(within 5 days) against 25%, and the share of alarms that are "up". Four detectors: sign, product (`c = 3`), Gaussian LR, naive CUSUM (threshold tuned on Gaussian pairs to 2.5% per side per day). The e-detectors are run with band 0 and 0.05 and, in a second table, with the true null mean (2 million draws) to check the guarantee free of baseline error.
 * **Q2 delay [SYNTHETIC].** 1000 paths, change at step 500, 3500 post-change steps, six transitions (0.3 to 0.6, 0.6 to 0.3, 0.0 to 0.3, 0.3 to 0.0, 0.5 to 0.9, 0.6 to 0.0) and three innovation types (Gaussian, t4, jumps). Reported: false alarms before the change, detection share, share of alarms in the right direction, median, mean and 90th percentile delay. Five detectors (the product also at `c = 2`).
 * **Q3 real data [REAL].** Binance spot 1-minute bars for BTC, ETH, SOL and DOGE against USDT, 1 January 2024 to 31 December 2025, from the mirror described in `avmonitor.data`. (a) Epps effect: Pearson and sign-implied correlation at 1, 5, 15, 30 and 60 minutes, by year. (b) The streaming monitor on 5-minute bars (sum of five 1-minute log returns, NaN if any minute is missing), deseasonalised by the 20-day rolling intraday profile of `avmonitor.data.intraday_scale` (this only matters for the product and Gaussian monitors, see 2.4), `A = 5760` (288 bars per day, 5% per day), calibration 1440 bars (5 days), bands 0, 0.1, 0.2. For every alarm: the sign mean and Pearson correlation over the 5 days after against the 5 days before, the BTC robust scale after / before (does the alarm coincide with a volatility change?), and the BTC return over the 24 hours before and after the alarm. The same quantities at 2000 random times are the control. Days on which all three pairs raise an increase alarm are listed with the BTC daily return. A 1-minute run of the sign monitor on BTC/ETH shows the effect of the bar length.
+
+* **Q4 basket [SYNTHETIC and REAL].** k = 4. Validity of the basket monitor against "any of six pairwise sign monitors at level 6A" under Gaussian and t4 equicorrelation 0.3 and under volatility changes of one or all assets (correlations fixed), bands 0 and 0.05; delay for basket-wide changes (0.3 to 0.6, 0.3 to 0.0, 0.3 to 0.9) and for a change confined to one pair (0.3 to 0.8). Then the basket monitor on raw 5-minute returns of BTC, ETH, SOL and DOGE (no deseasonalisation and no scales are needed), `A = 5760`, calibration 1440 bars, bands 0.05, 0.1 and 0.2, with the same post-alarm and sell-off checks against 2000 random times.
 
 What is deliberately not done: no tuning on the real data (all settings were fixed from the synthetic runs and the main report), no claim about specific news events (dates are listed, not interpreted), and no trading backtest.
 
@@ -129,10 +140,10 @@ What is deliberately not done: no tuning on the real data (all settings were fix
 alternatives/correlation_monitor/
   README.md            this file: problem, formulation, proofs, comparison, implementation, methodology
   RESULTS.md           every number, labelled [SYNTHETIC] or [REAL], and an honest ranking
-  corrmon.py           statistics, calibration, bounded betting e-detector, benchmarks, streaming monitor
-  simulate_pairs.py    synthetic bivariate returns with correlation and volatility changes, jumps, t tails
-  run_experiment.py    Q0 to Q3; writes results/ (about 5 minutes on one core; --only q0,q1,q2 or --only q3)
-  tests/test_corrmon.py   9 synthetic tests, about 3 seconds, no data files or network needed (CI safe)
+  corrmon.py           statistics (pair and basket), calibration, bounded betting e-detector, benchmarks, streaming monitors
+  simulate_pairs.py    synthetic pairs and baskets with correlation and volatility changes, jumps, t tails, GARCH
+  run_experiment.py    Q0 to Q4; writes results/ (about 8 minutes on one core; --only q0,q1,q2 / q3 / q4)
+  tests/test_corrmon.py   12 synthetic tests, about 8 seconds, no data files or network needed (CI safe)
   results/             CSV outputs and two figures (fig1 synthetic delays, fig2 real alarms)
 ```
 

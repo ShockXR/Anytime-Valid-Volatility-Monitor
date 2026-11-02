@@ -494,6 +494,104 @@ class CorrelationMonitor:
 
 
 # ----------------------------------------------------------------------------
+# k assets: basket concordance
+# ----------------------------------------------------------------------------
+
+
+def basket_concordance(r) -> np.ndarray:
+    """Average pairwise sign concordance of ``k`` assets, ``2 / (k (k - 1)) sum_{i<j} sign(r_i) sign(r_j)``.
+
+    ``r`` has the assets on its last axis (shape (n, k) or (reps, n, k)). The
+    statistic lies in ``[-1 / (k - 1), 1]`` (lower bound from
+    ``sum_{i<j} s_i s_j = ((sum s)^2 - sum s^2) / 2 >= -k / 2``), its mean is the
+    average Blomqvist beta over the pairs, and it is invariant to any positive
+    predictable rescaling of each asset. NaN where any asset is missing.
+    """
+    r = np.asarray(r, float)
+    k = r.shape[-1]
+    if k < 2:
+        raise ValueError("need at least two assets")
+    s = np.sign(r)
+    tot = s.sum(axis=-1)
+    out = (tot**2 - (s**2).sum(axis=-1)) / (k * (k - 1))
+    out[~np.isfinite(r).all(axis=-1)] = np.nan
+    return out
+
+
+def basket_bounds(k: int) -> tuple[float, float]:
+    return -1.0 / (k - 1), 1.0
+
+
+class BasketMonitor:
+    """Streaming two-sided monitor for the average dependence inside a basket of ``k`` assets.
+
+    Same protocol as ``CorrelationMonitor`` (calibrate on ``cal_len`` complete
+    rows, each side at ``2 A``, recalibrate after an alarm) with the statistic
+    ``basket_concordance``. One e-detector covers the whole basket, so there is
+    no Bonferroni-type split over the k (k - 1) / 2 pairs.
+    """
+
+    def __init__(self, k: int, threshold: float = 5760.0, cal_len: int = 1440, null_band: float = 0.0,
+                 fractions=DEFAULT_FRACTIONS):
+        self.k = int(k)
+        self.lo, self.hi = basket_bounds(self.k)
+        self.A = float(threshold)
+        self.cal_len = int(cal_len)
+        self.band = float(null_band)
+        self.fr = np.asarray(fractions, float)
+        self.t = -1
+        self.events: list[PairEvent] = []
+        self.segments: list[dict] = []
+        self._reset()
+
+    def _reset(self):
+        self.buf: list[float] = []
+        self.calibrated = False
+        self.S_up = np.zeros(len(self.fr))
+        self.S_dn = np.zeros(len(self.fr))
+
+    def _calibrate(self):
+        y = np.asarray(self.buf)
+        self.m0 = float(y.mean())
+        self.m_up = min(self.m0 + self.band, self.hi)
+        self.m_dn = max(self.m0 - self.band, self.lo)
+        self.lam_up = self.fr / (self.m_up - self.lo) if self.m_up > self.lo else np.zeros(len(self.fr))
+        self.lam_dn = self.fr / (self.hi - self.m_dn) if self.hi > self.m_dn else np.zeros(len(self.fr))
+        self.start = self.t + 1
+        self.calibrated = True
+        self.segments.append(dict(start=self.start, cal_len=len(y), m0=self.m0, m_up=self.m_up, m_dn=self.m_dn))
+
+    def update(self, row) -> PairEvent | None:
+        self.t += 1
+        y = float(basket_concordance(np.asarray(row, float)[None, :])[0])
+        if not np.isfinite(y):
+            return None
+        if not self.calibrated:
+            self.buf.append(y)
+            if len(self.buf) >= self.cal_len:
+                self._calibrate()
+            return None
+        with np.errstate(over="ignore"):
+            self.S_up = (1.0 + self.lam_up * (y - self.m_up)) * (self.S_up + 1.0)
+            self.S_dn = (1.0 + self.lam_dn * (self.m_dn - y)) * (self.S_dn + 1.0)
+        mu, md = float(self.S_up.mean()), float(self.S_dn.mean())
+        ev = None
+        if mu >= 2 * self.A:
+            ev = PairEvent(self.t, "up", self.start, self.m0, float("nan"), mu, float("nan"), float("nan"))
+        elif md >= 2 * self.A:
+            ev = PairEvent(self.t, "down", self.start, self.m0, float("nan"), md, float("nan"), float("nan"))
+        if ev is not None:
+            self.events.append(ev)
+            self._reset()
+        return ev
+
+    def run(self, r) -> list[PairEvent]:
+        for row in np.asarray(r, float):
+            self.update(row)
+        return self.events
+
+
+# ----------------------------------------------------------------------------
 # Helpers for real data
 # ----------------------------------------------------------------------------
 
