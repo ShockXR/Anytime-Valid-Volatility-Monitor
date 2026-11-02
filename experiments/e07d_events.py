@@ -86,6 +86,8 @@ def tag_events(s: pd.DataFrame):
     missing = []
     for _, r in e.iterrows():
         t = "covid_window" if r.event_type == "covid_halt" else r.event_type
+        if t not in rows:  # documentation rows (for example market_structure) are not event types
+            continue
         if r.date.date() in dates:
             rows[t].add(r.date.date())
         else:
