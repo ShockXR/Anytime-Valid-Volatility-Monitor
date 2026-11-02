@@ -38,14 +38,20 @@ Research questions
   Q14g [REAL] E12 rerun: BTC, ETH, SOL, 21 January 2024 to 31 December 2025, streaming design, band
        0.25 (E12's frozen setting). Share of time awake, awake at the 16 FOMC and 22 CPI releases,
        up alarm within 6 hours of a release, against matched control windows.
-
-All settings (c = 3, delta = 0.01, the grid, the running window 120 refreshed every 10 steps, the
-awake schedule) were fixed before the reported runs from first principles and two pilots on other
-seeds (docs/iterations/TH2.md); nothing was tuned on the reported data. Seeds are fixed below.
+  Q14h [SYNTHETIC] Streaming monitors on minute-scale paths of 30 days (1440 steps per day, A as in
+       E12): share of time blind and false alarms per day with no change (i.i.d. Gaussian, t3), and,
+       with volatility that moves by x2, x1.5, x0.67 or x0.5 about once a day, the share of changes
+       met awake, detected within a day (before the next change) and the median delay.
   Q14w [SYNTHETIC] Supporting numbers: band widths at every grid level (grid, DKW time-uniform, DKW
        fixed-n, E8), constants, and the dilution of the rank detector after a change (numerical
        integration of the expected log growth).
-Usage: python experiments/e14_running_tau.py a|b|c|d|e|f|g|w|figures [--smoke] [--cal=390] [--law=jumps]
+
+All settings (c = 3, delta = 0.01, the grid, the running window 120 refreshed every 10 steps, the
+awake schedule, the Q14h regime process) were fixed before the reported runs from first principles
+and two pilots on other seeds (docs/iterations/TH2.md); nothing was tuned on the reported data.
+Seeds are fixed below.
+Usage: python experiments/e14_running_tau.py a|b|c|d|e|f|g|h|w|figures [--smoke] [--cal=390] [--law=jumps]
+       [--sub=null|delay] [--procs=2]
 """
 
 from __future__ import annotations
@@ -503,7 +509,7 @@ def q14d():
     if SMOKE:
         sources = ["BTCUSDT"]
     jobs = [(s, m, b) for s in sources for m, b in runs]
-    with Pool(2) as pool:
+    with Pool(int(OPTS.get("procs", 2))) as pool:
         res = pool.map(real_job, jobs, chunksize=1)
     summ = pd.DataFrame([r for r, _ in res])
     ev = pd.concat([e for _, e in res], ignore_index=True)
@@ -561,7 +567,7 @@ def q14g():
 
     coins = ["BTC"] if SMOKE else list(E12.COINS)
     jobs = [(c, m) for c in coins for m in G_METHODS]
-    with Pool(2) as pool:
+    with Pool(int(OPTS.get("procs", 2))) as pool:
         res = pool.map(g_job, jobs, chunksize=1)
     win = pd.concat([w for w, _ in res], ignore_index=True)
     summ = pd.DataFrame([s for _, s in res])
@@ -586,6 +592,114 @@ def q14g():
     print(summ.round(3).to_string(index=False))
     print(tests.round(4).to_string(index=False))
     return tests
+
+
+# ----------------------------------------------------------------------------
+# Q14h: blind time, false alarms per day and delay of streaming monitors [SYNTHETIC]
+# ----------------------------------------------------------------------------
+
+H_METHODS = ("plugin", "cs", "B-lr", "awake-A", "awake-B")
+H_DAY, H_DAYS, H_A_PLUG = 1440, 30, 28800.0
+H_FACTORS = (2.0, 1.5, 1 / 1.5, 0.5)
+
+
+def regime_path(law, rng, n):
+    """Volatility that moves by a factor from H_FACTORS at random times (gaps 240 + Exponential(1200), so 1440 on
+    average; the first change after the first day); log2 volatility kept in [-2, 2] by flipping a factor that would
+    leave it. Returns the returns and the list of (time, factor)."""
+    vol = np.ones(n)
+    changes, lv = [], 0.0
+    t = H_DAY + 240 + int(rng.exponential(1200))
+    while t < n:
+        f = H_FACTORS[rng.integers(len(H_FACTORS))]
+        if abs(lv + np.log2(f)) > 2:
+            f = 1 / f
+        lv += np.log2(f)
+        vol[t:] = 2.0**lv
+        changes.append((t, f))
+        t += 240 + int(rng.exponential(1200))
+    return draw(law, n, rng) * vol, changes
+
+
+def h_job(job):
+    law, kind, p = job
+    li, ki = LAWS.index(law), ("null", "regime").index(kind)
+    n = H_DAYS * H_DAY
+    rng = np.random.default_rng([SEED, 20, li, ki, p])
+    if kind == "null":
+        u, changes = draw(law, n, rng), []
+    else:
+        u, changes = regime_path(law, rng, n)
+    out = []
+    for method in H_METHODS:
+        mon = make_monitor(method, 0.0, H_DAY, H_A_PLUG, H_DAY / (0.05 - DELTA), seed=SEED + p)
+        t0 = time.time()
+        events, awake = stream(mon, u)
+        secs = time.time() - t0
+        idx = np.array([e.index for e in events], int)
+        dirs = np.array([e.direction for e in events])
+        rec = dict(law=law, kind=kind, path=p, method=method, steps=n, days=n / H_DAY, alarms=len(events),
+                   awake_share=float(awake.mean()), awake_share_after_day1=float(awake[H_DAY:].mean()),
+                   changes=len(changes), us_per_step=secs / n * 1e6)
+        matched = np.zeros(len(events), bool)
+        ch_rows = []
+        for ci, (c, f) in enumerate(changes):
+            end = min(changes[ci + 1][0] if ci + 1 < len(changes) else n, c + H_DAY)
+            want = "up" if f > 1 else "down"
+            w = np.flatnonzero((idx >= c) & (idx < end))
+            hit = w[dirs[w] == want] if w.size else w
+            first_any = int(w[0]) if w.size else -1
+            ok = hit.size > 0
+            if ok:
+                matched[hit[0]] = True
+            ch_rows.append(dict(law=law, kind=kind, path=p, method=method, time=c, factor=round(f, 3),
+                                awake_at_change=bool(awake[c]), awake_share_next_hour=float(awake[c : c + 60].mean()),
+                                detected=ok, delay=int(idx[hit[0]] - c + 1) if ok else np.nan,
+                                wrong_direction_first=bool(first_any >= 0 and dirs[first_any] != want),
+                                window=end - c))
+        rec["alarms_not_first_correct"] = int((~matched).sum())
+        out.append((rec, ch_rows))
+    return out
+
+
+def q14h():
+    from multiprocessing import Pool
+
+    from scipy import stats
+
+    paths = 2 if SMOKE else 40
+    laws = ("gaussian", "student_t3")
+    jobs = [(law, kind, p) for law in laws for kind in ("null", "regime") for p in range(paths)]
+    with Pool(int(OPTS.get("procs", 2))) as pool:
+        res = pool.map(h_job, jobs, chunksize=1)
+    recs = pd.DataFrame([r for job in res for r, _ in job])
+    chs = pd.DataFrame([c for job in res for _, cr in job for c in cr])
+    rows = []
+    for (law, kind, method), g in recs.groupby(["law", "kind", "method"], sort=False):
+        days = g["days"].sum()
+        k = int(g["alarms"].sum())
+        row = dict(law=law, kind=kind, method=method, paths=len(g), days=days, alarms=k, alarms_per_day=k / days,
+                   alarms_per_day_ci_high=stats.chi2.ppf(0.975, 2 * k + 2) / 2 / days,
+                   blind_share=1 - g["awake_share"].mean(), blind_share_after_day1=1 - g["awake_share_after_day1"].mean(),
+                   us_per_step=g["us_per_step"].median())
+        if kind == "regime":
+            c = chs[(chs.law == law) & (chs.method == method)]
+            row.update(changes=len(c), changes_per_day=len(c) / days,
+                       other_alarms_per_day=g["alarms_not_first_correct"].sum() / days,
+                       awake_at_change=c["awake_at_change"].mean(), detected=c["detected"].mean(),
+                       median_delay=c.loc[c.detected, "delay"].median(),
+                       wrong_direction_first=c["wrong_direction_first"].mean())
+            for f in sorted(c["factor"].unique()):
+                cf = c[c.factor == f]
+                row[f"detected_x{f:g}"] = cf["detected"].mean()
+                row[f"median_delay_x{f:g}"] = cf.loc[cf.detected, "delay"].median()
+        rows.append(row)
+    summ = pd.DataFrame(rows)
+    sfx = "_smoke" if SMOKE else ""
+    summ.to_csv(OUT / f"e14h_streaming{sfx}.csv", index=False)
+    chs.to_csv(OUT / f"e14h_streaming_changes{sfx}.csv", index=False)
+    print(summ.round(4).to_string(index=False))
+    return summ
 
 
 # ----------------------------------------------------------------------------
@@ -683,8 +797,9 @@ def q14w():
     const += [dict(name=f"log(2K / delta), K = {K}, delta = 0.01", value=np.log(2 * K / DELTA)),
               dict(name="log(2 / delta), delta = 0.01", value=np.log(2 / DELTA))]
     for f in RT.bet_family("lr")[0] + RT.bet_family("lr")[1]:
-        const.append(dict(name=f"rank LR bet rho = {f.rho:.3f}: largest factor f(u0)", value=float(f(f.u0))))
-        const.append(dict(name=f"rank LR bet rho = {f.rho:.3f}: smallest factor", value=float(min(f(1.0), f(f.u0)))))
+        ends = (float(f(f.u0)), float(f(1.0)))  # f is monotone in u, so its extremes are at u0 and 1
+        const.append(dict(name=f"rank LR bet rho = {f.rho:.3f}: largest factor", value=max(ends)))
+        const.append(dict(name=f"rank LR bet rho = {f.rho:.3f}: smallest factor", value=min(ends)))
     pd.DataFrame(const).to_csv(OUT / "e14w_constants.csv", index=False)
     # dilution: expected log growth of the matching rank LR bet at post-change step k, reference of n0 pre-change values
     drows = []
@@ -710,6 +825,57 @@ def q14w():
     pd.DataFrame(drows).to_csv(OUT / "e14w_dilution.csv", index=False)
     print(pd.DataFrame(drows).round(4).to_string(index=False))
     print(pd.DataFrame(const).round(4).to_string(index=False))
+    plugin_drift()
+
+
+def plugin_drift():
+    """Theory note, Proposition A.6: share of calibration windows on which the plug-in detector has positive drift
+    under the null (some bet with E log f > 0 given the window), the resulting bound on the expected run length,
+    E[T | window] <= (log(2 A |grid|) + log f_max) / g, and the Markov lower bound on P(T <= m) it implies.
+    Expectations over F use Q quadrature points (quantiles of the 4 million draws of `Truth`)."""
+    Q = 20_000
+    up = np.asarray(RT.DEFAULT_UP_GRID, float)
+    phis = np.asarray(RT.DEFAULT_DOWN_FRACTIONS, float)
+    reps = 200 if SMOKE else 2000
+    rows = []
+    for li, law in enumerate(LAWS):
+        truth = Truth(law)
+        vq = truth.v[((np.arange(Q) + 0.5) / Q * truth.v.size).astype(int)]
+        for ci, cal in enumerate(CAL_LENS):
+            r = draw(law, (reps, cal), np.random.default_rng([SEED, 21, li, ci]))
+            tau2 = (C * RT.scaled_mad(r)) ** 2
+            m_hat = np.mean(np.minimum(r**2, tau2[:, None]), axis=1)
+            g_up, g_dn = np.full(reps, -np.inf), np.full(reps, -np.inf)
+            fmax_up, fmax_dn = np.ones(reps), np.ones(reps)
+            for i in range(reps):
+                z = np.minimum(vq, tau2[i]) / m_hat[i]
+                gu = np.log1p(up[:, None] * (z[None, :] - 1)).mean(axis=1)
+                k = int(np.argmax(gu))
+                g_up[i], fmax_up[i] = gu[k], 1 + up[k] * (tau2[i] / m_hat[i] - 1)
+                B = tau2[i] / m_hat[i]
+                if B > 1:
+                    lam = phis / (B - 1)
+                    gd = np.log1p(lam[:, None] * (1 - z[None, :])).mean(axis=1)
+                    k = int(np.argmax(gd))
+                    g_dn[i], fmax_dn[i] = gd[k], 1 + lam[k]
+            rel = m_hat / truth.m(np.sqrt(tau2)) - 1
+            for A in (A_PLUG, 1e6):
+                tb_up = np.where(g_up > 0, (np.log(2 * A * up.size) + np.log(fmax_up)) / np.maximum(g_up, 1e-300), np.inf)
+                tb_dn = np.where(g_dn > 0, (np.log(2 * A * phis.size) + np.log(fmax_dn)) / np.maximum(g_dn, 1e-300), np.inf)
+                tb = np.minimum(tb_up, tb_dn)
+                pos = np.isfinite(tb)
+                for m in (DAY, 5 * DAY, 20 * DAY):
+                    rows.append(dict(law=law, cal_len=cal, A=A, horizon=m, windows=reps,
+                                     share_positive_drift_up=float(np.mean(g_up > 0)),
+                                     share_positive_drift_down=float(np.mean(g_dn > 0)),
+                                     share_positive_drift_either=float(np.mean(pos)),
+                                     median_run_length_bound=float(np.median(tb[pos])) if pos.any() else np.nan,
+                                     markov_lower_bound_false_alarm=float(np.mean(np.clip(1 - tb / m, 0, 1))),
+                                     ville_bound_if_valid=m / A,
+                                     sd_relative_error_m_hat=float(np.std(rel))))
+    df = pd.DataFrame(rows)
+    df.to_csv(OUT / f"e14w_plugin_drift{'_smoke' if SMOKE else ''}.csv", index=False)
+    print(df.round(4).to_string(index=False))
 
 
 # ----------------------------------------------------------------------------
@@ -726,22 +892,26 @@ def figures():
     a = pd.concat([pd.read_csv(f) for f in sorted(OUT.glob("e14a_validity*.csv")) if "smoke" not in f.name])
     b = pd.concat([pd.read_csv(f) for f in sorted(OUT.glob("e14b_delay*.csv")) if "smoke" not in f.name])
     order = ["oracle", "plugin", "plugin-run", "cs", "A-grid-fixed", "A-grid-run", "A-dkw-run", "B-lr", "B-ind", "B-freeze"]
-    fig, axes = plt.subplots(1, 2, figsize=(12, 4.2), sharey=True)
-    for ax, cal in zip(axes, CAL_LENS):
-        g = a[(a.cal_len == cal) & (a.horizon == DAY)]
-        xs = np.arange(len(order))
-        for k, law in enumerate(LAWS):
-            gg = g[g.law == law].set_index("method").loc[order]
-            ax.errorbar(xs + (k - 1.5) * 0.15, 100 * gg.false_alarm_rate, yerr=[100 * (gg.false_alarm_rate - gg.ci_low),
-                        100 * (gg.ci_high - gg.false_alarm_rate)], fmt="o", ms=3, capsize=2, label=law)
-        ax.axhline(5, color="k", ls="--", lw=1)
-        ax.text(len(order) - 0.6, 5.1, "proved bound 5%", ha="right", va="bottom", fontsize=8)
-        ax.set_xticks(xs)
-        ax.set_xticklabels(order, rotation=45, ha="right", fontsize=8)
-        ax.set_title(f"Q14a [synthetic]: one-day false alarms, calibration {cal}")
-        ax.grid(axis="y", lw=0.4, color="#dddddd")
-    axes[0].set_ylabel("false alarm rate within 390 steps (%)")
-    axes[0].legend(fontsize=8)
+    fig, axes = plt.subplots(2, 2, figsize=(12, 7.5), sharey="row")
+    for col, cal in enumerate(CAL_LENS):
+        for row, h in enumerate((DAY, 5 * DAY)):
+            ax = axes[row, col]
+            g = a[(a.cal_len == cal) & (a.horizon == h)]
+            xs = np.arange(len(order))
+            for k, law in enumerate(LAWS):
+                gg = g[g.law == law].set_index("method").loc[order]
+                ax.errorbar(xs + (k - 1.5) * 0.15, 100 * gg.false_alarm_rate,
+                            yerr=[100 * (gg.false_alarm_rate - gg.ci_low), 100 * (gg.ci_high - gg.false_alarm_rate)],
+                            fmt="o", ms=3, capsize=2, label=law)
+            bnd = g.groupby("method").bound.first().loc[order]
+            ax.hlines(100 * bnd, xs - 0.35, xs + 0.35, color="k", lw=1.2, label="bound (proved only for the methods marked *)")
+            ax.set_xticks(xs)
+            ax.set_xticklabels([m + ("*" if PROVED[m] else "") for m in order], rotation=45, ha="right", fontsize=8)
+            ax.set_title(f"Q14a [synthetic]: false alarms within {h} steps, calibration {cal}", fontsize=10)
+            ax.grid(axis="y", lw=0.4, color="#dddddd")
+        axes[0, 0].set_ylabel("false alarm rate within 390 steps (%)")
+        axes[1, 0].set_ylabel("false alarm rate within 1950 steps (%)")
+    axes[0, 0].legend(fontsize=7)
     fig.tight_layout()
     fig.savefig(FIG / "e14_validity.png", dpi=130)
     plt.close(fig)
@@ -764,6 +934,31 @@ def figures():
     fig.tight_layout()
     fig.savefig(FIG / "e14_delay.png", dpi=130)
     plt.close(fig)
+    f = OUT / "e14f_awake_delay.csv"
+    if f.exists():
+        d = pd.read_csv(f)
+        meths = ["awake-A", "awake-B", "plugin (1440-step recalibration)", "cs (1440-step recalibration)",
+                 "B-lr (1440-step recalibration)"]
+        ratios = [2.0, 1.5, 0.667, 0.5]
+        fig, axes = plt.subplots(1, len(ratios), figsize=(14, 3.8), sharey=True)
+        for ax, ratio in zip(axes, ratios):
+            g = d[(d.law == "student_t3") & (np.isclose(d.sd_ratio, ratio, atol=1e-3))]
+            for m in meths:
+                gg = g[g.method == m].sort_values("change_after_restart")
+                ax.plot(gg.change_after_restart, gg.median_delay, marker="o", ms=3, lw=1, label=m)
+            ax.set_xscale("log")
+            ax.set_yscale("log")
+            ax.set_xticks([30, 120, 360])
+            ax.set_xticklabels(["30", "120", "360"])
+            ax.set_xlabel("change this many steps after the restart")
+            ax.set_title(f"sd x{ratio:g} (Student t3)", fontsize=10)
+            ax.grid(lw=0.4, color="#dddddd")
+        axes[0].set_ylabel("median delay (steps), detected paths")
+        axes[0].legend(fontsize=7)
+        fig.suptitle("Q14f [synthetic]: delay after a restart, awake monitors against 1440-step recalibration", fontsize=10)
+        fig.tight_layout()
+        fig.savefig(FIG / "e14_awake.png", dpi=130)
+        plt.close(fig)
 
 
 def main():
@@ -771,7 +966,8 @@ def main():
     FIG.mkdir(parents=True, exist_ok=True)
     for p in parts:
         t0 = time.time()
-        {"a": q14a, "b": q14b, "c": q14c, "d": q14d, "e": q14e, "f": q14f, "g": q14g, "w": q14w, "figures": figures}[p]()
+        {"a": q14a, "b": q14b, "c": q14c, "d": q14d, "e": q14e, "f": q14f, "g": q14g, "h": q14h, "w": q14w,
+         "figures": figures}[p]()
         print(f"part {p}: {time.time() - t0:.0f} s", flush=True)
 
 

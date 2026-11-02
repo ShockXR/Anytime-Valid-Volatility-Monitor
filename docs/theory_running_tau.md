@@ -10,6 +10,8 @@ The detector of `docs/math.md` bets on the truncated squared return `X_t = min(r
 * **Route B (ranks).** If the returns are *exchangeable* (their joint law does not change when their order is permuted; i.i.d. returns with any law, including ties and jumps, are exchangeable), the rank of `|r_t|` among all earlier values, randomised to break ties, is an exactly uniform p-value, and these p-values are independent (Proposition B.1, a classical result of Vovk and coauthors). Betting on them needs no baseline, no δ and no truncation level, and the guarantee P(false alarm within m) ≤ m / A is exact (Theorem B.2). The price is that post-change returns enter the reference set and dilute the evidence (section 4.3).
 * **No blind period.** Both routes allow monitoring to resume immediately after an alarm instead of after a full calibration day: route A with a band that keeps learning and Shiryaev-Roberts chains that each bet against the band available when they start (Theorem A.4); route B simply restarts its reference set (Remark B.3). Corollary A.5 bounds the expected number of false alarms when the monitor restarts after every alarm.
 
+* **Why the plug-in is not enough.** At a fixed calibration length, the plug-in detector has a positive drift under the null on a fixed share of calibration windows, so its run length grows only like log A there and no bound of the form C m / A can hold for all A (Proposition A.6). E14 sees it at A = 7800 already: within five days (1950 steps) the plug-in alarms on 41% to 43% of null paths at 390 calibration steps, above the bound 1950 / 7800 = 25% that the oracle (12% to 14%) and the rank detectors (14% to 18%) respect.
+
 What is proved, what is cited and what is only checked numerically is listed in section 8.
 
 ## 1. Set-up and notation
@@ -133,6 +135,28 @@ Two points the proof makes precise. First, the good event "the band never fails"
 
 *Proof.* This is Corollary 6.6 of `docs/math.md` with "good segment" redefined. Call alarm k *good* if its segment's band has not failed before the alarm (for the frozen band: the band at T holds; for the awake band: `N_k ≥` the alarm's segment step). Bad alarms: a segment raises at most one alarm, and its band fails with probability at most δ given the information at its start, so `E[#bad] ≤ δ E[#segments started within the first m monitored steps] ≤ δ (1 + E[N_m])`. Good alarms: the process `W_t` = (sum of the stopped statistics M' at past good alarms) + (the current stopped statistic) - (number of monitored steps) is a supermartingale with `W_0 = 0`; each good alarm banks at least A because `M' = M` up to that alarm; optional stopping at the m-th monitored step gives `E[#good] ≤ m / A`. Add and rearrange. ∎
 
+### 3.7 Why a plug-in baseline cannot carry a bound of this form
+
+The default monitor bets against the plug-in mean. E8 found its one-day false alarm rate close to, but not above, the bound m / A. The next result shows that this is an accident of the horizon: at a fixed calibration length, no bound of the form `C m / A` can hold for the plug-in as A grows.
+
+*Set-up.* Calibration window `W = (r_1, ..., r_n)`, `τ̂ = c ×` scaled MAD of W, `m̂ = n⁻¹ Σ min(r_i², τ̂²)`; the monitor uses `τ_t = τ̂` and `m↑_t = m↓_t = m̂` (band 0). Assume that all returns, calibration and monitored, are i.i.d. with a law F (the null holds exactly). Write `X = min(r², τ̂²)` for a monitored return, `B̂ = τ̂² / m̂`, and, given W,
+
+`g↑(W) = max_{λ ∈ Λ↑} E_F[log(1 + λ (X / m̂ - 1)) | W]`, `g↓(W) = max_φ E_F[log(1 + λ_φ (1 - X / m̂)) | W]` with `λ_φ = φ / (B̂ - 1)` (`g↓ = -∞` if `B̂ ≤ 1`),
+
+`g(W) = max(g↑(W), g↓(W))`, K the number of bets on the side that attains it (6 or 5) and `f_max(W)` the largest factor of the attaining bet (`1 + λ (B̂ - 1)` or `1 + λ_φ`).
+
+**Proposition A.6 (the plug-in drifts).** Let `T_A` be the first alarm of the two-sided plug-in rule (each side at 2A). If `g(W) > 0`, then
+
+`E[T_A | W] ≤ (log(2 A K) + log f_max(W)) / g(W)`.
+
+Hence for every η > 0 and κ < ∞ with `p_{η,κ} = P(g(W) ≥ η, f_max(W) ≤ e^κ)` and every m ≥ 1, `P(T_A ≤ m) ≥ p_{η,κ} (1 - (log(12 A) + κ) / (η m))`. The probability `p_{η,κ}` depends on n and F but not on A, so with `m_A = (log A)²`, `P(T_A ≤ m_A) → p_{η,κ}` as A → ∞ while `m_A / A → 0`: if `p_{η,κ} > 0` for some η, κ, then no inequality `P(T_A ≤ m) ≤ C m / A` with a constant C holds for all A and m.
+
+*Proof.* Fix W. Given W, the monitored returns are i.i.d. F and independent of W, so the factors `f_i` of the attaining bet are i.i.d. with `E log f_i = g(W) > 0`. They are bounded: `f_i ≤ f_max(W)` and `f_i ≥ 1 - λ ≥ 1/2` (increase side) or `f_i ≥ 1 - λ_φ (B̂ - 1) = 1 - φ ≥ 0.05` (decrease side). The Shiryaev-Roberts statistic of this bet is `Σ_{j ≤ t} Π_{i=j}^{t} f_i ≥ W_t := Π_{i=1}^{t} f_i`, and the side's statistic, an average over K bets, is at least `W_t / K`. So `T_A ≤ T' = inf{t : S_t ≥ b}` with `S_t = log W_t` and `b = log(2 A K)`. The process `S_t - g t` is a martingale with bounded increments; optional stopping at the bounded time `T' ∧ k` gives `g E[T' ∧ k | W] = E[S_{T' ∧ k} | W] ≤ b + log f_max(W)`, because S is below b before T' and the last step adds at most `log f_max`. Let k → ∞ (monotone convergence). The second claim follows from Markov's inequality `P(T' > m | W) ≤ E[T' | W] / m` on the event `{g ≥ η, f_max ≤ e^κ}` (K ≤ 6 gives `log(2AK) ≤ log(12A)`), integrated over W. The third is immediate. ∎
+
+*When is `p_{η,κ} > 0`?* `g↑(W) > 0` as soon as the true mean `m_F(τ̂)` exceeds `m̂` by more than about `λ_min Var_F(X / m̂) / 2` in relative terms (λ_min = 0.02, the smallest bet), and symmetrically for `g↓` when `m̂` is too large. The relative error of `m̂` has a standard deviation of order `n^{-1/2}`, so at n = 390 or 1440 a large share of calibration windows gives one side a positive drift. E14 computes this share, the median run length bound and the Markov lower bound on the false alarm rate for A = 7800 and A = 10⁶ (`results/e14w_plugin_drift.csv`, expectations over F by quadrature on 4 million draws), and Q14a shows the consequence at A = 7800: within 1950 steps (bound 25%) the plug-in alarms on 41% to 43% of null paths at n = 390.
+
+*Why the other monitors escape.* With a band, on the event that the band holds, every bet has `E[f_t | F_{t-1}] ≤ 1`, hence `E log f_t ≤ 0`: no chain drifts up, which is what Theorems A.1 and A.4 and `docs/math.md` Theorem 6.4 use. The rank detector of route B has `E[f(p_t) | G_{t-1}] = 1` exactly. The frozen rank reference (`B-freeze`, section 4.3) has the same defect as the plug-in, with the frozen reference in the role of W.
+
 ## 4. Route B: ranks
 
 ### 4.1 Exact p-values
@@ -194,7 +218,7 @@ Grid ratio 2^{1/4} and 13 levels (centre ± 1.5 octaves) cover decreases to half
 
 ## 8. Status
 
-* **Proved here:** Lemma 2.1 and (2.1); Theorem A.1; Lemma A.2; Proposition A.4a; Theorem A.4; Corollary A.5 (given the arguments of Corollary 6.6 in `docs/math.md`); the reduction of Proposition A.3 from continuous laws to laws with atoms; Proposition B.1 (a known result; the proof is given for completeness); Theorem B.2 (given Proposition B.1 and Theorems A and B of `docs/math.md`); the dilution limit `g_∞ ≤ 0` of 4.3.
+* **Proved here:** Lemma 2.1 and (2.1); Theorem A.1; Lemma A.2; Proposition A.4a; Theorem A.4; Corollary A.5 (given the arguments of Corollary 6.6 in `docs/math.md`); Proposition A.6 (the plug-in has no bound of the form C m / A); the reduction of Proposition A.3 from continuous laws to laws with atoms; Proposition B.1 (a known result; the proof is given for completeness); Theorem B.2 (given Proposition B.1 and Theorems A and B of `docs/math.md`); the dilution limit `g_∞ ≤ 0` of 4.3.
 * **Cited:** Proposition A.3 (Howard and Ramdas 2022, Theorem 2; statement checked against the authors' code, see 3.4); the empirical Bernstein confidence sequences and Ville's inequality as in `docs/math.md` section 6; conformal test martingales and the conformal Shiryaev-Roberts and CUSUM procedures (Vovk 2021; Vovk et al. 2021); e-detectors (Shin, Ramdas and Rinaldo 2024).
 * **Checked numerically:** coverage of both bands, uniformity and independence of the p-values with ties, the exact false alarm bound of route B, the δ + m / A bound of route A with running τ and of the awake monitor, streaming equals vectorised (`tests/test_running.py`); validity at scale, delays, seasonality and drift, real data and cost (E14).
 * **Assumed, not proved:** the nulls on real data (volatility clustering violates all of them); the deseasonalising profile is treated as known; missing returns are skipped (valid if missingness says nothing about the size of the return); the dilution formula `π_k` is an approximation for large reference sets.
