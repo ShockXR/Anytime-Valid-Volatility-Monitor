@@ -12,6 +12,12 @@ Research questions
   Q5c. Run the streaming monitor on deseasonalised returns. How often does it
        alarm, and are its alarms followed by a persistent change in volatility
        (unlike alarms of the Gaussian benchmark)?
+  Q5c-r2 (round 2, after the independent review). The same question with three
+       fixes: missing returns are passed to the monitor as NaN instead of zeros
+       (review M6), the intraday profile uses past days only, with June 2025 as
+       a warm-up that is not monitored (review m16), and every alarm is counted
+       in the up and down columns (review m11). The round 1 function is kept
+       unchanged (it uses start="pooled") so that its results stay reproducible.
 """
 
 import sys
@@ -95,7 +101,7 @@ def q5b(df: pd.DataFrame):
 
 def q5c(df: pd.DataFrame):
     r = df.logret
-    s = intraday_scale(r.fillna(0.0), lookback_days=20)
+    s = intraday_scale(r.fillna(0.0), lookback_days=20, start="pooled")  # round 1 behaviour, kept for reproducibility
     u = (r / s).to_numpy(copy=True)
     u[~np.isfinite(u)] = np.nan
     results, events_all = [], []
@@ -103,7 +109,7 @@ def q5c(df: pd.DataFrame):
     for name, cls, band in [("robust e-detector", VolatilityMonitor, 0.0), ("robust e-detector", VolatilityMonitor, 0.25),
                             ("robust e-detector", VolatilityMonitor, 0.5), ("Gaussian LR", GaussianLRMonitor, 0.0)]:
         mon = cls(threshold=A, c=3.0, cal_len=1440, null_band=band)
-        ev = mon.run(np.nan_to_num(u, nan=0.0))
+        ev = mon.run(np.nan_to_num(u, nan=0.0))  # round 1: NaN as zero (review M6); fixed in q5c_r2
         # validation: robust sd in the 1440 minutes after each alarm relative to its baseline
         post = []
         for e in ev:
@@ -144,6 +150,47 @@ def q5c(df: pd.DataFrame):
     return u, s
 
 
+def q5c_r2(df_with_warmup: pd.DataFrame, monitor_from: str = "2025-07-01"):
+    """Round 2 version of Q5c (see the module docstring). Writes e05c_r2_*.csv."""
+    r = df_with_warmup.logret
+    s = intraday_scale(r, lookback_days=20)  # past days only; NaN returns are skipped
+    keep = df_with_warmup.index >= pd.Timestamp(monitor_from, tz="UTC")
+    u = (r / s).to_numpy(copy=True)[keep]
+    u[~np.isfinite(u)] = np.nan
+    idx = df_with_warmup.index[keep]
+    days = keep.sum() / 1440
+    A = 28800.0
+    results, events_all = [], []
+    for name, cls, band in [("robust e-detector", VolatilityMonitor, 0.0), ("robust e-detector", VolatilityMonitor, 0.25),
+                            ("robust e-detector", VolatilityMonitor, 0.5), ("Gaussian LR", GaussianLRMonitor, 0.0)]:
+        mon = cls(threshold=A, c=3.0, cal_len=1440, null_band=band)
+        ev = mon.run(u)  # NaN passed through: the monitor skips missing returns
+        ups = downs = 0
+        post_up, post_dn = [], []
+        for e in ev:
+            ups += e.direction == "up"
+            downs += e.direction == "down"
+            seg = u[e.index + 1 : e.index + 1441]
+            seg = seg[np.isfinite(seg)]
+            ratio = np.median(np.abs(seg)) * R.MAD_NORMAL_SCALE / e.baseline_scale if seg.size >= 1000 else np.nan
+            (post_up if e.direction == "up" else post_dn).append(ratio)
+            events_all.append(dict(detector=name, band=band, time=idx[e.index], direction=e.direction,
+                                   delay_minutes=e.index - e.monitored_since, post_over_baseline=ratio))
+        pu, pd_ = np.array(post_up, float), np.array(post_dn, float)
+        pu, pd_ = pu[np.isfinite(pu)], pd_[np.isfinite(pd_)]
+        results.append(dict(detector=name, band=band, alarms=len(ev), alarms_per_day=len(ev) / days, up=ups, down=downs,
+                            up_validated=len(pu), down_validated=len(pd_),
+                            median_post_ratio_up=float(np.median(pu)) if len(pu) else np.nan,
+                            median_post_ratio_down=float(np.median(pd_)) if len(pd_) else np.nan,
+                            share_up_followed_by_higher_vol=float(np.mean(pu > 1)) if len(pu) else np.nan,
+                            share_down_followed_by_lower_vol=float(np.mean(pd_ < 1)) if len(pd_) else np.nan))
+    res = pd.DataFrame(results)
+    res.to_csv(OUT / "e05c_r2_monitor_summary.csv", index=False)
+    pd.DataFrame(events_all).to_csv(OUT / "e05c_r2_events.csv", index=False)
+    print(res.round(3).to_string(index=False))
+    return res
+
+
 def figure(df, u):
     import matplotlib
 
@@ -168,7 +215,10 @@ def figure(df, u):
     fig.savefig(OUT / "figures/e05_btc_alarms.png", dpi=130)
 
 
-def main():
+def main(parts=("a", "b", "c", "c_r2")):
+    if parts == ("c_r2",):
+        q5c_r2(load_bitstamp_csv(RAW, "2025-06-01", "2026-01-01"))
+        return
     df = load_bitstamp_csv(RAW, "2025-07-01", "2026-01-01")
     r = df.logret.dropna().to_numpy()
     print(f"REAL DATA: {len(df)} minutes, zero-return share {np.mean(r == 0):.3f}")
@@ -176,7 +226,9 @@ def main():
     q5b(df)
     u, _ = q5c(df)
     figure(df, u)
+    if "c_r2" in parts:
+        q5c_r2(load_bitstamp_csv(RAW, "2025-06-01", "2026-01-01"))
 
 
 if __name__ == "__main__":
-    main()
+    main(tuple(sys.argv[1:]) or ("a", "b", "c", "c_r2"))
