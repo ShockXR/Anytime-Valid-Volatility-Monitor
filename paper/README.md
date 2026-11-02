@@ -18,7 +18,7 @@ The other two figures are read from `results/figures/` (`e09_stress.png` for Fig
 
 Main text: abstract; 1 introduction; 2 setting and the truncated statistic; 3 betting e-detectors (Theorems A and B, two-sided rule, Corollary C, the one-sided Bahadur-Savage argument, the confidence-sequence baseline with Theorem D and Corollaries E and F); 4 detection delay (information ladder, speed limits, Theorems 8 and 9, the price of robustness, the signal cap of Proposition 10); 5 simulation evidence; 6 real data; 7 questions from the reproduction of the estimator; 8 discussion, limitations and open problems. Then references, Appendices A (proofs for the estimated baseline), B (proofs for the delay theory), C (experiment settings), D (where each result lives in the repository), and a supplement S1 to S5 with the detailed versions of results that the main text summarises.
 
-Conventions: every number cites its experiment label (E1 to E15, ALT1 to ALT5, as in `docs/experiment_report.md`) and is marked **[SYNTHETIC]**, **[REAL]** or **[PUBLISHED]**. Lines marked `[PENDING ...]` are placeholders for experiments that were not finished when the draft was written. **[HEURISTIC]** marks the one approximation that is not proved.
+Conventions: every number cites its experiment label (E1 to E15, ALT1 to ALT5, as in `docs/experiment_report.md`) and is marked **[SYNTHETIC]**, **[REAL]** or **[PUBLISHED]**. All experiments cited in the draft are finished; there are no placeholders left. **[HEURISTIC]** marks the one approximation that is not proved.
 
 ## Regenerating
 
@@ -53,4 +53,4 @@ For a journal template, copy the body of `short_paper.tex` (between `\begin{docu
 
 ## Length
 
-The main text (abstract to Section 8) has about 15,200 words including inline mathematics, plus tables and displayed equations, longer than a 10 to 14 page short paper. Results that the main text only summarises are already in the supplement. The next candidates for moving out of the main text are the construction of the confidence sequence in Section 3.4 (to Appendix A), the information rate and Table 2 in Section 4.5, and Sections 6.2 to 6.4.
+The main text (abstract to Section 8) has about 15,300 words including inline mathematics, plus tables and displayed equations, longer than a 10 to 14 page short paper. Results that the main text only summarises are already in the supplement. The next candidates for moving out of the main text are the construction of the confidence sequence in Section 3.4 (to Appendix A), the information rate and Table 2 in Section 4.5, and Sections 6.2 to 6.4.

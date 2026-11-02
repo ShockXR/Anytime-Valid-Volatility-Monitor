@@ -126,9 +126,7 @@ betting; high-frequency volatility; truncation; jumps; anytime validity.
 experiment of the accompanying repository, cited by its label (for
 example ``(E9)''). Each result is marked \textbf{{[}SYNTHETIC{]}} (our
 simulation), \textbf{{[}REAL{]}} (our run on market data) or
-\textbf{{[}PUBLISHED{]}} (printed in Bapat 2026). Lines marked
-``{[}PENDING \ldots{]}'' are placeholders for experiments that were
-still running when this draft was written.
+\textbf{{[}PUBLISHED{]}} (printed in Bapat 2026).
 
 \hypertarget{introduction}{%
 \section{1 Introduction}\label{introduction}}
@@ -849,18 +847,20 @@ With \(c = 3\) and Gaussian returns, \(\log(B/(B-1)) = 0.117\) nats per
 step. This per-step cap holds for every valid bet; how many steps it
 implies depends on the bets. For the default decrease grid at
 \(A = 7800\) the floor is 36, 73, 122 and 180 steps for \(c = 2, 3, 4\)
-and 5 (E11), and a complete collapse of volatility (all returns zero) is
-detected after exactly 73 steps with \(c = 3\). A single bet close to
-\(\lambda_{\max}\) does better: with \(F\) close to \(B/(B-1)\) the
+and 5, and a complete collapse of volatility (all returns zero) is
+detected after exactly 73 steps with \(c = 3\) (E11). A single bet close
+to \(\lambda_{\max}\) does better: with \(F\) close to \(B/(B-1)\) the
 deterministic bound reads \(M_n \le B(F^n - 1)\), so no Shiryaev-Roberts
 e-detector whose bets are valid over the whole null can alarm before
 \(n = \log(1 + A/B)/\log(B/(B-1))\), which is 57.7 at \(A = 7800\) and
 63.6 at the two-sided level \(2A\), and a single bet just below
 \(\lambda_{\max}\) alarms after 58 (64) steps when all returns are zero.
-For rules that are not e-detectors the only lower bound we have is the
-asymptotic one of Theorem 9(a). This is the quantitative form of the
-impossibility of Section 3.3: the bound \(B\) that makes a decrease
-detectable also caps the evidence that one step can provide.
+The corresponding floors for any valid bets at \(A = 7800\) are 29, 96
+and 141 steps for \(c = 2, 4\) and 5 (E11). For rules that are not
+e-detectors the only lower bound we have is the asymptotic one of
+Theorem 9(a). This is the quantitative form of the impossibility of
+Section 3.3: the bound \(B\) that makes a decrease detectable also caps
+the evidence that one step can provide.
 
 \hypertarget{delay-bounds-and-first-order-optimality}{%
 \subsection{4.2 Delay bounds and first-order
@@ -1058,19 +1058,22 @@ costs 3\% to 12\% of delay against no truncation, and with jumps
 truncation is what keeps a burst of jumps from looking like a volatility
 increase: a burst moves the \(c = 3\) detector only 3.5\% as much as a
 real 25\% increase, against 39\% without truncation. For decreases the
-speed limit dominates and a smaller \(c\) is faster. The two sides need
-not share \(c\): with a known or confidence-sequence baseline for each
-side, each is a valid e-detector for its own truncated statistic and the
-two-sided rule of Proposition 1 needs only each side's guarantee. The
-implementation offers the split only with the plug-in baseline, so the
-experiments below are not covered by a proof: their no-change rates were
-5.4\% to 6.7\% per day, whether or not the two sides shared \(c\)
-(E11f). With a plug-in baseline, \(c = 2\) on the decrease side
-shortened the median decrease delay for Gaussian, Student \(t_4\) and
-jump returns in all nine cells, by 13\% to 51\%, and was neutral to
-slightly positive on real data (E11, E11f). {[}PENDING E11f rerun:
-rounded prices with a fixed tick, for which the comparison may reverse
-for small falls.{]} Details are in Supplement S2.
+speed limit dominates and a smaller \(c\) is usually faster. A separate
+clip for the decrease side (\(c_{\downarrow} = 2\), keeping \(c = 3\)
+for increases) cut simulated median decrease delays by 13\% to 51\% for
+Gaussian, Student \(t_4\) and jump returns, and by 32\% to 52\% for
+prices rounded to ticks of 0.25 and 0.75 standard deviations, but was
+12\% slower for a 20\% fall at a tick of 0.5 standard deviations (paired
+difference of 29 steps, standard error 1.7, slower on 66\% of paths); on
+the five coins, which have few zero returns, it was neutral to slightly
+positive (E11f) {[}SYNTHETIC and REAL{]}. Its false alarm guarantee
+holds with a known baseline or with the confidence-sequence baseline,
+which the monitor supports for the split (each side at level
+\(\delta/2\)): each side is then a valid e-detector for its own
+truncated statistic, and the two-sided rule of Proposition 1 needs only
+each side's guarantee. The simulations used the plug-in baseline, whose
+one-day false alarm rates (5.0\% to 6.7\%, and 5.0\% to 6.05\% without
+the split) are empirical only. Details are in Supplement S2.
 
 \hypertarget{clustering-forecast-relative-monitoring-and-a-signal-cap}{%
 \subsection{4.5 Clustering, forecast-relative monitoring and a signal
@@ -2962,34 +2965,95 @@ change size, and without truncation it falls to 29\% of the \(c = 3\)
 value. A burst of jumps at constant volatility (jump probability raised
 from 0.005 to 0.02) moves the \(c = 3\) detector only 3.5\% as much as a
 real 25\% volatility increase, against 39\% without truncation (E11).
-For decreases the speed limit dominates and a smaller \(c\) is faster:
-with \(c = 2\) the simulated decrease delays fall by 26\% to 49\%
-relative to \(c = 3\). The two sides need not share \(c\): with a known
-or confidence-sequence baseline for each side, each is a valid
-e-detector for its own truncated statistic and the two-sided rule of
-Proposition 1 needs only each side's guarantee, so \(c\) of about 3 to 4
-for increases and 1.5 to 2 for decreases is a legitimate design. The
-decrease null then concerns the mean of
+For decreases the speed limit dominates and a smaller \(c\) is usually
+faster: with the true baseline and Gaussian data, \(c = 2\) shortens the
+mean decrease delay by 26\% to 49\% relative to \(c = 3\) (E11). The two
+sides need not share \(c\): with a known baseline, or with the
+confidence-sequence baseline, which the monitor supports for the split
+by running the lower bound on \(\min(r^2, \tau_{\downarrow}^2)\) and the
+upper bound on \(\min(r^2, \tau^2)\), each at level \(\delta/2\), each
+side is a valid e-detector for its own truncated statistic and the
+two-sided rule of Proposition 1 needs only each side's guarantee, so
+\(c\) of about 3 to 4 for increases and 1.5 to 2 for decreases is a
+legitimate design. The decrease null then concerns the mean of
 \(\min(r^2, \tau_{\downarrow}^2)\) for the smaller level
 \(\tau_{\downarrow}\); volatility that has not fallen implies it under a
 fixed innovation shape (Lemma 1), but a smaller clip reacts more to
 changes of shape at constant volatility, such as a larger share of zero
-returns. In the experiments the split was run with the plug-in baseline,
-which no proof covers: the one-day no-change rates were 5.4\% to 6.7\%
-for every choice of \(c\) on the decrease side, so the excess over the
-5\% bound that holds with the true baseline comes from the baseline, not
-from the split (E11f). With a 1440-step plug-in baseline, \(c = 2\) on
-the decrease side shortened the median decrease delay for Gaussian,
-Student \(t_4\) and jump returns in all nine cells, by 13\% to 51\%
-(29\%, 46\% and 51\% for Gaussian returns and falls of the standard
-deviation to 0.8, 0.67 and 0.5 of its value), while \(c = 1.5\) was
-faster still for large falls but slower than \(c = 2\) for a 20\% fall
-(E11f) {[}SYNTHETIC{]}. {[}PENDING E11f rerun: returns rounded to a
-fixed price tick; the first E11f runs let the tick shrink with
-volatility, and with a fixed tick the comparison may reverse for small
-falls.{]} On the five cryptocurrencies of Section 6 the choice \(c = 2\)
-for decreases was neutral to slightly positive for the confirmation rate
-of decrease alarms, within sampling noise (E11f) {[}REAL{]}.
+returns. In the experiments the split was run with a 1440-step plug-in
+baseline, which no proof covers: over all 18 no-change cells the one-day
+rate was 5.0\% to 6.7\%, and 5.0\% to 6.05\% with
+\(c_{\downarrow} = c\), so the excess over the 5\% bound that holds with
+the true baseline is there without the split and comes from the baseline
+(E11f). Table S2 gives the median decrease delays. Rounded prices use a
+tick fixed in units of the pre-change standard deviation, so that more
+returns are zero after a fall (at a tick of 0.5 standard deviations,
+19.7\% before the change and 24.5\%, 29.1\% and 38.3\% after falls to
+0.8, 0.67 and 0.5 of the standard deviation); a first version of the
+experiment let the tick shrink with volatility and overstated the gain.
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Returns (calibration scale)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+sd × 0.8: \(c_{\downarrow}\) = 3 / 2 / 1.5
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+sd × 0.67
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+sd × 0.5
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Gaussian & 247 / 176 / 185 & 158 / 85 / 73 & 118 / 58 / 40 \\
+Student \(t_4\) & 334 / 289 / 277 & 160 / 117 / 106 & 100 / 62 / 48 \\
+Jumps & 273 / 196 / 206 & 161 / 88 / 74 & 119 / 59 / 40 \\
+Ticks of 0.25 sd (scale 1.11) & 292 / 185 / 188 & 191 / 98 / 77 & 144 /
+69 / 45 \\
+Ticks of 0.5 sd (scale 0.74) & \textbf{188 / 211 / 251} & 99 / 80 / 86 &
+70 / 39 / 35 \\
+Ticks of 0.75 sd (scale 1.11) & 295 / 201 / 207 & 192 / 100 / 81 & 144 /
+69 / 47 \\
+\end{longtable}
+
+\emph{Table S2. Median decrease delay in steps with a separate decrease
+clip \(c_{\downarrow}\) and \(c = 3\) for increases, plug-in baseline
+from 1440 steps, \(A = 28{,}800\), change at the first monitored step;
+600 paths per cell for the continuous laws and 2000 for rounded prices,
+the same paths for the three values of \(c_{\downarrow}\); every path
+detected. ``Scale'' is the median calibration scale (scaled MAD) in
+units of the true pre-change standard deviation (E11f) {[}SYNTHETIC{]}.}
+
+With \(c_{\downarrow} = 2\) the median delay fell in all nine cells of
+the continuous laws, by 13\% to 51\% (for Gaussian data the mean delay
+fell by 25\%, 44\% and 50\%, close to the 26\%, 43\% and 49\% that the
+theory predicts with the true baseline), and in all six cells with ticks
+of 0.25 and 0.75 standard deviations, by 32\% to 52\%. At a tick of 0.5
+standard deviations it was 12\% slower for a 20\% fall (median 211
+against 188 steps; paired difference of 29 steps, standard error 1.7;
+slower on 66\% of paths) and faster for larger falls, by 19\% and 44\%.
+\(c_{\downarrow} = 1.5\) was no better than \(c_{\downarrow} = 2\) for a
+20\% fall except under Student \(t_4\) returns, and at the tick of 0.5
+standard deviations it was 34\% slower than \(c = 3\). A reading of the
+tick case, not a proof: with rounded returns the calibration scale is,
+on almost every path, a whole number of ticks times 1.4826, so at a tick
+of 0.5 standard deviations it is 0.74 standard deviations against 1.11
+at ticks of 0.25 and 0.75; \(c = 3\) then already clips at about 2.2
+standard deviations, near the best clip for a 20\% fall, and
+\(c_{\downarrow} = 2\) at about 1.5, past it, while the growing share of
+zero returns after the fall adds to the effect (E11f). On the five
+cryptocurrencies of Section 6, which have few zero returns (1.0\% to
+4.3\% of deseasonalised returns), the choice \(c_{\downarrow} = 2\) was
+neutral to slightly positive for the confirmation rate of decrease
+alarms, within sampling noise (E11f) {[}REAL{]}. On data with a coarse
+tick, \(c_{\downarrow} = 2\) should be compared with \(c = 3\) at that
+tick before it is used.
 
 \textbf{The slack of the false alarm bound.} E11 locates the slack with
 an exact optional stopping identity that writes the ratio of the false
