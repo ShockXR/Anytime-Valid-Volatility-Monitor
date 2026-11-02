@@ -443,3 +443,117 @@ After an increase alarm the next day's volatility exceeded both forecasts 76% to
 ### 6.4 What the real data say about the method
 
 Three lessons qualify the simulation results. First, alarm rates on real data are far above the 5% budget: 0.66 to 0.71 per day on crypto at band 0.25, and 0.14 to 0.57 per session on the Nifty 50 across configurations. This does not contradict the guarantee, which concerns periods in which the null holds; one-minute volatility relative to a one-day baseline simply moves often. Dividing returns by an EWMA forecast with a half-life of 6 or 24 hours changed the crypto alarm rate by between +2% and $-17\%$ (E10, Q10c). Second, a monitor that recalibrates for a full day after every alarm is blind most of the time when alarms come every 1.4 days (about 70% in E12, and 85% with band 0 on Bitstamp BTC/USD, E8). A restart without a blind period is studied in E14 (Section 5.5). Third, on Bitstamp BTC/USD the confidence-sequence baseline of Theorem D reduced the number of alarms by 16% to 20% at every band, almost all of it in decrease alarms, and behaved like a data-driven band of about 0.16 to 0.18 (E8, Q8e). Its value on real data is the proof, not better alarms. Finally, our crypto and Nifty data come from public mirrors of exchange data rather than from the exchanges, and Bapat (2026) does not name the source of its crypto data, so the comparison with its tables in Section 7 uses a data set that is close to, but not the same as, the published one.
+
+## 7 What a reproduction found about the estimator
+
+Before building the monitor we reimplemented the estimators of Bapat (2026) as printed and compared them with the published simulation and real-data tables. We report four findings, as questions for the author rather than corrections. Where we say what the code behind the tables probably does, this is an inference from published numbers, not a fact. None of the findings touches the central idea, truncation at a robust scale followed by kernel smoothing, and the monitor of this paper uses the scaled MAD and the squared statistic, so none of them affects Sections 3 to 6. We do not claim to have improved the estimator.
+
+**Question 1: are the kernel weights normalised?** The local estimator $\hat Q_t = \tfrac13 \sum_{i=t-h}^{t} K((i-t)/h)\, r_i^4$ (eqs. 6 and 12) uses raw kernel weights and no factor for the step length $\Delta$. Under locally constant volatility $\mathbb{E}[\hat Q_t] = W(h)\,\sigma_t^4\Delta^2$ with $W(h) = \sum_{k=0}^{h} K(k/h)$, about $0.341h + 0.32$ for the Gaussian kernel ($W(30) = 10.6$), so the estimate grows with the bandwidth. The real-data tables give a clean check: if the kernel estimate is the average of $\hat Q_t$ over the sample and RQ is $\tfrac13\sum r_i^4$, their ratio is close to $W(30)/(n - 30) \approx 3.99 \times 10^{-5}$ whatever the data. The published ratios are 4.00 to $4.03 \times 10^{-5}$ for all five coins [PUBLISHED], and our Binance data give $3.986 \times 10^{-5}$ for all five [REAL] (E1, E6). Once both kernels are put on the same scale, the comparison is fair and the robust idea holds up: with the scaled MAD the normalised robust kernel has a smaller RMSE than the normalised plain kernel in all 45 cells of the simulation design, and with the raw MAD it wins whenever jumps are moderate or large (E1) [SYNTHETIC].
+
+**Question 2: is the MAD scaled by 1.4826?** Because the MAD shrinks at the same rate as the returns, $\tau/(\sigma\sqrt\Delta)$ does not change with $n$, the share of clipped returns stays fixed, and the truncated estimator converges to $\kappa_4(a)$ times integrated quarticity rather than to integrated quarticity: $\kappa_4 = 0.705$ with the raw MAD ($c = 3$ clips at 2.02 standard deviations) and 0.964 with the scaled MAD. In simulation the ratio to the truth was 0.705 at $n = 390$, 1440 and 23,400 (E2) [SYNTHETIC]. Thresholds of the form $c\Delta^{\varpi}$ with $\varpi < 1/2$ (Mancini 2009) avoid this, as does division by $\kappa_4$. Two independent checks point to the raw MAD in the published tables: the simulated robust RMSE matches the published one with a median ratio of 0.90 for the raw MAD against 1.29 for the scaled MAD (E1), and on four coins, after adjusting for differences in quartiles between the data sets, the robust kernel matches the published values with ratios of 0.81 to 0.96 for the raw MAD against 1.86 to 2.48 for the scaled MAD (E6) [PUBLISHED against SYNTHETIC and REAL]. For a monitor this constant is a matter of definition, since the null concerns the truncated variance itself; for an estimator of integrated quarticity it has to be divided out.
+
+**Question 3: is the averaged estimator meant to equal truncated realised quarticity?** Exchanging the two sums in eq. (16), every interior return collects each kernel weight exactly once, so apart from the first and last $h$ returns the averaged estimator equals $W(h)/(3(n-h))\sum_i \tilde r_i^{\,4}$, a constant times the realised quarticity of the truncated returns. In simulation the normalised averaged robust kernel and plain truncated realised quarticity had correlation 0.98 to 0.99 and mean ratio within 0.4% of 1 in seven scenarios (E2) [SYNTHETIC]. For integrated quarticity, therefore, the kernel and the bandwidth mostly change a constant and the edges. The kernel's real contribution is the local estimate $\hat Q_t$, which is what an online procedure needs.
+
+**Question 4: is one scale per day or per sample enough when volatility moves within the day?** Under stochastic volatility with an intraday pattern, a single daily MAD left a bias of about $-14\%$ at $n = 23{,}400$ even after dividing by $\kappa_4$, and its RMSE fell like $n^{-0.1}$, while estimators truncating against a local scale (a few dozen neighbouring returns) converged at the usual rate (fitted slopes $-0.50$ to $-0.68$) (ALT3) [SYNTHETIC]. On one-minute crypto data, 10 to 15 times more returns are clipped within a day than for Gaussian returns, and with one MAD over six months, as in the published crypto table, the robust kernel keeps under 2% of the fourth moment (E6) [REAL]. Large one-minute returns come in bursts (44% to 65% have a large neighbour), and on BTC and DOGE the scale-truncated estimators come out at 0.33 to 0.44 times the median realised quarticity of Andersen, Dobrev and Schaumburg (2012), local plug-ins at 0.66 to 0.73 (ALT3) [REAL]. Was the MAD in the crypto application computed per day, over the whole sample, or locally?
+
+The accompanying documentation lists smaller points in the same spirit (the weight order in eq. 15, the noise model, the constants of the bipower and tripower quarticities, how the RMSE of the real-data table was computed, and the DOGE row, whose zero quartiles imply a zero MAD and hence a zero robust kernel, while a positive value is printed).
+
+## 8 Discussion, limitations and open problems
+
+**What is new and what is not.** The probabilistic tools (Ville's inequality, test supermartingales, Shiryaev-Roberts e-detectors, empirical Bernstein confidence sequences, the Bahadur-Savage phenomenon, Lorden's and Lai's lower bounds) are known, and Theorems A and B are instances of known results. What this paper adds is their combination for jump-robust online volatility monitoring: the choice of the clipped squared return with a predictable robust truncation level as the monitored statistic, the conditional-mean nulls and their volatility meaning, the explanation of why a decrease detector needs a bounded statistic and what speed limit truncation then imposes, the confidence-sequence baseline with its proof, the decomposition of the delay cost of robustness, the signal cap under forecast-relative monitoring, and the evidence of Sections 5 and 6. Sections 3.3 and 4 are where we would most value a check by a specialist in sequential analysis.
+
+**Limitations.**
+
+* *The null is a statement about conditional means.* Persistent volatility clustering, price-level microstructure noise, estimated baselines and errors in the intraday profile all move the conditional mean of $X_t$ without a structural change. Each has a remedy (forecast-relative monitoring, non-overlapping pre-averaged blocks, the confidence-sequence baseline), and each remedy costs speed. The effect of an estimated intraday profile was not isolated in any experiment.
+* *Tail shape.* By Lemma 1, a change in the shape of the return distribution at constant volatility, or a leverage effect, can move the truncated variance and raise an alarm that is not a volatility change.
+* *Estimated baselines.* The plug-in baseline that the real-data runs use has no proof and exceeds the bound over horizons of several days (Section 3.4). The confidence-sequence baseline has a proof but needs long calibration to be fast (Table 7).
+* *Conservatism.* With the default grid the bound is about four times larger than the observed rate at one day (Section 5.2).
+* *Restarts and blindness.* Corollaries C and F bound the expected number of false alarms when the monitor recalibrates after every alarm; they are not a single anytime-valid statement for a whole series, and on real data the monitor is blind most of the time (Section 6.4).
+* *Several assets.* Five coins monitored at 5% per day each give, by the union bound, up to 25% per day for at least one false alarm in the group. [PENDING E15: panel monitoring of many assets with false discovery control.]
+* *Delay theory.* The delay results assume i.i.d. post-change data and a known baseline; the second-order formula is a heuristic whose regularity conditions we did not check; Theorem 9 is asymptotic and the asymptotic regime arrives slowly (Section 4.3).
+* *Data.* One-minute bars only, from public mirrors of exchange data; no tick data; real-data validation has no ground truth and uses indirect checks (later volatility, forecasts, India VIX, scheduled events).
+
+**Open problems.**
+
+1. *A certified sharper threshold for mixtures.* For single bets the bound $m/A$ is nearly attained by an adversarial null law, but for the default mixture the worst law found reaches only 42% of it (Section 5.2). A sharper bound that is still provable would translate directly into speed.
+2. *A running truncation level and a restart without a blind period, with a proof that costs little.* Real data want $\tau_t$ to follow the current scale. A band that holds for all truncation levels at once, rank-based (conformal) bets that need no baseline, and restarts that learn the baseline while monitoring are candidates (E14, Section 5.5).
+3. *A narrower baseline.* A betting confidence sequence could recover at most the gap to the oracle bound of Section 5.3, 7.6 to 10.6 points at 390 calibration steps.
+4. *Theory under clustering.* A proof of the cap for the mean of the ratio $\mathbb{E}[r_t^2/s_t]$ that the monitor actually sees, delay bounds for forecast-relative monitoring with estimated forecast parameters, and a principled choice of band for clustered data.
+5. *What should the monitor watch?* The same detectors applied to the clipped fourth power were faster for increases and slower for decreases (ALT1). Whether to monitor the truncated variance, the truncated quarticity or both, and how to combine them with one false alarm budget, is a question on which the author of the quarticity estimator is better placed than we are.
+6. *Estimation.* A central limit theorem for truncation against a local scale, which the evidence of Section 7 (Question 4) suggests is the right object for one-minute data, and a comparison of classical purely sequential fixed-accuracy estimation of volatility, with a robust quarticity estimate as the variance plug-in, against anytime-valid confidence sequences.
+
+## References
+
+Andersen, T. G. and Bollerslev, T. (1997). Intraday periodicity and volatility persistence in financial markets. *Journal of Empirical Finance* 4(2-3), 115-158. doi:10.1016/S0927-5398(97)00004-2
+
+Andersen, T. G., Dobrev, D. and Schaumburg, E. (2012). Jump-robust volatility estimation using nearest neighbor truncation. *Journal of Econometrics* 169(1), 75-93. doi:10.1016/j.jeconom.2012.01.011
+
+Andersen, T. G., Todorov, V. and Zhou, B. (2025). Real-time detection of local no-arbitrage violations. *Quantitative Economics* 16(2), 459-495. doi:10.3982/QE2585
+
+Bahadur, R. R. and Savage, L. J. (1956). The nonexistence of certain statistical procedures in nonparametric problems. *Annals of Mathematical Statistics* 27(4), 1115-1122.
+
+Bapat, S. R. (2026). A jump and noise robust kernel based estimator of quarticity for high frequency data. *International Review of Economics and Finance* 109, 105482. doi:10.1016/j.iref.2026.105482
+
+Barndorff-Nielsen, O. E. and Shephard, N. (2004). Power and bipower variation with stochastic volatility and jumps. *Journal of Financial Econometrics* 2(1), 1-37. doi:10.1093/jjfinec/nbh001
+
+Bibinger, M., Jirak, M. and Vetter, M. (2017). Nonparametric change-point analysis of volatility. *Annals of Statistics* 45, 1542-1578. doi:10.1214/16-AOS1499
+
+Bollerslev, T. (1986). Generalized autoregressive conditional heteroskedasticity. *Journal of Econometrics* 31(3), 307-327. doi:10.1016/0304-4076(86)90063-1
+
+Boudt, K., Croux, C. and Laurent, S. (2011). Robust estimation of intraweek periodicity in volatility and jump detection. *Journal of Empirical Finance* 18(2), 353-367. doi:10.1016/j.jempfin.2010.11.005
+
+Corsi, F. (2009). A simple approximate long-memory model of realized volatility. *Journal of Financial Econometrics* 7(2), 174-196. doi:10.1093/jjfinec/nbp001
+
+Diebold, F. X. (1986). Modeling the persistence of conditional variances: a comment. *Econometric Reviews* 5(1), 51-56.
+
+Dufresne, D. (1990). The distribution of a perpetuity, with applications to risk theory and pension funding. *Scandinavian Actuarial Journal* 1990(1), 39-79.
+
+Fan, X., Grama, I. and Liu, Q. (2015). Exponential inequalities for martingales with applications. *Electronic Journal of Probability* 20, paper 1, 1-22. doi:10.1214/EJP.v20-3496
+
+Grünwald, P., de Heide, R. and Koolen, W. (2024). Safe testing. *Journal of the Royal Statistical Society Series B* 86(5), 1091-1128. doi:10.1093/jrsssb/qkae011
+
+Honda, J. and Takemura, A. (2010). An asymptotically optimal bandit algorithm for bounded support models. *Proceedings of the 23rd Conference on Learning Theory (COLT 2010)*.
+
+Horváth, L., Trapani, L. and Wang, S. (2024). Sequential monitoring for explosive volatility regimes. arXiv:2404.17885.
+
+Howard, S. R., Ramdas, A., McAuliffe, J. and Sekhon, J. (2021). Time-uniform, nonparametric, nonasymptotic confidence sequences. *Annals of Statistics* 49(2), 1055-1080. doi:10.1214/20-AOS1991
+
+Inclán, C. and Tiao, G. C. (1994). Use of cumulative sums of squares for retrospective detection of changes of variance. *Journal of the American Statistical Association* 89(427), 913-923.
+
+Lai, T. L. (1998). Information bounds and quick detection of parameter changes in stochastic systems. *IEEE Transactions on Information Theory* 44(7), 2917-2929.
+
+Lamoureux, C. G. and Lastrapes, W. D. (1990). Persistence in variance, structural change, and the GARCH model. *Journal of Business and Economic Statistics* 8(2), 225-234.
+
+Larsson, M., Ramdas, A. and Ruf, J. (2024). The numeraire e-variable and reverse information projection. arXiv:2402.18810.
+
+Lorden, G. (1970). On excess over the boundary. *Annals of Mathematical Statistics* 41(2), 520-527.
+
+Lorden, G. (1971). Procedures for reacting to a change in distribution. *Annals of Mathematical Statistics* 42(6), 1897-1908.
+
+Mancini, C. (2009). Non-parametric threshold estimation for models with stochastic diffusion coefficient and jumps. *Scandinavian Journal of Statistics* 36, 270-296.
+
+Mikosch, T. and Starica, C. (2004). Nonstationarities in financial time series, the long-range dependence, and the IGARCH effects. *Review of Economics and Statistics* 86(1), 378-390. doi:10.1162/003465304323023886
+
+Page, E. S. (1954). Continuous inspection schemes. *Biometrika* 41(1-2), 100-115. doi:10.1093/biomet/41.1-2.100
+
+Pollak, M. (1985). Optimal detection of a change in distribution. *Annals of Statistics* 13(1), 206-227. doi:10.1214/aos/1176346587
+
+Pollak, M. (1987). Average run lengths of an optimal method of detecting a change in distribution. *Annals of Statistics* 15(2), 749-779. doi:10.1214/aos/1176350373
+
+Ram, A. and Ramdas, A. (2026). Asymptotically optimal sequential change detection for bounded means. arXiv:2602.05272.
+
+Ramdas, A., Grünwald, P., Vovk, V. and Shafer, G. (2023). Game-theoretic statistics and safe anytime-valid inference. *Statistical Science* 38(4), 576-601. doi:10.1214/23-STS894
+
+Roberts, S. W. (1966). A comparison of some control chart procedures. *Technometrics* 8(3), 411-430.
+
+Shafer, G. (2021). Testing by betting: a strategy for statistical and scientific communication. *Journal of the Royal Statistical Society Series A* 184(2), 407-431. doi:10.1111/rssa.12647
+
+Shin, J., Ramdas, A. and Rinaldo, A. (2024). E-detectors: a nonparametric framework for sequential change detection. *New England Journal of Statistics in Data Science* 2(2), 229-260. doi:10.51387/23-NEJSDS51
+
+Shiryaev, A. N. (1963). On optimum methods in quickest detection problems. *Theory of Probability and Its Applications* 8(1), 22-46. doi:10.1137/1108002
+
+Ville, J. (1939). *Étude critique de la notion de collectif*. Thèse, Paris.
+
+Waudby-Smith, I. and Ramdas, A. (2024). Estimating means of bounded random variables by betting. *Journal of the Royal Statistical Society Series B* 86(1), 1-27. doi:10.1093/jrsssb/qkad009
+
+Woodroofe, M. (1982). *Nonlinear Renewal Theory in Sequential Analysis*. CBMS-NSF Regional Conference Series in Applied Mathematics 39. SIAM, Philadelphia.
