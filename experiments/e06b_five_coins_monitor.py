@@ -349,6 +349,20 @@ def forecast_hits(source, period, S: Series, events, rng):
             for dn, cmp in (("up", np.greater), ("down", np.less)):
                 p = post[(d == dn) & np.isfinite(post)] if t.size else np.array([])
                 rec[f"{dn}_share_post_over_baseline_in_direction"] = float(np.mean(cmp(p, 1))) if p.size else np.nan
+            # Do the two rules flag the same events? Share of e-detector alarms with a same-direction rule alarm
+            # within 60 or 360 minutes, and the median of (e-detector time - rule time) for those within 360.
+            te = np.array([e[0] for e in ev], int)
+            de = np.array([e[1] for e in ev])
+            for win in (60, 360):
+                hit, lead = [], []
+                for ti, di in zip(te, de):
+                    m = (d == di) & (np.abs(t - ti) <= win) if t.size else np.array([], bool)
+                    hit.append(bool(np.any(m)))
+                    if win == 360 and np.any(m):
+                        j = np.argmin(np.where(m, np.abs(t - ti), np.inf))
+                        lead.append(ti - t[j])
+                rec[f"share_edetector_alarms_with_rule_alarm_within_{win}"] = float(np.mean(hit)) if hit else np.nan
+            rec["median_edetector_minus_rule_minutes"] = float(np.median(lead)) if lead else np.nan
             comp_rows.append(rec)
     out = pd.DataFrame(rows)
     for dn in ("up", "down"):

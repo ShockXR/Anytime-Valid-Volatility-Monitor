@@ -14,6 +14,8 @@ Research questions
        H3 the ETH mean has the wrong sign because of a sign or ordering slip
           (the mean is fixed by the first and last prices);
        H4 a different calendar window (time zone) explains the small mean gaps;
+       H4b the window has about 2,000 fewer returns than a complete half year
+           (the length implied by Kernel / RQ in Q6b);
        H5 the extremes come from one crash (10 Oct 2025) and from venue
           microstructure, so gaps or multi-minute returns could move them.
   Q6b. Table 6 for all five coins: which printed formula or alternative gives
@@ -25,7 +27,7 @@ Research questions
        estimators, and the share of the fourth moment removed by MAD truncation
        (raw returns, deseasonalised returns, Gaussian theory).
 
-Outputs: results/e06a_table5.csv, e06a_hypotheses.csv, e06a_window_offsets.csv,
+Outputs: results/e06a_table5.csv, e06a_hypotheses.csv, e06a_window_offsets.csv, e06a_window_length.csv,
 e06a_extremes.csv, e06b_table6_formulas.csv, e06b_power_scan.csv,
 e06b_kernel_rq_ratio.csv, e06b_robust_mad.csv, e06b_rmse_definitions.csv,
 e06c_daily_iq.csv, e06c_summary.csv, e06c_truncation_share.csv.
@@ -177,6 +179,27 @@ def q6a(data):
     print("\n[Q6a H4] best calendar offsets (ETH sign flipped); 0 = UTC, 5.5 = IST, 8 = UTC+8")
     print(w.sort_values("max_abs_err_excl_ETH").head(5).round(4).to_string(index=False))
     print(w[w.offset_hours_before_utc.isin([0, 5.5, 8])].round(4).to_string(index=False))
+
+    # H4b: the window length implied by Kernel / RQ (Q6b) is about 262,950 returns, about 2,000 fewer than a
+    # complete UTC half year. Three ways to lose them: the window ends early, starts late, or has missing minutes
+    # (same first and last price, fewer returns, returns spanning the gaps).
+    n_t = 262950
+    t_start, t_last = pd.Timestamp(START, tz="UTC"), pd.Timestamp(END, tz="UTC") - pd.Timedelta(minutes=1)
+    cases = {"same window, about 2,000 missing minutes": (t_start, t_last),
+             "window ends early (30 Dec 14:30 UTC)": (t_start, t_start + pd.Timedelta(minutes=n_t)),
+             "window starts late (2 Jul 09:29 UTC)": (t_last - pd.Timedelta(minutes=n_t), t_last)}
+    rows = []
+    for lab, (st, en) in cases.items():
+        rec = dict(case=lab, n_returns=n_t, start=str(st), end=str(en))
+        for c in COINS:
+            m = np.log(closes[c][en] / closes[c][st]) / n_t
+            rec[f"{c}_ratio"] = m / (TABLE5_ALL[c]["mean"] * (-1 if c == "ETH" else 1))
+        rec["max_abs_err_all_five_ETH_flipped"] = max(abs(rec[f"{c}_ratio"] - 1) for c in COINS)
+        rows.append(rec)
+    wl = pd.DataFrame(rows)
+    wl.to_csv(OUT / "e06a_window_length.csv", index=False)
+    print("\n[Q6a H4b] means for a sample of 262,950 returns (ratio Binance / published, ETH sign flipped)")
+    print(wl.round(4).to_string(index=False))
 
     # H5: extremes, when they happen, and multi-minute returns
     rows = []
