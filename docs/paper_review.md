@@ -23,7 +23,7 @@ This review follows the 17-point structure of the research brief. It is written 
 
 **3. Context.** The log price is a continuous semimartingale (eq. 1), or a jump diffusion (eq. 8). Returns are modelled as `r_t = σ_t ε_t + J_t` (eq. 10), with Bernoulli(p) jumps of size `N(μ_J, σ_J²)`, and optionally `+ α_t` noise (eq. 13).
 
-**4. Existing methods (Section 2).** Realized quarticity RQ (eq. 3), bipower BPQ (eq. 4), tripower TPQ (eq. 5), threshold variants (Mancini 2009, Corsi, Pirino and Renò 2010), MinRQ and MedRQ (Andersen, Dobrev and Schaumburg 2012, extended by Schulz 2010), pre-averaging (Jacod et al. 2009), plus efficient (Jacod and Rosenbaum 2013), noise-and-jump robust (Podolskij and Vetter 2009) and Fourier (Mancino and Sanfelici 2012) approaches. Table 1 compares them on noise robustness, jump robustness and simplicity.
+**4. Existing methods (Section 2).** Realized quarticity RQ (eq. 3), bipower BPQ (eq. 4), tripower TPQ (eq. 5), threshold variants (Mancini 2009, Corsi, Pirino and Renò 2010), MinRQ and MedRQ (Andersen, Dobrev and Schaumburg 2012; the paper cites the 2008 working paper version), pre-averaging (Jacod et al. 2009), plus efficient (Jacod and Rosenbaum 2013), noise-and-jump robust (Podolskij and Vetter 2009) and Fourier (Mancino and Sanfelici 2012) approaches. Table 1 compares them on noise robustness, jump robustness and simplicity.
 
 **5. Gap.** According to the paper, no simple estimator is robust to both noise and jumps.
 
@@ -55,7 +55,7 @@ This review follows the 17-point structure of the research brief. It is written 
 
 **14. Results claimed.** The robust kernel has the lowest bias and RMSE in simulation and is the only member of the superior set in the MCS test. It is "consistently" better than the plain kernel. On real data it ranks best overall. For DOGE, MAD is close to zero because of price discreteness.
 
-**15. Limitations (stated and found).** Stated: kernels are light-tailed, robustness comes only from truncation, and DOGE breaks the MAD rule. Found by us: see `docs/estimator_issues.md`. In brief, the kernel weights are not normalised, the truncation bias does not vanish, the averaged estimator equals truncated RQ, the noise model makes noise look like volatility, and the real-data RMSE is uninformative.
+**15. Limitations (stated and found).** Stated: kernels are light-tailed, robustness comes only from truncation, and DOGE breaks the MAD rule. Found by us: see `docs/estimator_issues.md`. In brief, the kernel weights are not normalised, the truncation bias does not vanish, the averaged estimator equals truncated RQ, the noise model makes noise look like volatility, and the real-data RMSE depends mainly on the assumed true value.
 
 **16. Conclusions.** The robust kernel estimator is simple and outperforms standard estimators across jump intensities, jump sizes, bandwidths and kernels.
 
@@ -63,7 +63,7 @@ This review follows the 17-point structure of the research brief. It is written 
 
 ## Treatment of time in the paper (what is local and what is global)
 
-The paper's local estimator `Q_t` looks only backwards (from t - h to t), which is exactly what a real-time system needs. But two ingredients are global. The MAD uses the whole sample, including the future, and the reported quantity is the average over the whole day. The prototype keeps the backward-looking kernel, replaces the global MAD with an online one, and uses the local values directly instead of averaging them away.
+The paper's local estimator `Q_t` looks only backwards (from t - h to t), which is exactly what a real-time system needs. But two ingredients are global. The MAD uses the whole sample, including the future, and the reported quantity is the average over the whole day. The prototype keeps the backward-looking idea, estimates the MAD from past data only (a calibration window, re-estimated after each alarm; a rolling or exponentially weighted MAD in E3), and uses local, per-minute statistics directly instead of averaging them away.
 
 ## What we take from the paper
 

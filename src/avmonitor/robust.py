@@ -429,14 +429,19 @@ def rolling_mad_zero(r: np.ndarray, window: int, min_periods: int | None = None,
 
 
 def ew_quantile_scale(
-    r: np.ndarray, halflife: float = 390.0, init: float | None = None, scaled: bool = True, floor: float = 0.0
+    r: np.ndarray, halflife: float = 390.0, init: float | None = None, scaled: bool = True, floor: float = 0.0,
+    strict: bool = False,
 ) -> np.ndarray:
     """Predictable exponentially weighted ``median(|r|)`` by stochastic approximation.
 
     Uses the multiplicative Robbins and Monro update
     ``m_t = m_{t-1} * exp(eta * (1{|r_t| > m_{t-1}} - 1/2))``, which tracks the
     median of ``|r|`` and stays positive. ``eta`` is set from ``halflife``.
-    Entry ``t`` uses data before ``t`` only.
+    Entry ``t`` uses data before ``t`` only, with one exception: when ``init``
+    is None the start value is the median of the first 50 values, so entries
+    0 to 49 use those values (a start-up look-ahead, flagged by the independent
+    review). Pass ``init`` from earlier data, or ``strict=True`` to return NaN
+    for those entries, when strict predictability matters.
 
     Edge cases (iteration 3 of the log): NaN returns leave the estimate
     unchanged instead of counting as zeros; the estimate never falls below
@@ -468,4 +473,6 @@ def ew_quantile_scale(
         if at != at:  # NaN: no information
             continue
         m = m * up if at > m else max(m * down, lo)
+    if strict and init is None:
+        out[: min(n, 50)] = np.nan
     return out * MAD_NORMAL_SCALE if scaled else out

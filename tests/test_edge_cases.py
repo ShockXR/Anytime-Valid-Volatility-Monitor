@@ -88,3 +88,19 @@ def test_ew_scale_unchanged_on_clean_data():
         ref[t] = m
         m *= np.exp(eta * ((a[t] > m) - 0.5))
     assert np.allclose(R.ew_quantile_scale(a, scaled=False), ref, rtol=1e-12, atol=0)
+
+
+def test_ew_quantile_scale_strict_has_no_lookahead():
+    """Review m16: with strict=True the first 50 entries are NaN and later entries ignore the future."""
+    import numpy as np
+
+    from avmonitor.robust import ew_quantile_scale
+
+    rng = np.random.default_rng(1)
+    r = rng.standard_normal(500)
+    a = ew_quantile_scale(r, strict=True)
+    assert np.all(np.isnan(a[:50])) and np.all(np.isfinite(a[50:]))
+    r2 = r.copy()
+    r2[300:] *= 100.0
+    b = ew_quantile_scale(r2, strict=True)
+    np.testing.assert_array_equal(a[50:301], b[50:301])

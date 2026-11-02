@@ -56,3 +56,28 @@ def test_nifty_returns_stay_within_sessions(tmp_path):
 def test_month_and_file_keys():
     assert [str(m) for m in D._months("2025-11-15", "2026-02-01")] == ["2025-11", "2025-12", "2026-01"]
     assert D._nifty_keys("2025-06-01", "2026-03-01") == ["2025", "2026-01", "2026-02"]
+
+
+def test_intraday_scale_is_predictable_by_default():
+    """Review m16: changing day 15 must not change the profile on days 1 to 15 (start='past')."""
+    import numpy as np
+    import pandas as pd
+
+    from avmonitor.data import intraday_scale
+
+    idx = pd.date_range("2025-01-01", periods=1440 * 30, freq="1min", tz="UTC")
+    rng = np.random.default_rng(0)
+    r = pd.Series(rng.standard_normal(len(idx)), index=idx)
+    a = intraday_scale(r)
+    r2 = r.copy()
+    r2[(r2.index >= "2025-01-15") & (r2.index < "2025-01-16")] *= 10.0
+    b = intraday_scale(r2)
+    early = a.index < "2025-01-16"
+    np.testing.assert_array_equal(a[early].fillna(-1.0).to_numpy(), b[early].fillna(-1.0).to_numpy())
+    assert a[a.index < "2025-01-11"].isna().all()  # not enough past days yet
+    assert a[a.index >= "2025-01-12"].notna().all()
+    # missing returns are skipped, not counted as zeros
+    r3 = r.copy()
+    r3.iloc[1440 * 25 + 100 : 1440 * 25 + 160] = np.nan
+    c = intraday_scale(r3)
+    assert c[c.index >= "2025-01-27"].notna().all()
