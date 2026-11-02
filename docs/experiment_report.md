@@ -25,13 +25,13 @@ To rerun: `pip install -r requirements.txt && pip install -e .`, then `python sc
 | E9 | How tight is the guarantee, and when does it fail? | About 4 times conservative and distribution free; persistent GARCH clustering breaks it. |
 | E10 | Monitoring relative to a volatility forecast | Restores the guarantee under clustering; a frozen persistent forecast lets through at most (1 - β)/α of any break, and an information bound puts the delay near two days. |
 | E11 | Detection delay and bet design (theory) | Proved delay bound and asymptotic optimality (the delay attains log A / KL_inf); the price of robustness is a ratio of information numbers that predicts E4's 14% to 73% penalties, mostly the cost of making no distributional assumption; truncation caps decrease detection at log(B / (B - 1)) per step (at least 73 steps at c = 3); the false alarm bound is nearly attained by an adversarial null for a single bet. |
-| E12 | Crypto alarms around FOMC and CPI releases | Up alarms within 6 hours of 14 to 15 of 16 FOMC statements against about 30% of matched control windows; the streaming monitor is blind about 70% of the time while recalibrating. |
+| E12 | Crypto alarms around FOMC and CPI releases | Streaming monitor (fixed in advance): up alarms within 6 hours of 8 to 9 of 16 FOMC statements (all at which it was monitoring) against 11% to 17% of weekday-matched controls; primary test passes for FOMC, not for CPI on BTC. Fresh calibration: 14 to 15 of 16 against 29% to 32%. The streaming monitor is blind about 70% of the time while recalibrating. |
 | E13 | Benchmark against Bibinger, Jirak and Vetter (2017) and Bayesian online change points | In progress. |
 | E14 | A guarantee with a running truncation level | In progress. |
 | E15 | Panel monitoring with false discovery control | Proved FDR control at every stopping time with e-BH on per-asset e-processes (a Shiryaev-Roberts statistic divided by t is not an e-value); FDR at most 0.96% in 48 designs; on five coins plus Nifty, discoveries are confirmed 78% to 97% of the time against about 50% at random, and e-BH's gain over Bonferroni is mostly earlier flags. |
 | ALT1 | Quarticity stream; pre-averaging for noise | Price noise breaks the raw-return guarantee; non-overlapping pre-averaged blocks restore it. |
 | ALT2 | Risk switch | Tails on par with daily volatility targeting, worse tracking, no Sharpe difference; the robust trigger beats the Gaussian one. |
-| ALT3 | Robust local IQ estimator | Squaring a local variance is 95% efficient against 74% for RQ-type estimators; one daily MAD stops converging when volatility moves within the day; on BTC and DOGE large returns come in bursts and scale-truncated estimators remove a third to a half of IQ. |
+| ALT3 | Robust local IQ estimator | Squaring a local variance is 95% efficient in simulation, against 86% for the kappa-corrected kernel with an estimated MAD (98% with an oracle cut-off) and 74% for untruncated RQ; one daily MAD stops converging when volatility moves within the day; on BTC and DOGE large returns come in bursts, and our version of the robust kernel is 0.33 to 0.42 times MedRQ. |
 | ALT4 | Correlation monitor | Sign concordance gives a valid correlation monitor that volatility changes cannot fool. |
 | ALT5 | Two-sample (rank) betting test | Ranks against a growing reference give an exactly valid detector for any return law and horizon (1.9% to 3.5% per day against 5%); ranks against a fixed reference fail like a plug-in baseline; 2.9 times faster for a change in tail shape, 4% to 19% slower for a scale change. |
 | ALT6 | Sequential fixed-accuracy estimation of volatility (classical purely sequential rules against anytime-valid confidence sequences) | In progress. |
@@ -92,7 +92,7 @@ The loss does not shrink with n, which matches the theory in `docs/math.md`, sec
 
 **Reading.** Truncation works very well against jumps. The raw-MAD version "wins" the noise columns only because its built-in downward bias (mean 0.68 when clean) cancels the upward noise bias. That is a coincidence of two errors, not robustness. Clipped returns keep τ⁴ per jump, so big jumps still leave a bias (mean ratio 1.21 with the scaled MAD). Dropping returns (TRQ, mean 1.10) removes more of it. No estimator here handles noise, which is expected.
 
-**Q2d [SYNTHETIC].** The normalised robust kernel IQ against plain truncated RQ: correlation 0.982 to 0.989 and mean ratio 0.996 to 1.001 in all seven scenarios. The kernel adds nothing for the integrated quantity (`docs/math.md`, section 4).
+**Q2d [SYNTHETIC].** The normalised robust kernel IQ against plain truncated RQ: correlation 0.982 to 0.990 and mean ratio 0.996 to 1.001 in all seven scenarios. The kernel adds nothing for the integrated quantity (`docs/math.md`, section 4).
 
 ## E3. Can the truncation run online?
 
@@ -326,7 +326,7 @@ One definition, comparing the robust kernel with the truncated target κ₄ θ, 
 
 ### Q6d. The streaming monitor on five coins, out of sample, and across venues
 
-**Settings, frozen from E5.** A = 28,800 per side (at most a 5% chance of any false alarm per day under the null), c = 3, 1,440-minute calibration, bands 0, 0.25 and 0.5, returns divided by the predictable intraday profile (`intraday_scale`, 20-day lookback, using only days before). The Gaussian likelihood ratio monitor (band 0) is the benchmark. Periods: 1 July to 31 December 2025, and **out of sample** 21 January 2024 to 30 June 2025 (527 days; the first 20 days of January 2024 only warm up the intraday profile). Nothing was changed after seeing either period. Gaps: missing minutes would be NaN rows, so no return spans a gap; the monitor skips NaN returns and drops them from calibration windows; post-alarm volatilities need at least 1,000 finite returns out of 1,440. The mirror had no gaps, so this rule never fired.
+**Settings, frozen from E5.** A = 28,800, each side alarming at 2A (together at most a 5% chance of any false alarm per day under the null), c = 3, 1,440-minute calibration, bands 0, 0.25 and 0.5, returns divided by the predictable intraday profile (`intraday_scale`, 20-day lookback, using only days before). The Gaussian likelihood ratio monitor (band 0) is the benchmark. Periods: 1 July to 31 December 2025, and **out of sample** 21 January 2024 to 30 June 2025 (527 days; the first 20 days of January 2024 only warm up the intraday profile). Nothing was changed after seeing either period. Gaps: missing minutes would be NaN rows, so no return spans a gap; the monitor skips NaN returns and drops them from calibration windows; post-alarm volatilities need at least 1,000 finite returns out of 1,440. The mirror had no gaps, so this rule never fired.
 
 **Validation.** As in E5c: robust volatility (scaled median |u|) of the 1,440 minutes after an alarm, divided by the baseline of the calibration window. New here: Wilson 95% intervals, and a **matched-delay control**: random times whose baseline window ended as long before as each alarm's did (5 random times per alarm). The E5 control (next day against previous day at 3,000 random times) gives 45% to 54% (`results/e06d_monitor_summary.csv`).
 
@@ -472,7 +472,7 @@ Median ratio of daily IQ to MedRQ (`results/e07a_iq_summary.csv`):
 
 The held-out years look the same (1.24, 1.04, 1.02). The function in `src` should get a `circular=False` option for session markets (see the hand-back notes).
 
-**Settings, fixed before any monitor run.** One session is 375 steps. A = 375 / 0.05 = 7,500 per alarm level, so under the null (volatility equal to the baseline) the chance of any false alarm within a session is at most 5%. Truncation at c = 3 scaled MADs of the calibration window. Calibration 375 or 750 steps, null band b = 0, 0.25 or 0.5 (the band makes the monitor ignore changes in truncated variance smaller than a factor 1 ± b). Pre-registered primary configuration: calibration 750 (E4d found one session of calibration slightly above the bound) and band 0.25 (E4c). Development period 2017 to 2021 (1,170 sessions), held-out period 2022 to October 2026 (1,191 sessions). The monitor was run on the development period alone first (`results/*_devonly.csv`), then on everything. **Nothing was changed after looking at the held-out period.** Missing minutes are fed as missing (skipped), not as zeros.
+**Settings, fixed before any monitor run.** One session is 375 steps. A = 375 / 0.05 = 7,500, with each side alarming at 2A, so under the null (volatility equal to the baseline) the chance of any false alarm within a session is at most 5%. Truncation at c = 3 scaled MADs of the calibration window. Calibration 375 or 750 steps, null band b = 0, 0.25 or 0.5 (the band makes the monitor ignore changes in truncated variance smaller than a factor 1 ± b). Pre-registered primary configuration: calibration 750 (E4d found one session of calibration slightly above the bound) and band 0.25 (E4c). Development period 2017 to 2021 (1,170 sessions), held-out period 2022 to October 2026 (1,191 sessions). The monitor was run on the development period alone first (`results/*_devonly.csv`), then on everything. **Nothing was changed after looking at the held-out period.** Missing minutes are fed as missing (skipped), not as zeros.
 
 **Validation.** For each alarm, compare the robust volatility of the next session (scaled median |u|) with the baseline the alarm was measured against. Control: 5,000 random minutes from the same run while it is monitoring, compared with the baseline in force at that minute. Intervals are Wilson 95% intervals. Because each alarm restarts calibration, no session has more than one alarm, so "alarms per session" is also the share of sessions with an alarm.
 
@@ -637,7 +637,7 @@ Median delay in steps after a change 500 monitored steps in (in brackets: share 
 
 All 54 cells are in `e08b_change.csv`; figure `e08_delays.png`.
 
-**Reading.** The proof is expensive with short calibration and cheap with long calibration. At 390 steps the cs detector needs 1.8 to 7.2 times the plug-in delay and misses a 25% increase within 2500 steps on 24% (Gaussian) to 65% (t5) of paths, because its upper bound sits 37% to 41% above the truth (Q8a). At 1440 steps the factor is about 1.4 for a doubling or halving and 1.5 to 3.0 for smaller changes. At 5000 steps it is 1.2 to 1.7. Large changes (×2, ×0.5) cost the least: about twice the plug-in delay at 390 steps (14 to 67 extra steps) and at most 1.45 times at 1440 steps.
+**Reading.** The proof is expensive with short calibration and cheap with long calibration. At 390 steps the cs detector needs 1.8 to 7.6 times the plug-in delay (the largest ratio, 695.5 against 92 steps for jumps at ×1.25, is in the CSV but not in the printed table) and misses a 25% increase within 2500 steps on 24% (Gaussian) to 65% (t5) of paths, because its upper bound sits 37% to 41% above the truth (Q8a). At 1440 steps the factor is about 1.4 for a doubling or halving and 1.5 to 3.0 for smaller changes. At 5000 steps it is 1.2 to 1.7. Large changes (×2, ×0.5) cost the least: about twice the plug-in delay at 390 steps (14 to 67 extra steps) and at most 1.45 times at 1440 steps.
 
 ### Q8c. Calibration length chosen from the data [SYNTHETIC]
 
@@ -656,9 +656,9 @@ Rule: τ from the first 195 steps, then stop at the first step with (U - L) / me
 
 ### Q8d. Is the width the bound's fault? [SYNTHETIC]
 
-Upper and lower bound divided by the true mean of X, at the end of a fixed window, δ = 0.01: a normal-approximation interval (no finite-sample guarantee), the best bound any constant bet can give for the true law (an "oracle" that knows the distribution), and our empirical Bernstein bound (median of 500 paths).
+Upper and lower bound divided by the true mean of X, at the end of a fixed window, δ = 0.01: a normal-approximation interval (no finite-sample guarantee), the best bound any constant bet can give for the true law ("best constant bet", a benchmark that knows the distribution, not a strict limit for every betting bound), and our empirical Bernstein bound (median of 500 paths).
 
-| Returns | Calibration (sequence length) | Upper: normal approx. | oracle betting | ours | Lower: normal approx. | oracle betting | ours |
+| Returns | Calibration (sequence length) | Upper: normal approx. | best constant bet | ours | Lower: normal approx. | best constant bet | ours |
 |---|---|---|---|---|---|---|---|
 | Gaussian | 390 (292) | 1.189 | 1.290 | 1.368 | 0.811 | 0.785 | 0.741 |
 | Gaussian | 1440 (1080) | 1.098 | 1.139 | 1.171 | 0.902 | 0.881 | 0.869 |
@@ -667,7 +667,7 @@ Upper and lower bound divided by the true mean of X, at the end of a fixed windo
 | Student t5 | 390 (292) | 1.211 | 1.320 | 1.426 | 0.789 | 0.761 | 0.704 |
 | Student t5 | 5000 (3750) | 1.059 | 1.080 | 1.082 | 0.941 | 0.926 | 0.920 |
 
-**Reading.** At 1440 steps and above our bound is within 3.5 points of the oracle; at 390 steps it gives away 7.6 to 10.6 points. Most of the width is intrinsic: the truncated squared return has a standard deviation 1.4 to 1.6 times its mean and a range of 4.7 to 6.5 standard deviations, and even an oracle needs a bound 29% to 32% above the mean from 292 observations. A tighter construction (the "hedged capital" betting sequence) could recover at most the gap to the oracle.
+**Reading.** At 1440 steps and above our upper bound is within 3.5 points of the best constant bet; at 390 steps the upper bound gives away 7.6 to 10.6 points. Most of the width is intrinsic: the truncated squared return has a standard deviation 1.4 to 1.6 times its mean and a range of 4.7 to 6.5 standard deviations, and even the best constant bet needs a bound 29% to 32% above the mean from 292 observations. A tighter construction (the "hedged capital" betting sequence) could recover roughly the gap to that benchmark.
 
 ### Q8g. Choosing δ [SYNTHETIC]
 
@@ -715,8 +715,8 @@ Configuration of E5c: deseasonalised one-minute returns, c = 3, 1440-minute cali
 | cs | 0.5 | 36000 | 76 (0.41) | 54 / 22 | 1.52 | 83% | 0.31 | 100% | 1.77 / 0.41 | 1440 | 58% |
 
 **Reading.**
-* The cs baseline cuts alarms by 16% to 20% at every band (156 to 131, 126 to 101, 92 to 76). Almost all of the cut is in decrease alarms (86 to 56, 53 to 35, 33 to 22); increase alarms change little. The control row shows that the larger A alone changes nothing (126 alarms at both A values), so the cut comes from the baseline.
-* Hit rates of decrease alarms rise (67% to 82% with no band, 90% to 97% with band 0.25, 97% to 100% with band 0.5), and the remaining decrease alarms are followed by larger drops (median 0.45 against 0.65 at band 0.25). Hit rates of increase alarms stay at 77% to 83%. Against a 50% chance level (E5c control), all variants are informative.
+* The cs baseline cuts alarms by 16% to 20% at every band (156 to 131, 126 to 101, 92 to 76). Almost all of the cut is in decrease alarms (86 to 56, 53 to 35, 33 to 22); increase alarms change little. The control row shows that the larger A alone changes almost nothing (126 alarms at both A values; the split moves from 73/53 to 74/52 and the increase hit rate from 81% to 77%), so the cut comes from the baseline.
+* Hit rates of decrease alarms rise (67% to 82% with no band, 90% to 97% with band 0.25, 97% to 100% with band 0.5), and the remaining decrease alarms are followed by larger drops (median 0.45 against 0.65 at band 0.25). Hit rates of increase alarms stay at 77% to 83%. All variants beat random times (about 50%, E5c control). A rate-matched ratio rule does about as well (E6e), so this check shows that the alarms are not noise, not that they add precision.
 * On this data the cs baseline acts like an extra, data-driven band: at band 0 its null values sit 16% above and 18% below the plug-in, close to a fixed band of 0.16 to 0.18, and its alarm count and decrease hit rate fall between those of the plug-in with band 0 and with band 0.25. Its value is the proof, not better alarms.
 * A side effect worth knowing: with recalibration after every alarm, the monitor spends most of the time calibrating (it monitors only 15% of the minutes with the plug-in and no band). Fewer alarms mean more monitored time (29% for cs). The adaptive rule needed longer windows here (median 2455 minutes for w = 0.3, against 1233 steps for synthetic Gaussian data with a slightly different split), so it monitors only 25% of the time. We did not check why; a likely reason is that the truncated squared deseasonalised returns are more dispersed relative to their mean than in the synthetic laws, or drift within the window.
 
@@ -756,7 +756,7 @@ Script `e09_stress_guarantee.py`. All results **[SYNTHETIC]**, fixed seeds.
 | 0.50 | 3.6% | 34% | 60% | 69% |
 | 1.00 (increase side only) | 0% | 12% | 16% | 20% |
 
-**Reading.** Short-lived clustering (half-life of a few steps) is absorbed by a band of 0.5. Persistent clustering is not absorbed by any reasonable static band: with a half-life of an hour or more, even b = 1 (alarm only if variance more than doubles) leaves 12% to 20% of days with an alarm. This is not a failure of the proof; it says what the monitor detects. Persistent GARCH clusters *are* changes in conditional volatility, and the monitor reports them. If the goal is to flag breaks *relative to a volatility model* rather than ordinary clustering, the null has to be stated relative to a forecast: monitor returns divided by a predictable volatility forecast. E10 tests that idea.
+**Reading.** Short-lived clustering (half-life 14 steps, the shortest case in the table) is absorbed by a band of 0.5. Persistent clustering is not absorbed by any reasonable static band: with a half-life of an hour or more, even b = 1 (alarm only if variance more than doubles) leaves 12% to 20% of days with an alarm. This is not a failure of the proof; it says what the monitor detects. Persistent GARCH clusters *are* changes in conditional volatility, and the monitor reports them. If the goal is to flag breaks *relative to a volatility model* rather than ordinary clustering, the null has to be stated relative to a forecast: monitor returns divided by a predictable volatility forecast. E10 tests that idea.
 
 **Q9d. Runtime** (`e09d_profile.csv`; one shared 4-core machine, so timings are indicative). The streaming monitor processes about 100,000 returns per second for one series (10 µs per step), so a year of one-minute crypto bars takes about 5 seconds. The vectorised detector costs 0.04 µs per path-step at 10,000 paths, so a Monte Carlo study of 10,000 paths of one week takes about 1 second. The normalised robust kernel IQ costs about 0.15 µs per return. Nothing in the prototype needs compiled code at these sizes; numba was considered and not added.
 
@@ -785,7 +785,7 @@ Script `e10_forecast_relative.py`. Parts a, b, b2 and d are **[SYNTHETIC]** with
 | oracle | 0 | 5.3% | 4.7% | 5.3% |
 | oracle | 0.25 | 0% | 0% | 0% |
 
-**Reading.** A well specified forecast restores the guarantee: with the fitted GARCH the one-day false alarm rate is 3% to 6%, the same as with the true volatility. The level is about 5% rather than the 1% to 1.4% of E9 because the baseline is a plug-in estimate from one calibration day (E4d and E8 deal with this; it is not caused by the forecast). An EWMA forecast is only as good as its match to the clustering: half-life 60 steps nearly works at band 0.25, half-life 360 is too slow and behaves almost like raw returns. So "monitor relative to a forecast" is only as valid as the forecast.
+**Reading.** With the fitted GARCH forecast the one-day false alarm rate falls to the oracle's level: 3% to 6% (5.8%, 3.0% and 6.2%; the 6.2% has a 95% Wilson interval of about 4.5% to 8.4%), against 4.7% to 5.3% with the true volatility. Both use a plug-in baseline, which the theorem does not cover; the proof needs the true or the confidence-sequence baseline and a correct forecast model. The level is about 5% rather than the 1% to 1.4% of E9 because the baseline is a plug-in estimate from one calibration day (E4d and E8 deal with this; it is not caused by the forecast). An EWMA forecast is only as good as its match to the clustering: half-life 60 steps nearly works at band 0.25, half-life 360 is too slow and behaves almost like raw returns. So "monitor relative to a forecast" is only as valid as the forecast.
 
 **Q10b. Power: a break that doubles the long-run variance.** Persistence 0.99, break 200 steps after calibration, five days of monitoring, 300 paths per row. Two kinds of break: "scale" multiplies every later return by √2 (the variance doubles at once), "omega" doubles the GARCH intercept (the variance moves to twice its old level gradually). Band 0 shown; band 0.25 is in `results/e10b_power.csv`.
 
@@ -820,7 +820,7 @@ Script `e10_forecast_relative.py`. Parts a, b, b2 and d are **[SYNTHETIC]** with
 **Reading.** Two corrections to a naive reading of Q10b follow.
 
 1. *Part of the "detection within five days" is not detection.* Without any break, the oracle monitor alarms within five days on 44% of paths and the fitted GARCH monitor on 38%. Against those, a doubling of the variance raises the rates to 94% and 93%; within one day the lift is from 4% to 6% (no break) to 34% to 43% (break). The break is clearly detected, but slowly.
-2. *The plug-in baseline breaks the bound at long horizons.* For the oracle the standardised returns are exactly i.i.d. N(0, 1), so Theorem B with the true baseline guarantees at most 7200 / 28,800 = 25% false alarms over the five monitored days. With a baseline estimated from one calibration day the rate is 44% (95% interval 39% to 50%). At one day the plug-in error costs little (about 5% against the 5% budget, Q10a), but its effect grows with the horizon, because a baseline that is a little too low makes the e-process drift upward at a small constant rate. This is a strong reason to use the confidence-sequence baseline (E8) whenever a monitor runs for days without recalibration.
+2. *The plug-in baseline breaks the bound at long horizons.* For the oracle the standardised returns are exactly i.i.d. N(0, 1), so Theorem B with the true baseline guarantees at most 7200 / 28,800 = 25% false alarms over the five monitored days. With a baseline estimated from one calibration day the rate is 44% (95% interval 39% to 50%). At one day the plug-in error already raises the rate from about 1.4% (true baseline, E9) to about 5% (Q10a); that it lands near the 5% budget reflects the slack in Ville's inequality, not a guarantee. Its effect grows with the horizon, because a baseline that is a little too low makes the e-process drift upward at a small constant rate. This is a strong reason to use the confidence-sequence baseline (E8) whenever a monitor runs for days without recalibration.
 
 With a 4-fold increase in the long-run variance the forecast-relative monitors detect within a day on 89% to 90% of paths (median 612 to 712 steps), against 4% to 6% without a break.
 
@@ -833,22 +833,24 @@ With a 4-fold increase in the long-run variance the forecast-relative monitors d
 
    which increases in k but never exceeds (1 - β) / α, however large the break.
 
-The monitor sees the mean of the ratio, E[r_t² / s_t], which is a little larger than the ratio of means (Jensen) but is bounded too. Simulation (200 paths of 18,000 post-break steps per row; standard errors below 0.002):
+The monitor sees the mean of the ratio, E[r_t² / s_t], which is a little larger than the ratio of means (Jensen) but is bounded too. Simulation, 200 paths of 18,000 post-break steps per row. The simulated ratio of means is pooled over paths (the sum of the path means of the true variance divided by the sum of the path means of the forecast), with a bootstrap standard error over paths in brackets. The mean of the ratio has standard errors below 0.002 (`mean_of_ratio_se` in the CSV).
 
-| α + β | Variance factor k | ρ(k) formula | Ratio of means, simulated | Mean of ratio (what the monitor sees) | KL rate per step (nats) | ln A / KL, days |
+| α + β | Variance factor k | ρ(k) formula | Ratio of means, simulated (pooled) | Mean of ratio (what the monitor sees) | KL rate per step (nats) | ln A / KL, days |
 |---|---|---|---|---|---|---|
-| 0.95 | 2 | 1.333 | 1.334 | 1.361 | 0.0276 | 0.26 |
-| 0.95 | 1000 | 1.998 | 2.001 | 2.204 | 0.2200 | 0.03 |
-| 0.99 | 1.5 | 1.059 | 1.059 | 1.074 | 0.0015 | 4.7 |
-| 0.99 | 2 | 1.091 | 1.091 | 1.116 | 0.0037 | 1.9 |
-| 0.99 | 4 | 1.143 | 1.143 | 1.187 | 0.0093 | 0.77 |
-| 0.99 | 1000 | 1.200 | 1.201 | 1.271 | 0.0187 | 0.38 |
-| 0.999 | 2 | 1.016 | 1.019 | 1.031 | 0.0003 | 21 |
-| 0.999 | 1000 | 1.033 | 1.038 | 1.065 | 0.0015 | 4.8 |
+| 0.95 | 2 | 1.333 | 1.333 (0.0003) | 1.361 | 0.0276 | 0.26 |
+| 0.95 | 1000 | 1.998 | 2.000 (0.0015) | 2.204 | 0.2200 | 0.03 |
+| 0.99 | 1.5 | 1.059 | 1.058 (0.0003) | 1.074 | 0.0015 | 4.7 |
+| 0.99 | 2 | 1.091 | 1.091 (0.0005) | 1.116 | 0.0037 | 1.9 |
+| 0.99 | 4 | 1.143 | 1.142 (0.0007) | 1.187 | 0.0093 | 0.77 |
+| 0.99 | 1000 | 1.200 | 1.200 (0.0010) | 1.271 | 0.0187 | 0.38 |
+| 0.999 | 2 | 1.016 | 1.016 (0.0006) | 1.031 | 0.0003 | 21 |
+| 0.999 | 1000 | 1.033 | 1.034 (0.0010) | 1.065 | 0.0015 | 4.8 |
+
+The pooled ratio agrees with the formula within two standard errors in every row of the CSV. An earlier version of this table showed the average of per-path ratios instead; a mean of ratios is biased upward when the per-path means are noisy, which at persistence 0.999 put it at 1.034 and 1.038, above the proved cap of 1.033. Both columns are in `results/e10d_signal_cap.csv` (`ratio_of_means_sim` is the per-path average).
 
 The KL column is the per-step Kullback-Leibler divergence between the post-break and pre-break conditional laws of r_t, averaged over the post-break path, I = E[½(q_t - 1 - ln q_t)] with q_t the ratio of the two conditional variances. By Lai (1998), any detector whose average run length to a false alarm is at least A needs, asymptotically as A grows, an expected delay of at least about ln A / I. At A = 28,800 this is only an order-of-magnitude guide, not an exact bound.
 
-**Reading.** At persistence 0.99 a doubling of the long-run variance looks, after standardisation, like an increase of about 9% to 12%, and the information bound says that *no* detector with the same false alarm budget can be expected to notice it much faster than within about two days. The 1500 to 1800 step median delays of the oracle and fitted GARCH monitors in Q10b are of this order, though somewhat shorter. E11 explains the gap: at this alarm level the Shiryaev-Roberts statistic pools evidence over many candidate change times, and this memory term is worth 54% to 62% of ln A. In an i.i.d. version of the same steady state the detector alarms at 0.41 to 0.58 times ln A / KL with the true baseline (`results/e11e2_e10_crosscheck.csv`), so a ratio of about 0.6 is expected and the Lai figure is an asymptotic guide, not a prediction at A = 28,800.
+**Reading.** At persistence 0.99 a doubling of the long-run variance looks, after standardisation, like an increase of about 9% to 12%, and the information bound suggests delays of the order of two days for any detector with the same false alarm budget (an asymptotic statement, as A grows, about the worst-case delay); at this A the observed delays are about 0.6 times that, as explained next. The 1500 to 1800 step median delays of the oracle and fitted GARCH monitors in Q10b are of this order, though somewhat shorter. E11 explains the gap: at this alarm level the Shiryaev-Roberts statistic pools evidence over many candidate change times, and this memory term is worth 54% to 62% of ln A. In an i.i.d. version of the same steady state the detector alarms at 0.41 to 0.58 times ln A / KL with the true baseline (`results/e11e2_e10_crosscheck.csv`), so a ratio of about 0.6 is expected and the Lai figure is an asymptotic guide, not a prediction at A = 28,800.
 
 **Q10e. Where in time is the evidence?** Persistence 0.99, 400 paths, the pre-break filter s0 run on post-break returns with true conditional variance s1. Mean of s1/s0 at t steps after the break, and the step at which the average cumulative KL divergence reaches ln A = 10.3 (`results/e10e_transient.csv`):
 
@@ -876,13 +878,13 @@ At persistence 0.999 a doubling is practically invisible for weeks. This is a pr
 | XRP | deseasonalised only | 0.70 | 69% (57 to 78) | 86% (75 to 93) | 37% |
 | XRP | divided by EWMA, half-life 360 min | 0.62 | 60% (49 to 70) | 82% (67 to 91) | 37% |
 | SOL | deseasonalised only | 0.67 | 64% (53 to 74) | 87% (74 to 94) | 45% |
-| SOL | divided by EWMA, half-life 360 min | 0.57 | 62% (51 to 72) | 82% (63 to 92) | 45% |
-| DOGE | deseasonalised only | 0.69 | 60% (48 to 70) | 72% (58 to 82) | 42% |
+| SOL | divided by EWMA, half-life 360 min | 0.57 | 62% (51 to 72) | 81% (63 to 92) | 45% |
+| DOGE | deseasonalised only | 0.68 | 60% (48 to 70) | 72% (58 to 82) | 42% |
 | DOGE | divided by EWMA, half-life 360 min | 0.57 | 65% (53 to 75) | 80% (65 to 90) | 42% |
 
 The half-life 1440 variant and all event times are in `results/e10c_real_forecast_relative.csv` and `results/e10c_events.csv`.
 
-**Reading.** Dividing by an EWMA forecast changes the alarm rate by between +2% and -17% (0.57 to 0.71 alarms per day in every variant), far above the 0.05 per day that a correct forecast would give. One-minute crypto volatility therefore moves much more than an hours-scale EWMA forecast tracks, so in practice the real-data alarms are mostly genuine departures from such a forecast, not false alarms in the sense of the theorem. The alarms carry information beyond the forecast: after "up" alarms the next day's realised variance exceeded the forecast 60% to 71% of the time, against 37% to 45% at random times; after "down" alarms it fell short 72% to 87% of the time, against 55% to 63% at random times. The 95% intervals of the alarm groups exclude the random-time rate for every coin and variant on the "up" side, and for all but one case on the "down" side (DOGE, deseasonalised only, where the lower end of the interval equals the random-time rate of 58%). The comparison forecast is deliberately simple; part of the effect is ordinary persistence (an alarm reflects the last few hours, which the one-day EWMA has not yet absorbed).
+**Reading.** Dividing by an EWMA forecast changes the alarm rate by between +2% and -17% (0.57 to 0.71 alarms per day in every variant), far above the at most 0.05 per day that a correct forecast would give. One-minute crypto volatility therefore moves much more than an hours-scale EWMA forecast tracks, so in practice the real-data alarms are mostly genuine departures from such a forecast, not false alarms in the sense of the theorem. The alarms carry information beyond the forecast: after "up" alarms the next day's realised variance exceeded the forecast 60% to 71% of the time in the variants of the table (57.5% to 71% including the half-life 1440 variant in the CSV), against 37% to 45% at random times; after "down" alarms it fell short 72% to 87% of the time, against 55% to 63% at random times. The 95% intervals of the alarm groups exclude the random-time rate for every coin and variant on the "up" side, and for all but one case on the "down" side (DOGE, deseasonalised only, where the lower end of the interval equals the random-time rate of 58%). The comparison forecast is deliberately simple; part of the effect is ordinary persistence (an alarm reflects the last few hours, which the one-day EWMA has not yet absorbed).
 
 **Relation to E6 (Q6e).** E6 asks the same question with a robust volatility measure (median of |u|) instead of realised variance, adds a HAR forecast and a rate-matched ratio rule, and also runs out of sample. The two agree: alarms are followed by volatility on the flagged side of a forecast far more often than random times (E6: 71% to 83% against 48% to 52%). The random-time rates differ (about 50% in E6, 37% to 45% here) because realised variance is a mean of squares, whose distribution is skewed, so at a random time it falls below its own forecast more often than above. E6 also shows the limit of this kind of evidence: a ratio rule tuned with hindsight to the same number of alarms is about as precise, so the e-detector's contribution on real data is the guarantee with fixed settings, not extra precision. What E10 adds is the forecast-relative *monitor input*: dividing returns by an EWMA forecast changes the alarm rate little on real data, unlike the synthetic GARCH case.
 
@@ -965,7 +967,7 @@ Figures: `results/figures/e11_delay_predictions.png`, `e11_price_of_robustness.p
 
 **Question.** Section 6.3 of `docs/theory_delay.md` predicts that clipping at c = 1.5 to 2 on the decrease side, while keeping c = 3 for increases, cuts decrease delays by a quarter to a half without touching the guarantee. Does it, with an estimated baseline, with ties and zeros, and on real data? The monitor now has this as an option, `VolatilityMonitor(c_down=...)` (plug-in baseline only; the default keeps c_down = c).
 
-**Method.** `experiments/e11f_split_c.py`. Part a [SYNTHETIC]: plug-in baseline from a 1440-step calibration window, band 0, A = 28,800 (each side at 2A, so at most 5% per 1440-step day with the true baseline); 2000 no-change paths and 600 paths per decrease (sd × 0.8, 0.67, 0.5 at the first monitored step) for four return laws: Gaussian, Student t4, Gaussian with jumps (0.5% per step, 8 sd), and returns rounded to half a standard deviation ("ticks", about 38% zeros). The vectorised code is checked alarm for alarm against the class. Part b [REAL]: the five Binance coins, July to December 2025, deseasonalised with the past-only intraday profile, band 0.25; an alarm counts as confirmed when the robust scale of the next 1440 minutes is on the flagged side of the calibration scale. Files: `results/e11f_split_c_synthetic.csv`, `results/e11f_split_c_real.csv`.
+**Method.** `experiments/e11f_split_c.py`. Part a [SYNTHETIC]: plug-in baseline from a 1440-step calibration window, band 0, A = 28,800 (each side at 2A, so at most 5% per 1440-step day with the true baseline); 2000 no-change paths and 600 paths per decrease (sd × 0.8, 0.67, 0.5 at the first monitored step) for four return laws: Gaussian, Student t4, Gaussian with jumps (0.5% per step, 8 sd), and returns rounded to half a standard deviation ("ticks", about 20% zeros). The vectorised code is checked alarm for alarm against the class. Part b [REAL]: the five Binance coins, July to December 2025, deseasonalised with the past-only intraday profile, band 0.25; an alarm counts as confirmed when the robust scale of the next 1440 minutes is on the flagged side of the calibration scale. Files: `results/e11f_split_c_synthetic.csv`, `results/e11f_split_c_real.csv`.
 
 **Results [SYNTHETIC].** Median decrease delay in steps (every path detected):
 
@@ -998,115 +1000,161 @@ On real data the tighter clip gives slightly fewer and, for four of five coins, 
 
 Script `experiments/e12_crypto_events.py`, outputs `results/e12_*.csv`, figure `results/figures/e12_event_profiles.png`. All results **[REAL]**.
 
+**Headline numbers [REAL].** Robust monitor (band 0.25), number of releases followed by an "up" alarm (a detected rise in volatility) at most 1 hour and at most 6 hours after the release. The *matched control rate* is the share of ordinary days with an up alarm in the same window, where each release is compared only with days of the same weekday at the same US Eastern clock time, averaged over the releases. p is the one-sided stratified permutation test for the 6-hour window, which was fixed in advance; the 1-hour window was added after review round 2a and is secondary. Sources: `e12_delay.csv` and `e12_tests.csv`.
+
+| Design | Releases | | BTC | ETH | SOL |
+|---|---|---|---|---|---|
+| Streaming (primary) | FOMC, 16 | flagged within 1 hour | 9 | 6 | 8 |
+| | | flagged within 6 hours | 9 | 8 | 9 |
+| | | matched control rate, 1 hour / 6 hours | 2% / 14% | 2% / 11% | 2% / 17% |
+| | | p, 6 hours | 0.0001 (Holm 0.0002) | 0.0002 | 0.0005 |
+| | CPI, 22 | flagged within 1 hour | 2 | 5 | 8 |
+| | | flagged within 6 hours | 5 | 7 | 9 |
+| | | matched control rate, 1 hour / 6 hours | 3% / 12% | 2% / 9% | 1% / 8% |
+| | | p, 6 hours | 0.11 (Holm 0.11) | 0.003 | 0.00004 |
+| Fresh calibration (secondary) | FOMC, 16 | flagged within 1 hour | 14 | 13 | 11 |
+| | | flagged within 6 hours | 14 | 14 | 15 |
+| | | matched control rate, 1 hour / 6 hours | 2% / 29% | 8% / 32% | 5% / 32% |
+| | | p, 6 hours | 0.000003 | 0.00001 | 0.0000006 |
+| | CPI, 22 | flagged within 1 hour | 8 | 11 | 11 |
+| | | flagged within 6 hours | 13 | 16 | 14 |
+| | | matched control rate, 1 hour / 6 hours | 5% / 23% | 4% / 28% | 5% / 23% |
+| | | p, 6 hours | 0.0004 | 0.00002 | 0.00006 |
+
+The streaming monitor was monitoring (not recalibrating after an earlier alarm) at 9, 8 and 9 of the 16 FOMC statements. It flagged every one of those within 6 hours (9 of 9, 8 of 8, 9 of 9) and most of them within 1 hour (9 of 9, 6 of 8, 8 of 9). For CPI it was monitoring at 9, 8 and 12 of 22 releases and flagged 4, 6 and 9 of them within 6 hours. In the primary family (BTC, streaming, Holm), FOMC passes and CPI does not. The 1-hour p-values are below 0.001 in every cell except BTC CPI streaming (0.12). A sentence that can be quoted: "The streaming monitor flagged 8 to 9 of 16 FOMC statements within six hours, every statement at which it was monitoring, against 11% to 17% of matched control times; a monitor calibrated on the day before each statement flagged 14 to 15 of 16 within six hours (11 to 14 within one hour), against about 30% (2% to 8% within one hour) of matched control times."
+
 **Question.** Scheduled US macro releases are known to move crypto volatility. If the monitor is doing its job, an "up" alarm (volatility increase) should be much more likely in the hours after a release than at the same time of day on ordinary days, it should come after the release rather than before it, and it should not simply be the one big minute at the release. Four questions: (a) is an up alarm more likely in the 6 hours after a release than in matched control windows; (b) how many minutes after the release does the first up alarm come, and does the monitor alarm before the release; (c) do "down" alarms (volatility normalising) follow in the next 1 to 2 days; (d) does the Gaussian likelihood-ratio benchmark alarm around releases for the wrong reason, that is one jump rather than a regime change.
 
-**Events [REAL].** `data/events/us_macro_events.csv`: the 16 FOMC rate decisions of 2024 and 2025 (statement released at 14:00 US Eastern, second day of each scheduled meeting) and the 23 US CPI releases of 2024 and 2025 (08:30 US Eastern). Every date was checked by web search on 2026-11-02 against the Federal Reserve meeting calendar and the BLS release schedule or the archived BLS news release, and the URL is in the file (the official hosts could not be fetched directly from this environment, so verification used search results that index the official pages; one CPI date, 11 June 2025, rests on the BLS schedule listing only, the other 38 on an individual official page). No date was left out for lack of verification. The late-2025 federal shutdown (1 October to 12 November 2025) changed the CPI calendar and the file records what happened, with sources: the September 2025 CPI was moved from 15 to 24 October 2025 (a Friday), the October 2025 CPI, due on 13 November 2025, was cancelled (BLS could not collect October data), and the November 2025 CPI was moved from 10 to 18 December 2025. The December 2025 CPI kept its date, 13 January 2026, which is outside the sample. Eastern times were converted to UTC with the IANA time zone database, so the switch between EST (UTC-5) and EDT (UTC-4) on 10 March 2024, 3 November 2024, 9 March 2025 and 2 November 2025 is handled by the library; the script recomputes the UTC column and stops if the file disagrees. 15 of the 16 FOMC statements fall on a Wednesday (7 November 2024 is a Thursday, after the US election); the CPI releases fall on Tuesdays to Fridays. The first CPI release of 2024 (11 January) falls inside the 20-day warm-up of the intraday profile (next paragraph) and is excluded (`e12_events_excluded.csv`), so **38 events are used: 16 FOMC and 22 CPI**.
+**Events [REAL].** `data/events/us_macro_events.csv`: the 16 FOMC rate decisions of 2024 and 2025 (statement released at 14:00 US Eastern, second day of each scheduled meeting) and the 23 US CPI releases of 2024 and 2025 (08:30 US Eastern). Every date was checked by web search on 2026-11-02 against the Federal Reserve meeting calendar and the BLS release schedule or the archived BLS news release, and the URL is in the file (the official hosts could not be fetched directly from this environment, so verification used search results that index the official pages; one CPI date, 11 June 2025, rests on the BLS schedule listing only, the other 38 on an individual official page). No date was left out for lack of verification. The late-2025 federal shutdown (1 October to 12 November 2025) changed the CPI calendar and the file records what happened, with sources: the September 2025 CPI was moved from 15 to 24 October 2025 (a Friday), the October 2025 CPI, due on 13 November 2025, was cancelled (BLS could not collect October data), and the November 2025 CPI was moved from 10 to 18 December 2025. The December 2025 CPI kept its date, 13 January 2026, which is outside the sample. Eastern times were converted to UTC with the IANA time zone database, so the switch between EST (UTC-5) and EDT (UTC-4) on 10 March 2024, 3 November 2024, 9 March 2025 and 2 November 2025 is handled by the library; the script recomputes the UTC column and stops if the file disagrees. 15 of the 16 FOMC statements fall on a Wednesday (7 November 2024 is a Thursday, after the US election); the 22 CPI releases used fall on Tuesdays (5), Wednesdays (11), Thursdays (5) and one Friday. The first CPI release of 2024 (11 January) falls inside the 20-day warm-up of the intraday profile (next paragraph) and is excluded (`e12_events_excluded.csv`), so **38 events are used: 16 FOMC and 22 CPI**.
 
 **Data [REAL].** Binance spot one-minute bars for BTCUSDT, ETHUSDT and SOLUSDT, 1 January 2024 to 31 December 2025 (no missing minutes in the mirror). Returns are divided by the predictable intraday profile (`intraday_scale`, 20-day rolling median of |r| per minute of day, past days only; returns are passed with their NaN, never filled with zeros). The first 20 days warm up the profile and the monitored stream runs from 21 January 2024 to 31 December 2025 (711 days, 1,023,840 minutes per coin).
 
-**Method.** Settings frozen from E5c, not tuned here: A = 28,800 per side (at most a 5% chance of any false alarm per day under the null), c = 3, calibration 1440 minutes, null band 0.25. Benchmark: the Gaussian likelihood-ratio monitor (band 0, as in E5c), which does not truncate returns. Two designs:
+**Method.** Settings frozen from E5c, not tuned here: A = 28,800, each side alarming at 2A (together at most a 5% chance of any false alarm per day under the null), c = 3, calibration 1440 minutes, null band 0.25. Benchmark: the Gaussian likelihood-ratio monitor (band 0, as in E5c), which does not truncate returns. The band alone changes how often a monitor alarms, so for a like-for-like comparison with the benchmark the robust monitor was also run with band 0 (added after review round 2a; secondary). Two designs:
 
 * *Streaming*: the monitor runs over the whole stream exactly as in E5c and E6 (calibrate 1440 minutes, monitor, alarm, recalibrate). This is what a user of the monitor would have seen.
-* *Fresh calibration* (added in iteration 2, see `docs/iterations/EV1.md`, after the streaming run showed that the monitor was still recalibrating after an earlier alarm at 40% to 60% of the releases): for every release and every control time a new monitor is calibrated on the 1440 minutes before that time and then monitors the next 48 hours; for the pre-release window a monitor calibrated on the 1440 minutes ending 6 hours before the release monitors those 6 hours. Both detectors are awake at every anchor, so this design measures what the detector can do, not where the stream left it.
+* *Fresh calibration* (added in iteration 2, see `docs/iterations/EV1.md`, after the streaming run showed that the monitor was still recalibrating after an earlier alarm at about half of the releases, 44% to 64% by coin and release type): for every release and every control time a new monitor is calibrated on the 1440 minutes before that time and then monitors the next 48 hours; for the pre-release window a monitor calibrated on the 1440 minutes ending 6 hours before the release monitors those 6 hours. Both detectors are awake at every anchor, so this design measures what the detector can do, not where the stream left it.
 
-*Control windows*: for each event, every day in the monitored period with the same weekday, at the same US Eastern clock time, at least 2 days away from any event day: 134 control windows for the FOMC statements and 299 for the CPI releases. Outcomes per window: an up alarm within [0, 6 h) of the anchor, an up alarm within [-6 h, 0), a down alarm within [6 h, 48 h), any alarm within 6 hours.
+*Control windows*: for each event, every day in the monitored period with the same weekday, at the same US Eastern clock time, at least 2 days away from any event day: 65 to 94 control windows per event, 134 distinct ones for the FOMC statements and 299 for the CPI releases. Because weekday and clock time match, an event and its controls also agree on whether a window reaches into the weekend: the 6-to-48-hour window of a Thursday or Friday anchor does, that of a Tuesday or Wednesday anchor does not (the script checks this for every event, `e12_events_checked.csv`). Outcomes per window: an up alarm within [0, 6 h) of the anchor, an up alarm at most 60 minutes after the anchor, an up alarm within [-6 h, 0), a down alarm within [6 h, 48 h), any alarm within 6 hours.
 
-*Test*: a stratified permutation test, computed exactly. Within each event's stratum (its window plus its matched control windows) the event label is exchangeable under the null, so the number of event windows with an alarm is a sum of independent Bernoulli draws with p_i = (windows with an alarm in stratum i) / (windows in stratum i); the one-sided p-value is P(T >= observed). A pooled one-sided Fisher exact test (event windows against the union of their control windows) is reported next to it. *Multiple comparisons*: the primary family, fixed before the first run, is {FOMC, CPI} x {up alarm within 6 hours} on BTC with the robust detector in the streaming design, Holm-corrected at 5%. ETH and SOL are replications with raw p-values (the three coins move together, so they are not three independent tests). Everything else (the Gaussian benchmark, the fresh-calibration design, the pre-release and down-alarm outcomes) is secondary and reported raw; a Holm correction over the six robust "up within 6 hours" tests (3 coins x 2 types) is also given within each design (`e12_tests.csv`, column `p_holm_six_coins_types`).
+*Matched control rate*: for each event, the share of its own control windows with the outcome, averaged over the events. Each weekday therefore counts as often as it has events. Earlier versions of this section printed the rate over the union of all events' control windows, and a pooled Fisher test on it. That union gave the Thursday windows half the weight for FOMC (65 Wednesdays and 69 Thursdays, for 15 Wednesday statements and one Thursday statement) and gave Thursdays and Fridays 163 of the 299 CPI windows (for 6 of 22 releases). It matters for the down-alarm outcome (Q12c), because a 6-to-48-hour window that starts on a Thursday or Friday runs into the weekend. The union rates and the pooled Fisher test are superseded; they remain in `e12_tests.csv` only in columns ending in `_superseded`.
 
-**Q12a. Up alarm within 6 hours of the release (robust detector).** Event rate against the rate in matched control windows; p from the stratified permutation test.
+*Test*: a stratified permutation test, computed exactly. Within each event's stratum (its window plus its matched control windows) the event label is exchangeable under the null, so the number of event windows with an alarm is a sum of independent Bernoulli draws with p_i = (windows with an alarm in stratum i) / (windows in stratum i); the one-sided p-value is P(T >= observed). This test compares each event only with its own matched controls, so the weekday mix of the union never entered it; the rerun gives the same p-values as before to the last digit. Cross-check (`p_stratified_fisher`): an exact stratified Fisher test, which is the exact form of the Cochran-Mantel-Haenszel test, with one stratum per weekday and clock time; the events of a stratum share its control windows, and strata share none. *Multiple comparisons*: the primary family, fixed before the first run, is {FOMC, CPI} x {up alarm within 6 hours} on BTC with the robust detector in the streaming design, Holm-corrected at 5%. ETH and SOL are replications with raw p-values (the three coins move together, so they are not three independent tests). Everything else (the Gaussian benchmark, the band-0 robust monitor, the fresh-calibration design, the 1-hour, pre-release and down-alarm outcomes) is secondary and reported raw; a Holm correction over the six robust "up within 6 hours" tests (3 coins x 2 types) is also given within each design (`e12_tests.csv`, column `p_holm_six_coins_types`).
 
-| Coin | Design | FOMC: events with alarm | control rate | p | CPI: events with alarm | control rate | p |
+**Q12a. Up alarm within 6 hours of the release (robust detector).** Event rate against the matched control rate; p from the stratified permutation test.
+
+| Coin | Design | FOMC: events with alarm | matched control rate | p | CPI: events with alarm | matched control rate | p |
 |---|---|---|---|---|---|---|---|
-| BTC | streaming (primary) | 9 / 16 (56%) | 19 / 134 (14%) | 0.0001 (Holm 0.0002) | 5 / 22 (23%) | 34 / 299 (11%) | 0.11 (Holm 0.11) |
-| ETH | streaming | 8 / 16 (50%) | 16 / 134 (12%) | 0.0002 | 7 / 22 (32%) | 31 / 299 (10%) | 0.003 |
-| SOL | streaming | 9 / 16 (56%) | 19 / 134 (14%) | 0.0005 | 9 / 22 (41%) | 27 / 299 (9%) | 0.00004 |
-| BTC | fresh calibration | 14 / 16 (88%) | 42 / 134 (31%) | 0.000003 | 13 / 22 (59%) | 82 / 299 (27%) | 0.0004 |
-| ETH | fresh calibration | 14 / 16 (88%) | 41 / 134 (31%) | 0.00001 | 16 / 22 (73%) | 81 / 299 (27%) | 0.00002 |
-| SOL | fresh calibration | 15 / 16 (94%) | 39 / 134 (29%) | 0.0000006 | 14 / 22 (64%) | 76 / 299 (25%) | 0.00006 |
+| BTC | streaming (primary) | 9 / 16 (56%) | 14% | 0.0001 (Holm 0.0002) | 5 / 22 (23%) | 12% | 0.11 (Holm 0.11) |
+| ETH | streaming | 8 / 16 (50%) | 11% | 0.0002 | 7 / 22 (32%) | 9% | 0.003 |
+| SOL | streaming | 9 / 16 (56%) | 17% | 0.0005 | 9 / 22 (41%) | 8% | 0.00004 |
+| BTC | fresh calibration | 14 / 16 (88%) | 29% | 0.000003 | 13 / 22 (59%) | 23% | 0.0004 |
+| ETH | fresh calibration | 14 / 16 (88%) | 32% | 0.00001 | 16 / 22 (73%) | 28% | 0.00002 |
+| SOL | fresh calibration | 15 / 16 (94%) | 32% | 0.0000006 | 14 / 22 (64%) | 23% | 0.00006 |
 
-Holm over the six robust tests: streaming 0.0006, 0.0007, 0.001 (FOMC) and 0.11, 0.006, 0.0002 (CPI); fresh calibration all at most 0.0004. The pooled Fisher p-values agree (`e12_tests.csv`). Why the streaming rates are lower: the streaming robust monitor spends 70% of the time recalibrating after its own alarms (0.7 alarms per day, each followed by a 1440-minute calibration; `e12_monitor_summary.csv`), and it was in monitoring mode at only 9 of 16 FOMC and 9 of 22 CPI releases on BTC (8/16 and 8/22 on ETH, 9/16 and 12/22 on SOL), against 33% to 43% of control windows. Restricted to releases at which it was awake, it alarmed at 9 of 9 FOMC statements on BTC (controls 26%, p = 0.00001), 8 of 8 on ETH and 9 of 9 on SOL, and at 4 of 9 (BTC, p = 0.27), 6 of 8 (ETH, p = 0.005) and 9 of 12 (SOL, p = 0.0001) CPI releases (`sample = monitoring at start`).
+Holm over the six robust tests: streaming 0.0006, 0.0007, 0.001 (FOMC) and 0.11, 0.006, 0.0002 (CPI); fresh calibration all at most 0.0004. The exact stratified Fisher test agrees (at most 0.007 in every cell except BTC CPI streaming, 0.13). For this outcome the matched control rates are close to the superseded union rates (at most 4.2 points apart), so the conclusions of Q12a do not change. Why the streaming rates are lower: the streaming robust monitor spends about 70% of the time (67% to 70% by coin) recalibrating after its own alarms (0.7 alarms per day, each followed by a 1440-minute calibration; `e12_monitor_summary.csv`), and it was in monitoring mode at only 9 of 16 FOMC and 9 of 22 CPI releases on BTC (8/16 and 8/22 on ETH, 9/16 and 12/22 on SOL), against 33% to 43% of matched control windows. Restricted to releases at which it was awake, it alarmed within 6 hours at 9 of 9 FOMC statements on BTC (matched controls 26%, p = 0.00001), 8 of 8 on ETH (29%, p = 0.0001) and 9 of 9 on SOL (39%, p = 0.0004), and at 4 of 9 (BTC, p = 0.27), 6 of 8 (ETH, p = 0.005) and 9 of 12 (SOL, p = 0.0001) CPI releases (`sample = monitoring at start`).
 
-**Q12d, first part. The Gaussian LR benchmark on the same windows.**
+**Q12d, first part. The Gaussian LR benchmark on the same windows, and the robust monitor at the same band.**
 
-| Coin | Design | FOMC: events with alarm | control rate | p | CPI: events with alarm | control rate | p |
+| Coin | Detector, design | FOMC: events with alarm | matched control rate | p | CPI: events with alarm | matched control rate | p |
 |---|---|---|---|---|---|---|---|
-| BTC | streaming | 4 / 16 (25%) | 23 / 134 (17%) | 0.34 | 6 / 22 (27%) | 41 / 299 (14%) | 0.06 |
-| ETH | streaming | 4 / 16 (25%) | 23 / 134 (17%) | 0.29 | 6 / 22 (27%) | 54 / 299 (18%) | 0.26 |
-| SOL | streaming | 1 / 16 (6%) | 18 / 134 (13%) | 0.85 | 4 / 22 (18%) | 56 / 299 (19%) | 0.53 |
-| BTC | fresh calibration | 15 / 16 (94%) | 87 / 134 (65%) | 0.02 | 21 / 22 (95%) | 227 / 299 (76%) | 0.02 |
-| ETH | fresh calibration | 16 / 16 (100%) | 92 / 134 (69%) | 0.004 | 21 / 22 (95%) | 230 / 299 (77%) | 0.02 |
-| SOL | fresh calibration | 16 / 16 (100%) | 86 / 134 (64%) | 0.0005 | 21 / 22 (95%) | 205 / 299 (69%) | 0.0007 |
+| BTC | Gaussian LR, streaming | 4 / 16 (25%) | 18% | 0.34 | 6 / 22 (27%) | 13% | 0.06 |
+| ETH | Gaussian LR, streaming | 4 / 16 (25%) | 17% | 0.29 | 6 / 22 (27%) | 20% | 0.26 |
+| SOL | Gaussian LR, streaming | 1 / 16 (6%) | 11% | 0.85 | 4 / 22 (18%) | 17% | 0.53 |
+| BTC | Gaussian LR, fresh calibration | 15 / 16 (94%) | 67% | 0.02 | 21 / 22 (95%) | 76% | 0.02 |
+| ETH | Gaussian LR, fresh calibration | 16 / 16 (100%) | 71% | 0.004 | 21 / 22 (95%) | 75% | 0.02 |
+| SOL | Gaussian LR, fresh calibration | 16 / 16 (100%) | 62% | 0.0005 | 21 / 22 (95%) | 64% | 0.0007 |
+| BTC | robust, band 0, fresh calibration | 15 / 16 (94%) | 39% | 0.000009 | 16 / 22 (73%) | 41% | 0.003 |
+| ETH | robust, band 0, fresh calibration | 14 / 16 (88%) | 51% | 0.003 | 17 / 22 (77%) | 43% | 0.001 |
+| SOL | robust, band 0, fresh calibration | 15 / 16 (94%) | 41% | 0.00002 | 18 / 22 (82%) | 40% | 0.0001 |
 
-The streaming Gaussian monitor is in monitoring mode only 8% to 10% of the time (0.9 alarms per day), so it was awake at 0 to 3 of the releases per coin and its event rates say nothing. With a fresh calibration it alarms at almost every release, but also in 64% to 77% of the control windows: a window of 6 ordinary hours contains a return large enough to trip it two times out of three. Its rate ratio is 1.2 to 1.6, against 2.2 to 3.2 for the robust detector.
+The streaming Gaussian monitor is in monitoring mode only 8% to 10% of the time (0.9 alarms per day), so it was awake at 0 to 3 of the releases per coin and its event rates say little; the same holds for the streaming robust monitor at band 0 (monitoring 15% to 17% of the time, 0.8 alarms per day; rows in `e12_tests.csv`). With a fresh calibration the Gaussian monitor alarms at almost every release, but also in 62% to 76% of the matched control windows: an ordinary 6-hour window usually contains a return large enough to trip it. Event rate divided by matched control rate, fresh calibration:
 
-**Q12b. Delay and anticipation (fresh calibration, robust detector).** Minutes from the release to the first up alarm, among events with an alarm within 6 hours.
+* Gaussian LR (band 0): 1.4 to 1.6 for FOMC, 1.3 to 1.5 for CPI;
+* robust, band 0.25 (the frozen setting): 2.7 to 3.0 for FOMC, 2.5 to 2.8 for CPI;
+* robust, band 0 (same band as the Gaussian monitor): 1.7 to 2.4 for FOMC, 1.8 to 2.0 for CPI.
 
-| Coin | Type | with alarm | median delay (IQR) | min to max | within 30 min | within 60 min | up alarm in the 6 h before (events) | same, control windows |
-|---|---|---|---|---|---|---|---|---|
-| BTC | FOMC | 14 / 16 | 33 (16 to 40) | 14 to 45 | 6 | 14 | 1 / 16 | 22% |
-| BTC | CPI | 13 / 22 | 32 (22 to 104) | 14 to 356 | 6 | 8 | 2 / 22 | 24% |
-| ETH | FOMC | 14 / 16 | 34 (18 to 43) | 15 to 67 | 6 | 13 | 3 / 16 | 26% |
-| ETH | CPI | 16 / 22 | 23 (20 to 98) | 10 to 352 | 9 | 11 | 2 / 22 | 23% |
-| SOL | FOMC | 15 / 16 | 32 (19 to 57) | 14 to 145 | 7 | 11 | 3 / 16 | 19% |
-| SOL | CPI | 14 / 22 | 28 (19 to 36) | 15 to 282 | 7 | 11 | 2 / 22 | 18% |
+So the earlier comparison of the frozen settings mixed two things. Averaged over the six cells, the matched control rate is 28% for the robust monitor at band 0.25, 42% at band 0 and 69% for the Gaussian monitor: about a third of the gap comes from the band and two thirds from the detector itself (no truncation in the Gaussian monitor, and a different betting rule). At the same band the robust monitor still alarms in fewer control windows and has the higher ratio in all six cells. Within the first hour the Gaussian monitor alarms in 20% to 34% of matched control windows, the robust monitor in 6% to 16% at band 0 and 2% to 8% at band 0.25 (`e12_delay.csv`).
 
-The Gaussian LR monitor (fresh calibration) has a median delay of 0 to 2 minutes (BTC FOMC: 2, IQR 0 to 3; CPI: 0, IQR 0 to 0; 15 of 15 FOMC and 20 of 21 CPI alarms within 30 minutes): the first minute after the release is enough for it. In the streaming design the robust delays are shorter (BTC FOMC median 15 minutes, IQR 12 to 39; SOL 10; ETH 33) because a Shiryaev-Roberts statistic that has been running for hours starts the release with a head start (it adds 1 per step under the null), whereas a fresh monitor starts at 0.
+**Q12b. Delay and anticipation (fresh calibration, robust detector).** Minutes from the release to the first up alarm, among events with an alarm within 6 hours. Control columns are matched control rates.
 
-Alarms *before* the release are rarer on event days than on control days for the robust detector (6% to 19% of events against 18% to 26% of control windows; streaming design: 0 to 1 of 16 FOMC and 0 to 1 of 22 CPI releases per coin, against 6% to 13% of controls). The pre-release hours are quieter than usual, not noisier. Of the 13 pre-release up alarms across the three coins (fresh design), the three on 12 June 2024 came 312 to 320 minutes before the FOMC statement, which is the CPI release of that morning, and only two came within 10 minutes of the release (ETH, 10 December 2025, 6 minutes before; SOL, 11 September 2025, 4 minutes before). The Gaussian LR monitor alarms in 41% to 75% of the pre-release windows and in 58% to 74% of the control windows, again a base rate rather than anticipation.
+| Coin | Type | with alarm | median delay (IQR) | min to max | within 30 min | within 60 min | control windows, within 60 min | up alarm in the 6 h before (events) | same, control windows |
+|---|---|---|---|---|---|---|---|---|---|
+| BTC | FOMC | 14 / 16 | 33 (16 to 40) | 14 to 45 | 6 | 14 | 2% | 1 / 16 | 20% |
+| BTC | CPI | 13 / 22 | 32 (22 to 104) | 14 to 356 | 6 | 8 | 5% | 2 / 22 | 22% |
+| ETH | FOMC | 14 / 16 | 34 (18 to 43) | 15 to 67 | 6 | 13 | 8% | 3 / 16 | 32% |
+| ETH | CPI | 16 / 22 | 23 (20 to 98) | 10 to 352 | 9 | 11 | 4% | 2 / 22 | 20% |
+| SOL | FOMC | 15 / 16 | 32 (19 to 57) | 14 to 145 | 7 | 11 | 5% | 3 / 16 | 20% |
+| SOL | CPI | 14 / 22 | 28 (19 to 36) | 15 to 282 | 7 | 11 | 5% | 2 / 22 | 16% |
 
-**Q12c. Down alarms in the next 1 to 2 days (window 6 to 48 hours after the anchor, robust detector, fresh calibration).**
+The Gaussian LR monitor (fresh calibration) has a median delay of 0 to 2 minutes (BTC FOMC: 2, IQR 0 to 3; CPI: 0, IQR 0 to 0; 15 of 15 FOMC and 20 of 21 CPI alarms within 30 minutes): the first minute after the release is enough for it. The robust monitor at band 0 is faster than at band 0.25 (median 18 to 22 minutes, minimum 8 to 11) but, like it, never alarms in the first minutes, so the speed of the Gaussian monitor comes from the missing truncation, not from the band. In the streaming design the robust delays are shorter (BTC FOMC median 15 minutes, IQR 12 to 39; SOL 10; ETH 33) because a Shiryaev-Roberts statistic that has been running for hours starts the release with a head start (it adds 1 per step under the null), whereas a fresh monitor starts at 0.
+
+Alarms *before* the release (robust detector): 6% to 19% of events had an up alarm in the 6 hours before the release, against 16% to 32% of matched control windows (fresh design); in the streaming design 0 to 1 of 16 FOMC and 0 to 1 of 22 CPI releases per coin, against 5% to 12% of matched control windows. So there is no sign of more alarms before releases. Event days had fewer pre-release alarms than their matched control days in all twelve cells (3 coins x 2 release types x 2 designs), but no single cell's one-sided test for "fewer" reaches p = 0.10 (p = 0.11 to 0.65, column `p_stratified_permutation_fewer`, a test added after the review), and the cells are not independent, so we do not claim that the hours before a release are quieter than usual. Of the 13 pre-release up alarms across the three coins (fresh design), the three on 12 June 2024 came 312 to 320 minutes before the FOMC statement, which is the CPI release of that morning, and only two came within 10 minutes of the release (ETH, 10 December 2025, 6 minutes before; SOL, 11 September 2025, 4 minutes before). The Gaussian LR monitor alarms in 41% to 75% of the pre-release windows and in 52% to 74% of the matched control windows, again a base rate rather than anticipation.
+
+**Q12c. Down alarms in the next 1 to 2 days (window 6 to 48 hours after the anchor, robust detector, fresh calibration).** Control columns are matched control rates.
 
 | Coin | Type | events with a down alarm | control windows | p (one-sided, more on event days) | among events with an up alarm within 6 h: later down alarm | same for control windows with an up alarm |
 |---|---|---|---|---|---|---|
-| BTC | FOMC | 10 / 16 (63%) | 95 / 134 (71%) | 0.21 | 8 / 14 (57%) | 45% |
-| BTC | CPI | 16 / 22 (73%) | 219 / 299 (73%) | 0.26 | 8 / 13 (62%) | 59% |
-| ETH | FOMC | 9 / 16 (56%) | 88 / 134 (66%) | 0.21 | 7 / 14 (50%) | 42% |
-| ETH | CPI | 9 / 22 (41%) | 205 / 299 (69%) | 0.99 | 6 / 16 (38%) | 65% |
-| SOL | FOMC | 9 / 16 (56%) | 87 / 134 (65%) | 0.17 | 8 / 15 (53%) | 38% |
-| SOL | CPI | 13 / 22 (59%) | 190 / 299 (64%) | 0.44 | 9 / 14 (64%) | 54% |
+| BTC | FOMC | 10 / 16 (63%) | 49% | 0.20 | 8 / 14 (57%) | 45% |
+| BTC | CPI | 16 / 22 (73%) | 64% | 0.26 | 8 / 13 (62%) | 59% |
+| ETH | FOMC | 9 / 16 (56%) | 43% | 0.21 | 7 / 14 (50%) | 42% |
+| ETH | CPI | 9 / 22 (41%) | 62% | 0.99 | 6 / 16 (38%) | 65% |
+| SOL | FOMC | 9 / 16 (56%) | 42% | 0.17 | 8 / 15 (53%) | 38% |
+| SOL | CPI | 13 / 22 (59%) | 55% | 0.44 | 9 / 14 (64%) | 54% |
 
-No. A down alarm within 6 to 48 hours is about as common after a release as in control windows, because the base rate is high: with 0.3 down alarms per day, two ordinary days contain one more often than not. Conditional on an up alarm, a later down alarm is somewhat more common after FOMC statements than in control windows with an up alarm (57%, 50%, 53% against 45%, 42%, 38%), not after CPI releases, and the numbers are too small to call. When a down alarm does follow, its median time is 32 to 35 hours after the release, which is as early as the protocol allows (the up alarm at about 30 minutes is followed by a 1440-minute recalibration that absorbs the burst, and the decrease side then needs a few hundred quiet minutes, E4). The streaming design gives the same picture (BTC FOMC 11/16 against 66% of controls, stratified p = 0.04 but Fisher p = 0.55, not confirmed by ETH, p = 0.09, or by the fresh design).
+Not clearly. After FOMC statements a down alarm in the following 6 to 48 hours is more common than on matched control days in all three coins and in both designs, by 13 to 27 percentage points: with a fresh calibration 63%, 56% and 56% against 49%, 43% and 42% (p = 0.20, 0.21, 0.17), in the streaming design 69%, 63% and 69% against 45%, 43% and 41% (p = 0.04, 0.09, 0.02). These are secondary, uncorrected tests; a Holm correction over the six down-alarm tests of the streaming design (3 coins x 2 release types) leaves none below 0.15. Among the releases at which the streaming monitor was awake the excess is smaller and far from significant (5/9, 4/8 and 4/9 against 48%, 38% and 39%; p = 0.37 to 0.50). After CPI releases the differences are small and go both ways (fresh: 73%, 41%, 59% against 64%, 62%, 55%; streaming: 64%, 59%, 59% against 55%, 54%, 53%; p = 0.26 to 0.99 for "more"; on ETH with a fresh calibration there are fewer, one-sided p for "fewer" 0.03, not a planned test). Conditional on an up alarm, a later down alarm is somewhat more common after FOMC statements than in control windows with an up alarm (57%, 50%, 53% against 45%, 42%, 38%), not after CPI releases, and the numbers are too small to call.
 
-**Q12d, second part. Is the Gaussian alarm driven by one jump?** For the first up alarm within 6 hours of an anchor (fresh calibration): the largest |deseasonalised return| in the 5 minutes up to the alarm in units of the baseline scale (the robust monitor clips at 3), the robust volatility of the next 1440 minutes relative to the baseline (1 = no persistent change), and the share of alarms that had both a return above 3 scale units and no persistent increase ("jump only").
+The earlier version of this answer said that a down alarm is about as common after a release as in control windows "because the base rate is high". That was largely an artefact of comparing with control days of the wrong weekday: a window that starts on a Thursday or Friday runs into the weekend, when crypto volatility falls, and contains a down alarm in 70% to 94% of cases (by coin, weekday and design), against 38% to 57% for windows starting on a Tuesday or Wednesday (BTC, fresh calibration: 94% of Thursday 14:00 windows against 46% of Wednesday 14:00 windows). Matched on weekday, the FOMC base rate is 41% to 49%, not the 63% to 71% of the superseded union. The base rate is still substantial (0.3 down alarms per day), which limits the size of any excess. When a down alarm does follow, its median time is 32 to 35 hours after the release, which is as early as the protocol allows (the up alarm at about 30 minutes is followed by a 1440-minute recalibration that absorbs the burst, and the decrease side then needs a few hundred quiet minutes, E4).
+
+**Q12d, second part. Is the Gaussian alarm driven by one jump?** For the first up alarm within 6 hours of an anchor (fresh calibration): the largest |deseasonalised return| in the 5 minutes up to the alarm in units of the baseline scale (the robust monitor clips at 3), the robust volatility of the next 1440 minutes relative to the baseline (1 = no persistent change), and the share of alarms that had both a return above 3 scale units and no persistent increase ("jump only"). The "controls" rows pool the control windows of both release types (433 per coin); they describe ordinary alarms and are not used in any test.
 
 | Coin | Detector | windows | n alarms | median largest recent return (scale units) | share above 5 | median post / baseline | share post > 1 | share jump only |
 |---|---|---|---|---|---|---|---|---|
 | BTC | robust | releases | 27 | 4.1 | 37% | 1.20 | 78% | 19% |
 | BTC | robust | controls | 124 | 4.0 | 27% | 1.08 | 60% | 34% |
+| BTC | robust, band 0 | releases | 31 | 3.7 | 29% | 1.16 | 68% | 19% |
+| BTC | robust, band 0 | controls | 181 | 3.7 | 21% | 1.06 | 57% | 30% |
 | BTC | Gaussian LR | releases | 36 | 8.1 | 78% | 1.11 | 67% | 33% |
-| BTC | Gaussian LR | controls | 314 | 4.5 | 39% | 0.97 | 48% | 45% |
+| BTC | Gaussian LR | controls | 314 | 4.5 | 39% | 0.97 | 47% | 45% |
 | ETH | robust | releases | 30 | 4.4 | 33% | 1.05 | 53% | 40% |
 | ETH | robust | controls | 122 | 4.1 | 31% | 1.11 | 68% | 25% |
+| ETH | robust, band 0 | releases | 31 | 3.9 | 29% | 1.08 | 58% | 35% |
+| ETH | robust, band 0 | controls | 194 | 3.7 | 26% | 1.06 | 60% | 24% |
 | ETH | Gaussian LR | releases | 37 | 8.3 | 78% | 1.05 | 57% | 41% |
 | ETH | Gaussian LR | controls | 322 | 4.8 | 42% | 0.99 | 48% | 48% |
-| SOL | robust | releases | 29 | 3.9 | 35% | 1.06 | 62% | 35% |
+| SOL | robust | releases | 29 | 3.9 | 34% | 1.06 | 62% | 34% |
 | SOL | robust | controls | 115 | 3.9 | 30% | 1.08 | 62% | 28% |
+| SOL | robust, band 0 | releases | 33 | 3.9 | 24% | 1.05 | 61% | 24% |
+| SOL | robust, band 0 | controls | 180 | 3.6 | 21% | 1.05 | 59% | 33% |
 | SOL | Gaussian LR | releases | 37 | 8.9 | 84% | 1.05 | 68% | 30% |
 | SOL | Gaussian LR | controls | 291 | 4.2 | 33% | 1.02 | 53% | 39% |
 
-The Gaussian alarm at a release sits on a return of 8 to 9 scale units (median; above 5 in 78% to 84% of cases) and comes in the first minute or two: a single return of 8 standard deviations multiplies its likelihood ratio by about 10^10, far above the threshold of 57,600, so one minute decides. The robust detector cannot be moved by one minute (clipped at 3 scale units, one minute multiplies its statistic by at most about 4), so it needs roughly 8 to 15 elevated minutes in a row, which is why its minimum delay with a fresh calibration is 14 minutes (10 on ETH) and its alarms mark a short volatility regime rather than a jump. In control windows, the Gaussian alarms are a coin flip on persistence (48% to 53% followed by higher volatility, median post / baseline 0.97 to 1.02): the false alarms that E4 predicted for untruncated detectors on heavy-tailed data. Over all streaming up alarms, the robust detector's median post / baseline is 1.30, 1.22 and 1.22 (BTC, ETH, SOL; 76% to 80% above 1) against 1.12, 1.09 and 1.08 for the Gaussian monitor (64% to 66%), as in E5c and E6.
+The Gaussian alarm at a release sits on a return of 8 to 9 scale units (median; above 5 in 78% to 84% of cases) and comes in the first minute or two: a single return of 8 standard deviations multiplies its statistic by more than 10^9, far above the alarm level of 57,600, so one minute decides. The robust detector cannot be moved by one minute: returns are clipped at 3 scale units, so one minute multiplies its statistic by at most about 4 (about 5 at band 0). It needs a run of elevated minutes, which is why its minimum delay with a fresh calibration is 14 minutes (10 on ETH) at band 0.25 and 8 to 11 minutes at band 0, and why the median largest recent return of its alarms at releases is 3.7 to 4.4 scale units at either band. These two facts, the size of the triggering return and the delay, are what support reading a robust alarm at a release as a short burst of volatility rather than a single jump.
 
-**What the releases do to volatility.** Median over events of the mean |deseasonalised return| in the first hour after the release divided by the mean over the 6 hours before: FOMC 2.5 (BTC), 2.5 (ETH), 2.3 (SOL); CPI 2.0, 2.0, 2.1. Over the whole 6-hour window: FOMC 1.8, 1.6, 1.5; CPI 1.4, 1.3, 1.3. The figure (`e12_event_profiles.png`) shows the average profile from 6 hours before to 12 hours after each release type and coin, with the control average and the alarm times: a CPI release is a spike that is back to normal within about 2 hours, an FOMC statement starts a burst that lasts 2 to 3 hours (the press conference starts half an hour after the statement), and the robust alarms cluster 15 to 60 minutes after the release.
+The "jump only" column does not support that reading on its own. At releases the robust shares (19%, 40%, 34% at band 0.25; 19%, 35%, 24% at band 0) are not clearly below the Gaussian shares (33%, 41%, 30%). What the column can show: how often an alarm sat on a return above 3 scale units and was not followed by higher volatility over the next day. What it cannot show: whether that return caused the alarm (for the robust detector it cannot have done so alone), or whether volatility stayed high for a few hours after the alarm, because it compares the next full 1440 minutes with the baseline, and a release burst of 1 to 3 hours that is over by the evening counts as "no persistent increase". With 27 to 37 alarms per cell, differences of 10 points are also within noise. In control windows, the Gaussian alarms are a coin flip on persistence (47% to 53% followed by higher volatility, median post / baseline 0.97 to 1.02), against 57% to 60% for the robust detector at band 0 and 60% to 68% at band 0.25: the false alarms that E4 predicted for untruncated detectors on heavy-tailed data. Over all streaming up alarms, the robust detector's median post / baseline is 1.30, 1.22 and 1.22 (BTC, ETH, SOL; 76% to 80% above 1), and 1.25, 1.16 and 1.15 at band 0 (74% to 80%), against 1.12, 1.09 and 1.08 for the Gaussian monitor (64% to 66%), as in E5c and E6.
+
+**What the releases do to volatility.** Median over events of the mean |deseasonalised return| in the first hour after the release divided by the mean over the 6 hours before: FOMC 2.5 (BTC), 2.5 (ETH), 2.3 (SOL); CPI 2.0, 2.0, 2.1. Over the whole 6-hour window: FOMC 1.8, 1.6, 1.5; CPI 1.4, 1.3, 1.3. The figure (`e12_event_profiles.png`) shows the average profile from 6 hours before to 12 hours after each release type and coin, with the control average and the alarm times: a CPI release is a spike that is back to normal within about 2 hours, an FOMC statement starts a burst that lasts 2 to 3 hours (the press conference starts half an hour after the statement), and the robust alarms cluster 15 to 60 minutes after the release. The control curve in the figure averages all control windows of a release type with equal weight (it is descriptive and enters no rate or test).
 
 **Events the robust detector missed (fresh calibration, no up alarm within 6 hours on any of the three coins):** the FOMC statement of 7 November 2024 (first-hour |return| 1.7 to 2.0 times the pre-release level, a burst too short for the detector) and the CPI releases of 11 December 2024, 13 May 2025, 15 July 2025 and 24 October 2025 (the rescheduled September CPI, released during the shutdown; first-hour ratio 1.8 to 2.5). The FOMC statement of 20 March 2024 was caught only on SOL (67 minutes). Per-event rows are in `e12_event_windows.csv`.
 
 **Reading.**
-* Yes, the alarms line up with the news. Whenever the robust monitor is awake at an FOMC statement it alarms within the hour (9/9, 8/8, 9/9 across coins in the streaming design; 14/16, 14/16, 15/16 with a fresh calibration), at a rate 2.8 to 3.2 times that of the same clock time on ordinary Wednesdays. CPI releases are caught in 59% to 73% of cases (fresh calibration), 2.2 to 2.7 times the control rate; their volatility spike is shorter, and the 08:30 ET control windows contain other scheduled releases (see caveats), which works against the contrast.
+* Yes, the alarms line up with the news. In the primary streaming design the robust monitor flagged 9, 8 and 9 of the 16 FOMC statements within 6 hours (BTC, ETH, SOL), against 11% to 17% of matched control windows. These are exactly the statements at which it was monitoring rather than recalibrating (9 of 9, 8 of 8, 9 of 9), and it flagged most of them within the first hour (9 of 9, 6 of 8, 8 of 9). With a fresh calibration before every statement it flagged 14, 14 and 15 of 16 within 6 hours and 14, 13 and 11 within the first hour, against 29% to 32% (6 hours) and 2% to 8% (1 hour) of matched control windows; within 6 hours that is 2.7 to 3.0 times the rate at the same clock time on the same weekday of ordinary weeks. CPI releases are caught in 59% to 73% of cases within 6 hours (fresh calibration), 2.5 to 2.8 times the matched control rate; their volatility spike is shorter, and the 08:30 ET control windows contain other scheduled releases (see caveats), which works against the contrast.
 * The primary family (streaming design, BTC): FOMC passes Holm (p = 0.0002); CPI does not (p = 0.11), because the streaming monitor was asleep at 13 of the 22 CPI releases. ETH and SOL replicate the FOMC result and both replicate CPI (p = 0.003 and 0.00004); with a fresh calibration all six tests are at p <= 0.0004 after Holm.
-* The alarms come after the release, not before: median 23 to 34 minutes with a fresh calibration (10 to 33 minutes for a running monitor), never earlier than 14 minutes with a fresh calibration on BTC and SOL (10 on ETH), and the pre-release hours have fewer alarms than ordinary hours.
-* The expected "down" alarm within two days is not visible above a high base rate. The protocol itself limits this question: the recalibration after the up alarm absorbs the burst.
-* The Gaussian benchmark "detects" releases by reacting to the first big minute, which it also does in two thirds of ordinary 6-hour windows. That is detection for the wrong reason: the same mechanism gives its false alarms in E4 and E6.
-* A practical finding about the protocol, not about the news: a monitor that recalibrates for a full day after every alarm is blind 70% of the time when alarms come every 1.4 days. A shorter recalibration, or a warm restart from the last baseline, would be the first thing to change for live use.
+* The alarms come after the release, not before: median 23 to 34 minutes with a fresh calibration (10 to 33 minutes for a running monitor at FOMC statements), never earlier than 14 minutes with a fresh calibration on BTC and SOL (10 on ETH). There is no sign of more alarms in the hours before a release.
+* Down alarms within two days: after FOMC statements they are 13 to 27 points more common than on matched control days, in every coin and both designs, but no test is significant after correction (fresh calibration p = 0.17 to 0.21; streaming p = 0.02 to 0.09 raw, Holm at least 0.15). After CPI releases there is no clear excess. The earlier explanation, that a high base rate hides any effect, came from comparing with control days of the wrong weekday. The protocol itself limits this question: the recalibration after the up alarm absorbs the burst.
+* The Gaussian benchmark "detects" releases by reacting to the first big minute (median delay 0 to 2 minutes, on a return of 8 to 9 scale units), and with a fresh calibration it also alarms in 62% to 76% of ordinary 6-hour windows. Compared like for like, both at band 0, the robust monitor alarms in 39% to 51% of those windows, needs at least 8 minutes, and has a higher event-to-control ratio in every cell (1.7 to 2.4 against 1.3 to 1.6). About a third of the difference between the frozen settings comes from the band and two thirds from the detector. The Gaussian monitor's detection is detection for the wrong reason: the same mechanism gives its false alarms in E4 and E6.
+* A practical finding about the protocol, not about the news: a monitor that recalibrates for a full day after every alarm is blind about 70% of the time when alarms come every 1.4 days. A shorter recalibration, or a warm restart from the last baseline, would be the first thing to change for live use.
 
 **Caveats.**
 * Small numbers of events: 16 FOMC statements and 22 CPI releases. Rates per coin have Wilson 95% intervals of roughly plus or minus 20 points (`e12_tests.csv`), and the three coins are not independent replications.
-* Overlapping windows: the CPI release and the FOMC statement of 12 June 2024 are 5.5 hours apart, so the FOMC fresh baseline for that day includes the CPI spike and the CPI 6-hour window contains the statement; the pre-release FOMC alarms of that day are the CPI. Events of the same type are at least four weeks apart, so event windows do not overlap each other; control windows of the same weekday are shared by all events of that type, which the stratified test allows for by construction but which makes the strata dependent through their shared controls.
+* Overlapping windows: the CPI release and the FOMC statement of 12 June 2024 are 5.5 hours apart, so the FOMC fresh baseline for that day includes the CPI spike and the CPI 6-hour window contains the statement; the pre-release FOMC alarms of that day are the CPI. Events of the same type are at least four weeks apart, so event windows do not overlap each other; control windows of the same weekday are shared by all events of that type, which the stratified permutation test allows for by construction but which makes its strata dependent through their shared controls. The exact stratified Fisher test, with one stratum per weekday and clock time, has no shared controls and agrees.
 * "Non-event" control windows are only free of FOMC and CPI releases. Other scheduled US releases (weekly jobless claims every Thursday at 08:30 ET, producer prices, payrolls, retail sales) and crypto-specific events fall inside some control windows, which raises the control rate and makes the CPI contrast conservative. These dates were not verified here, so they were not excluded.
 * The 2025 calendar disruptions: one CPI release moved by 9 days and delivered on a Friday (24 October 2025; no alarm on any coin), one cancelled (October 2025 data), one moved by 8 days (18 December 2025; alarms at 30, 20 and 238 minutes). The CPI list is therefore 22 releases rather than 24, and one of them is on an unusual weekday.
 * Verification used web search results that index the official Federal Reserve and BLS pages rather than a direct fetch of those pages (blocked in this environment).
-* Settings were chosen in E5c on Bitstamp BTC, July to December 2025, which overlaps the last six months of this sample; the fresh-calibration design was added after seeing the streaming results (it is marked secondary for that reason).
-* The Gaussian monitor runs with band 0 and the robust monitor with band 0.25, as in E5c; part of the Gaussian control rate comes from the narrower null, the rest from the missing truncation.
+* Settings were chosen in E5c on Bitstamp BTC, July to December 2025, which overlaps the last six months of this sample; the fresh-calibration design was added after seeing the streaming results (it is marked secondary for that reason). The band-0 robust monitor, the 1-hour outcome, the matched control rates, the stratified Fisher test and the test for fewer pre-release alarms were added after review round 2a, with the results already known; they are secondary.
+* The Gaussian monitor runs with band 0 and the robust monitor with band 0.25, as in E5c. The like-for-like comparison uses the robust monitor at band 0; the remaining difference still mixes truncation with the different betting rule of the two detectors.
 * Binance data come from a third-party mirror (checked for gaps and duplicates, none found).
+
+**Revision after review round 2a.** (1) The counts "within the hour" were the 6-hour counts; the 1-hour counts are now given separately (streaming 9/9, 6/8, 8/9 among the FOMC statements at which the monitor was awake; fresh calibration 14, 13 and 11 of 16). (2) Control rates are now matched on weekday and clock time, and the pooled Fisher test is replaced by an exact stratified one; the old union rates (for example 71%, 66%, 65% for FOMC down alarms) are superseded, and with them the Q12c explanation "because the base rate is high". The stratified permutation p-values are unchanged. (3) The Gaussian against robust comparison is now also made at equal band. (4) Two sentences that the data did not support were replaced ("the pre-release hours are quieter than usual" and the reliance on the "jump only" column). Three rounding errors were corrected (BTC FOMC down-alarm p 0.20, not 0.21; SOL jump-only and above-5 shares at releases 34%, not 35%; BTC Gaussian control alarms followed by higher volatility 47%, not 48%), and the share of releases at which the streaming monitor was recalibrating is 44% to 64%, not 40% to 60%.
 
 ---
 
@@ -1124,7 +1172,7 @@ Script `experiments/e14_running_tau.py`; outputs `results/e14*.csv` and `results
 
 Comparators: `plugin` (the default monitor: fixed τ, plug-in mean; no proof), `plugin-run` (plug-in mean at the running level; no proof), `cs` (E8), `oracle` (true τ and true m(τ)). A = 7800 for methods with bound m / A and 390 / (0.05 - 0.01) = 9750 for methods with bound δ + m / A (δ = 0.01), so every proved bound is 5% per 390-step day. Two-sided rule as in the monitor (each side at 2A).
 
-[SYNTHETIC] Unit-scale returns: Gaussian, Student t3 (unit variance), jumps (probability 0.005 per step, size N(0, 10²)), price ticks (Gaussian rounded to 0.5, 38% zeros), as in E9.
+[SYNTHETIC] Unit-scale returns: Gaussian, Student t3 (unit variance), jumps (probability 0.005 per step, size N(0, 10²)), price ticks (Gaussian rounded to 0.5, about 20% zeros: P(|Z| < 0.25) = 0.197), as in E9.
 
 ### Q14a. False alarms at scale [SYNTHETIC]
 
@@ -1248,6 +1296,140 @@ Within five days:
 | GARCH(1,1) 0.05 / 0.94 | 0.25 | 94.9% (74% up) | 73.4% (57% up) | 66.7% (52% up) | 73.4% (54% up) | 65.3% (61% up) | 51.6% (52% up) |
 
 **Reading.** With no null band every monitor reacts to an undeseasonalised intraday profile and to slow stochastic volatility, the rank detectors and the plug-in most (they spend their budget), route A and cs least (their bands absorb some drift). With the null band 0.25 (E12's frozen setting) the rank detectors are the most tolerant of slow drift (slow SV, five days: 5.9% and 4.0% against 53.8% for the plug-in and 15% to 21% for route A and cs), probably because their reference set keeps growing and so follows the long-run level rather than the calibration day. Under GARCH(1,1) every monitor alarms on half or more of the paths within five days even with the band, as in E8: these alarms describe volatility clustering, which every null here excludes.
+
+### Q14f. No blind period: guarantee and delay after a restart [SYNTHETIC]
+
+A segment starts at a restart (for example right after an alarm). `awake-A` takes its grid centre from the 120 returns before the restart and learns its band from the segment; `awake-B` starts its rank reference set empty. Both bet from the first return of the segment.
+
+False alarms after a restart with no change (4000 paths; bound δ + m / A = 5% and 21% for awake-A, m / A = 5% and 25% for awake-B):
+
+| Returns | Steps after restart | awake-A | awake-B |
+|---|---|---|---|
+| Gaussian | 390 | 0.00% (bound 5.0%) | 2.73% (bound 5.0%) |
+| Gaussian | 1950 | 0.00% (bound 21.0%) | 16.28% (bound 25.0%) |
+| Student t3 | 390 | 0.00% (bound 5.0%) | 3.35% (bound 5.0%) |
+| Student t3 | 1950 | 0.00% (bound 21.0%) | 15.65% (bound 25.0%) |
+| Jumps | 390 | 0.00% (bound 5.0%) | 2.70% (bound 5.0%) |
+| Jumps | 1950 | 0.00% (bound 21.0%) | 15.82% (bound 25.0%) |
+| Ticks | 390 | 0.00% (bound 5.0%) | 3.35% (bound 5.0%) |
+| Ticks | 1950 | 0.03% (bound 21.0%) | 17.03% (bound 25.0%) |
+
+Delay when the standard deviation changes 30, 120 or 360 steps after the restart (1000 paths per cell). Median delay among detected paths, and in brackets the share detected within 2000 steps of the change. "recal." is the standard protocol: the monitor calibrates on the first 1440 returns of the segment (which contain the change) and then monitors; its delays are counted from the change, so they include the rest of the calibration.
+
+| Returns | change at | sd ratio | awake-A | awake-B | plugin (recal.) | cs (recal.) | A-grid-run (recal.) | B-lr (recal.) |
+|---|---|---|---|---|---|---|---|---|
+| Gaussian | 30 | x2 |  (0%) | 53 (61%) | 1836 (4%) |  (0%) |  (0%) | 1681 (3%) |
+| Gaussian | 30 | x1.5 |  (0%) | 134 (26%) | 1784 (4%) |  (0%) |  (0%) | 1737 (2%) |
+| Gaussian | 30 | x0.5 |  (0%) | 49 (91%) | 1855 (6%) |  (0%) |  (0%) | 1692 (5%) |
+| Gaussian | 30 | x0.667 |  (0%) | 109 (47%) | 1862 (2%) |  (0%) |  (0%) | 1761 (4%) |
+| Gaussian | 120 | x2 | 66 (34%) | 20 (99%) | 1808 (13%) |  (0%) |  (0%) | 1752 (6%) |
+| Gaussian | 120 | x1.5 | 104 (0%) | 55 (97%) | 1761 (9%) |  (0%) |  (0%) | 1706 (5%) |
+| Gaussian | 120 | x0.5 | 165 (100%) | 28 (99%) | 1748 (61%) |  (0%) | 1670 (0%) | 1680 (22%) |
+| Gaussian | 120 | x0.667 | 694 (25%) | 70 (98%) | 1829 (18%) |  (0%) |  (0%) | 1664 (8%) |
+| Gaussian | 360 | x2 | 40 (100%) | 15 (97%) | 1459 (92%) | 1985 (0%) | 1751 (1%) | 1452 (47%) |
+| Gaussian | 360 | x1.5 | 184 (100%) | 37 (97%) | 1579 (67%) | 2000 (0%) | 1760 (0%) | 1518 (27%) |
+| Gaussian | 360 | x0.5 | 94 (100%) | 26 (97%) | 1252 (100%) |  (0%) | 1624 (64%) | 1278 (100%) |
+| Gaussian | 360 | x0.667 | 199 (100%) | 58 (98%) | 1434 (99%) |  (0%) | 1718 (5%) | 1446 (61%) |
+| Student t3 | 30 | x2 |  (0%) | 83 (33%) | 1716 (4%) |  (0%) |  (0%) | 1722 (2%) |
+| Student t3 | 30 | x1.5 |  (0%) | 257 (16%) | 1856 (2%) |  (0%) |  (0%) | 1684 (2%) |
+| Student t3 | 30 | x0.5 |  (0%) | 72 (70%) | 1819 (4%) |  (0%) |  (0%) | 1729 (4%) |
+| Student t3 | 30 | x0.667 |  (0%) | 187 (34%) | 1810 (4%) |  (0%) |  (0%) | 1740 (5%) |
+| Student t3 | 120 | x2 | 566 (26%) | 43 (98%) | 1724 (12%) |  (0%) |  (0%) | 1683 (5%) |
+| Student t3 | 120 | x1.5 | 957 (1%) | 115 (65%) | 1728 (8%) |  (0%) |  (0%) | 1686 (5%) |
+| Student t3 | 120 | x0.5 | 428 (81%) | 42 (99%) | 1806 (21%) |  (0%) |  (0%) | 1696 (11%) |
+| Student t3 | 120 | x0.667 | 966 (3%) | 112 (83%) | 1796 (11%) | 1919 (0%) | 1690 (0%) | 1682 (9%) |
+| Student t3 | 360 | x2 | 92 (100%) | 31 (98%) | 1529 (78%) |  (0%) | 1663 (2%) | 1477 (34%) |
+| Student t3 | 360 | x1.5 | 627 (58%) | 91 (96%) | 1596 (46%) |  (0%) | 1424 (0%) | 1447 (18%) |
+| Student t3 | 360 | x0.5 | 123 (100%) | 37 (98%) | 1374 (99%) |  (0%) | 1636 (14%) | 1357 (84%) |
+| Student t3 | 360 | x0.667 | 538 (85%) | 90 (97%) | 1596 (63%) |  (0%) | 1705 (1%) | 1448 (37%) |
+
+False alarms before the change: at most 3.0% (awake-B, change after 360 steps; bound 360 / 7800 = 4.6%) and 0% for every other column (`e14f_awake_delay.csv`). Figure: `e14_awake.png`.
+
+**Reading.**
+* **Both awake monitors keep their guarantee from the first step after a restart.** awake-B uses its budget (2.70% to 3.35% per day, 15.7% to 17.0% over five days), awake-A almost none (0.03% at most).
+* **awake-B detects changes that the standard protocol cannot see.** A change 120 steps after a restart is found in 20 to 70 steps (Gaussian) and 42 to 115 steps (Student t3), on 65% to 99% of paths; the standard protocol is still calibrating and finds at most 61% of them within 2000 steps, 1660 to 1830 steps after the change. Even a change 30 steps after the restart is often caught (x0.5: 91% Gaussian, 70% t3), although with 30 reference values the p-values are coarse and the post-change values soon dominate the reference set (dilution, theory note 4.3).
+* **awake-A is valid but slow early in a segment, a real limitation of the learning band.** With a change 30 steps after a restart it detects nothing: the band from fewer than 30 returns is very wide, and every later snapshot contains post-change returns, so the band learns the new level instead of testing against the old one. With a change after 120 steps it detects the halving of the standard deviation (x0.5: 100% Gaussian, 81% t3) but at most 34% of the other changes; after 360 steps it detects 58% to 100%. Where awake-A detects, awake-B is about 3 to 10 times faster (median delays). The rank route is the one to use for the no-blind-period monitor.
+
+### Q14w. Why: band widths, plug-in drift and dilution [SYNTHETIC]
+
+**Band widths.** Median of bound / true m over 2000 calibration windows, as upper / lower, at the grid centre (τ = 3 × the calibration scale), at the lowest and the highest grid level, and for the other bands at the centre (`e14w_bands.csv`). No band failed at any level on more than 0.05% of windows (allowed: 1%).
+
+| Returns | Calibration | grid, centre | grid, 0.35 x centre | grid, 2.83 x centre | DKW time-uniform, centre | DKW fixed n, centre | E8, one level |
+|---|---|---|---|---|---|---|---|
+| Gaussian | 390 | 1.46 / 0.68 | 1.20 / 0.80 | 3.20 / 0.49 | 2.17 / 0.49 | 1.74 / 0.62 | 1.40 / 0.72 |
+| Gaussian | 1440 | 1.20 / 0.85 | 1.09 / 0.91 | 1.56 / 0.82 | 1.62 / 0.66 | 1.39 / 0.75 | 1.19 / 0.86 |
+| Student t3 | 390 | 1.50 / 0.64 | 1.20 / 0.80 | 2.28 / 0.33 | 1.83 / 0.40 | 1.52 / 0.54 | 1.44 / 0.68 |
+| Student t3 | 1440 | 1.20 / 0.83 | 1.09 / 0.91 | 1.47 / 0.68 | 1.43 / 0.60 | 1.27 / 0.73 | 1.18 / 0.84 |
+| Jumps | 390 | 1.47 / 0.67 | 1.20 / 0.80 | 2.95 / 0.26 | 2.16 / 0.48 | 1.73 / 0.60 | 1.41 / 0.71 |
+| Jumps | 1440 | 1.21 / 0.84 | 1.09 / 0.91 | 1.57 / 0.64 | 1.60 / 0.65 | 1.38 / 0.74 | 1.19 / 0.85 |
+| Ticks | 390 | 1.45 / 0.70 | 1.18 / 0.82 | 2.26 / 0.59 | 1.67 / 0.53 | 1.42 / 0.64 | 1.37 / 0.74 |
+| Ticks | 1440 | 1.17 / 0.86 | 1.08 / 0.92 | 1.36 / 0.82 | 1.35 / 0.69 | 1.22 / 0.80 | 1.15 / 0.87 |
+
+The grid band costs almost nothing against E8's single level at 1440 steps (1.20 / 0.85 against 1.19 / 0.86, Gaussian) and a little at 390 (1.46 / 0.68 against 1.40 / 0.72), while it covers 13 levels and needs no sample split. It is tight at low levels (what the decrease side needs) and loose at the highest levels, where an upper bound for a [0, 1] variable with mostly tiny values cannot be sharp (theory note 3.5). The integrated DKW band is much wider: at the centre its upper bound exceeds the truth by 1.5 to 3.1 times as much as the grid band's, and at high levels by far more; its time-uniform radius is 0.131 at 390 and 0.068 at 1440 observations (constant C = 9.28 for α = 0.01, solved numerically as in the authors' code; the closed form 0.8 log(1612 / α) gives 9.59), against 0.082 and 0.043 for Massart's fixed-n DKW radius (`e14w_constants.csv`).
+
+**Plug-in drift (Proposition A.6).** For each calibration window, the expected log growth of every bet given the window, computed by quadrature on 4 million draws from the true law; "positive drift" means some bet on that side has `E log f > 0`, so that the detector reaches any threshold in finite expected time, bounded by `(log(2AK) + log f_max) / g` (`e14w_plugin_drift.csv`).
+
+| Returns | Calibration | sd of m̂ / m - 1 | positive drift, increase side | decrease side | either | median run length bound, A = 7800 | A = 10⁶ | lower bound on P(alarm within 7800), A = 10⁶ | 7800 / A |
+|---|---|---|---|---|---|---|---|---|---|
+| Gaussian | 390 | 7.2% | 40.6% | 42.5% | 83.2% | 13,701 | 19,472 | 7.95% | 0.78% |
+| Gaussian | 1440 | 3.7% | 30.9% | 37.0% | 68.0% | 37,014 | 52,834 | 0.26% | 0.78% |
+| Student t3 | 390 | 8.1% | 37.8% | 39.1% | 76.9% | 13,114 | 18,658 | 7.64% | 0.78% |
+| Student t3 | 1440 | 4.2% | 30.0% | 26.2% | 56.2% | 29,313 | 41,656 | 0.36% | 0.78% |
+| Jumps | 390 | 7.3% | 42.4% | 40.4% | 82.7% | 13,948 | 19,813 | 7.90% | 0.78% |
+| Jumps | 1440 | 3.7% | 32.0% | 32.6% | 64.7% | 35,524 | 50,689 | 0.22% | 0.78% |
+| Ticks | 390 | 6.6% | 41.4% | 36.3% | 77.7% | 12,762 | 18,177 | 7.97% | 0.78% |
+| Ticks | 1440 | 3.4% | 33.2% | 27.5% | 60.7% | 29,929 | 42,619 | 0.32% | 0.78% |
+
+At 390 calibration steps 77% to 83% of calibration windows give the plug-in detector a positive drift under the null, at 1440 steps 56% to 68%. The bound on the expected run length grows only from about 13,000 to about 19,000 steps when A grows 128-fold (7800 to 10⁶), which is the log A behaviour of the proposition. At A = 10⁶ the bound m / A for 7800 steps (20 days of 390 steps) would be 0.78%; Markov's inequality applied to the run length bound proves a false alarm probability of at least 7.6% to 8.0% at 390 calibration steps. This crude lower bound uses only the chain started at the first step; the simulated rates of Q14a are much higher.
+
+**Dilution of the rank detector after a change** (`e14w_dilution.csv`). Expected log growth per step of the matching rank bet k steps after a normal scale change by ρ, with 1940 pre-change values in the reference set (1440 calibration + 500 monitored, as in Q14b), from the formula of theory note 4.3 by numerical integration; and the number of steps a chain started at the change needs to gain log(2A) = log(15600) with and without dilution.
+
+| ρ | growth per step, k = 0 | k = 500 | k = 1940 | k = 5000 | steps to log(2A), no dilution | with dilution |
+|---|---|---|---|---|---|---|
+| 1.25 | 0.055 | 0.029 | -0.001 | -0.019 | 175 | 199 |
+| 1.5 | 0.194 | 0.086 | -0.008 | -0.057 | 50 | 53 |
+| 2 | 0.573 | 0.195 | -0.028 | -0.129 | 17 | 18 |
+| 0.8 | 0.043 | 0.028 | 0.005 | -0.016 | 225 | 249 |
+| 0.667 | 0.126 | 0.085 | 0.013 | -0.054 | 76 | 79 |
+| 0.5 | 0.313 | 0.206 | 0.010 | -0.173 | 31 | 32 |
+
+
+The growth falls to about zero once the post-change values are as many as the pre-change values (k ≈ 1940), as the theory predicts (g_k → a limit ≤ 0). Within the time a chain needs to gain log(2A), dilution costs 3% to 14% (for example 199 steps against 175 for ρ = 1.25). These numbers are for one chain started at the change; the Shiryaev-Roberts statistic also carries the evidence of earlier chains, which is why the medians of Q14b are shorter.
+
+### Q14d. Real data: alarms, awake time and the E5c check [REAL]
+
+Five Binance USDT pairs, 1 July to 31 December 2025, minute returns divided by the predictable intraday profile of E6 (`intraday_scale`, 20 past days; the profile warms up on June), calibration 1440 minutes, "day" = 1440 minutes, A = 28800 (m / A) or 1440 / 0.04 = 36000 (δ + m / A). Nifty 50, 2024 and 2025, deseasonalised as in E7, calibration 750 minutes, "day" = 375 minutes, A = 7500 or 9375. Each cell: alarms per day (share of minutes monitored). Last two columns, pooled over the six series: share of up (down) alarms after which the robust scale of the next day is above (below) the baseline the alarm was measured against (E5c). No guarantee applies here: volatility clusters, so every null is false.
+
+Null band 0.25 (E12's frozen setting):
+
+| Method | BTC | ETH | XRP | SOL | DOGE | Nifty 50 | up alarms followed by higher volatility | down alarms followed by lower |
+|---|---|---|---|---|---|---|---|---|
+| plugin | 0.69 (31%) | 0.66 (33%) | 0.70 (30%) | 0.67 (33%) | 0.68 (31%) | 0.30 (40%) | 82% of 446 | 90% of 326 |
+| cs | 0.53 (47%) | 0.53 (46%) | 0.52 (47%) | 0.51 (49%) | 0.53 (47%) | 0.18 (64%) | 78% of 374 | 96% of 195 |
+| A-grid-fixed | 0.49 (51%) | 0.50 (49%) | 0.47 (52%) | 0.45 (54%) | 0.49 (51%) | 0.08 (83%) | 79% of 314 | 97% of 168 |
+| A-grid-run | 0.57 (43%) | 0.55 (44%) | 0.54 (45%) | 0.51 (48%) | 0.52 (48%) | 0.17 (66%) | 83% of 348 | 95% of 229 |
+| A-dkw-run | 0.40 (60%) | 0.34 (66%) | 0.34 (65%) | 0.31 (68%) | 0.34 (66%) | 0.08 (84%) | 93% of 184 | 94% of 172 |
+| B-lr | 0.53 (47%) | 0.49 (51%) | 0.48 (52%) | 0.49 (50%) | 0.46 (53%) | 0.15 (70%) | 79% of 379 | 94% of 144 |
+| B-ind | 0.46 (53%) | 0.36 (63%) | 0.33 (67%) | 0.34 (65%) | 0.32 (67%) | 0.12 (75%) | 79% of 332 | 95% of 63 |
+| awake-A | 0.77 (100%) | 0.69 (100%) | 0.83 (100%) | 0.68 (100%) | 0.72 (100%) | 0.25 (100%) | 80% of 447 | 85% of 352 |
+| awake-B | 0.88 (100%) | 0.76 (100%) | 0.74 (100%) | 0.68 (100%) | 0.66 (100%) | 0.23 (100%) | 74% of 595 | 90% of 200 |
+
+Null band 0:
+
+| Method | BTC | ETH | XRP | SOL | DOGE | Nifty 50 | up alarms followed by higher volatility | down alarms followed by lower |
+|---|---|---|---|---|---|---|---|---|
+| plugin | 0.83 (16%) | 0.83 (17%) | 0.84 (16%) | 0.83 (17%) | 0.83 (16%) | 0.38 (24%) | 80% of 441 | 75% of 509 |
+| cs | 0.71 (29%) | 0.70 (30%) | 0.74 (25%) | 0.68 (31%) | 0.71 (29%) | 0.26 (49%) | 79% of 446 | 84% of 331 |
+| A-grid-run | 0.72 (28%) | 0.72 (28%) | 0.73 (27%) | 0.70 (30%) | 0.73 (26%) | 0.27 (46%) | 80% of 421 | 84% of 370 |
+| B-lr | 0.84 (15%) | 0.83 (17%) | 0.83 (16%) | 0.82 (18%) | 0.84 (15%) | 0.37 (25%) | 80% of 420 | 72% of 528 |
+| awake-A | 1.51 (100%) | 1.36 (100%) | 1.41 (100%) | 1.26 (100%) | 1.38 (100%) | 0.42 (100%) | 78% of 769 | 79% of 712 |
+| awake-B | 4.27 (100%) | 3.93 (100%) | 3.84 (100%) | 3.60 (100%) | 3.81 (100%) | 1.15 (100%) | 67% of 1870 | 73% of 2262 |
+
+**Reading.**
+* **The standard protocol is blind most of the time, and the blind time caps its alarm rate.** With the band 0.25 the plug-in monitors only 30% to 33% of crypto minutes (40% for Nifty), E12's finding; with band 0 only 16% to 17%, and its 0.83 alarms per day are close to the largest rate possible when every alarm costs a day of calibration.
+* **The awake monitors watch 100% of the time** (99.9% for Nifty, whose first 120 minutes are a warm-up). With the band 0.25 they raise 0.66 to 0.88 alarms per crypto day and 0.23 to 0.25 per Nifty day, about as many as the plug-in, which spends two thirds of the day blind. Their alarms are as often confirmed by the next day's volatility (awake-A: 80% up, 85% down; awake-B: 74% and 90%; plug-in: 82% and 90%).
+* **Without a band, awake-B alarms 3.6 to 4.3 times per crypto day.** Right after a restart its reference set is small, so it is quickly sure that the returns are not exchangeable, which is true under volatility clustering; the alarms are confirmed less often (67% and 73%). The band (or a larger A) is needed on real data, as E12 found for the plug-in.
+* Among the monitors that recalibrate, the proved ones (cs, route A, rank) alarm less than the plug-in and are confirmed about as often after up alarms (78% to 83% against 82%) and more often after down alarms (94% to 97% against 90%); the DKW band alarms least (0.31 to 0.40 per crypto day) and has the highest confirmation rate of up alarms (93%), consistent with its low power.
 
 ---
 
@@ -1473,7 +1655,7 @@ Scripts, tests, READMEs and full results are in `alternatives/quarticity_stream/
 | two-point mixture, d = 0.5 / 0.7 / 0.9 | 8% / 5% / 2% | 28% / 46% / 58% | 82.5% (4915) / 99.5% (2678) / 99% (1033) |
 | slow SV, log-sd 0.3 / 0.5 | 100% (715) / 100% (496) | 100% (524) / 100% (271) | 100% (664) / 100% (442) |
 
-**Q4 Real data [REAL].** `A = 28,800` per side, 1440-minute calibration, recalibration after each alarm, band 0.25. Alarms per day: variance monitor 0.69 (BTC) and 0.69 (DOGE); quarticity monitor 0.71 and 0.70. Share of quarticity alarms on the same UTC day as a variance alarm: 87% and 87%; within one hour: 62% and 60%. Median truncated variance in the next 24 hours over the baseline: 1.45 and 1.38 after up alarms, 0.59 and 0.66 after down alarms (control at random times: 1.00). The 34 to 35 quarticity alarms per coin that are more than four hours from any variance alarm are still followed by a move in the flagged direction 80% and 88% of the time. All monitors on both coins alarmed at 15:28 to 15:31 UTC on 10 October 2025, the crypto crash after the US tariff announcement (checked online, `results/q4_real_event_check.csv`). With the same variance tolerance (band 0.5625 on quarticity), the quarticity monitor alarms 20% less often and its decrease alarms are followed by lower variance 100% and 97% of the time.
+**Q4 Real data [REAL].** `A = 28,800` (each side alarms at 2A), 1440-minute calibration, recalibration after each alarm, band 0.25. Alarms per day: variance monitor 0.69 (BTC) and 0.69 (DOGE); quarticity monitor 0.71 and 0.70. Share of quarticity alarms on the same UTC day as a variance alarm: 87% and 87%; within one hour: 62% and 60%. Median truncated variance in the next 24 hours over the baseline: 1.45 and 1.38 after up alarms, 0.59 and 0.66 after down alarms (control at random times: 1.00). The 34 to 35 quarticity alarms per coin that are more than four hours from any variance alarm are still followed by a move in the flagged direction 80% and 88% of the time. All monitors on both coins alarmed at 15:28 to 15:31 UTC on 10 October 2025, the crypto crash after the US tariff announcement (checked online, `results/q4_real_event_check.csv`). With the same variance tolerance (band 0.5625 on quarticity), the quarticity monitor alarms 20% less often and its decrease alarms are followed by lower variance 100% and 97% of the time.
 
 **Reading.**
 * Valid, as the theory says.
@@ -1614,66 +1796,70 @@ Alarm rates of the frozen robust monitor: 93 a year per coin on crypto in 2025 (
 
 ## Report part ALT3: a robust local plug-in estimator of integrated quarticity (A5)
 
-Code, tests, README (mathematics, proofs, comparison with the literature) and full results are in `alternatives/robust_iq_estimator/`. Every number below is copied from its `results/` folder. [SYNTHETIC] marks simulated data or closed-form theory, [REAL] marks Binance spot one-minute bars (BTCUSDT and DOGEUSDT, 1 July to 31 December 2025, 184 UTC days each). Iteration notes: `docs/iterations/ALT3.md`.
+Code, tests, README (mathematics, proofs, comparison with the literature) and full results are in `alternatives/robust_iq_estimator/`. Every number below is copied from its `results/` folder. [SYNTHETIC] marks simulated data or closed-form theory, [REAL] marks Binance spot one-minute bars (BTCUSDT and DOGEUSDT, 1 July to 31 December 2025, 184 UTC days each). Iteration notes: `docs/iterations/ALT3.md`. RK and RK-k below are this repository's version of the paper's kernel estimator (normalised weights, scaled MAD, c = 3, h = 30, without and with the kappa correction), not the formula as printed. PI-LU and PI-NN are proposals for discussion; where they do better, that is evidence from our simulation designs, not a claim to have improved the published estimator.
 
-**Question.** Integrated quarticity (`IQ = int sigma^4`, the quantity that sets the width of every confidence interval for daily variance) is estimated in Bapat (2026) by clipping returns at `c x MAD` and averaging kernel-weighted local fourth powers. `docs/estimator_issues.md` lists four problems with it. Can the paper's idea (robust-scale truncation plus local smoothing) be turned into an estimator that is consistent, close to the efficient asymptotic variance `8 int sigma^8`, robust to jumps, equipped with a confidence interval, and better behaved on real minute data?
+**Question.** Integrated quarticity (`IQ = int sigma^4`, the quantity that sets the width of every confidence interval for daily variance) is estimated in Bapat (2026) by clipping returns at `c x MAD` and averaging kernel-weighted local fourth powers. `docs/estimator_issues.md` raises four questions about it. What does the paper's idea (robust-scale truncation plus local smoothing) need in order to stay consistent when volatility moves during the day, how close can it come to the efficient asymptotic variance `8 int sigma^8`, can it be given a confidence interval, and how do such estimators behave on real minute data?
 
-**Method.** Two changes of principle and one of detail. (1) Aggregate by **squaring a local variance** (the plug-in principle of Jacod and Rosenbaum 2013) instead of averaging local fourth powers: over blocks of k returns, `IQ_hat = sum over blocks of k delta (block mean of r^2 / delta)^2`, whose asymptotic variance is `8 (k + 3) / (k + 2) int sigma^8` (RQ-type estimators, including the paper's averaged kernel, are at `32/3`). (2) Truncate against a **local** scale (median absolute deviation, then a truncated root mean square, over about three blocks) with either a fixed cut-off a = 3 or the growing cut-off `a_n = sqrt(2 log n)`, and **drop** truncated returns rather than clip them. (3) Remove the squaring and truncation biases with an **exact finite-sample correction**, computed from the cumulants of a clipped or dropped squared normal, so the estimator is unbiased under locally constant volatility for every block size. The same algebra gives `int sigma^8` and hence a 95% interval. Main proposal **PI-LU** (local scale, `a_n`, drop, `k = ceil(sqrt n)`). Second proposal **PI-NN** (added in iteration 3, after the real data): PI-LU with the scale raised to 1.4826 times the median of the six nearest absolute returns when that is larger, and blocks of `round(n^(1/4))`. Simulations: log-OU stochastic volatility from `avmonitor.simulate`, vol of vol 0.5 or 1 with a U-shaped intraday pattern, 0 or 4 jumps a day of three sizes, n = 390, 1440, 23,400, 500 days per cell, 15 estimators, true IQ known exactly.
+**Method.** Two changes of principle and one of detail. (1) Aggregate by **squaring a local variance** (the plug-in principle of Jacod and Rosenbaum 2013) instead of averaging local fourth powers: over blocks of k returns, `IQ_hat = sum over blocks of k delta (block mean of r^2 / delta)^2`, whose asymptotic variance is `8 (k + 3) / (k + 2) int sigma^8`. (2) Truncate against a **local** scale (median absolute deviation, then a truncated root mean square, over about three blocks) with either a fixed cut-off a = 3 or the growing cut-off `a_n = sqrt(2 log n)`, and **drop** truncated returns rather than clip them. (3) Remove the squaring and truncation biases with an **exact finite-sample correction**, computed from the cumulants of a clipped or dropped squared normal, so the estimator is unbiased under locally constant volatility for every block size. The same algebra gives `int sigma^8` and hence a 95% interval. Main proposal **PI-LU** (local scale, `a_n`, drop, `k = ceil(sqrt n)`). Second proposal **PI-NN** (added in iteration 3, after the real data): PI-LU with the scale raised to 1.4826 times the median of the six nearest absolute returns when that is larger, and blocks of `round(n^(1/4))`. Simulations: log-OU stochastic volatility from `avmonitor.simulate`, vol of vol 0.5 or 1 with a U-shaped intraday pattern, 0 or 4 jumps a day of three sizes, n = 390, 1440, 23,400, 500 days per cell, 15 estimators, true IQ known exactly.
 
-**Q1 Efficiency [SYNTHETIC].** Constant volatility, n = 1440, 8000 days. AVAR in units of `int sigma^8` (closed form / simulated) and efficiency `8 / AVAR`:
+**Q1 Efficiency [SYNTHETIC].** Constant volatility, n = 1440, 8000 days. AVAR in units of `int sigma^8` (closed form / simulated) and efficiency `8 / AVAR` (simulated AVAR where there is one):
 
-| RQ | TPQ | MedRQ | MinRQ | RK-k (Bapat, normalised, corrected) | PI-LU (k = 38) | PI-NN (k = 6) |
+| RQ | TPQ | MedRQ | MinRQ | RK-k (kernel, kappa-corrected) | PI-LU (k = 38) | PI-NN (k = 6) |
 |---|---|---|---|---|---|---|
-| 10.67 / 10.81, 0.74 | 13.65 / 13.48, 0.59 | 14.24 (sim.), 0.56 | 18.50 (sim.), 0.43 | 9.26 (sim.), 0.86 | 8.20 / 8.46, 0.95 | 9.00 / 9.17, 0.87 |
+| 10.67 / 10.81, 0.74 | 13.65 / 13.48, 0.59 | 14.24 (sim.), 0.56 | 18.50 (sim.), 0.43 | 8.19 (oracle cut-off) / 9.26, 0.86 | 8.20 / 8.46, 0.95 | 9.00 / 9.17, 0.87 |
 
-A jump clipped at a = 3 leaves 17.55 (plug-in) or 27.01 (fourth powers) times `sigma^4 delta` (simulation 17.56 and 27.02); a dropped jump leaves 0.003. At n = 390 each clipped jump is 4.5% to 6.9% of the day's IQ.
+The paper's averaged kernel is a truncated RQ with edge weights (`docs/math.md`, section 4), and truncation already lowers its variance from 10.67 to 8.19 with an oracle cut-off (efficiency 0.98, closed form) and to 9.26 with the estimated daily MAD (0.86, simulated). PI-LU's closed-form efficiency is 0.976. A jump clipped at a = 3 leaves 17.55 (plug-in) or 27.01 (fourth powers) times `sigma^4 delta` (simulation 17.56 and 27.02); a dropped jump leaves 0.003. At n = 390 each clipped jump is 4.5% to 6.9% of the day's IQ.
 
 **Q2 Consistency [SYNTHETIC].** Strong stochastic volatility plus intraday pattern, no jumps (S5): relative bias at n = 390 / 1440 / 23,400 and slope of log RMSE on log n (minus 0.5 is the `sqrt(n)` rate):
 
-| | RK (Bapat) | RK-k | PI-G3 (daily scale) | TRQ-M (Mancini) | MedRQ | PI-LU | PI-NN |
+| | RK (no kappa correction) | RK-k | PI-G3 (daily scale) | TRQ-M (Mancini) | MedRQ | PI-LU | PI-NN |
 |---|---|---|---|---|---|---|---|
 | bias | -0.209 / -0.159 / -0.144 | -0.179 / -0.128 / -0.112 | -0.069 / -0.061 / -0.055 | -0.038 / -0.028 / -0.024 | -0.017 / 0.005 / 0.002 | -0.002 / -0.001 / 0.000 | 0.008 / 0.006 / 0.001 |
 | slope | -0.11 | -0.14 | -0.22 | -0.36 | -0.50 | -0.51 | -0.51 |
 
-**Q3 Bandwidth [SYNTHETIC].** The paper's cross-validation (eq. 17 as printed) picks the smallest bandwidth offered (h = 5) on 58% to 97% of days. Its expected value under constant volatility is 74.3, 77.2, 99.2, 142.8 at h = 5, 10, 20, 30 (minimum at h = 5 whatever the data). A corrected target picks the oracle spot bandwidth (median h = 50 to 150), but that oversmooths for the integrated quantity (kernel plug-in RMSE 0.250 at the corrected choice against 0.198 at h = 10, S5, n = 390). The block length of PI-LU matters little in smooth designs (default within 1% to 8% of the best k).
+In S1 (vol of vol 0.5, no intraday pattern) RK is minus 4.2% to minus 4.7% at every n and RK-k minus 0.6% to minus 1.1%.
+
+**Q3 Bandwidth [SYNTHETIC].** The cross-validation criterion as printed (eq. 17) picks the smallest bandwidth offered (h = 5) on 58% to 97% of days. Its expected value under constant volatility is 74.3, 77.2, 99.2, 142.8 at h = 5, 10, 20, 30 (minimum at h = 5 whatever the data). A corrected target picks the oracle spot bandwidth (median h = 50 to 150), but that oversmooths for the integrated quantity (kernel plug-in RMSE 0.250 at the corrected choice against 0.198 at h = 10, S5, n = 390). The block length of PI-LU matters little in smooth designs (default within 1% to 8% of the best k).
 
 **Q4 Comparison and intervals [SYNTHETIC].** Relative RMSE at n = 390 (n = 1440 in brackets):
 
-| | S1 no jumps | S3 medium jumps | S4 large jumps | S5 strong SV | S6 S5 + jumps |
-|---|---|---|---|---|---|
-| RQ | 0.167 (0.091) | 28.2 (102) | 3017 (12917) | 0.197 (0.111) | 31.2 (95.1) |
-| TPQ | 0.189 (0.100) | 0.630 (0.379) | 3.54 (2.99) | 0.239 (0.130) | 0.782 (0.383) |
-| MedRQ | 0.186 (0.106) | 0.471 (2.10) | 177 (93.4) | 0.236 (0.127) | 19.3 (1.19) |
-| RK (Bapat) | 0.156 (0.091) | 0.249 (0.091) | 0.312 (0.089) | 0.256 (0.184) | 0.198 (0.154) |
-| PI-LU | 0.154 (0.078) | **0.179 (0.082)** | **0.163 (0.078)** | 0.183 (0.098) | 0.217 (0.106) |
-| PI-NN | 0.162 (0.085) | 0.320 (0.121) | 0.236 (0.088) | 0.192 (0.105) | 0.375 (0.129) |
+| | S1 no jumps | S2 small jumps | S3 medium jumps | S4 large jumps | S5 strong SV | S6 S5 + jumps |
+|---|---|---|---|---|---|---|
+| RQ | 0.167 (0.091) | 0.631 (1.35) | 28.2 (102) | 3017 (12917) | 0.197 (0.111) | 31.2 (95.1) |
+| TPQ | 0.189 (0.100) | 0.213 (0.125) | 0.630 (0.379) | 3.54 (2.99) | 0.239 (0.130) | 0.782 (0.383) |
+| MedRQ | 0.186 (0.106) | 0.208 (0.111) | 0.471 (2.10) | 177 (93.4) | 0.236 (0.127) | 19.3 (1.19) |
+| RK | 0.156 (0.091) | **0.156** (0.084) | 0.249 (0.091) | 0.312 (0.089) | 0.256 (0.184) | 0.198 (0.154) |
+| RK-k | 0.156 (0.082) | 0.170 (0.091) | 0.280 (0.106) | 0.350 (0.107) | 0.236 (0.160) | 0.197 (0.134) |
+| PI-G3 | 0.149 (0.078) | 0.158 (0.082) | 0.222 (0.090) | 0.261 (0.091) | 0.178 (0.109) | **0.191** (0.106) |
+| PI-LU | 0.154 (0.078) | 0.165 (**0.081**) | **0.179 (0.082)** | **0.163 (0.078)** | 0.183 (0.098) | 0.217 (**0.106**) |
+| PI-NN | 0.162 (0.085) | 0.208 (0.119) | 0.320 (0.121) | 0.236 (0.088) | 0.192 (0.105) | 0.375 (0.129) |
 
-PI-LU's 95% interval covers the true IQ 92.6% to 97.2% of the time in all 18 cells (simulation standard error about 1%).
+Bold marks the lowest of the 15 estimators in a jump cell. PI-LU is lowest in 6 of the 8 jump cells; in S2 and S6 at n = 390 the kernel and PI-G3 are slightly better, because their downward truncation bias offsets the upward jump bias (at n = 23,400 in S6 they are biased by minus 5% to minus 14%). PI-LU is best or within 0.01 of the best in 11 of the 12 cells at n = 390 and 1440. Its 95% interval covers the true IQ 92.6% to 97.2% of the time in all 18 cells (simulation standard error about 1%).
 
-**Q5 Real data [REAL].** Median over days of each estimator's ratio to MedRQ of the same day, and rank correlation with MedRQ:
+**Q5 Real data [REAL].** Median over days of each estimator's ratio to MedRQ of the same day, and rank correlation with MedRQ. The true IQ is unknown, so these are ratios between estimators, not errors:
 
-| | RK (Bapat) | RK-k | PI-G3 | TRQ-M | PI-L3 | PI-LU | KPI-L3 | PI-NN | MinRQ | TPQ |
+| | RK | RK-k | PI-G3 | TRQ-M | PI-L3 | PI-LU | KPI-L3 | PI-NN | MinRQ | TPQ |
 |---|---|---|---|---|---|---|---|---|---|---|
 | BTC | 0.33 | 0.35 | 0.38 | 0.63 | 0.70 | 0.66 | 0.72 | **0.95** | 1.03 | 0.99 |
 | DOGE | 0.42 | 0.44 | 0.46 | 0.66 | 0.71 | 0.69 | 0.73 | **0.96** | 1.05 | 1.03 |
 | Spearman, BTC / DOGE | 0.865 / 0.814 | 0.865 / 0.814 | 0.879 / 0.837 | 0.927 / 0.890 | 0.939 / 0.908 | 0.931 / 0.888 | 0.941 / 0.911 | **0.975 / 0.965** | 0.995 / 0.994 | 0.987 / 0.987 |
 
-**Q6 Bursts or jumps [REAL + SYNTHETIC].** Locally standardised one-minute returns: 65% (BTC) and 44% (DOGE) of returns beyond `sqrt(2 log n)` have a neighbour beyond 2 sd, and the lag-1 autocorrelation of capped squared returns is 0.114 and 0.099; isolated jumps on a slowly varying volatility give 0% and minus 0.008. A two-factor volatility model with a fast factor (sd 0.75 in log variance, half-life 3 minutes), picked from a 3 by 3 grid on these diagnostics, gives 41% and 0.120 and reproduces the real ratios (PI-LU / MedRQ 0.68 against 0.66 to 0.69; PI-NN 0.95 against 0.95 to 0.96; 1-minute over 5-minute MedRQ 1.41 against 1.33 to 1.45). In that model, median relative error and RMSE at n = 390 / 1440 / 23,400:
+**Q6 Bursts or jumps [REAL + SYNTHETIC].** Locally standardised one-minute returns: 65% (BTC) and 44% (DOGE) of returns beyond `sqrt(2 log n)` have a neighbour beyond 2 sd, against a chance level of 8.9% (`1 - 0.9545^2`) for independent Gaussian returns, and the lag-1 autocorrelation of capped squared returns is 0.114 and 0.099. A model with isolated jumps on slowly varying volatility gives 0 of 16 (1.4 expected by chance) and minus 0.008. That many apparent jumps are short bursts of volatility is documented for equities and currencies by Christensen, Oomen and Podolskij (2014, *Journal of Financial Economics*) and Bajgrowicz, Scaillet and Treccani (2016, *Management Science*); what is examined here is the consequence for truncated IQ estimators. A two-factor volatility model with a fast factor (sd 0.75 in log variance, half-life 3 minutes), picked from a 3 by 3 grid on these diagnostics, gives 41% and 0.120 and reproduces the real ratios (PI-LU / MedRQ 0.68 against 0.66 to 0.69; PI-NN 0.95 against 0.95 to 0.96; 1-minute over 5-minute MedRQ 1.41 against 1.33 to 1.45). In that model, median relative error and RMSE at n = 390 / 1440 / 23,400:
 
-| | RK (Bapat) | PI-LU | MedRQ | TPQ | PI-NN |
-|---|---|---|---|---|---|
-| median error, no jumps | -0.58 / -0.59 / -0.57 | -0.49 / -0.47 / -0.26 | -0.40 / -0.20 / -0.02 | -0.40 / -0.20 / -0.02 | -0.36 / -0.23 / -0.04 |
-| RMSE, no jumps | 0.59 / 0.59 / 0.59 | 0.49 / 0.46 / 0.27 | 0.42 / 0.29 / 0.08 | 0.42 / 0.28 / 0.08 | **0.39 / 0.28 / 0.07** |
-| RMSE, 4 jumps a day | 0.54 / 0.56 / 0.58 | 0.48 / 0.44 / 0.27 | 0.89 / 1.63 / 1.28 | 0.43 / 0.51 / 0.17 | **0.36 / 0.26 / 0.07** |
+| | RK | PI-LU | TRQ-M | MedRQ | TPQ | PI-NN |
+|---|---|---|---|---|---|---|
+| median error, no jumps | -0.58 / -0.59 / -0.57 | -0.49 / -0.47 / -0.26 | -0.39 / -0.35 / -0.31 | -0.40 / -0.20 / -0.02 | -0.40 / -0.20 / -0.02 | -0.36 / -0.23 / -0.04 |
+| RMSE, no jumps | 0.59 / 0.59 / 0.59 | 0.49 / 0.46 / 0.27 | 0.41 / 0.37 / 0.33 | 0.42 / 0.29 / 0.08 | 0.42 / 0.28 / 0.08 | **0.39 / 0.28 / 0.07** |
+| RMSE, 4 jumps a day | 0.54 / 0.56 / 0.58 | 0.48 / 0.44 / 0.27 | **0.35** / 0.33 / 0.32 | 0.89 / 1.63 / 1.28 | 0.43 / 0.51 / 0.17 | 0.36 / **0.26 / 0.07** |
 
 **Reading.**
-* Squaring a local variance instead of averaging fourth powers raises efficiency from 0.74 (RQ, and Bapat's averaged kernel, which is RQ in disguise) to 0.95, and the exact correction makes it unbiased at every n (without it PI-LU is 9.2% too high at n = 390).
-* Bapat's rule with one daily MAD is inconsistent when volatility moves during the day: its bias does not shrink (minus 14% at n = 23,400) and its RMSE falls like `n^-0.1`. A local scale restores the `sqrt(n)` rate for every truncation rule; the growing cut-off with dropping (PI-LU) also removes jumps without a residual and is the best estimator in the jump scenarios at n = 390 and 1440.
-* The paper's cross-validation choice is a scale artefact, and even a corrected CV answers the wrong question for an integrated quantity: the IQ estimator wants less smoothing than the spot estimator.
-* On real data the local estimators agree with MedRQ and MinRQ far better than the MAD-truncated ones, but only PI-NN closes the gap. The diagnosis: large one-minute crypto returns come in bursts of a few minutes, which are part of volatility. In a model calibrated to that, every estimator that truncates against a scale measured over hours (Bapat's, PI-LU, PI-L3, the kernel plug-in) removes 20% to 59% of IQ, while the nearest-neighbour fourth-power estimators keep bursts but break with jumps. PI-NN combines both properties and has the lowest RMSE among robust estimators there, with and without jumps.
-* Practical rule: compute the clustering diagnostic first. Isolated large returns: use PI-LU. Clustered ones: use PI-NN, and do not trust agreement with a 5-minute estimate (in the model the 5-minute MedRQ is 0.57 of the true IQ at the median).
+* Under constant volatility, squaring a local variance gives efficiency 0.95 (simulated; 0.976 in closed form). That is a large gain over untruncated RQ (0.74) and the nearest-neighbour and multipower estimators (0.43 to 0.59), and a modest one over the paper's kernel with the kappa correction (0.86 simulated), which truncation already makes fairly efficient; its oracle version (0.98) is as efficient as PI-LU. The exact correction makes the plug-in unbiased at every n (without it PI-LU is 9.2% too high at n = 390).
+* With a fixed c and one daily MAD, the kernel estimator converges to `kappa_4(c)` times IQ under constant volatility (minus 3.6% with the scaled MAD, minus 29.5% with the raw MAD), which the kappa correction removes. When volatility moves within the day, the corrected estimator keeps a bias that does not shrink with n: about minus 1% in the moderate design S1 and minus 11% at n = 23,400 in the strong design S5, where its RMSE falls like `n^-0.14`. This setting is outside the conditions of the paper's Theorem 1, which assumes a threshold that shrinks more slowly than the returns. A local scale removes the remaining bias for every truncation rule, and the growing cut-off with dropping (PI-LU) also removes jumps without a residual.
+* The cross-validation choice as printed is driven by the criterion's scale term, and even a corrected criterion answers a different question for an integrated quantity: the IQ estimator wants less smoothing than the spot estimator.
+* On real data the local estimators agree with MedRQ and MinRQ far better than those with one daily MAD threshold (RK is 0.33 to 0.42 times MedRQ, that is 2.4 to 3.0 times lower), but only PI-NN closes the gap. A possible explanation: large one-minute crypto returns come in bursts of a few minutes, which under the model are part of volatility. If the calibrated burst model is right, every estimator that truncates against a scale measured over hours is biased down by about 35% to 59% at one minute (31% to 56% with jumps); for our version of the kernel the figure is 56% to 59% at every n. The nearest-neighbour fourth-power estimators keep bursts but break with jumps. PI-NN combines both properties and has the lowest RMSE among the robust estimators in five of the six model cells (nearly tied with TPQ at n = 1440 without jumps; TRQ-M slightly lower at n = 390 with jumps).
+* Practical suggestion: compute the clustering diagnostic first. Isolated large returns: PI-LU. Clustered ones: PI-NN, and agreement with a 5-minute estimate is no evidence of accuracy (in the model the 5-minute MedRQ is 0.57 of the true IQ at the median).
 
-**Caveats.** PI-NN was designed after seeing the real data, with settings chosen in exploratory runs (other seeds), so its numbers are not strictly out of sample; it is worse than PI-LU with isolated jumps at small n (S3, n = 390: 0.320 against 0.179) and its `int sigma^8` estimate is not robust. The burst reading is a model fit, not a proof: clustered small jumps or microstructure effects could leave similar signatures, and the daily-scale estimators fit the real data less well (RK 0.53 in the model, 0.33 to 0.42 real). No central limit theorem is proved for the feasible estimators; coverage is numerical evidence. One venue, two coins, six months, no microstructure noise in the simulations.
+**Caveats.** PI-NN was designed after seeing the real data, with settings chosen in exploratory runs (other seeds), so its numbers are not strictly out of sample; it is worse than PI-LU with isolated jumps at small n (S3, n = 390: 0.320 against 0.179) and its `int sigma^8` estimate is not robust. The burst reading is a model fit, not a proof: clustered small jumps or microstructure effects could leave similar signatures, and the daily-scale estimators fit the real data less well (RK 0.53 in the model, 0.33 to 0.42 real). The two papers on bursts were read from their abstracts only. No central limit theorem is proved for the feasible estimators; coverage is numerical evidence. One venue, two coins, six months, no microstructure noise in the simulations.
 
 ---
 
