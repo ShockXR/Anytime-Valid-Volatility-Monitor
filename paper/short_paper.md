@@ -166,3 +166,147 @@ with nothing assumed about the calibration window beyond $0 \le X \le \tau^2$. T
 
 **Choosing $A$ and $\delta$.** For a target $\alpha$ per day of $m$ steps, choose $\delta < \alpha$ and $A = m/(\alpha - \delta)$. With $\delta = 0.01$ and $\alpha = 5\%$, $A = 9750$ for a 390-step day and $A = 36{,}000$ for a 1440-minute day. Because the delay grows like $\log A$, the larger $A$ costs little ($\log 9750/\log 7800 \approx 1.025$); the real cost is the width of the bounds (Section 5.3). Two remarks. Under volatility clustering the bounds still cover the bet-weighted average of the conditional means within the calibration window, but the monitoring null "never above that average" is then simply false (Section 5.4): the confidence sequence protects against estimation error, not against this model mismatch. And because the coverage is uniform in time, the calibration may end at any stopping time, which a fixed-$n$ interval would not allow.
 
+## 4 Detection delay
+
+Section 3 controls false alarms. This section asks how fast the detector reacts to a real change, what robustness costs in speed, and what limits the speed of decrease detection. Proofs not given here are in Appendix B. Numerical statements are from E10 and E11 and are [SYNTHETIC].
+
+### 4.1 Growth rate and information
+
+**Post-change model.** From a change time $\nu$ on, $Y_\nu, Y_{\nu+1}, \dots$ are i.i.d. with law $Q$ and independent of $\mathcal{F}_{\nu-1}$. Write $V = Y - 1$ for the increase side and $V = 1 - Y$ for the decrease side; $V$ takes values in $[v_{\mathrm{lo}}, v_{\mathrm{hi}}]$, equal to $[-1, B-1]$ or $[1-B, 1]$, and the admissible bets are $\lambda \in [0, \lambda_{\max})$ with $\lambda_{\max} = 1/\lvert v_{\mathrm{lo}}\rvert$. A change means $\mathbb{E}_Q[V] > 0$. The worst-case delay of a stopping rule $T$ is Lorden's (1971)
+$$
+\mathrm{WADD}(T) = \sup_{\nu \ge 1}\ \operatorname*{ess\,sup}\ \mathbb{E}_\nu\big[(T - \nu + 1)^+ \mid \mathcal{F}_{\nu-1}\big].
+$$
+The *growth rate* of a bet is $g(\lambda) = \mathbb{E}_Q[\log(1 + \lambda V)]$. It is strictly concave with $g(0) = 0$ and $g'(0) = \mathbb{E}_Q[V] > 0$, so it has a unique maximiser $\lambda^\ast(Q)$ in $[0, \lambda_{\max}]$. Let $\mathcal{H} = \lbrace P \text{ on } [0, B] : \mathbb{E}_P[V] \le 0 \rbrace$ be the nonparametric null class of one step, and
+$$
+\mathrm{KL}_{\inf}(Q) = \inf_{P \in \mathcal{H}} \mathrm{KL}(Q \,\Vert\, P).
+$$
+
+**Lemma 4 (growth is bounded by information).** If $E \ge 0$ and $\mathbb{E}_P[E(Y)] \le 1$ for a law $P$, then $\mathbb{E}_Q[\log E(Y)] \le \mathrm{KL}(Q \,\Vert\, P)$.
+
+**Lemma 5 (the best nonparametric growth).** Let $B < \infty$. (a) Every e-variable for the whole class $\mathcal{H}$ is dominated by a bet: there is $\lambda \in [0, \lambda_{\max}]$ with $E(y) \le 1 + \lambda v(y)$ for all $y$. (b) If $0 < \lambda^\ast < \lambda_{\max}$, then $\max_\lambda g(\lambda) = g(\lambda^\ast) = \mathrm{KL}_{\inf}(Q)$, and the infimum is attained by $P^\ast(dy) = Q(dy)/(1 + \lambda^\ast v(y))$.
+
+Part (b) is the dual form, for a bounded statistic, of the information number $K_{\inf}$ of Honda and Takemura (2010), and $P^\ast$ is the reverse information projection of $Q$ onto the null (Grünwald, de Heide and Koolen 2024; Larsson, Ramdas and Ruf 2024). Since every bet is an e-variable for the true pre-change law $P_0$ (when $P_0 \in \mathcal{H}$), and since $X$ and $Y$ are functions of $r$, Lemmas 4 and 5 and the data processing inequality give:
+
+**Corollary 6 (information ladder).** With $g_{\mathrm{grid}} = \max_k g(\lambda_k)$,
+$$
+\mathrm{KL}(Q_r \,\Vert\, P_{0,r}) \ \ge\ \mathrm{KL}(Q_X \,\Vert\, P_{0,X}) \ \ge\ \mathrm{KL}_{\inf}(Q) \ \ge\ g_{\mathrm{grid}}.
+$$
+The three ratios between neighbouring terms are the *truncation loss*, the *nonparametric loss* (the price of a null that restricts only the mean of $Y$, which is what makes the detector valid for every return law) and the *grid loss*. The ratio $\mathrm{KL}(Q_r \Vert P_{0,r})/g_{\mathrm{grid}}$ is the first-order delay ratio of the robust detector against the likelihood-ratio detector that knows both laws.
+
+**Corollary 7 (speed limits).** Every bet satisfies $f_\lambda \le 1 + \lambda_{\max} v_{\mathrm{hi}}$, so by Lemma 5(a) every e-variable for $\mathcal{H}$ satisfies $\log E \le \log B$ on the increase side and $\log E \le \log(B/(B-1))$ on the decrease side, and $\mathrm{KL}_{\inf}(Q)$ obeys the same bounds however large the change. For the detector itself the statement is deterministic: $M_n \le \sum_k w_k \sum_{j=1}^{n} F_k^{\,n-j+1}$ with $F_k = 1 + \lambda_k v_{\mathrm{hi}}$, so $T_A$ is never smaller than the first $n$ at which this sum reaches $A$.
+
+With $c = 3$ and Gaussian returns, $\log(B/(B-1)) = 0.117$ nats per step, and for the default decrease grid at $A = 7800$ the floor is 36, 73, 122 and 180 steps for $c = 2, 3, 4$ and 5 (E11). A complete collapse of volatility (all returns zero) is detected after exactly 73 steps with $c = 3$. This is the quantitative form of the impossibility of Section 3.3: the bound $B$ that makes a decrease detectable also caps the evidence that one step can provide.
+
+### 4.2 Delay bounds and first-order optimality
+
+**Theorem 8 (non-asymptotic delay bound).** Under the post-change model, for the Shiryaev-Roberts mixture or its CUSUM-type version:
+
+(a) for every $A$, every change time $\nu$ and every pre-change history,
+$$
+\mathbb{E}\big[(T_A - \nu + 1)^+ \mid \mathcal{F}_{\nu-1}\big] \ \le\ \min_{k:\, g_k > 0}\ \frac{\log(A/w_k) + o_k}{g_k},
+$$
+where $g_k = g(\lambda_k)$, $Z_k = \log(1 + \lambda_k V)$ with $V$ drawn from $Q$, and $o_k = \min\big(\sup Z_k,\ \mathbb{E}[(Z_k^+)^2]/\mathbb{E}[Z_k]\big)$ bounds the mean overshoot;
+
+(b) $\mathrm{WADD}(T_A) = \mathbb{E}_Q[T_A^0]$, where $T_A^0$ is the alarm time of the detector started from $M_0 = 0$ on i.i.d. data from $Q$: the worst case is a change at the first monitored step.
+
+*Proof.* (a) For $t \ge \nu$ all terms of the Shiryaev-Roberts sum are nonnegative, so $M_t \ge w_k L_t^{(\nu, k)}$. Let $S_n = \sum_{i=0}^{n-1} Z_{k, \nu+i}$ and $N = \inf\lbrace n \ge 1 : S_n \ge \log(A/w_k)\rbrace$; then $(T_A - \nu + 1)^+ \le N$. $N$ depends only on post-change data, which are independent of $\mathcal{F}_{\nu-1}$. $S$ is a random walk with drift $g_k > 0$ and bounded increments, so Wald's identity gives $g_k\,\mathbb{E}[N] = \log(A/w_k) + \mathbb{E}[S_N - \log(A/w_k)]$, and the overshoot is bounded by $\sup Z_k$ and, in mean, by Lorden's (1970) inequality. (b) Each recursion $x \mapsto f(x + 1)$ (or $f\max(x, 1)$) is nondecreasing in $x$, so from any state $M_{\nu-1} \ge 0$ the statistic after $\nu$ dominates the one started from 0 on the same post-change data. $\square$
+
+Part (a) is the elementary version, for linear bets on a bounded statistic, of the delay bounds that Shin, Ramdas and Rinaldo (2024) give for mixtures of exponential baseline e-detectors. It pays the full $\log(1/w_k) = \log K$ for not knowing the right bet and ignores the help of the other bets and start times; in simulation it is 1.3 to 2.7 times the true delay (E11). Part (b) means that simulations with the change at the first monitored step measure the worst-case delay exactly, and any pre-change history can only shorten it.
+
+**Theorem 9 (first-order asymptotics).** Fix $Q$ with $\mathbb{E}_Q[V] > 0$ and an interior maximiser $0 < \lambda^\ast < \lambda_{\max}$, so that $g(\lambda^\ast) = \mathrm{KL}_{\inf}(Q)$. As $A \to \infty$:
+
+(a) *Lower bound.* Let $T$ be any stopping rule based on the returns whose average run length is at least $A$ under every i.i.d. return law $P$ with $\mathbb{E}_P[\min(r^2, \tau^2)] \le m^{\uparrow}$ (increase side; symmetrically for the decrease side). Then $\mathrm{WADD}_Q(T) \ge (\log A / \mathrm{KL}_{\inf}(Q))(1 + o(1))$.
+
+(b) *Fixed grid.* For a fixed grid with $g_{\mathrm{grid}} > 0$, $\mathrm{WADD}(T_A) \big/ (\log A/\mathrm{KL}_{\inf}) \to \mathrm{KL}_{\inf}/g_{\mathrm{grid}} \ge 1$.
+
+(c) *Refined grid.* Fix $0 < a < b' < \lambda_{\max}$ with $\lambda^\ast \in [a, b']$, and use $K_A = 1 + \lceil (b' - a)\sqrt{\log A}\,\rceil$ equally spaced bets on $[a, b']$ with equal weights. Then $\mathrm{WADD}(T_A) \le (\log A + \tfrac12 \log\log A + O(1))/\mathrm{KL}_{\inf}$.
+
+(d) *Continuous mixture.* For a mixing law on $[0, b']$ with a density at least $p_0 > 0$ on $[a, b']$ and $\lambda^\ast \in (a, b')$, $\mathrm{WADD}(T_A) \le (\log A + \log\log A + O(1))/\mathrm{KL}_{\inf}$.
+
+Hence the Shiryaev-Roberts e-detector with the oracle bet, a refined grid or a continuous mixture is first-order minimax optimal among all rules that control the run length over the nonparametric null, and a fixed grid has asymptotic efficiency $g_{\mathrm{grid}}/\mathrm{KL}_{\inf}$.
+
+*Proof sketch* (details in Appendix B). (a) The law $P_r^\ast(dr) = Q_r(dr)/(1 + \lambda^\ast v(r))$ is a probability law (its mass is 1 by the first-order condition $\mathbb{E}_Q[V/(1 + \lambda^\ast V)] = 0$), it satisfies the null with equality, and $\mathrm{KL}(Q_r \Vert P_r^\ast) = g(\lambda^\ast)$. The rule has run length at least $A$ under $P_r^\ast$, and Lorden's (1971) lower bound for a change from $P_r^\ast$ to $Q_r$ gives the claim. (b) The upper half is Theorem 8(a) with the best bet; the lower half uses $\log M_n \le \log n + \max_{k} \max_{i < n}(S_n^k - S_i^k)$ and the strong law of large numbers. (c) Some bet lies within half a grid step of $\lambda^\ast$, where $g$ is within $O(h^2)$ of its maximum (Taylor), and Theorem 8(a) with $w_k = 1/K_A$ gives the bound. (d) Concavity of $\lambda \mapsto \log(1 + \lambda v)$ bounds the mixture from below by its value on a window of width $2/\log A$ around $\lambda^\ast$, and the Wald argument applies to the resulting random walk. $\square$
+
+Ram and Ramdas (2026, preprint) prove a universal lower bound of the form (a) for composite pre- and post-change classes and a matching upper bound for bounded means, which covers the truncated statistic. We give (a) to (d) because for linear bets on a bounded statistic the arguments are short, and because the comparison between fixed grids, refined grids and mixtures is what matters for the choice of bets.
+
+### 4.3 Second-order behaviour at practical alarm levels [HEURISTIC, checked numerically]
+
+The first-order formula $\log A / g$ is a poor guide at $A = 7800$. For one bet and the change at the first step, $M_n = e^{S_n} V_n$ with $S_n = \sum_{i \le n} \log f_i$ and $V_n = \sum_{j=0}^{n-1} e^{-S_j} \uparrow V_\infty < \infty$, so $\log M_n$ is a random walk plus a slowly changing term. Nonlinear renewal theory (Woodroofe 1982; Pollak 1987 for the Shiryaev-Roberts statistic) suggests
+$$
+\mathbb{E}[T_A] \approx \frac{\log A + \kappa - \zeta}{g}, \qquad \kappa = \frac{\mathbb{E}[H^2]}{2\,\mathbb{E}[H]}, \quad \zeta = \mathbb{E}[\log V_\infty],
+$$
+with $H$ the first ascending ladder height of $S$ (so $\kappa$ is the limiting mean overshoot). We have not checked the regularity conditions of those theorems for our law of $Y$ (a continuous part and an atom at the cap), so we call the formula heuristic. Approximating $S$ by a Brownian motion with drift $g$ and variance $s^2$ per step, Dufresne's (1990) identity for exponential functionals gives $\zeta \approx \log(2/s^2) - \psi(2g/s^2)$, with $\psi$ the digamma function. For a growth-optimal bet and a small change $s^2 \approx 2g$, so $\zeta \approx \log(1/g) + \gamma_E$ with Euler's constant $\gamma_E = 0.5772$, and
+$$
+\mathbb{E}[\text{delay}] \approx \frac{\log(A g) - \gamma_E + \kappa}{g}.
+$$
+The memory term $\zeta$ is the reason the first-order formula fails: for a 25% increase in standard deviation $g \approx 0.05$, so $\zeta \approx 3.6$ while $\log A = 8.96$.
+
+Table 1 compares the predictions with simulation (true baseline, $c = 3$, $A = 7800$, change at the first monitored step, 3000 paths per case, mean delays, E11) [SYNTHETIC].
+
+| Case | $g_{\mathrm{grid}}$ | first order $\log A/g_{\mathrm{grid}}$ | proved bound (Thm. 8a) | simulated, default grid | second order, best single bet | simulated, best single bet |
+|---|---|---|---|---|---|---|
+| Gaussian, sd ratio 1.1 | 0.0093 | 964 | 1221 | 455 | 405 | 417 |
+| Gaussian, sd ratio 1.25 | 0.0502 | 179 | 233 | 122 | 109 | 107 |
+| Gaussian, sd ratio 1.5 | 0.161 | 56 | 75 | 48 | 42 | 42 |
+| Gaussian, sd ratio 2 | 0.413 | 22 | 30 | 23 | 18.4 | 18.7 |
+| Jumps, sd ratio 1.25 | 0.0473 | 190 | 248 | 128 | 115 | 115 |
+| Student $t_5$, sd ratio 1.25 | 0.0320 | 280 | 362 | 178 | 158 | 159 |
+| Gaussian, sd ratio 0.8 | 0.0340 | 264 | 314 | 195 | 157 | 156 |
+| Gaussian, sd ratio 0.67 | 0.0598 | 150 | 179 | 124 | 99 | 99 |
+| Gaussian, sd ratio 0.5 | 0.0839 | 107 | 127 | 93 | 74 | 74 |
+
+*Table 1. Predicted and simulated mean delays in steps (E11, Q11a). Standard errors are below 1.5% of the mean.*
+
+In all 20 cases of E11 the second-order prediction for a single bet is within 3% of its simulated mean delay, the first-order formula overstates the delay of small changes by up to 112%, and the proved bound is 1.3 to 2.7 times the simulated delay. The default grid costs 9% to 26% against the best single bet. With the change after 500 pre-change steps, as in E4, the delays are 17% to 34% shorter, because the Shiryaev-Roberts statistic enters the change with a head start, and they match E4 to within about 10% (E11). The asymptotic regime arrives very slowly: at $A = 10^8$ even the best single bet is 5% to 24% faster than $\log A/\mathrm{KL}_{\inf}$ in 15 cases (Gaussian, Student $t_3$ and jump returns), and the second-order formula explains the gap to within 0.024 in ratio for every $A \ge 10^4$ (E11, Q11e; Figure `e11_asymptotic_optimality.png`).
+
+![Figure 1. Ratio of predicted to simulated delay for the first-order formula, the proved bound of Theorem 8(a) and the second-order formula (E11) [SYNTHETIC].](../results/figures/e11_delay_predictions.png)
+
+### 4.4 The price of robustness and the truncation constant
+
+Table 2 splits the first-order delay ratio against the Gaussian likelihood-ratio detector into the three factors of Corollary 6, for clean Gaussian data and $c = 3$, and compares it with simulated mean delays (E11, Q11b) [SYNTHETIC].
+
+| sd ratio | 1.25 | 1.5 | 2 | 0.8 | 0.67 | 0.5 |
+|---|---|---|---|---|---|---|
+| truncation loss | 1.03 | 1.08 | 1.27 | 1.00 | 1.00 | 1.00 |
+| nonparametric loss | 1.10 | 1.23 | 1.48 | 1.25 | 2.00 | 3.61 |
+| grid loss | 1.02 | 1.02 | 1.04 | 1.02 | 1.05 | 1.05 |
+| predicted penalty $\mathrm{KL}/g_{\mathrm{grid}}$ | 1.16 | 1.37 | 1.95 | 1.27 | 2.09 | 3.79 |
+| simulated penalty against the Gaussian LR mixture | 1.14 | 1.35 | 1.73 | 1.48 | 2.19 | 3.45 |
+
+*Table 2. The price of robustness on clean Gaussian data, $c = 3$ (E11). Penalties are ratios of mean delays, change at the first step, 3000 paths with common random numbers.*
+
+The information ratio explains the 10% to 70% delay penalty measured in E4 (Section 5.3). The largest factor is the nonparametric loss, not truncation. For decreases the nonparametric loss is the speed limit of Corollary 7: $\mathrm{KL}_{\inf}$ cannot exceed 0.117 nats per step, while the Gaussian information keeps growing with the size of the change. Asymptotically, the robust detector keeps $\mathrm{KL}_{\inf}/\mathrm{KL}$ = 53% to 88% of the speed of the Gaussian likelihood-ratio detector for increases (sd ratio 2 to 1.25) and 28% to 80% for decreases (0.5 to 0.8); under Student $t_3$ returns it keeps 94% to 98% of the speed of the correctly specified detector for increases, because heavy tails carry little information about scale (E11, Q11e). In exchange the robust detector keeps its false alarm guarantee where the Gaussian one loses it (Section 5.1).
+
+**The truncation constant.** For increases on clean data the delay barely changes for $c \ge 4$, and $c = 3$ costs 3%, 6% and 12% at sd ratios 1.25, 1.5 and 2 against no truncation. With jumps (probability 0.005 per step, standard deviation 8 times the diffusive one) the growth at sd ratio 1.25 peaks at $c$ between 3.25 and 4.25 depending on the change size, and without truncation it falls to 29% of the $c = 3$ value. A burst of jumps at constant volatility (jump probability raised from 0.005 to 0.02) moves the $c = 3$ detector only 3.5% as much as a real 25% volatility increase, against 39% without truncation (E11). For decreases the speed limit dominates and a smaller $c$ is faster: with $c = 2$ the simulated decrease delays fall by 26% to 49% relative to $c = 3$. The two sides need not share $c$, since each is a valid e-detector for its own truncated statistic and the two-sided rule of Proposition 1 needs only each side's guarantee: $c$ of about 3 to 4 for increases and 1.5 to 2 for decreases is a legitimate design. It has not been tested on real data, where zero returns and price ticks matter more when $c$ is small.
+
+### 4.5 Clustering, forecast-relative monitoring and a signal cap
+
+Under persistent volatility clustering the conditional mean of $X_t$ wanders even when the unconditional variance is constant, so the nulls of Section 3 are false and the raw monitor alarms on most days (Section 5.4). A natural fix is to monitor $z_t = r_t/\hat\sigma_t$, with $\hat\sigma_t^2$ a predictable volatility forecast; the null then reads "the forecast is right up to a constant". The following exact calculation shows what this costs when the forecast model is GARCH(1,1) (Bollerslev 1986).
+
+**Proposition 10 (signal cap).** Let $\alpha, \beta > 0$ with $\alpha + \beta < 1$ and $\omega > 0$. Before a break the returns follow GARCH$(\omega, \alpha, \beta)$, and the forecast is the pre-break filter $s_t = \omega + \alpha r_{t-1}^2 + \beta s_{t-1}$, run without change after the break. From the break on, the returns follow GARCH$(k\omega, \alpha, \beta)$ with $k > 0$: $r_t = \sigma_t \varepsilon_t$, $\sigma_t^2 = k\omega + \alpha r_{t-1}^2 + \beta \sigma_{t-1}^2$, with i.i.d. $\varepsilon_t$ of mean 0 and variance 1. Then $d_t = \sigma_t^2 - s_t$ satisfies $d_t = (k-1)\omega + \beta d_{t-1}$ deterministically, so $d_t \to (k-1)\omega/(1-\beta)$ geometrically at rate $\beta$, and in the post-break stationary regime
+$$
+\rho(k) := \frac{\mathbb{E}[r_t^2]}{\mathbb{E}[s_t]} = \frac{k(1-\beta)}{1 - \alpha - \beta + \alpha k},
+$$
+which does not depend on $\omega$, increases in $k$, and satisfies $\rho(k) < (1-\beta)/\alpha$ for every $k$, however large the break.
+
+*Proof.* Subtracting the two recursions, the terms $\alpha r_{t-1}^2$ cancel, which gives the recursion for $d_t$. In the post-break stationary regime $\mathbb{E}[r_t^2] = \mathbb{E}[\sigma_t^2] = k\omega/(1 - \alpha - \beta)$ and $\mathbb{E}[s_t] = \mathbb{E}[\sigma_t^2] - (k-1)\omega/(1-\beta)$. Dividing and simplifying gives $\rho(k)$. Its derivative in $k$ has the sign of $(1-\beta)(1-\alpha-\beta) > 0$, and $\rho(k) \to (1-\beta)/\alpha$ as $k \to \infty$. $\square$
+
+Two exact facts sit behind this. A scale break ($r_t \mapsto \sqrt{k}\, r_t$) and an intercept break ($\omega \mapsto k\omega$) lead to the same post-break model and differ only in the transient right after the break. And the filter absorbs most of the break through its $\alpha r^2$ term: at persistence $\alpha + \beta = 0.99$ with $\alpha = 0.05$, a doubling of the long-run variance appears after standardisation as an increase of the ratio of means to $\rho(2) = 1.091$, and no break can push it above $(1 - \beta)/\alpha = 1.2$. The monitor sees the mean of the ratio, $\mathbb{E}[r_t^2/s_t]$, which is a little larger by Jensen's inequality (1.116 for $k = 2$ in simulation) and which stayed below 1.28 for $k$ up to 1000 at this persistence; we have a proof of the cap only for the ratio of means. Figure 2 compares the closed form with simulation (E10, Q10d) [SYNTHETIC].
+
+![Figure 2. The ratio of means $\rho(k)$ (lines, closed form; filled circles, simulation) and the mean of the ratio that the monitor sees (open triangles), with the caps $(1-\beta)/\alpha$ (dashed), for three persistences. 200 paths of 18,000 post-break steps per point, standard errors below 0.002 (E10) [SYNTHETIC].](figures/signal_cap.png)
+
+**An information rate.** With Gaussian innovations the per-step Kullback-Leibler divergence between the post-break and pre-break conditional laws of $r_t$ is $\tfrac12(q_t - 1 - \ln q_t)$ with $q_t = \sigma_t^2/s_t$. Let $I$ be its average over the post-break path. By Lai (1998), any detector whose average run length to a false alarm is at least $A$ needs, as $A \to \infty$ and under his condition that the post-change log-likelihood ratio grows at rate $I$ uniformly in the change time, a worst-case delay of at least $(\ln A/I)(1 + o(1))$. At $A = 28{,}800$ this is an order-of-magnitude guide, not an exact bound. Table 3 gives the numbers.
+
+| $\alpha + \beta$ | $k$ | $\rho(k)$ | simulated mean of ratio | $I$ (nats per step) | $\ln A / I$ (days of 1440 steps) |
+|---|---|---|---|---|---|
+| 0.95 | 2 | 1.333 | 1.361 | 0.0276 | 0.26 |
+| 0.99 | 1.5 | 1.059 | 1.074 | 0.0015 | 4.7 |
+| 0.99 | 2 | 1.091 | 1.116 | 0.0037 | 1.9 |
+| 0.99 | 4 | 1.143 | 1.187 | 0.0093 | 0.77 |
+| 0.99 | 1000 | 1.200 | 1.271 | 0.0187 | 0.38 |
+| 0.999 | 2 | 1.016 | 1.031 | 0.0003 | 21 |
+
+*Table 3. Signal left after a frozen GARCH(1,1) forecast and the information rate of a break (E10, Q10d) [SYNTHETIC]. $A = 28{,}800$.*
+
+At persistence 0.99 no detector with this false alarm budget can be expected to see a doubling of the long-run variance much faster than within about two days, and at persistence 0.999 it is practically invisible for weeks. This is a property of the question, not of the monitor: a highly persistent volatility model can explain a level shift as its own slow wandering, which is the mirror image of the known finding that unmodelled level shifts make fitted GARCH models look nearly integrated (Diebold 1986; Lamoureux and Lastrapes 1990; Mikosch and Starica 2004). The observed median delays of the forecast-relative monitors (1523 to 1791 steps for a doubling, Section 5.4) are about 0.6 times the step at which the cumulative information reaches $\ln A$. The memory term of Section 4.3 can explain a factor of this size on its own: in an i.i.d. version of the same steady state with the true baseline, $\zeta$ is 54% to 62% of $\ln A$ and the detector alarms at 0.41 to 0.58 times $\ln A/\mathrm{KL}$ (E11, cross-check with E10). We did not rerun the GARCH setting itself to separate this from the effect of the plug-in baseline.
+
