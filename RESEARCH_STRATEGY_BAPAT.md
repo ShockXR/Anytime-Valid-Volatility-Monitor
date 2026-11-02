@@ -13,7 +13,7 @@ Volatility in high-frequency markets moves between regimes (calm, stressed, calm
 1. **Jumps and fat tails.** A few extreme returns distort ordinary volatility estimates. Bapat (2026) proposes clipping each return at c times its median absolute deviation (MAD) and kernel-smoothing the result, which bounds the influence of any single return.
 2. **Repeated looks.** A classical test checked every minute will eventually raise a false alarm by chance. E-processes and e-detectors (Shin, Ramdas and Rinaldo 2024) control false alarms at every possible stopping time.
 
-The paper solves the first problem for a fixed sample. It does not address the second, and its averaged estimator throws away the local, minute-by-minute information that an online monitor needs.
+The paper solves the first problem for a fixed sample. It does not address the second: its averaged estimator is a daily summary, and the local quantity it averages is what an online monitor needs.
 
 ## 3. What exactly are we validating? (research questions)
 
@@ -21,10 +21,10 @@ The paper solves the first problem for a fixed sample. It does not address the s
 |---|---|---|
 | Q1 | **Correctness.** What do the printed estimators converge to, how should they be scaled, and do the published tables follow the printed formulas? | Answered (E1, E2, E5a, E6). The printed kernel is not on the quarticity scale, truncation at c × MAD leaves a bias that does not shrink with n, and the published tables are consistent with the printed (unnormalised) formulas, the raw MAD and a sample with about 2,000 missing minutes. |
 | Q2 | **Online robustness.** Can the full-sample MAD be replaced by one computed from past data only, without losing the jump protection? | Yes in simulation (E3). |
-| Q3 | **Detection.** Can a bounded truncated statistic drive a nonparametric e-detector with a proven false alarm guarantee under jumps, fat tails and noise, and how fast is it compared with parametric, classical and published change-point methods? | Guarantee proved (`docs/math.md` 5) and confirmed at scale (E4, E9: 1.1% to 1.4% against a 5% bound for four very different return laws). 10% to 70% slower than parametric detectors on clean Gaussian data, the only valid one under jumps and fat tails (E4). Comparison with published methods: E13. |
+| Q3 | **Detection.** Can a bounded truncated statistic drive a nonparametric e-detector with a proven false alarm guarantee under jumps, fat tails and noise, and how fast is it compared with parametric, classical and published change-point methods? | Guarantee proved (`docs/math.md` 5) and confirmed at scale (E4, E9: 1.1% to 1.4% against a 5% bound for four very different return laws). 10% to 70% slower than parametric detectors on clean Gaussian data; the only one of E4's detectors that is valid in both directions under jumps and fat tails (an e-detector on raw r² also stays valid for increases, but truncation is needed for decreases and for speed under jumps: 102 against 246 steps for a 25% increase). The comparison with published change-point methods (E13) is in progress. |
 | Q4 | **Why a bounded statistic.** Why does the paper's truncation matter for sequential testing? | A fall in the variance cannot be detected by any nonparametric e-test (math.md 5.3, related to Bahadur and Savage 1956); a bounded functional such as the truncated variance can. |
 | Q5 | **Estimated baseline.** Does the guarantee survive when the "normal" level is estimated from data? | Not exactly with a plug-in estimate (roughly triples the false alarm rate with short calibration, E4e; 44% against 25% over five days, E10). Yes, with a proof, with a confidence-sequence baseline (E8, math.md 6). A running truncation level: E14. |
-| Q6 | **When does the guarantee stop applying?** | Under persistent volatility clustering (E9) and price-level noise (ALT1), the conditional null is false. Monitoring relative to a volatility forecast restores it, at a quantified cost (E10). |
+| Q6 | **When does the guarantee stop applying?** | Under persistent volatility clustering (E9) and price-level noise (ALT1), the conditional null is false. Monitoring relative to a volatility forecast restores it when the forecast model is right, at a quantified cost (E10); with a fitted GARCH and a plug-in baseline the one-day rate is 3% to 6%, close to the 4.7% to 5.3% with the true model. Non-overlapping pre-averaged blocks restore it under price noise (ALT1). |
 | Q7 | **Real data.** Do alarms on real one-minute data mean anything beyond volatility clustering? | Alarms are followed by volatility on the flagged side of EWMA and HAR forecasts 71% to 83% of the time against about 50% at random times, on five coins in and out of sample (E6), and on Nifty 50 (E7). But a ratio rule tuned with hindsight is about as precise (E6e), so the contribution on real data is a guarantee with fixed settings, not extra precision. Event studies: FOMC statements (E12), Union Budget days (E7). |
 | Q8 | **Use.** Does a change-triggered risk rule help? | Tails on par with daily volatility targeting, worse tracking, no Sharpe difference (ALT2). |
 
@@ -37,7 +37,7 @@ The paper solves the first problem for a fixed sample. It does not address the s
 | H3. Sizing bets with the local truncated quarticity speeds up detection. | Rejected: slightly slower in 14 of 18 cells (E4, Q4c). |
 | H4. A plug-in baseline costs little. | Rejected for short calibration windows and long horizons (E4e, E10). |
 | H5. Alarms on real data carry information beyond a volatility forecast. | Supported against EWMA and HAR (E6e, E10c); not beyond a well-tuned naive rule. |
-| H6. Dividing returns by a volatility forecast restores the guarantee under clustering without losing power. | Half supported: validity restored, power against level shifts strongly reduced, with a closed-form explanation (E10). |
+| H6. Dividing returns by a volatility forecast restores the guarantee under clustering without losing power. | Half supported: validity restored when the forecast model is right (in simulation the fitted GARCH matches the true model's false alarm rate; a proof also needs a true or confidence-sequence baseline), power against level shifts strongly reduced, with a closed-form explanation (E10). |
 
 ## 5. What exactly are we building?
 
@@ -68,7 +68,7 @@ The paper solves the first problem for a fixed sample. It does not address the s
 * Real-data applications on crypto and on an Indian index.
 * Several natural joint-paper directions (section 11).
 
-We do not claim to have improved his estimator. Where the normalised robust kernel does well (E1: it beats the plain kernel in most cells once both are on the same scale), we say so.
+The main project does not claim to improve his estimator. Where the normalised robust kernel does well (E1: it beats the plain kernel in most cells once both are on the same scale), we say so. One alternative (ALT3) explores a different quarticity estimator that, in simulation, is somewhat more efficient than the κ-corrected robust kernel under constant volatility and stays consistent when volatility moves within the day; it is a proposal for discussion, not a correction.
 
 ## 8. Choosing the primary direction
 
@@ -101,7 +101,7 @@ Five candidate directions were scored from 1 (weak) to 10 (strong) on the seven 
 
 | Criterion | Met? |
 |---|---|
-| Every theorem has a complete proof with stated assumptions, checked by an independent reviewer. | Yes for sections 5 and 6 of `docs/math.md` (review round 1; round 2 covers later work). |
+| Every theorem has a complete proof with stated assumptions, checked by an independent reviewer. | Yes for sections 5 and 6 of `docs/math.md` (section 5: review round 1; section 6: review round 2a, no errors found, a few statements sharpened). The delay theory (`docs/theory_delay.md`) and the panel theory (`docs/theory_panel.md`) await an independent check. |
 | The false alarm rate stays below the proved bound in every null scenario the theorem covers, with Monte Carlo error small enough to see the slack. | Yes (E9: 4000 paths; E8: 10,000 paths). |
 | Every published number we discuss is either reproduced or has a stated, tested hypothesis for why not. | Yes for Tables 5 to 8, with open questions listed (E1, E6). |
 | Real-data alarms beat a random-time control and a forecast, out of sample, on several assets. | Yes (E6, E7); not beyond a hindsight-tuned naive rule (E6e). |
@@ -120,11 +120,11 @@ Five candidate directions were scored from 1 (weak) to 10 (strong) on the seven 
 
 ## 11. Development roadmap
 
-**Done in rounds 1 and 2.** Everything in sections 3 to 6, 164 automated tests, experiments E1 to E12, alternatives ALT1 to ALT5, an independent review.
+**Done in rounds 1 and 2.** Everything in sections 3 to 6, about 240 automated tests, experiments E1 to E15 (E13 and E14 finishing), alternatives ALT1 to ALT6, two independent reviews (rounds 1 and 2a), a one-command reproduction script (`scripts/reproduce.py`) and a short paper draft (`paper/`).
 
 **Next, after a first meeting with Prof. Bapat (about 2 to 3 weeks).**
 1. Confirm the code conventions (weight normalisation, MAD scaling, simulation σ, the σ_J = 0.10 design, the RMSE definition, the DOGE data) and rerun E1 and E6 with his settings.
 2. Decide the target with him: variance stream, quarticity stream (ALT1), or both.
-3. Finish the theory: delay optimality (E11), running truncation and warm restarts (E14), panel monitoring (E15).
+3. Finish the theory that is still open: warm restarts without a blind period (E14), the chance of any false discovery in the panel once real changes are present (E15), and a central limit theorem for the ALT3 estimator.
 
 **Then (stretch).** A short paper, "Anytime-valid detection of volatility regime changes with robust high-frequency measures": guarantees with an estimated baseline, the bounded-statistic argument, the forecast-relative signal cap and information bound, and the crypto and Nifty applications. In parallel, the estimation paper of ALT3 if he prefers that direction.

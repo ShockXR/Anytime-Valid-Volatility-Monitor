@@ -128,7 +128,7 @@ Following Shin, Ramdas and Rinaldo (2024), define the Shiryaev-Roberts type stat
 * An average `M̄_t` of several M statistics (several fixed bets, or a fixed grid plus an adaptive bet) does not obey the recursion itself, but it satisfies `E[M̄_t | F_{t-1}] ≤ M̄_{t-1} + 1`, which is all Lemma 1 needs. It is again an e-detector and inherits Theorems A and B.
 * Two-sided monitoring: under the two-sided null `(1 - b) m₀ ≤ E[X_t | F_{t-1}] ≤ (1 + b) m₀`, `(M↑ + M↓) / 2` is an e-detector, and `max(M↑, M↓) ≥ 2A` implies `(M↑ + M↓) / 2 ≥ A`. Running each side at level `2A` therefore keeps both guarantees for the first alarm of either side.
 
-**Corollary C (restarts after alarms).** The monitor restarts after every alarm. Suppose the null holds in every segment relative to that segment's baseline (true baselines). Let `G_t` be the sum of the two-sided statistic `(M↑ + M↓)/2` at all past alarms, plus its current value, minus the number of monitored steps so far. G is a supermartingale with `G₀ = 0`, and every alarm adds at least A to the banked sum. Hence the expected number of false alarms in m monitored steps is at most `m / A`. Numerical check (E4e) [SYNTHETIC]: with A = 300, the true baseline gave 26.5 alarms per 10,000 monitored steps and the streaming monitor with plug-in recalibration on 390 steps gave 30.1, against the bound of 33.3. Section 6 (Corollary 6.6) gives the version with an estimated baseline. (Corollary C was suggested by the independent review.)
+**Corollary C (restarts after alarms).** The monitor restarts after every alarm. Suppose the null holds in every segment relative to that segment's baseline: with plug-in recalibration each segment k has its own truncation level τ_k, and "true baseline" means that m₀ equals the true conditional mean of min(r², τ_k²) for that segment's τ_k. Let `G_t` be the sum of the two-sided statistic `(M↑ + M↓)/2` at all past alarms, plus its current value, minus the number of monitored steps so far. G is a supermartingale with `G₀ = 0`, and every alarm adds at least A to the banked sum. Hence the expected number of false alarms in m monitored steps is at most `m / A`. Numerical check (E4e) [SYNTHETIC]: with A = 300, the true baseline gave 26.5 alarms per 10,000 monitored steps, against the bound of 33.3. The streaming monitor with plug-in recalibration on 390 steps gave 30.1; the corollary does not cover the plug-in baseline, so this second number is an empirical check only. Section 6 (Corollary 6.6) gives the version with an estimated baseline. (Corollary C was suggested by the independent review.)
 
 *Status:* proved, assuming the null holds with the true `m₀`.
 
@@ -232,11 +232,15 @@ Since `0 ≤ ν̄ ≤ 1`, the clipped bounds `min(U_t, 1)` and `max(L_t, 0)` sti
 
 Nothing is assumed about the calibration window beyond `0 ≤ X ≤ τ²`.
 
+These nulls are stated relative to bet-weighted calibration averages whose weights the algorithm chooses from the data, so whether "no change" holds can in principle depend on the bets. A sufficient condition that does not depend on the algorithm: if `sup_{t > T} μ_t ≤ (1 + b) min_{n_τ < i ≤ T} μ_i`, then (H↑) holds for every bet sequence, because a weighted average is at least the minimum; likewise `inf_{t > T} μ_t ≥ (1 - b) max_{n_τ < i ≤ T} μ_i` implies (H↓). Under a constant conditional law (Corollary 6.5) both hold with b = 0.
+
 **Theorem 6.4.** Let `δ = δ_u + δ_l`.
 
 1. Under (H↑) and (H↓), for every integer `m ≥ 1`, `P(an alarm at one of the times T + 1, ..., T + m) ≤ δ + m / A`. (More precisely `≤ P(Gᶜ) + P(G) m / A ≤ δ + (1 - δ) m / A` for m < A, with G defined in the proof.)
 2. Under (H↑) and (H↓), the expected number of monitored steps before the first alarm is at least `(1 - δ) A`.
 3. One side alone, at level A: under (H↑) the increase side alone has `P(alarm within m) ≤ δ_u + m / A`; under (H↓) the decrease side alone has `≤ δ_l + m / A`.
+
+In parts 1 and 2, "monitored steps" counts every step after T, including steps with a missing return: M is unchanged at such a step, and the proof only uses `E[M_t | F_{t-1}] ≤ M_{t-1} + P(r_t observed | F_{t-1}) ≤ M_{t-1} + 1`.
 
 *Proof.* Let `G↑ = {ν̄↑_T < U_T}`, `G↓ = {ν̄↓_T > L_T}` and `G = G↑ ∩ G↓`. These events are known at time T.
 

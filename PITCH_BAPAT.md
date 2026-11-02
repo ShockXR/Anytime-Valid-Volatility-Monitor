@@ -19,7 +19,7 @@ Bapat (2026) estimates integrated quarticity (the quantity behind confidence int
 * Your estimators exactly as printed, normalised versions, and all the benchmark estimators of your Tables 3 and 4 (`src/avmonitor/robust.py`).
 * A streaming monitor (`src/avmonitor/monitor.py`) that clips each squared return at c × MAD from past data only, X_t = min(r_t², τ²), and runs **betting e-detectors** on X_t, one for increases and one for decreases. An e-detector keeps a running "wealth" from bets against "nothing has changed"; it alarms when the wealth reaches A.
 * Three ways to set the "normal" level: plug-in, plug-in with a margin, and a confidence sequence with a proof (`confseq.py`); forecast-relative monitoring for clustered volatility (`forecast.py`).
-* Real-data pipelines for Binance BTC, ETH, XRP, SOL and DOGE (your five coins), Bitstamp BTC/USD and the Nifty 50 index, with a command line and an executed notebook. About 190 tests.
+* Real-data pipelines for Binance BTC, ETH, XRP, SOL and DOGE (your five coins), Bitstamp BTC/USD and the Nifty 50 index, with a command line and an executed notebook. About 240 tests, and one command (`scripts/reproduce.py`) that checks the data hashes, runs the tests and reruns the experiments.
 
 ## 5. What did we independently validate?
 
@@ -31,15 +31,15 @@ Bapat (2026) estimates integrated quarticity (the quantity behind confidence int
 
 * **The clipping step of your estimator is what makes a model-free alarm possible.** No nonparametric test can detect a *fall* in the variance itself (a one-sided form of Bahadur and Savage 1956, `docs/math.md` 5.3), but it can detect a fall in a bounded quantity such as the clipped variance.
 * **The price of robustness is small and explained.** On clean normal data the robust detector is 14%, 35% and 73% slower than a Gaussian likelihood-ratio detector for volatility rises of 25%, 50% and 100%. A ratio of information numbers predicts these penalties (1.16, 1.37, 1.95), and splits them into a truncation cost, a cost of making no distributional assumption (the largest part) and a cost of a finite set of bets (2% to 4%) (E11) [SYNTHETIC].
-* **On real data the alarms mean something.** On your five coins, alarms are followed by volatility on the flagged side of EWMA and HAR forecasts 71% to 83% of the time against about 50% at random times, in and out of sample (E6). 14 to 15 of 16 FOMC statements raise an alarm within six hours, against about 30% of matched control times (E12). On Nifty 50, 9 of 11 Union Budget sessions raise an alarm against 25% of ordinary sessions, and 78% of increase alarms in a held-out period are followed by a more volatile session against 47% at random (E7) [REAL].
+* **On real data the alarms mean something.** On your five coins, alarms are followed by volatility on the flagged side of EWMA and HAR forecasts 71% to 83% of the time against about 50% at random times, in and out of sample (E6). Around FOMC statements, the streaming monitor (the design fixed in advance) flags 8 to 9 of 16 within six hours: every statement at which it was monitoring rather than recalibrating. A monitor calibrated on the day before each statement flags 14 to 15 of 16, against about 30% of matched control times (E12). On Nifty 50, 9 of 11 Union Budget sessions raise an alarm against 25% of ordinary sessions, and 78% of increase alarms in a held-out period are followed by a more volatile session against 47% at random (E7) [REAL].
 
 ## 7. What did we discover?
 
 * **Clipping sets a speed limit for detecting decreases**: no valid detector can gather more than about 1 / c² of evidence per step against a fall, so at c = 3 even a total collapse of volatility takes at least 73 steps. A tighter clip on the decrease side only (c = 2, keeping c = 3 for increases) cut decrease delays by 4% to 51% in all 12 simulated cells, with an estimated baseline, fat tails, jumps and rounded prices, and was neutral to slightly positive on real data; it is now an option of the monitor (E11, E11f) [SYNTHETIC and REAL].
 * **An estimated baseline quietly breaks the guarantee over long horizons**: 44% false alarms against a guaranteed 25% over five days (E10), 51% to 57% against 35% over seven days (ALT5). A confidence-sequence baseline restores a proof, P(false alarm within m) ≤ δ + m / A (E8).
-* **Volatility clustering is itself a change in conditional variance.** Dividing by a fitted GARCH forecast restores the guarantee, but a forecast that keeps adapting lets through at most (1 − β)/α of any level shift, a fact we derived in closed form: a doubling of volatility looks like a 9% rise at persistence 0.99 (E10) [SYNTHETIC].
+* **Volatility clustering is itself a change in conditional variance.** Dividing by a fitted GARCH forecast brings false alarms back to the level of the true model, which restores the guarantee when the forecast model is right. But a forecast that keeps adapting also absorbs most of a real level shift, and we derived by how much in closed form: a doubling of the long-run variance raises the ratio of squared returns to the forecast by only 9% at persistence 0.99, and no shift, however large, can push it above (1 − β)/α = 1.2 (E10) [SYNTHETIC].
 * **Price-level microstructure noise breaks the guarantee on raw returns** (false alarms rise from 5% to 41.5% per day as noise grows), and non-overlapping pre-averaged blocks restore it (ALT1) [SYNTHETIC].
-* **On one-minute crypto data, large returns come in bursts**, not as isolated jumps: 44% to 65% have a large neighbour. Any estimator that clips against a scale measured over hours then removes a third to a half of the quarticity; a local scale fixes most of it (ALT3) [REAL and SYNTHETIC].
+* **On one-minute crypto data, large returns come in bursts**, not as isolated jumps: 44% to 65% have a large neighbour, against 8.9% by chance. Our normalised version of your robust kernel then comes out at 0.33 to 0.42 times MedRQ. The true quarticity is unknown on real data, but if a calibrated burst model is right, any estimator that clips against a scale measured over hours is biased down by about 35% to 59%, and a local scale removes most of that (ALT3) [REAL and SYNTHETIC].
 * **The honest bottom line on real data**: a simple ratio rule tuned with hindsight is about as precise as the e-detector (E6e). What the e-detector adds is a false-alarm guarantee with settings fixed in advance, not extra precision.
 
 ## 8. What are the limitations?
@@ -74,7 +74,7 @@ Bapat (2026) estimates integrated quarticity (the quantity behind confidence int
 
 ```bash
 pip install -e ".[dev]"
-python -m pytest -q                                   # about 190 tests, no data needed
+python -m pytest -q                                   # about 240 tests, no data needed
 python -m avmonitor simulate --ratio 2                # synthetic stream with a known change
 python -m avmonitor run --source binance --symbol BTCUSDT --download \
     --start 2025-10-08 --end 2025-10-14 --plot btc.png  # real data around the 10 October 2025 crash
