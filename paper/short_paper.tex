@@ -108,13 +108,16 @@ delay cost of robustness into a truncation loss, a nonparametric loss
 and a grid loss, and a closed-form cap on the signal that remains after
 dividing returns by a GARCH forecast. In simulations the bound holds
 under jumps, Student \(t\) returns and price ticks (1.1\% to 1.4\% false
-alarms per day against a bound of 5\%), while Gaussian likelihood-ratio
-and CUSUM detectors fail. On five cryptocurrencies the alarms carry
-information beyond EWMA and HAR volatility forecasts, and on the Nifty
-50 index and around FOMC statements they follow scheduled events far
-more often than control times do. A ratio rule tuned with hindsight is
-about as precise: on real data the contribution is a false alarm
-guarantee with settings fixed in advance, not extra precision.
+alarms per day against a bound of 5\%), while Gaussian likelihood-ratio,
+CUSUM and Bayesian online change-point detectors raise false alarms on
+half or more of the days under jumps or fat tails; on clean Gaussian
+data the Bayesian detector is faster, especially for decreases. On five
+cryptocurrencies the alarms carry information beyond EWMA and HAR
+volatility forecasts, and on the Nifty 50 index and around FOMC
+statements they follow scheduled events far more often than control
+times do. A ratio rule tuned with hindsight is about as precise: on real
+data the contribution is a false alarm guarantee with settings fixed in
+advance, not extra precision.
 
 \textbf{Keywords.} Sequential change detection; e-processes; testing by
 betting; high-frequency volatility; truncation; jumps; anytime validity.
@@ -216,23 +219,24 @@ bounds. Our contributions are the following.
   baseline of a detector, with this bound, is what we add.
 \item
   \textbf{Detection delay.} A non-asymptotic bound on the worst-case
-  delay (Theorem 8), first-order optimality of the oracle bet among all
-  rules that control the run length over the nonparametric null (Theorem
-  9), and a decomposition of the delay cost of robustness into a
-  truncation loss, a nonparametric loss and a grid loss (Corollary 6).
-  Under GARCH clustering, monitoring returns divided by a correct
-  volatility forecast makes the null hold again, but caps the visible
-  signal of a variance break at \((1-\beta)/\alpha\) (Proposition 10,
-  closed form).
+  delay (Theorem 8); first-order asymptotic optimality of a refined grid
+  of bets among all rules that control the run length over the
+  nonparametric null, a known result for bounded means (Ram and Ramdas
+  2026) for which we give the constants of this detector (Theorem 9);
+  and a decomposition of the delay cost of robustness into a truncation
+  loss, a nonparametric loss and a grid loss (Corollary 6). Under GARCH
+  clustering, monitoring returns divided by a correct volatility
+  forecast makes the null hold again, but caps the visible signal of a
+  variance break at \((1-\beta)/\alpha\) (Proposition 10, closed form).
 \item
   \textbf{Evidence.} Simulations of validity and delay against Gaussian
-  likelihood-ratio, CUSUM and repeated-test benchmarks, and of the
-  failure modes (clustering, estimated baselines). Real-data studies on
-  the five cryptocurrencies of Bapat (2026), the Nifty 50 index with
-  India VIX, and FOMC and CPI releases, with random-time, forecast and
-  rate-matched controls. First results on a running truncation level and
-  on restarts without a blind period, and on a panel of assets with
-  false discovery control.
+  likelihood-ratio, CUSUM and repeated-test benchmarks and against two
+  published change-point methods, and of the failure modes (clustering,
+  estimated baselines). Real-data studies on the five cryptocurrencies
+  of Bapat (2026), the Nifty 50 index with India VIX, and FOMC and CPI
+  releases, with random-time, forecast and rate-matched controls. First
+  results on a running truncation level and on restarts without a blind
+  period, and on a panel of assets with false discovery control.
 \end{itemize}
 
 We also report, briefly and as questions, what an independent
@@ -246,10 +250,13 @@ Jirak and Vetter (2017). Online monitoring for a switch to explosive
 GARCH volatility on daily data is studied by Horváth, Trapani and Wang
 (2024). Andersen, Todorov and Zhou (2025) monitor high-frequency prices
 in real time for local departures from the semimartingale model, a
-different target. Our literature search (November 2026, not exhaustive)
-did not find a method that combines jump-robust high-frequency
-volatility measures with anytime-valid sequential change detection; we
-state this with that caveat.
+different target. Bayesian online change-point detection (Adams and
+MacKay 2007) is a standard online method that models the data inside
+each regime; we compare with it and with a test of the Bibinger, Jirak
+and Vetter type in Section 5.6. Our literature search (November 2026,
+not exhaustive) did not find a method that combines jump-robust
+high-frequency volatility measures with anytime-valid sequential change
+detection; we state this with that caveat.
 
 \textbf{Organisation.} Section 2 sets up the statistic. Section 3 gives
 the detectors and their guarantees, the impossibility result and the
@@ -626,6 +633,15 @@ effect is measurable {[}SYNTHETIC{]}:
   guarantees 25\% (E10, Q10b2). Over seven days at band 0 it was 51\% to
   57\% for Gaussian, Student \(t_4\) and jump returns, against a
   guaranteed 35\% (ALT5).
+\item
+  In 30-day streams with no change and recalibration after every alarm,
+  the plug-in raised 0.094 (Gaussian) and 0.084 (Student \(t_3\)) false
+  alarms per 1440-step day against a nominal 0.05, with 95\% lower
+  limits above 0.05 (E14, Q14h). The accompanying theory note on running
+  truncation levels shows why: at a fixed calibration length the plug-in
+  drifts upward under the null on a fixed share of calibration windows
+  (77\% to 83\% at 390 steps), so no bound of the form \(C\,m/A\) can
+  hold for it (E14).
 \end{itemize}
 
 A confidence sequence restores a proof. The construction uses a sample
@@ -830,12 +846,21 @@ change. For the detector itself the statement is deterministic:
 than the first \(n\) at which this sum reaches \(A\).
 
 With \(c = 3\) and Gaussian returns, \(\log(B/(B-1)) = 0.117\) nats per
-step, and for the default decrease grid at \(A = 7800\) the floor is 36,
-73, 122 and 180 steps for \(c = 2, 3, 4\) and 5 (E11). A complete
-collapse of volatility (all returns zero) is detected after exactly 73
-steps with \(c = 3\). This is the quantitative form of the impossibility
-of Section 3.3: the bound \(B\) that makes a decrease detectable also
-caps the evidence that one step can provide.
+step. This per-step cap holds for every valid bet; how many steps it
+implies depends on the bets. For the default decrease grid at
+\(A = 7800\) the floor is 36, 73, 122 and 180 steps for \(c = 2, 3, 4\)
+and 5 (E11), and a complete collapse of volatility (all returns zero) is
+detected after exactly 73 steps with \(c = 3\). A single bet close to
+\(\lambda_{\max}\) does better: with \(F\) close to \(B/(B-1)\) the
+deterministic bound reads \(M_n \le B(F^n - 1)\), so no Shiryaev-Roberts
+e-detector whose bets are valid over the whole null can alarm before
+\(n = \log(1 + A/B)/\log(B/(B-1))\), which is 57.7 at \(A = 7800\) and
+63.6 at the two-sided level \(2A\), and a single bet just below
+\(\lambda_{\max}\) alarms after 58 (64) steps when all returns are zero.
+For rules that are not e-detectors the only lower bound we have is the
+asymptotic one of Theorem 9(a). This is the quantitative form of the
+impossibility of Section 3.3: the bound \(B\) that makes a decrease
+detectable also caps the evidence that one step can provide.
 
 \hypertarget{delay-bounds-and-first-order-optimality}{%
 \subsection{4.2 Delay bounds and first-order
@@ -913,11 +938,16 @@ and any pre-change history can only shorten it.
   \(\mathrm{WADD}(T_A) \le (\log A + \log\log A + O(1))/\mathrm{KL}_{\inf}\).
 \end{enumerate}
 
-Hence the Shiryaev-Roberts e-detector with the oracle bet, a refined
-grid or a continuous mixture is first-order minimax optimal among all
-rules that control the run length over the nonparametric null, and a
-fixed grid has asymptotic efficiency
-\(g_{\mathrm{grid}}/\mathrm{KL}_{\inf}\).
+What is proved is a first-order lower bound in (a) and upper bounds in
+(b) to (d); the second-order terms in (c) and (d) are upper bounds, not
+exact rates. Together, (a) and (c) say that the delay of a refined grid
+divided by \(\log A/\mathrm{KL}_{\inf}\) tends to 1, so such a grid is
+first-order asymptotically optimal among all rules that control the run
+length over the nonparametric null. A fixed grid is not: its delay ratio
+tends to \(\mathrm{KL}_{\inf}/g_{\mathrm{grid}}\), which is 1.00 to 1.08
+for the default grid in the cases of E11 (E11, Q11e) {[}SYNTHETIC{]},
+and at practical alarm levels its delays are in fact below
+\(\log A/\mathrm{KL}_{\inf}\) (Section 4.3).
 
 \emph{Proof idea} (full proof in Appendix B). For (a), the law
 \(P_r^\ast(dr) = Q_r(dr)/(1 + \lambda^\ast v(r))\) satisfies the null
@@ -927,12 +957,16 @@ with equality and has
 Parts (b) to (d) combine Theorem 8(a) with a Taylor expansion of \(g\)
 around \(\lambda^\ast\). \(\square\)
 
-Ram and Ramdas (2026, preprint) prove a universal lower bound of the
-form (a) for composite pre- and post-change classes and a matching upper
-bound for bounded means, which covers the truncated statistic. We give
+First-order optimality for bounded means is known: Ram and Ramdas (2026,
+preprint) prove a universal lower bound of the form (a) for composite
+pre- and post-change classes and show that it is attained for bounded
+means, which covers the truncated statistic. Theorem 9 is an instance of
+their result, with explicit constants for linear bets on our statistic,
+and we make no claim of priority for the first-order statement. We give
 (a) to (d) because for linear bets on a bounded statistic the arguments
 are short, and because the comparison between fixed grids, refined grids
-and mixtures is what matters for the choice of bets.
+and mixtures, with the rate at which a grid must be refined, is what
+matters for the choice of bets.
 
 \hypertarget{second-order-behaviour-at-practical-alarm-levels}{%
 \subsection{4.3 Second-order behaviour at practical alarm
@@ -1025,12 +1059,18 @@ truncation is what keeps a burst of jumps from looking like a volatility
 increase: a burst moves the \(c = 3\) detector only 3.5\% as much as a
 real 25\% increase, against 39\% without truncation. For decreases the
 speed limit dominates and a smaller \(c\) is faster. The two sides need
-not share \(c\), since each is a valid e-detector for its own truncated
-statistic and the two-sided rule of Proposition 1 needs only each side's
-guarantee. With a plug-in baseline, \(c = 2\) on the decrease side
-shortened the median decrease delay in all 12 simulated cells, by 4\% to
-51\%, and was neutral to slightly positive on real data (E11, E11f).
-Details are in Supplement S2.
+not share \(c\): with a known or confidence-sequence baseline for each
+side, each is a valid e-detector for its own truncated statistic and the
+two-sided rule of Proposition 1 needs only each side's guarantee. The
+implementation offers the split only with the plug-in baseline, so the
+experiments below are not covered by a proof: their no-change rates were
+5.4\% to 6.7\% per day, whether or not the two sides shared \(c\)
+(E11f). With a plug-in baseline, \(c = 2\) on the decrease side
+shortened the median decrease delay for Gaussian, Student \(t_4\) and
+jump returns in all nine cells, by 13\% to 51\%, and was neutral to
+slightly positive on real data (E11, E11f). {[}PENDING E11f rerun:
+rounded prices with a fixed tick, for which the comparison may reverse
+for small falls.{]} Details are in Supplement S2.
 
 \hypertarget{clustering-forecast-relative-monitoring-and-a-signal-cap}{%
 \subsection{4.5 Clustering, forecast-relative monitoring and a signal
@@ -1503,22 +1543,23 @@ details of all three cases.
 \subsection{5.5 Extensions: a running truncation level and many
 assets}\label{extensions-a-running-truncation-level-and-many-assets}}
 
-Two extensions are under way; Supplement S4 reports them in full. First,
-E14 makes the truncation level a running, data-driven \(\tau_t\) with a
-proof, either through a band for the truncated mean that holds for all
-truncation levels at once (bound \(\delta + m/A\)) or through rank-based
-(conformal) bets that need no baseline (bound \(m/A\) under exchangeable
-returns). In the first results the rank detector was valid at its
-nominal level and two to three times faster than the plug-in for large
-decreases, while the plug-in with 390 calibration steps alarmed on
+Two extensions are studied in E14 and E15; Supplement S4 reports them in
+full. First, E14 makes the truncation level a running, data-driven
+\(\tau_t\) with a proof, either through a band for the truncated mean
+that holds for all truncation levels at once (bound \(\delta + m/A\)) or
+through rank-based (conformal) bets that need no baseline (bound \(m/A\)
+under exchangeable returns). In simulation the rank detector was valid
+at its nominal level and two to three times faster than the plug-in for
+large decreases, while the plug-in with 390 calibration steps alarmed on
 40.6\% to 42.9\% of null paths within five days against a bound of 25\%
-(E14) {[}SYNTHETIC{]}. Second, E15 monitors many assets at once with the
-e-BH procedure (Wang and Ramdas 2022) applied to mixture e-processes,
-which controls the false discovery rate within a block under any
-dependence between assets; in simulation it kept the probability of any
-false alarm on quiet blocks below 1\% with up to 50 assets, where the
-uncorrected rule reached 37.2\%, and found 5.0 percentage points more
-changes than Bonferroni on average (E15) {[}SYNTHETIC{]}.
+(E14, Q14a and Q14b) {[}SYNTHETIC{]}. Second, E15 monitors many assets
+at once with the e-BH procedure (Wang and Ramdas 2022) applied to
+mixture e-processes, which controls the false discovery rate within a
+block under any dependence between assets; in simulation it kept the
+probability of any false alarm on quiet blocks below 1\% with up to 50
+assets, where the uncorrected rule reached 37.2\%, and found 5.0
+percentage points more changes than Bonferroni on average (E15)
+{[}SYNTHETIC{]}.
 
 E14 also tests restarts that bet from the first return after an alarm,
 so that the monitor is never blind. Without a change both versions kept
@@ -1533,14 +1574,79 @@ against 30\% to 33\% for the standard protocol, raised about as many
 alarms (0.66 to 0.88 per day against 0.66 to 0.70) and were confirmed by
 the next day's volatility about as often (E14, Q14d) {[}REAL{]}. The
 rank version tests exchangeability, which volatility clustering
-violates: without a band it alarmed 3.6 to 4.3 times per crypto day.
+violates: without a band it alarmed 3.6 to 4.3 times per crypto day. In
+30-day synthetic streams in which volatility moves about once a day, the
+rank restart detected 99.6\% (Gaussian) and 98.0\% (Student \(t_3\)) of
+the changes within a day, with median delays of 34 and 60 steps, while
+the standard protocol was blind 57\% to 71\% of the time and detected
+56\% to 66\% (E14, Q14h) {[}SYNTHETIC{]}. In the event design of Section
+6.3, the restarted monitors were watching at all 114 releases, against
+55 for the standard monitor, and the BTC CPI test, not significant
+there, gave \(p = 0.003\) and \(0.0003\) (E14, Q14g) {[}REAL{]}. Every
+monitor of E14 costs well under a millisecond per return (Q14e).
 
-{[}PENDING E14: the final version of the E14 tables and the
-computational cost of the running monitors (Q14e).{]}
+\hypertarget{comparison-with-published-change-point-methods}{%
+\subsection{5.6 Comparison with published change-point
+methods}\label{comparison-with-published-change-point-methods}}
 
-{[}PENDING E13: benchmark against published change-point methods, the
-offline test of Bibinger, Jirak and Vetter (2017) and an online Bayesian
-change-point detector, under the designs of Tables 3 and 5.{]}
+E13 compares the e-detector with two published methods {[}SYNTHETIC{]}.
+The first is a nonparametric test for volatility jumps in the spirit of
+Bibinger, Jirak and Vetter (2017): it compares the realised variance of
+the \(k\) returns before each candidate time with that of the \(k\)
+returns after it, standardises the difference and takes the maximum; we
+use a jump-robust version that drops returns above 4 times a local
+bipower scale, offline on a fixed window and online as a rolling test
+with \(k = 120\). This implementation is our reconstruction from the
+published idea and was not checked against the paper's equations, whose
+full text we could not reach; every conclusion below therefore uses
+critical values calibrated by simulation, not the asymptotic Gumbel
+constants. The second is Bayesian online change-point detection (BOCPD;
+Adams and MacKay 2007) with Gaussian returns inside a regime and a
+conjugate prior on the variance, run on raw returns and, as our
+modification, on returns clipped at the e-detector's level \(\tau\).
+Online, the competitors' thresholds were matched to the e-detector's
+false alarm rate per 390-step day on clean Gaussian paths (E13).
+
+\begin{itemize}
+\tightlist
+\item
+  \emph{Robustness.} At these matched thresholds BOCPD raised a false
+  alarm within one day on 73.2\% of paths with jumps and 53.2\% with
+  Student \(t_5\) returns, against 1.3\% and 1.2\% for the e-detector
+  with a plug-in baseline. Clipping the returns first fixed jumps
+  (1.6\%) but not fat tails (7.5\% per day under \(t_5\)), and the
+  rolling test reached 14.9\% under \(t_5\) (E13, Q13b).
+\item
+  \emph{Speed on clean data.} BOCPD was faster on clean Gaussian data
+  for decreases (median 26 against 81 steps for a halving of the
+  standard deviation, 51 against 109 for a fall to 0.67 of it) and for a
+  doubling (13 against 20 steps). BOCPD on clipped returns kept most of
+  that speed under jumps (25 against 81 steps for a halving). Neither
+  BOCPD version detected 25\% increases as reliably (81\% to 90\% of
+  paths with Gaussian or jump returns, against 98\% to 99\%) (E13,
+  Q13c).
+\item
+  \emph{Offline power.} On windows of 2000 steps with critical values
+  matched to 5\% size on clean Gaussian windows, the test of the BJV
+  type found a 25\% increase of the standard deviation in 6\% to 30\% of
+  windows (window length \(k\) = 50 or 125, with or without
+  studentisation), against 100\% for the e-detector, which uses the
+  first 500 steps as a change-free calibration stretch (E13, Q13a). The
+  published test is built to find local volatility jumps inside smoothly
+  moving volatility, with short windows and no reference period; for a
+  lasting change after a known calm stretch, accumulating evidence wins,
+  and this is not a weakness of the test for its own purpose.
+\item
+  \emph{The plug-in caveat again.} In the same offline design, with only
+  500 calibration steps, the plug-in e-detector's size at its nominal
+  level was 11.4\% to 18.6\% instead of 5\%, while the
+  confidence-sequence baseline gave 0.0\% for every law, at a cost of
+  roughly 1.5 to 2.5 times the delay (E13, Q13a).
+\end{itemize}
+
+The e-detector was also the cheapest of the robust online methods, at
+about 11 microseconds per step against about 300 for BOCPD (E13, Q13e).
+Section 6.1 compares the methods on real data at equal alarm counts.
 
 \hypertarget{real-data}{%
 \section{6 Real data}\label{real-data}}
@@ -1657,6 +1763,56 @@ precision over a simple rule tuned with hindsight. What it adds is a
 false alarm guarantee with settings fixed in advance, which the ratio
 rule does not have.
 
+\textbf{Against published methods.} E13 repeats this check for the
+competitors of Section 5.6, run continuously with predictable priors and
+scales and with the same one-day pause after every alarm, and with their
+up and down thresholds set per series so that each raises as many up and
+down alarms as the e-detector at band 0.25 (about 0.68 alarms per day).
+Table 8 pools the five coins.
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Method
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Jul to Dec 2025: up / down
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Jan to Jun 2025 (held out): up / down
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Robust e-detector & 78.5\% / 80.5\% (\(n\) = 369 / 258) & 82.0\% /
+69.7\% (\(n\) = 308 / 304) \\
+BOCPD & 67.8\% / 61.7\% & 69.2\% / 56.7\% \\
+BOCPD on truncated returns & 68.0\% / 71.7\% & 71.5\% / 67.0\% \\
+Rolling BJV-type test & 65.6\% / 58.7\% & 68.6\% / 59.8\% \\
+Rolling BJV-type test, studentised & 66.5\% / 62.4\% & 67.8\% /
+58.3\% \\
+\end{longtable}
+
+\emph{Table 8. Share of up (down) alarms after which the next day's
+robust volatility was above (below) an EWMA forecast made at the alarm,
+at equal numbers of up and down alarms, pooled over five coins (E13,
+Q13d) {[}REAL{]}. At random times the share is 46.5\% to 50.1\% per
+coin.}
+
+At equal alarm counts the e-detector's alarms were followed by the
+announced volatility more often than every competitor's (two-proportion
+tests, \(p \le 0.02\), treating alarms as independent, which they are
+not), with one exception: in the held-out half-year the down alarms of
+BOCPD on truncated returns were as informative (\(p = 0.47\)), and on
+DOGE the two tied (41 of 58 each). Rate matching uses the real data and
+favours the competitors. The e-detector's settings were frozen in E5 on
+Bitstamp BTC/USD for July to December 2025, so only January to June 2025
+is fully held out for it. On the Nifty 50 (2024 and 2025, 494 sessions)
+all five methods scored 69\% to 83\% and no difference was significant
+(E13, Q13d) {[}REAL{]}.
+
 \hypertarget{the-nifty-50-index-and-india-vix}{%
 \subsection{6.2 The Nifty 50 index and India
 VIX}\label{the-nifty-50-index-and-india-vix}}
@@ -1701,7 +1857,13 @@ scale units: one large minute is enough to trigger it. It also alarmed
 in 62\% to 76\% of control windows, but it ran at band 0 and the robust
 monitor at band 0.25, so that contrast is partly the band: run at band 0
 as well, the robust monitor alarmed in 39\% to 51\% of control windows
-(E12). Details are in Supplement S5.
+(E12). Restarts without a blind period (Section 5.5) were watching at
+all 114 releases of the three coins, against 55 for the streaming
+monitor; up alarms within six hours rose from 21 to 25 and 31 of 66 CPI
+releases and from 26 to 30 and 35 of 48 FOMC statements, at the price of
+somewhat higher control rates for the rank version, and the BTC CPI cell
+gave \(p = 0.003\) and \(0.0003\) instead of 0.11 (E14, Q14g). Details
+are in Supplement S5.
 
 \hypertarget{a-panel-of-assets}{%
 \subsection{6.4 A panel of assets}\label{a-panel-of-assets}}
@@ -1886,6 +2048,12 @@ analysis.
   \emph{Conservatism.} With the default grid the bound is about four
   times larger than the observed rate at one day (Section 5.2).
 \item
+  \emph{Speed on clean data.} On Gaussian returns, Bayesian online
+  change-point detection found decreases two to three times faster at
+  the same false alarm rate, and on clipped returns it kept most of that
+  speed under jumps (Section 5.6). The case for the e-detector is
+  robustness and a proved guarantee, not speed.
+\item
   \emph{Restarts and blindness.} Corollaries C and F bound the expected
   number of false alarms when the monitor recalibrates after every
   alarm; they are not a single anytime-valid statement for a whole
@@ -1964,6 +2132,9 @@ analysis.
 \hypertarget{references}{%
 \section{References}\label{references}}
 
+Adams, R. P. and MacKay, D. J. C. (2007). Bayesian online changepoint
+detection. arXiv:0710.3742.
+
 Andersen, T. G. and Bollerslev, T. (1997). Intraday periodicity and
 volatility persistence in financial markets. \emph{Journal of Empirical
 Finance} 4(2-3), 115-158. doi:10.1016/S0927-5398(97)00004-2
@@ -1989,7 +2160,7 @@ variation with stochastic volatility and jumps. \emph{Journal of
 Financial Econometrics} 2(1), 1-37. doi:10.1093/jjfinec/nbh001
 
 Bibinger, M., Jirak, M. and Vetter, M. (2017). Nonparametric
-change-point analysis of volatility. \emph{Annals of Statistics} 45,
+change-point analysis of volatility. \emph{Annals of Statistics} 45(4),
 1542-1578. doi:10.1214/16-AOS1499
 
 Bollerslev, T. (1986). Generalized autoregressive conditional
@@ -2554,6 +2725,22 @@ unless varied & \(A = 7800\) (and \(10^4\) to \(10^8\)) & 3000 per case
 E11f & Gaussian, Student \(t_4\), jumps (0.005, sd 8), ticks & plug-in,
 1440 steps & \(A = 28{,}800\) & 2000 null, 600 per change & sd ratio
 0.8, 0.67, 0.5 at step 1 \\
+E13 & Gaussian; jumps (0.005, sd 8); Student \(t_5\); price noise (sd
+0.5); ticks of 0.5 sd; slow SV; GARCH(1,1) with persistence 0.99 &
+offline: 500 change-free steps of a 2000-step window (plug-in or CS);
+online: plug-in or CS on 2000 steps & offline: critical values matched
+to 5\% on clean Gaussian windows; online: \(A = 7800\), competitors
+matched to the e-detector's rate per 390-step day on clean Gaussian
+paths & offline 1000 null, 300 per change; online 1000 null, 200 per
+change & offline at step 1000; online at monitored step 500; sd ratio
+1.25, 1.5, 2, 0.8, 0.67, 0.5 \\
+E14 & Gaussian, Student \(t_3\), jumps (0.005, sd 10), ticks of 0.5 sd &
+plug-in, running plug-in, CS, band over 13 truncation levels, ranks (390
+or 1440 steps); restarts with no calibration & \(A = 7800\) (\(m/A\)) or
+9750 (\(\delta + m/A\)); streams \(A = 28{,}800\) or 36,000 & 5000 null,
+1000 per change; streams 40 paths of 30 days & at monitored step 500;
+after a restart at 30, 120 or 360 steps; streams about one change per
+day \\
 ALT1 (noise) & one-second returns, 23,400 per day, i.i.d. Gaussian price
 noise & per experiment & \(A\) = steps per day / 0.05 & 200 days per
 cell & none (validity) \\
@@ -2588,8 +2775,17 @@ to 2021, held-out 2022 to October 2026; India VIX; event dates verified
 individually \\
 E12 & Binance BTC, ETH, SOL, 21 January 2024 to 31 December 2025 & as E6
 with band 0.25; 16 FOMC statements, 22 CPI releases; 134 and 299 control
-windows; stratified permutation tests, Holm correction over the primary
-family \\
+windows, matched by weekday; stratified permutation tests, Holm
+correction over the primary family \\
+E13 & Binance five coins, 1 July to 31 December 2025 and 1 January to 30
+June 2025; Nifty 50, 2024 and 2025 & e-detector as E6 and E7; BOCPD with
+the robust variance of the previous day as prior mean and hazard
+\(1/A\); rolling BJV-type test with \(k = 120\); one-day pause after
+every alarm for every method; competitor thresholds rate-matched per
+series \\
+E14 & Binance five coins, July to December 2025; Nifty 50, 2024 and
+2025; the E12 event design & as E6 and E7, bands 0 and 0.25; running and
+restarted monitors as in the synthetic runs \\
 \end{longtable}
 
 \hypertarget{appendix-d.-correspondence-with-the-accompanying-repository}{%
@@ -2625,10 +2821,17 @@ part (a) is stated here at the level of returns \\
 Second-order formula (Section 4.3) & \texttt{docs/theory\_delay.md},
 section 4.3 \\
 Proposition 10 & \texttt{docs/report\_parts/E10.md}, Q10d \\
+Section 5.5, Supplement S4.1 & \texttt{docs/theory\_running\_tau.md},
+\texttt{docs/report\_parts/E14.md} \\
+Section 5.6, Table 8 & \texttt{docs/report\_parts/E13.md} \\
+Supplement S4.2 & \texttt{docs/theory\_panel.md},
+\texttt{docs/report\_parts/E15.md} \\
 Section 7 & \texttt{docs/estimator\_issues.md}, Issues 1, 2, 3 and 5 \\
 Code & \texttt{src/avmonitor/detectors.py} (bets and e-detectors),
 \texttt{monitor.py} (streaming monitor), \texttt{confseq.py} (confidence
-sequence), \texttt{forecast.py}, \texttt{design.py} \\
+sequence), \texttt{forecast.py}, \texttt{design.py}, \texttt{running.py}
+(running truncation and restarts), \texttt{competitors.py} (BOCPD and
+the BJV-type test), \texttt{panel.py} (panel monitor) \\
 Experiments & \texttt{experiments/e04\_detection.py},
 \texttt{e04e\_review\_checks.py}, \texttt{e08\_cs\_baseline.py},
 \texttt{e09\_stress\_guarantee.py}, \texttt{e10\_forecast\_relative.py},
@@ -2636,8 +2839,9 @@ Experiments & \texttt{experiments/e04\_detection.py},
 \texttt{e06a\_five\_coins\_tables.py},
 \texttt{e06b\_five\_coins\_monitor.py}, \texttt{e07\_nifty.py},
 \texttt{e07c\_india\_vix.py}, \texttt{e07d\_events.py},
-\texttt{e12\_crypto\_events.py}; results in \texttt{results/}, report in
-\texttt{docs/experiment\_report.md} \\
+\texttt{e12\_crypto\_events.py}, \texttt{e13\_benchmarks.py},
+\texttt{e14\_running\_tau.py}, \texttt{e15\_panel.py}; results in
+\texttt{results/}, report in \texttt{docs/experiment\_report.md} \\
 Figure 1 & \texttt{paper/make\_paper\_figures.py} \\
 \end{longtable}
 
@@ -2760,18 +2964,32 @@ from 0.005 to 0.02) moves the \(c = 3\) detector only 3.5\% as much as a
 real 25\% volatility increase, against 39\% without truncation (E11).
 For decreases the speed limit dominates and a smaller \(c\) is faster:
 with \(c = 2\) the simulated decrease delays fall by 26\% to 49\%
-relative to \(c = 3\). The two sides need not share \(c\), since each is
-a valid e-detector for its own truncated statistic and the two-sided
-rule of Proposition 1 needs only each side's guarantee: \(c\) of about 3
-to 4 for increases and 1.5 to 2 for decreases is a legitimate design.
-With a plug-in baseline and four return laws, \(c = 2\) on the decrease
-side shortened the median decrease delay in all 12 simulated cells, by
-4\% to 51\%, while \(c = 1.5\) was slower than \(c = 3\) for a 20\% fall
-when returns were rounded to price ticks, because zero and one-tick
-returns then carry most of the statistic (E11f) {[}SYNTHETIC{]}. On the
-five cryptocurrencies of Section 6 the choice \(c = 2\) for decreases
-was neutral to slightly positive for the confirmation rate of decrease
-alarms, within sampling noise (E11f) {[}REAL{]}.
+relative to \(c = 3\). The two sides need not share \(c\): with a known
+or confidence-sequence baseline for each side, each is a valid
+e-detector for its own truncated statistic and the two-sided rule of
+Proposition 1 needs only each side's guarantee, so \(c\) of about 3 to 4
+for increases and 1.5 to 2 for decreases is a legitimate design. The
+decrease null then concerns the mean of
+\(\min(r^2, \tau_{\downarrow}^2)\) for the smaller level
+\(\tau_{\downarrow}\); volatility that has not fallen implies it under a
+fixed innovation shape (Lemma 1), but a smaller clip reacts more to
+changes of shape at constant volatility, such as a larger share of zero
+returns. In the experiments the split was run with the plug-in baseline,
+which no proof covers: the one-day no-change rates were 5.4\% to 6.7\%
+for every choice of \(c\) on the decrease side, so the excess over the
+5\% bound that holds with the true baseline comes from the baseline, not
+from the split (E11f). With a 1440-step plug-in baseline, \(c = 2\) on
+the decrease side shortened the median decrease delay for Gaussian,
+Student \(t_4\) and jump returns in all nine cells, by 13\% to 51\%
+(29\%, 46\% and 51\% for Gaussian returns and falls of the standard
+deviation to 0.8, 0.67 and 0.5 of its value), while \(c = 1.5\) was
+faster still for large falls but slower than \(c = 2\) for a 20\% fall
+(E11f) {[}SYNTHETIC{]}. {[}PENDING E11f rerun: returns rounded to a
+fixed price tick; the first E11f runs let the tick shrink with
+volatility, and with a fixed tick the comparison may reverse for small
+falls.{]} On the five cryptocurrencies of Section 6 the choice \(c = 2\)
+for decreases was neutral to slightly positive for the confirmation rate
+of decrease alarms, within sampling noise (E11f) {[}REAL{]}.
 
 \textbf{The slack of the false alarm bound.} E11 locates the slack with
 an exact optional stopping identity that writes the ratio of the false
@@ -2880,10 +3098,9 @@ the highest frequencies.
 \hypertarget{s4.-extensions-e14-e15}{%
 \subsection{S4. Extensions (E14, E15)}\label{s4.-extensions-e14-e15}}
 
-\hypertarget{s4.1-a-running-truncation-level-and-restarts-with-a-proof-e14-final-tables-pending}{%
+\hypertarget{s4.1-a-running-truncation-level-and-restarts-with-a-proof-e14}{%
 \subsubsection{S4.1 A running truncation level and restarts with a proof
-(E14, final tables
-pending)}\label{s4.1-a-running-truncation-level-and-restarts-with-a-proof-e14-final-tables-pending}}
+(E14)}\label{s4.1-a-running-truncation-level-and-restarts-with-a-proof-e14}}
 
 The monitor of Section 3 fixes \(\tau\) before monitoring and
 recalibrates for a day after every alarm. E14 studies three
@@ -2911,11 +3128,11 @@ indicator that the band has not failed by then, an event known when the
 chain starts, which keeps each chain a supermartingale. The rank version
 restarts its reference set empty.
 
-The first results {[}SYNTHETIC{]} (5000 null paths per cell, the four
-laws of E9, every proved bound 5\% per 390-step day) sharpen Section
-3.4. Within one day the plug-in stayed below 5\% (4.0\% to 4.9\% with
-390 calibration steps), but within five days it alarmed on 40.6\% to
-42.9\% of null paths against a bound of 25\%, with or without a running
+The results {[}SYNTHETIC{]} (5000 null paths per cell, the four laws of
+E9, every proved bound 5\% per 390-step day) sharpen Section 3.4. Within
+one day the plug-in stayed below 5\% (4.0\% to 4.9\% with 390
+calibration steps), but within five days it alarmed on 40.6\% to 42.9\%
+of null paths against a bound of 25\%, with or without a running
 \(\tau\); the theory note shows that at a fixed calibration length the
 plug-in has a positive drift under the null on a fixed share of
 calibration windows, so that its run length there grows only like
@@ -2971,6 +3188,43 @@ Among the monitors that recalibrate, the proved ones alarmed less than
 the plug-in and were confirmed about as often after increase alarms
 (78\% to 83\% against 82\%) and more often after decrease alarms (94\%
 to 97\% against 90\%) (E14, Q14d).
+
+\textbf{Month-long streams {[}SYNTHETIC{]}.} In 40 synthetic streams of
+30 days of 1440 steps per cell, with every monitor restarting after each
+alarm at the thresholds of Section 6 (band 0): with no change, the
+plug-in raised 0.094 (Gaussian) and 0.084 (Student \(t_3\)) false alarms
+per day against a nominal 0.05, while the proved monitors stayed within
+their per-day bounds (rank restart 0.029 and 0.035 against 0.050; band
+restart and confidence sequence essentially 0). With the standard
+deviation multiplied by 2, 1.5, 0.67 or 0.5 about once a day, the
+standard protocol was blind 57\% to 71\% of the time, awake at 31\% to
+49\% of the changes, and detected 56\% to 66\% of them within a day
+(median delay 78 to 166 steps); the rank restart detected 99.6\% and
+98.0\% (median 34 and 60 steps) and the band restart 94.3\% and 77.9\%
+(median 97 and 153) (E14, Q14h).
+
+\textbf{Event study rerun {[}REAL{]}.} With the design of Section 6.3
+unchanged except for the monitor, the restarted monitors were watching
+at all 114 releases (48 FOMC statements and 66 CPI releases over three
+coins), against 55 for the streaming plug-in. Up alarms within six hours
+rose from 26 of 48 FOMC statements (plug-in) to 30 (band restart) and 35
+(rank restart), and from 21 of 66 CPI releases to 25 and 31; every awake
+cell had a stratified \(p \le 0.004\) against matched controls,
+including BTC CPI (\(p = 0.003\) and \(0.0003\), against 0.11 for the
+plug-in). The rank restart paid with a higher control rate (13\% to 19\%
+of matched control windows, against 7\% to 14\% for the band restart and
+8\% to 17\% for the plug-in), so part of its gain is more alarms
+everywhere. Being awake did not mean flagging every release: at the
+releases where it was awake the plug-in flagged 26 of 26 FOMC
+statements, while the restarted monitors flagged 30 and 35 of 48 (E14,
+Q14g).
+
+\textbf{Cost {[}SYNTHETIC{]}.} On a shared machine, in plain Python with
+NumPy, one return at a time: 13 microseconds per return for the plug-in,
+15 to 16 for the running band, 44 for the rank monitor (whose sorted
+reference set grows when there is no alarm) and 47 for the band restart
+(77 in its learning phase). Only the ratios are informative, and every
+monitor costs well under a millisecond per return (E14, Q14e).
 
 \hypertarget{s4.2-many-assets-false-discovery-control-e15}{%
 \subsubsection{S4.2 Many assets: false discovery control
