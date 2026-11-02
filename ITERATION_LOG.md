@@ -300,11 +300,11 @@ CHANGES IMPLEMENTED: `docs/theory_delay.md` (growth rate, its dual form, a prove
 
 EXPERIMENTS PERFORMED: E11 (Q11a to Q11e: 20 delay cases, the price of robustness, bet grids, the slack in the bound, optimality as A grows to 10^8) and E11f (c_down = 3, 2, 1.5; four return laws, 2000 null and 600 change paths per cell; five coins, July to December 2025).
 
-RESULTS: The second-order formula is within 3% of the simulated delay in all 20 cases; the information ratio predicts the penalties (1.16, 1.37, 1.95 against 1.14, 1.35, 1.73 simulated). At c = 3 even a total collapse of volatility needs at least 73 steps. c_down = 2 cut decrease delays by 4% to 51% in all 12 simulated cells with false alarms of 5.4% to 6.7% per day with the plug-in baseline, and was neutral to slightly positive on real data; c_down = 1.5 is hurt by ties in rounded prices.
+RESULTS: The second-order formula is within 3% of the simulated delay in all 20 cases; the information ratio predicts the penalties (1.16, 1.37, 1.95 against 1.14, 1.35, 1.73 simulated). For decreases truncation caps the evidence per step at log(B / (B - 1)), about 1/c², for every bet that is valid over the whole null: at c = 3 and A = 7800 even a total collapse of volatility takes any Shiryaev-Roberts e-detector built from valid bets at least 58 steps (64 at 2A), and the default five-bet grid 73 (79). c_down = 2 cut median decrease delays by 13% to 51% for Gaussian, Student t4 and jump returns and by 32% to 52% with ticks of 0.25 and 0.75 sd, but was 12% slower for a 20% fall at a tick of 0.5 sd (paired difference +29 steps, standard error 1.7); one-day false alarms were 5.0% to 6.7% with the plug-in baseline (empirical only); on real data it was neutral to slightly positive. (These numbers are after review round 2b, which found that the first version's 73-step floor holds for the default grid only and that its rounded-price model scaled the tick with the volatility.)
 
 IMPROVEMENTS: A theory-driven, tested design option, and a quantitative account of the price of robustness and of the slack in the false alarm bound.
 
-REMAINING ISSUES: The delay theory awaits an independent review (round 2b, started); c_down is an option, not the default.
+REMAINING ISSUES: Review round 2b is fixed (`docs/review/independent_review_round2b.md`; C1, C2, M1, M2 and the minors). c_down now works with the confidence-sequence baseline (each side at δ/2), but E11f has not been rerun with it; c_down is an option, not the default.
 
 NEXT ITERATION: Panel monitoring (15).
 

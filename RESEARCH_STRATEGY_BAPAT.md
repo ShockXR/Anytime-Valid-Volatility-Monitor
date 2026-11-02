@@ -101,7 +101,7 @@ Five candidate directions were scored from 1 (weak) to 10 (strong) on the seven 
 
 | Criterion | Met? |
 |---|---|
-| Every theorem has a complete proof with stated assumptions, checked by an independent reviewer. | Yes for sections 5 and 6 of `docs/math.md` (section 5: review round 1; section 6: review round 2a, no errors found, a few statements sharpened). The delay theory (`docs/theory_delay.md`) and the panel theory (`docs/theory_panel.md`) await an independent check. |
+| Every theorem has a complete proof with stated assumptions, checked by an independent reviewer. | Yes for sections 5 and 6 of `docs/math.md` (section 5: review round 1; section 6: review round 2a, no errors found, a few statements sharpened). The delay theory (`docs/theory_delay.md`) and the panel theory (`docs/theory_panel.md`) were checked in review round 2b: no proof step was wrong, but the 73-step decrease floor holds for the default bets only (58 steps for any valid bets), the rounded-price test of c_down was mis-modelled (c_down = 2 is slower for a 20% fall at a tick of 0.5 sd), and the optimality claim was narrowed and credited to Ram and Ramdas (2026); all fixed. The running-truncation theory (`docs/theory_running_tau.md`) is in review round 3. |
 | The false alarm rate stays below the proved bound in every null scenario the theorem covers, with Monte Carlo error small enough to see the slack. | Yes (E9: 4000 paths; E8: 10,000 paths). |
 | Every published number we discuss is either reproduced or has a stated, tested hypothesis for why not. | Yes for Tables 5 to 8, with open questions listed (E1, E6). |
 | Real-data alarms beat a random-time control and a forecast, out of sample, on several assets. | Yes (E6, E7); not beyond a hindsight-tuned naive rule (E6e). |

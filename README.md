@@ -38,7 +38,7 @@ The main project does **not** claim to improve the estimator. Once both kernels 
 
 | Step | What | Where |
 | --- | --- | --- |
-| 1 | Truncation level τ = c × MAD × 1.4826, estimated on each calibration window from past data only and held fixed until the next recalibration (a running level is studied in E3 and E14), c = 3 by default; optionally a tighter c_down = 2 for the decrease side, which detects falls faster (E11f) | `robust.py`, `monitor.py` |
+| 1 | Truncation level τ = c × MAD × 1.4826, estimated on each calibration window from past data only and held fixed until the next recalibration (a running level is studied in E3 and E14), c = 3 by default; optionally a tighter c_down = 2 for the decrease side, which detected simulated falls 13% to 51% faster for continuous return laws; with prices rounded to a coarse tick the gain depends on the tick size, and at a tick of half a standard deviation it was 12% slower for a 20% fall (E11f) | `robust.py`, `monitor.py` |
 | 2 | Bounded statistic X_t = min(r_t², τ²), after an intraday profile estimated from past days only | `robust.py`, `data.py` |
 | 3 | Baseline μ₀ = mean of X on a calibration window: plug-in, plug-in with a margin (band), or a confidence sequence | `detectors.py`, `confseq.py` |
 | 4 | Betting e-detectors (Shiryaev-Roberts form): wealth M_t = Σ_j Π_{i=j..t} (1 + λ (X_i / μ₀ − 1)) over start times j for increases, with λ in [0, 1), and the same with factors 1 + λ (1 − X_i / μ₀), λ < 1 / (B − 1), B = τ² / μ₀, for decreases; each averaged over a grid of bets λ | `detectors.py` |
