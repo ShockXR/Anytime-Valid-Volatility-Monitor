@@ -81,3 +81,14 @@ def test_intraday_scale_is_predictable_by_default():
     r3.iloc[1440 * 25 + 100 : 1440 * 25 + 160] = np.nan
     c = intraday_scale(r3)
     assert c[c.index >= "2025-01-27"].notna().all()
+
+
+def test_mark_frozen_only_long_zero_runs():
+    import numpy as np
+    import pandas as pd
+
+    from avmonitor.data import mark_frozen
+
+    r = pd.Series(np.r_[np.ones(5), np.zeros(3), np.ones(2), np.zeros(40), np.ones(1)])
+    m = mark_frozen(r, min_run=30)
+    assert m.isna().sum() == 40 and (m.iloc[5:8] == 0).all() and np.isnan(m.iloc[10:50]).all()

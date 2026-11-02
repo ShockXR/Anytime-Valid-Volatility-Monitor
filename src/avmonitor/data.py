@@ -115,6 +115,34 @@ def intraday_scale(returns: pd.Series, lookback_days: int = 20, smooth: int = 15
     return pd.Series(out, index=returns.index, name="intraday_scale")
 
 
+def mark_frozen(returns: pd.Series, min_run: int = 30) -> pd.Series:
+    """Set runs of at least ``min_run`` consecutive exact-zero returns to NaN.
+
+    A price that does not move for half an hour on a liquid market is almost
+    always a frozen feed (for example the NSE trading halt of 24 February
+    2021), not information about volatility. Left as zeros, such runs look like
+    strong evidence for a volatility fall. Shorter runs of zeros (normal for
+    coarse ticks) are kept. The rule looks at the whole run, so it is meant for
+    cleaning historical data; a live feed should flag staleness at the source.
+    """
+    r = returns.copy()
+    z = (r == 0).to_numpy()
+    out = r.to_numpy(copy=True)
+    n = z.size
+    i = 0
+    while i < n:
+        if z[i]:
+            j = i
+            while j < n and z[j]:
+                j += 1
+            if j - i >= min_run:
+                out[i:j] = np.nan
+            i = j
+        else:
+            i += 1
+    return pd.Series(out, index=r.index, name=r.name)
+
+
 def daily_robust_scale(returns: pd.Series) -> pd.Series:
     """Scaled ``median(|r|)`` per UTC day (a robust per-minute standard deviation)."""
     return returns.abs().groupby(returns.index.floor("D")).median() * MAD_NORMAL_SCALE
