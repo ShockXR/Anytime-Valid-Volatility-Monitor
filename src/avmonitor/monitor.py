@@ -15,6 +15,20 @@ stream of (deseasonalised) returns:
 ``null_band = b`` makes each side bet against "truncated variance within a
 factor (1 +/- b) of the baseline" instead of exact equality.
 
+``c_down`` (default: equal to ``c``) gives the decrease side its own truncation
+constant: it uses ``X_dn = min(r^2, tau_dn^2)`` with ``tau_dn = c_down * scale``
+and its own null mean ``m0_dn`` = mean of ``X_dn``, while the increase side
+keeps ``tau = c * scale`` and ``m0``. A smaller clip on the decrease side raises
+the cap on the evidence one step can carry against a fall, about ``1 / c_down^2``
+nats (``docs/theory_delay.md``, Corollary 4 and section 6.3). Each side is an
+e-detector for its own clipped statistic, so the two-sided guarantee needs
+only each side's own null: "the mean of ``min(r^2, tau^2)`` has not risen" for
+the increase side and "the mean of ``min(r^2, tau_dn^2)`` has not fallen" for
+the decrease side. That guarantee is proved when each side's baseline is the
+true null mean, or with ``baseline="cs"`` (below); with the plug-in baseline it
+is an approximation, as for ``c_down = c``. ``c_down = c`` reproduces the
+default exactly. Each entry of ``segments`` records ``tau2_dn`` and ``m0_dn``.
+
 Baselines
 ---------
 ``baseline="plugin"`` (default) is the original behaviour described above. Its
@@ -28,10 +42,17 @@ confidence sequence for the mean of ``X = min(r^2, tau^2)`` runs on the rest
 (``confseq.StreamingEBConfSeq``). The increase side bets against the upper
 bound ``U``, the decrease side against the lower bound ``L``. If there is no
 change, P(any false alarm within m monitored steps) <= ``delta + m / A``, where
-``delta`` is split equally between the two bounds. Optional adaptive rule: with
+``delta`` is split equally between the two bounds. With ``c_down != c`` there
+are two sequences, both started after the same ``tau`` split: the upper bound
+``U`` comes from a sequence on ``min(r^2, tau^2)`` and the lower bound ``L``
+from a sequence on ``min(r^2, tau_dn^2)`` (bounded by ``tau_dn^2``), each at
+level ``delta / 2``. Only one bound of each sequence is used, so the total
+error is still ``delta``, and ``docs/math.md`` Theorem 6.4 applies to each side
+for its own clipped statistic. Optional adaptive rule: with
 ``target_rel_width = w``, calibration continues past ``cal_len`` until
 ``(U - L) / mean <= w`` or the window reaches ``cal_max``; the time-uniform
-sequence keeps the guarantee at this data-dependent length.
+sequence keeps the guarantee at this data-dependent length. (With two
+sequences, both must meet the target, each with its own ``(U - L) / mean``.)
 
 Degenerate windows
 ------------------
@@ -96,8 +117,9 @@ class VolatilityMonitor:
     ):
         self.A = float(threshold)
         self.c = c
-        # The decrease side may use its own truncation constant (docs/theory_delay.md, 6.3): each side is a
-        # valid e-detector for its own truncated statistic, so the two-sided guarantee is unchanged.
+        # The decrease side may use its own truncation constant (docs/theory_delay.md, 6.3). Each side is an
+        # e-detector for its own truncated statistic, so the two-sided guarantee needs only each side's own
+        # null; it is proved for a known baseline and for baseline="cs" (docs/math.md, Theorem 6.4).
         self.c_down = float(c) if c_down is None else float(c_down)
         if self.c_down <= 0:
             raise ValueError("c_down must be positive")
@@ -125,8 +147,6 @@ class VolatilityMonitor:
             self.cs_n_plan = cal_len - self.n_tau if cs_n_plan is None else cs_n_plan
         elif target_rel_width is not None:
             raise ValueError("target_rel_width needs baseline='cs'")
-        if baseline == "cs" and self.c_down != float(c):
-            raise ValueError("a separate c_down is implemented for the plug-in baseline only")
         self.tau_frac = tau_frac
         self.cs_c = cs_c
         self.target_rel_width = target_rel_width
@@ -144,6 +164,7 @@ class VolatilityMonitor:
         self._extended = False
         self._fallback = False
         self._cs = None
+        self._cs_dn = None  # second sequence (on min(r^2, tau_dn^2)) when c_down != c with baseline="cs"
         self._n_tau_used = 0
         self._n_finite = 0
 
@@ -169,6 +190,7 @@ class VolatilityMonitor:
         self.cal_stats["restarted"] += 1
         self.buffer = []
         self._cs = None
+        self._cs_dn = None
         self._n_tau_used = 0
 
     def _feed_calibration(self, r: float):
@@ -217,7 +239,7 @@ class VolatilityMonitor:
         else:
             m_up = m0 * (1 + self.band)
             m_dn = m0_dn * (1 - self.band)
-        self._finish(m0, m_up, m_dn, None, None)
+        self._finish(m0, m_up, m_dn, None, None, m0_dn)
 
     def _feed_cs(self, r: float):
         if self._cs is None:  # first part: choose tau
@@ -240,23 +262,31 @@ class VolatilityMonitor:
                     self._fallback = True
             self.tau_scale = scale
             self.tau2 = tau2
-            self.tau2_dn = tau2
+            self.tau2_dn = tau2 if self.c_down == self.c else (self.c_down * scale) ** 2
             half = self.delta / 2
             self._cs = StreamingEBConfSeq(tau2, half, half, n_plan=self.cs_n_plan, c=self.cs_c)
+            if self.c_down != self.c:
+                # The upper bound is read from self._cs and the lower bound from self._cs_dn, each at level
+                # delta / 2, so the total error stays at delta (docs/math.md, Theorem 6.4, for each side).
+                self._cs_dn = StreamingEBConfSeq(self.tau2_dn, half, half, n_plan=self.cs_n_plan, c=self.cs_c)
             self._n_tau_used = len(self.buffer)
             return
-        if np.isfinite(r):  # second part: confidence sequence for E[X]
+        if np.isfinite(r):  # second part: confidence sequence for E[X] (and for E[X_dn])
             self._cs.update(min(r * r, self.tau2))
+            if self._cs_dn is not None:
+                self._cs_dn.update(min(r * r, self.tau2_dn))
         n_cs = len(self.buffer) - self._n_tau_used
         if n_cs < self.cal_len - self.n_tau:
             return
         if self.target_rel_width is not None and len(self.buffer) < self.cal_max:
             if not self._cs.rel_width <= self.target_rel_width:
                 return
+            if self._cs_dn is not None and not self._cs_dn.rel_width <= self.target_rel_width:
+                return
         if self._cs.t < max(1, (self.cal_len - self.n_tau) // 2):  # too few finite returns in the second part
             if len(self.buffer) < self.cal_max or self._cs.t == 0:
                 # Keep collecting. A sequence that has started is never restarted, so each segment uses exactly
-                # one confidence sequence and its error probability stays at delta (docs/math.md, 6.3).
+                # one confidence sequence per side and its error probability stays at delta (docs/math.md, 6.3).
                 self._extended = True
                 return
         rr = np.asarray(self.buffer)
@@ -264,11 +294,13 @@ class VolatilityMonitor:
         self._n_finite = int(rr.size)
         full = float(np.median(np.abs(rr)) * MAD_NORMAL_SCALE)
         self.scale = full if full > 0 else self.tau_scale
-        U, L = self._cs.upper, self._cs.lower
-        self._finish(self._cs.mean, U * (1 + self.band), L * (1 - self.band), U, L)
+        cs_dn = self._cs if self._cs_dn is None else self._cs_dn
+        U, L = self._cs.upper, cs_dn.lower
+        self._finish(self._cs.mean, U * (1 + self.band), L * (1 - self.band), U, L, cs_dn.mean)
 
-    def _finish(self, m0, m_up, m_dn, upper, lower):
+    def _finish(self, m0, m_up, m_dn, upper, lower, m0_dn):
         self.m0 = m0
+        self.m0_dn = m0_dn
         self.m_up = m_up
         self.m_dn = m_dn
         b = self.tau2_dn / self.m_dn if self.m_dn > 0 else math.inf
@@ -285,8 +317,8 @@ class VolatilityMonitor:
         self.segments.append(dict(start=self.start, cal_len=len(self.buffer), n_finite=self._n_finite,
                                   baseline=self.baseline,
                                   n_tau=self._n_tau_used if self.baseline == "cs" else None,
-                                  scale=self.scale, tau2=self.tau2, tau2_dn=self.tau2_dn, m0=m0, m_up=m_up,
-                                  m_dn=m_dn,
+                                  scale=self.scale, c=self.c, c_down=self.c_down, tau2=self.tau2,
+                                  tau2_dn=self.tau2_dn, m0=m0, m0_dn=m0_dn, m_up=m_up, m_dn=m_dn,
                                   upper=upper, lower=lower, extended=self._extended, fallback=self._fallback,
                                   down_active=self.down_active))
 

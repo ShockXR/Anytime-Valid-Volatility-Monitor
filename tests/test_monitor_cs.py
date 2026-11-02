@@ -1,4 +1,5 @@
-"""Tests for the monitor: the default output is unchanged, degenerate windows, and the cs baseline.
+"""Tests for the monitor: the default output is unchanged, degenerate windows, the cs baseline, and the
+separate truncation constant of the decrease side (``c_down``, with both baselines).
 
 The legacy classes below are a verbatim copy (renamed) of ``VolatilityMonitor``
 and ``GaussianLRMonitor`` as of commit bf67e2b, before the cs baseline and the
@@ -397,31 +398,206 @@ def test_cs_path_skips_missing_returns():
     assert e1.stat == e2.stat and e1.baseline_scale == e2.baseline_scale
 
 
-def test_separate_decrease_truncation_matches_default_and_is_faster():
-    """c_down equal to c reproduces the default exactly; a tighter decrease clip detects a fall sooner."""
-    import numpy as np
-    from avmonitor.monitor import VolatilityMonitor
-
-    rng = np.random.default_rng(7)
-    r = np.concatenate([rng.standard_normal(1440), rng.standard_normal(3000)])
-    a = VolatilityMonitor(threshold=7800, cal_len=1440).run(r)
-    b = VolatilityMonitor(threshold=7800, cal_len=1440, c_down=3.0).run(r)
-    assert [(e.index, e.direction) for e in a] == [(e.index, e.direction) for e in b]
-
-    delays = {3.0: [], 1.5: []}
-    for seed in range(40):
-        g = np.random.default_rng(100 + seed)
-        x = np.concatenate([g.standard_normal(1440), 0.6 * g.standard_normal(3000)])
-        for cd in delays:
-            ev = VolatilityMonitor(threshold=7800, cal_len=1440, c_down=cd).run(x)
-            down = [e.index - 1440 for e in ev if e.direction == "down"]
-            delays[cd].append(down[0] if down else 3000)
-    assert np.median(delays[1.5]) < np.median(delays[3.0])
+# ----------------------------------------------------------------------------
+# Separate truncation constant for the decrease side (c_down)
+# ----------------------------------------------------------------------------
 
 
-def test_separate_decrease_truncation_rejects_cs_baseline():
-    import pytest
-    from avmonitor.monitor import VolatilityMonitor
+def _gauss_clipped_mean(t):
+    """E[min(Z^2, t^2)] for a standard normal Z."""
+    from scipy import stats
 
+    t = np.asarray(t, float)
+    return 2 * stats.norm.cdf(t) - 1 - 2 * t * stats.norm.pdf(t) + 2 * t * t * stats.norm.sf(t)
+
+
+@pytest.mark.parametrize("baseline", ["plugin", "cs"])
+def test_c_down_equal_to_c_reproduces_default_on_a_stream_with_alarms(baseline):
+    """Review 2b, m16: the comparison is made on a stream with alarms on both sides, and is not vacuous."""
+    r = _stream(2024)
+    kw = dict(threshold=2000.0, cal_len=500, baseline=baseline)
+    a, b = VolatilityMonitor(**kw), VolatilityMonitor(**kw, c_down=3.0)
+    ev_a, ev_b = a.run(r), b.run(r)
+    assert {e.direction for e in ev_a} == {"up", "down"}  # both sides alarm, so the comparison means something
+    assert _tuples(ev_a) == _tuples(ev_b)  # exact equality, floats included
+    assert a.segments == b.segments
+    # the general code path (a c_down that differs from c by rounding) gives the same alarms
+    c = VolatilityMonitor(**kw, c_down=3.0 * (1 + 1e-12))
+    ev_c = c.run(r)
+    assert [(e.index, e.direction, e.monitored_since) for e in ev_c] == [(e.index, e.direction, e.monitored_since)
+                                                                           for e in ev_a]
+    np.testing.assert_allclose([e.stat for e in ev_c], [e.stat for e in ev_a], rtol=1e-6)
+    # and the option is not ignored: a tighter clip changes the decrease alarms, not the first increase alarm
+    d = VolatilityMonitor(**kw, c_down=2.0)
+    ev_d = d.run(r)
+    assert _tuples(ev_d) != _tuples(ev_a)
+    assert _tuples(ev_d)[0] == _tuples(ev_a)[0] and ev_a[0].direction == "up"
+    first_down_a = next(e.index for e in ev_a if e.direction == "down")
+    first_down_d = next(e.index for e in ev_d if e.direction == "down")
+    assert first_down_d < first_down_a
+
+
+@pytest.mark.parametrize("baseline", ["plugin", "cs"])
+def test_c_down_segment_record_and_bets(baseline):
+    """Review 2b, m17 and m18: tau2_dn, m0_dn and lam_dn = down_fractions / (tau2_dn / m_dn - 1)."""
+    rng = np.random.default_rng(48)
+    r = rng.standard_normal(1200)
+    mon = VolatilityMonitor(threshold=1e9, cal_len=1000, baseline=baseline, c_down=1.5, null_band=0.1, delta=0.02)
+    mon.run(r)
+    seg = mon.segments[0]
+    assert {"c", "c_down", "tau2", "tau2_dn", "m0", "m0_dn", "m_up", "m_dn"} <= set(seg)
+    assert seg["c"] == 3.0 and seg["c_down"] == 1.5
+    np.testing.assert_allclose(seg["tau2_dn"], seg["tau2"] * (1.5 / 3.0) ** 2, rtol=1e-12)
+    np.testing.assert_allclose(mon.lam_dn, np.asarray(DEFAULT_DOWN_FRACTIONS) / (seg["tau2_dn"] / seg["m_dn"] - 1),
+                               rtol=1e-12)
+    if baseline == "plugin":
+        cal = r[:1000]
+        np.testing.assert_allclose(seg["m0_dn"], np.mean(np.minimum(cal**2, seg["tau2_dn"])), rtol=1e-12)
+        np.testing.assert_allclose(seg["m0"], np.mean(np.minimum(cal**2, seg["tau2"])), rtol=1e-12)
+        np.testing.assert_allclose(seg["m_dn"], 0.9 * seg["m0_dn"], rtol=1e-12)
+    else:
+        part = r[250:1000]  # tau from the first 25% of the window, the sequences on the rest
+        np.testing.assert_allclose(seg["m0_dn"], np.mean(np.minimum(part**2, seg["tau2_dn"])), rtol=1e-9)
+        np.testing.assert_allclose(seg["m_dn"], 0.9 * seg["lower"], rtol=1e-12)
+        assert seg["lower"] < seg["m0_dn"] < seg["m0"] < seg["upper"]
+    # the bets are applied to min(r^2, tau_dn^2)
+    s0 = mon.S_dn.copy()
+    mon.update(2.5)
+    xd = min(2.5**2, seg["tau2_dn"])
+    np.testing.assert_allclose(mon.S_dn, (1 + mon.lam_dn * (1 - xd / seg["m_dn"])) * (s0 + 1), rtol=1e-12)
+
+
+def test_c_down_with_margin_z_uses_the_decrease_side_standard_error():
+    """Review 2b, m17: with margin_z the decrease side moves by its own standard error se_dn."""
+    rng = np.random.default_rng(49)
+    r = rng.standard_normal(600)
+    r[rng.random(600) < 0.03] = np.nan
+    mon = VolatilityMonitor(threshold=1e9, cal_len=500, margin_z=1.5, c_down=2.0)
+    mon.run(r)
+    seg = mon.segments[0]
+    cal = r[:500]
+    cal = cal[np.isfinite(cal)]
+    x = np.minimum(cal**2, seg["tau2"])
+    xd = np.minimum(cal**2, seg["tau2_dn"])
+    se, se_dn = np.sqrt(x.var(ddof=1) / x.size), np.sqrt(xd.var(ddof=1) / xd.size)
+    np.testing.assert_allclose(seg["m_up"], x.mean() + 1.5 * se, rtol=1e-12)
+    np.testing.assert_allclose(seg["m_dn"], xd.mean() - 1.5 * se_dn, rtol=1e-12)
+    assert se_dn < se  # a tighter clip gives a less variable statistic
+
+
+def test_c_down_with_degenerate_windows_and_missing_returns():
+    """Review 2b, m17: fallback and extended windows, and NaN returns, with c_down != c."""
+    rng = np.random.default_rng(50)
+    r = rng.standard_normal(20000)
+    r[rng.random(r.size) < 0.6] = 0.0  # the MAD is 0 in every window: extension, then fallback
+    for baseline in ("plugin", "cs"):
+        mon = VolatilityMonitor(threshold=10000.0, cal_len=500, c_down=2.0, baseline=baseline)
+        mon.run(r)
+        seg = mon.segments[0]
+        assert mon.cal_stats["fallback"] >= 1 and seg["fallback"]
+        np.testing.assert_allclose(seg["tau2_dn"], seg["tau2"] * (2.0 / 3.0) ** 2, rtol=1e-12)
+        assert 0 < seg["m0_dn"] < seg["m0"] and seg["m_dn"] > 0
+        if baseline == "plugin":
+            assert seg["cal_len"] == 1000
+            np.testing.assert_allclose(seg["m0_dn"], np.mean(np.minimum(r[:1000] ** 2, seg["tau2_dn"])), rtol=1e-12)
+    # missing returns: skipped in calibration and in monitoring, on both sides
+    r = rng.standard_normal(4000)
+    r[800:] *= 0.5  # a fall right after calibration, so the first alarm is on the decrease side
+    miss = rng.random(r.size) < 0.05
+    r_nan = np.where(miss, np.nan, r)
+    for baseline in ("plugin", "cs"):
+        kw = dict(threshold=1000.0, cal_len=800, c_down=1.5, baseline=baseline, delta=0.02)
+        mon = VolatilityMonitor(**kw)
+        mon.run(r_nan[:800])
+        seg = mon.segments[0]
+        assert np.isfinite(seg["m0_dn"]) and seg["n_finite"] == int((~miss[:800]).sum())
+        if baseline == "plugin":
+            cal = r_nan[:800][~miss[:800]]
+            np.testing.assert_allclose(seg["m0_dn"], np.mean(np.minimum(cal**2, seg["tau2_dn"])), rtol=1e-12)
+        else:
+            assert mon._cs.t == mon._cs_dn.t == int((~miss[200:800]).sum())
+        mon.run(r_nan[800:])
+        # up to the first alarm, the run with missing monitoring returns equals the run with them deleted
+        keep = np.concatenate([np.ones(800, bool), ~miss[800:]])
+        dropped = VolatilityMonitor(**kw)
+        dropped.run(r_nan[keep])
+        orig_index = np.flatnonzero(keep)
+        e1, e2 = mon.events[0], dropped.events[0]
+        assert e1.direction == "down"
+        assert (e1.index, e1.direction, e1.monitored_since) == (orig_index[e2.index], e2.direction,
+                                                                 e2.monitored_since)
+        assert e1.stat == e2.stat
+
+
+def test_c_down_cs_bounds_match_the_vectorised_sequences():
+    """With baseline="cs" the upper bound is the default one, and the lower bound is a sequence on min(r^2, tau_dn^2)."""
+    rng = np.random.default_rng(51)
+    r = rng.standard_normal(1440)
+    split = VolatilityMonitor(threshold=1e9, cal_len=1440, baseline="cs", delta=0.02, c_down=2.0)
+    split.run(np.append(r, 0.1))
+    default = VolatilityMonitor(threshold=1e9, cal_len=1440, baseline="cs", delta=0.02)
+    default.run(np.append(r, 0.1))
+    s, d = split.segments[0], default.segments[0]
+    assert s["upper"] == d["upper"] and s["m_up"] == d["m_up"] and s["tau2"] == d["tau2"] and s["m0"] == d["m0"]
+    x_dn = np.minimum(r[360:] ** 2, s["tau2_dn"])
+    cs = eb_confseq(x_dn, s["tau2_dn"], delta_upper=0.01, delta_lower=0.01, n_plan=1080)
+    np.testing.assert_allclose([s["lower"], s["m0_dn"]], [cs.lower[0, -1], cs.mean[0, -1]], rtol=1e-9)
+    # the lower bound of the clipped-at-tau_dn statistic is closer to its mean, relative to the bound tau_dn^2
+    assert (s["m0_dn"] - s["lower"]) / s["tau2_dn"] > 0
+
+
+def test_c_down_cs_coverage_of_the_lower_bound():
+    """Coverage of both bounds at level delta / 2 each, Gaussian windows, true means in closed form."""
+    rng = np.random.default_rng(52)
+    delta, n_win, cal_len = 0.2, 300, 300
+    fail_lo = fail_up = 0
+    for _ in range(n_win):
+        r = rng.standard_normal(cal_len + 1)
+        mon = VolatilityMonitor(threshold=1e12, cal_len=cal_len, baseline="cs", delta=delta, c_down=1.5)
+        mon.run(r)
+        seg = mon.segments[0]
+        fail_lo += seg["lower"] >= _gauss_clipped_mean(np.sqrt(seg["tau2_dn"]))
+        fail_up += seg["upper"] <= _gauss_clipped_mean(np.sqrt(seg["tau2"]))
+    se = np.sqrt(0.1 * 0.9 / n_win)
+    assert fail_lo / n_win <= delta / 2 + 3 * se
+    assert fail_up / n_win <= delta / 2 + 3 * se
+
+
+@pytest.mark.parametrize("c_down", [2.0, 1.5])
+def test_c_down_cs_alarm_count_bound_on_long_null_streams(c_down):
+    """docs/math.md Corollary 6.6 with a separate decrease clip: E[alarms] <= (delta + m / A) / (1 - delta)."""
+    rng = np.random.default_rng(53)
+    alarms, down, monitored, bound = 0, 0, 0, 0.0
+    for _ in range(2):
+        mon = VolatilityMonitor(threshold=100.0, cal_len=200, baseline="cs", delta=0.02, c_down=c_down)
+        r = rng.standard_normal(50000)
+        mon.run(r)
+        cal = sum(s["cal_len"] for s in mon.segments) + (0 if mon.calibrated else len(mon.buffer))
+        m = r.size - cal
+        alarms += len(mon.events)
+        down += sum(e.direction == "down" for e in mon.events)
+        monitored += m
+        bound += (0.02 + m / 100.0) / (1 - 0.02)
+    assert monitored > 50000 and alarms <= bound
+    assert down >= 1 and all(s["down_active"] for s in mon.segments)  # the decrease side is switched on and alarms
+
+
+def test_tighter_decrease_clip_is_faster_on_gaussian_data():
+    """A tighter decrease clip detects a 40% fall in sd sooner (Gaussian data, plug-in and cs baselines)."""
+    for baseline in ("plugin", "cs"):
+        delays = {3.0: [], 1.5: []}
+        for seed in range(30):
+            g = np.random.default_rng(100 + seed)
+            x = np.concatenate([g.standard_normal(1440), 0.6 * g.standard_normal(3000)])
+            for cd in delays:
+                ev = VolatilityMonitor(threshold=7800, cal_len=1440, c_down=cd, baseline=baseline).run(x)
+                down = [e.index - 1440 for e in ev if e.direction == "down"]
+                delays[cd].append(down[0] if down else 3000)
+        assert np.median(delays[1.5]) < np.median(delays[3.0])
+
+
+def test_c_down_must_be_positive():
     with pytest.raises(ValueError):
-        VolatilityMonitor(baseline="cs", c_down=1.5)
+        VolatilityMonitor(c_down=0.0)
+    with pytest.raises(ValueError):
+        VolatilityMonitor(baseline="cs", c_down=-1.0)
