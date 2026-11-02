@@ -60,33 +60,56 @@ def load_bitstamp_csv(path: str | Path, start: str | None = None, end: str | Non
     return df
 
 
-def intraday_scale(returns: pd.Series, lookback_days: int = 20, smooth: int = 15) -> pd.Series:
+def intraday_scale(returns: pd.Series, lookback_days: int = 20, smooth: int = 15, start: str = "past",
+                   circular: bool = True) -> pd.Series:
     """Predictable intraday volatility profile, one value per minute.
 
     For each minute of the day the scale is the scaled median of ``|r|`` at that
     minute over the previous ``lookback_days`` days (the current day is excluded),
-    smoothed with a centred circular moving average of ``smooth`` minutes across
-    the clock, and normalised so that its median over the day is 1. Medians keep
-    jumps from distorting the profile (compare Boudt, Croux and Laurent 2011).
-    The first ``lookback_days`` days get the overall profile of those days.
+    smoothed with a centred moving average of ``smooth`` minutes across the clock,
+    and normalised so that its median over the day is 1. Medians keep jumps from
+    distorting the profile (compare Boudt, Croux and Laurent 2011). Missing
+    returns (NaN) are left out of the medians; pass returns with their NaN, do
+    not fill them with zeros.
+
+    ``start`` sets what happens before ``max(5, lookback_days // 2)`` earlier days
+    exist. ``"past"`` (default) returns NaN there, so every value uses past data
+    only. ``"pooled"`` fills those days with the median profile of the first
+    ``lookback_days`` days, which uses up to ``lookback_days`` days of future data
+    (this was the behaviour before November 2026 and is kept to reproduce old
+    results). Load a warm-up period before the monitored period to avoid both.
+
+    ``circular=True`` wraps the smoothing window from the end of the day to its
+    start, which is right for 24-hour markets. Use ``circular=False`` for session
+    markets (the edges are then averaged over the available minutes only).
     """
+    if start not in ("past", "pooled"):
+        raise ValueError("start must be 'past' or 'pooled'")
     r = returns.abs()
     day = r.index.floor("D")
     minute = r.index.hour * 60 + r.index.minute
     wide = pd.DataFrame({"a": r.values, "day": day, "minute": minute}).pivot_table(
-        index="day", columns="minute", values="a", aggfunc="first"
+        index="day", columns="minute", values="a", aggfunc="first", dropna=False
     )
     prof = wide.rolling(lookback_days, min_periods=max(5, lookback_days // 2)).median().shift(1)
-    prof = prof.fillna(wide.iloc[:lookback_days].median())
+    if start == "pooled":
+        prof = prof.fillna(wide.iloc[:lookback_days].median())
     if smooth > 1:
         arr = prof.to_numpy()
         pad = smooth // 2
-        ext = np.concatenate([arr[:, -pad:], arr, arr[:, :pad]], axis=1)
-        ker = np.ones(smooth) / smooth
-        arr = np.apply_along_axis(lambda v: np.convolve(v, ker, mode="valid"), 1, ext)
+        ker = np.ones(smooth)
+        if circular:
+            ext = np.concatenate([arr[:, -pad:], arr, arr[:, :pad]], axis=1)
+            arr = np.apply_along_axis(lambda v: np.convolve(v, ker / smooth, mode="valid"), 1, ext)
+        else:
+            ok = np.isfinite(arr)
+            num = np.apply_along_axis(lambda v: np.convolve(v, ker, mode="same"), 1, np.where(ok, arr, 0.0))
+            den = np.apply_along_axis(lambda v: np.convolve(v, ker, mode="same"), 1, ok.astype(float))
+            with np.errstate(invalid="ignore", divide="ignore"):
+                arr = np.where(ok, num / den, np.nan)
         prof = pd.DataFrame(arr, index=prof.index, columns=prof.columns)
     prof = prof.div(prof.median(axis=1), axis=0)
-    long = prof.stack()
+    long = prof.stack(future_stack=True)
     idx = pd.MultiIndex.from_arrays([day, minute])
     out = long.reindex(idx).to_numpy()
     return pd.Series(out, index=returns.index, name="intraday_scale")

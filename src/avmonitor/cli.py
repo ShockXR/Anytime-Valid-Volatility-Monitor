@@ -78,7 +78,7 @@ def cmd_run(a) -> int:
     df = _load(a)
     spd = STEPS_PER_DAY[a.source]
     r = df["logret"]
-    s = intraday_scale(r.fillna(0.0), lookback_days=a.lookback_days)
+    s = intraday_scale(r, lookback_days=a.lookback_days)
     u = (r / s).to_numpy(copy=True)
     u[~np.isfinite(u)] = np.nan
     A = _threshold(spd, a.budget)

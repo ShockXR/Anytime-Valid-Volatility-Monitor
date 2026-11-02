@@ -89,3 +89,25 @@ IMPROVEMENTS: A precise statement of what the guarantee covers and what it does 
 REMAINING ISSUES: The conservativeness is examined theoretically by the theory track (E11).
 
 NEXT ITERATION: Forecast-relative monitoring (E10).
+
+---
+
+ITERATION NUMBER: R2-5 (framework iterations 4 and 6: statistical validation and sensitivity, forecast-relative null)
+
+OBJECTIVE: Restore a meaningful false alarm guarantee under persistent volatility clustering, and measure what that costs.
+
+PROBLEM IDENTIFIED: E9 showed that under GARCH clustering with a half-life of an hour or more, the raw-return monitor alarms on 12% to 100% of days whatever the band, because the conditional mean of the statistic is not constant.
+
+HYPOTHESIS: Dividing returns by a predictable volatility forecast makes the conditional variance constant under the model, so the guarantee applies again. A forecast that reacts to returns will also absorb part of any real break, so power should fall.
+
+CHANGES IMPLEMENTED: `forecast.py` (predictable EWMA and GARCH(1,1) filters, a quasi maximum likelihood GARCH fit with variance targeting, `standardise`) with tests; `experiments/e10_forecast_relative.py` (Q10a to Q10d).
+
+EXPERIMENTS PERFORMED: Q10a validity under three GARCH persistences (600 paths each); Q10b power against scale and intercept breaks that double the long-run variance (300 paths, 5 days); Q10b2 the same monitors without a break, and with a 4-fold break; Q10d the exact signal that survives standardisation and the Kullback-Leibler rate; Q10e the transient right after a break; Q10c five Binance coins, July to December 2025.
+
+RESULTS: A fitted GARCH forecast gives 3% to 6% one-day false alarms against 82% to 100% for raw returns. EWMA forecasts work only when their half-life matches the clustering. Breaks are detected within five days by the forecast-relative monitor at band 0 (93% to 94%) but slowly (median about 1600 to 1800 steps, more than a day), and never at band 0.25. Q10d explains why: scaling GARCH returns by c is the same model as multiplying the intercept by c², and a frozen pre-break filter absorbs the break except for a constant offset, so the visible ratio is ρ(k) = k(1 - β)/(1 - α - β + αk), capped at (1 - β)/α (1.2 at α = 0.05, β = 0.94; a doubling shows as +9%). The KL rate then puts any detector's delay at about 1.9 days for a doubling at persistence 0.99 (Lai 1998, asymptotic). Without a break the same monitors alarm within five days on 38% to 44% of paths, so part of that detection rate is the plug-in baseline: for exactly i.i.d. standardised returns the five-day false alarm rate was 44% against the 25% that Theorem B guarantees with the true baseline. A short transient after the break carries extra evidence (a scale break is fully visible at first and fades with a half-life of about 11 steps), which matters mainly for large breaks. On real data, dividing by an EWMA forecast changed alarm rates by between +2% and -17%; alarms remained informative relative to the forecast (next-day realised variance on the flagged side of the forecast 60% to 87% of the time, against 37% to 63% at random times).
+
+IMPROVEMENTS: A clear statement of two different monitoring questions (any change in volatility, or a departure from a model) with a guarantee for each, and a closed-form explanation, checked by simulation, of why breaks are hard to see relative to a persistent model.
+
+REMAINING ISSUES: The forecast-relative guarantee is only as good as the model; a misspecified forecast (EWMA with the wrong half-life) is not valid. The information bound is asymptotic. A forecast with an explicitly modelled long-run level, re-estimated slowly, is a possible middle ground that we have not tested.
+
+NEXT ITERATION: Integrate the agents' results (E6, E7, E8, E11, alternatives) and the independent review.

@@ -34,6 +34,10 @@ Research questions
         formula by simulation and compute the Kullback-Leibler rate between the
         post-break and pre-break conditional laws, which bounds how fast ANY
         detector with the same false alarm budget can react (Lai 1998).
+  Q10e [SYNTHETIC]. Where in time is the evidence? After a break at time 0,
+        the mean of s2_post / s2_pre along the path and the cumulative
+        Kullback-Leibler divergence, and the step at which the average
+        cumulative divergence reaches ln A (a rough predicted delay).
   Q10c [REAL]. On the five Binance coins (Jul to Dec 2025, deseasonalised
         one-minute returns), how do alarm rates change when the monitor runs on
         returns divided by an EWMA forecast, and after an "up" ("down") alarm
@@ -200,7 +204,7 @@ def q10c():
     for sym in ("BTCUSDT", "ETHUSDT", "XRPUSDT", "SOLUSDT", "DOGEUSDT"):
         df = load_binance(sym, "2025-06-01", "2026-01-01", download=False)
         r = df.logret
-        s = intraday_scale(r.fillna(0.0), lookback_days=20)
+        s = intraday_scale(r, lookback_days=20)
         u_all = (r / s).to_numpy(copy=True)
         u_all[~np.isfinite(u_all)] = np.nan
         keep = df.index >= pd.Timestamp("2025-07-01", tz="UTC")  # June is warm-up for the profile and the EWMA
@@ -323,6 +327,34 @@ def q10d(reps=200, n=20000):
     return df
 
 
+def q10e(reps=400, n=4000, brk=500):
+    """Q10e: the transient after a break, persistence 0.99."""
+    a, b = 0.05, 0.94
+    omega = 1 - a - b
+    rows = []
+    for kind in ("omega", "scale"):
+        for k in (2.0, 4.0):
+            rng = np.random.default_rng(SEED + 31)
+            r, v = garch_paths(reps, n, omega, a, b, rng, break_at=brk, break_kind=kind, factor=k)
+            q = np.empty_like(r)
+            for i in range(reps):
+                q[i] = v[i] / F.garch11_filter(r[i], omega, a, b)
+            post = q[:, brk:]
+            cum = np.cumsum(np.mean(0.5 * (post - 1 - np.log(post)), axis=0))
+            hit = int(np.argmax(cum >= np.log(A))) if cum[-1] >= np.log(A) else np.nan
+            row = dict(break_kind=kind, k=k, steps_until_mean_cum_kl_reaches_lnA=hit)
+            for t in (0, 10, 30, 100, 300, 1000, 3000):
+                row[f"mean_ratio_t{t}"] = float(post[:, t].mean())
+            for t in (100, 300, 1000):
+                row[f"cum_kl_t{t}"] = float(cum[t])
+            rows.append(row)
+    df = pd.DataFrame(rows)
+    df.to_csv(OUT / "e10e_transient.csv", index=False)
+    with pd.option_context("display.width", 200):
+        print(df.round(3).to_string(index=False))
+    return df
+
+
 def main(parts=("a", "b", "c")):
     if "a" in parts:
         q10a()
@@ -334,9 +366,11 @@ def main(parts=("a", "b", "c")):
         q10c()
     if "d" in parts:
         q10d()
+    if "e" in parts:
+        q10e()
 
 
 if __name__ == "__main__":
     import sys
 
-    main(tuple(sys.argv[1:]) or ("a", "b", "b2", "c", "d"))
+    main(tuple(sys.argv[1:]) or ("a", "b", "b2", "c", "d", "e"))
