@@ -7,3 +7,5 @@ method,crit_matched,crit_nominal,calibration_paths
 "BOCPD, w=250",0.705763135324494,,2000
 "e-detector, plug-in",319607.51893914747,30000.0,2000
 "e-detector, CS baseline",311.7034199735886,37500.0,2000
+"BJV overlap, k=250, truncated",3.4232779622368654,3.933330900934874,2000
+"BJV overlap, k=500, truncated",3.0967776255045156,3.8630189304159135,2000

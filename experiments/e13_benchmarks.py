@@ -30,6 +30,15 @@ Research questions
         or below (down alarm) an EWMA forecast and the previous day, compared with the e-detector at the
         same numbers of up and down alarms?
   Q13e. Cost. Time per step of each method in a one-series streaming loop.
+  Review round 3 (docs/review/independent_review_round3.md):
+  M3.   Is BJV's low power the lack of accumulated evidence, or its short windows? Offline rows with k = 250 and 500 on
+        the same windows as Q13a; rolling BJV with k = 250 and 500 on the clean Gaussian cells of Q13b and Q13c.
+  M4.   The real-data outcome (next day beyond a one-day forecast) is on the e-detector's time scale. Do the
+        competitors' alarms score as well with windows of half a day to a day (crypto: BJV k = 480 and 1440, BOCPD
+        w = 720 and 1440; Nifty: k = w = 375)? Every alarm is also scored on a four-hour outcome, and the comparison is
+        tested with standard errors clustered by calendar day and by calendar week.
+  m9.   How far is the capped BOCPD filter from the exact recursion in the E13 setting?
+  m16.  Nominal rolling BJV level with the correct series length (day + 2k - 1).
 
 Fixed in advance (not tuned on the reported data):
   * e-detector: c = 3, plug-in baseline from the calibration window, A = 7800 for 390-step days
@@ -45,6 +54,9 @@ Fixed in advance (not tuned on the reported data):
     simulations, as reported by later work), truncation constant 4.
   * Thresholds of the competitors come from simulated Gaussian data only. On real data the only
     adjustment is the explicit matching of alarm counts to the e-detector, as in E6b.
+  * Added after the first runs (review round 3), lengths fixed before these runs: BJV offline k = 250 and 500, BJV online
+    k = 250 and 500 (Gaussian cells), real data BJV k = 480 and 1440 and BOCPD w = 720 and 1440 with run-length cap 2w
+    (crypto), k = w = 375 (Nifty). No other setting was changed.
 
 All simulated results are [SYNTHETIC]; Binance and Nifty results are [REAL]. Seeds are fixed below.
 
@@ -59,10 +71,21 @@ Usage
   python experiments/e13_benchmarks.py real-nifty   # Q13d, Nifty 50
   python experiments/e13_benchmarks.py cost         # Q13e
   python experiments/e13_benchmarks.py figures      # tables and figures from the saved CSV files
+  Review round 3 (after the commands above):
+  python experiments/e13_benchmarks.py offline-long  # M3: Q13a rows for BJV k = 250 and 500 (appended to e13a_*.csv)
+  python experiments/e13_benchmarks.py online-long   # M3: rolling BJV k = 250 and 500, Gaussian cells (appended)
+  python experiments/e13_benchmarks.py fix-nominal   # m16: nominal rolling BJV rows of Q13b and Q13c rerun in place
+  python experiments/e13_benchmarks.py cap-check     # m9: capped BOCPD against the exact recursion
+  python experiments/e13_benchmarks.py real-long nifty   # M4 (and m16 for the real nominal rows), Nifty 50
+  python experiments/e13_benchmarks.py real-long crypto  # M4, both half-years (about 20 minutes with 2 processes)
+  python experiments/e13_benchmarks.py long-pooled   # pooled table with z-tests and clustered tests, and its figure
+  python experiments/e13_benchmarks.py figures       # rebuild e13d_real_pooled.csv and the figures
+  Optional: E13_CACHE=<folder> keeps the long BOCPD arrays between attempts of real-long (not a result file).
 """
 
 from __future__ import annotations
 
+import os
 import sys
 import time
 from multiprocessing import Pool
@@ -269,7 +292,7 @@ def offline_change():
     _offline_table(rows, stats_, crit, "e13a_offline_power.csv")
 
 
-def _offline_table(rows, stats_, crit, fname):
+def _offline_frame(rows, stats_, crit):
     c = crit.set_index("method")
     for row, v in zip(rows, stats_):
         cm, cn = c.loc[row["method"], "crit_matched"], c.loc[row["method"], "crit_nominal"]
@@ -281,7 +304,16 @@ def _offline_table(rows, stats_, crit, fname):
         row["reject_matched_lo"], row["reject_matched_hi"] = lo, hi
     df = pd.DataFrame(rows)
     df["kind"] = df.kind.replace({"null": "no change"})  # "null" would be read back as a missing value by pandas
+    return df
+
+
+def _offline_table(rows, stats_, crit, fname):
+    df = _offline_frame(rows, stats_, crit)
     df.to_csv(OUT / fname, index=False)
+    _print_offline(df)
+
+
+def _print_offline(df):
     pd.set_option("display.width", 250)
     if (df.kind == "change").any():
         print(df.pivot_table(index="method", columns=["scenario", "ratio"], values="reject_matched").round(2).T.to_string())
@@ -352,7 +384,13 @@ def matched_thresholds(day, a_level, cal_len, k, hazard, reps, seed):
                 bocpd_threshold_log_odds=float(np.quantile(pm, 1 - fa)), bjv_threshold=float(np.quantile(dm, 1 - fa)),
                 bjv_studentised_threshold=float(np.quantile(em, 1 - fa)),
                 bocpd_truncated_threshold_log_odds=float(np.quantile(tm, 1 - fa)),
-                bjv_nominal=C.mosum_crit(day, k, 0.05))
+                bjv_nominal=bjv_nominal_crit(day, k))
+
+
+def bjv_nominal_crit(day, k):
+    """Nominal 5% per day for the rolling BJV: ``day`` window positions span ``day + 2k - 1`` returns, the series length
+    that the MOSUM formula expects (review round 3, m16; the first runs used ``day``)."""
+    return C.mosum_crit(day + 2 * k - 1, k, 0.05)
 
 
 def online_alarms(r_full, th):
@@ -382,6 +420,10 @@ def null_job(args):
     t0 = time.time()
     al = online_alarms(r, th)
     print(f"online null {name}: {time.time() - t0:.0f} s", flush=True)
+    return null_rows(name, reps, al)
+
+
+def null_rows(name, reps, al):
     rows = []
     for m, (a, _) in al.items():
         k1 = int(np.sum((a >= 0) & (a < DAY)))
@@ -415,6 +457,10 @@ def change_job(args):
     t0 = time.time()
     al = online_alarms(r, th)
     print(f"online change {name} {ratio}: {time.time() - t0:.0f} s", flush=True)
+    return change_rows(name, ratio, reps, al)
+
+
+def change_rows(name, ratio, reps, al):
     rows = []
     want = 1.0 if ratio > 1 else -1.0
     for m, (a, d) in al.items():
@@ -530,7 +576,7 @@ def trailing_robust_var(u, day):
     return out
 
 
-def real_bocpd(um, prior, hazard, cal_len, truncated):
+def real_bocpd(um, prior, hazard, cal_len, truncated, r_max=R_MAX, short=W_SHORT):
     """BOCPD on (rows of) monitored real returns um; prior: predictable prior variance per step (same shape).
 
     ``truncated=True`` clips each return at 3 times the square root of that predictable robust variance
@@ -541,7 +587,7 @@ def real_bocpd(um, prior, hazard, cal_len, truncated):
     if truncated:  # the first day has no trailing prior yet: use the calibration window's own robust scale
         sc = np.nanmedian(np.abs(um[:, :cal_len]), axis=1, keepdims=True) * MAD_NORMAL_SCALE
         x[:, :cal_len] = np.clip(um[:, :cal_len], -3 * sc, 3 * sc)
-    return C.bocpd_paths(x, hazard, cal=x[:, :cal_len], alpha0=ALPHA0, r_max=R_MAX, short=W_SHORT, prior_var_path=prior,
+    return C.bocpd_paths(x, hazard, cal=x[:, :cal_len], alpha0=ALPHA0, r_max=r_max, short=short, prior_var_path=prior,
                          return_log_odds=True)
 
 
@@ -643,13 +689,12 @@ def real_crypto():
     save_real("crypto", rows, rnd, matched, ev_rows)
 
 
-def real_crypto_h1_2025():
-    """Same as real_crypto on a second, earlier half-year (1 Jan to 30 Jun 2025), with the same frozen settings."""
+def prepare_h1_2025():
+    """Deseasonalised one-minute returns of the five coins for the held-out half-year (1 Jan to 30 Jun 2025)."""
     from e06b_five_coins_monitor import COINS
 
     from avmonitor.data import intraday_scale, load_binance
 
-    th = pd.read_csv(OUT / "e13d_real_thresholds.csv").set_index("day").loc[1440].to_dict()
     prepared = {}
     for c, sym in COINS.items():
         df = load_binance(sym, "2024-01-01", "2025-07-01", download=False)
@@ -658,6 +703,15 @@ def real_crypto_h1_2025():
         u[~np.isfinite(u)] = np.nan
         i0 = int(np.searchsorted(df.index, pd.Timestamp("2025-01-01", tz="UTC")))
         prepared[c] = (df.index, u, i0)
+    return prepared
+
+
+def real_crypto_h1_2025():
+    """Same as real_crypto on a second, earlier half-year (1 Jan to 30 Jun 2025), with the same frozen settings."""
+    from e06b_five_coins_monitor import COINS
+
+    th = pd.read_csv(OUT / "e13d_real_thresholds.csv").set_index("day").loc[1440].to_dict()
+    prepared = prepare_h1_2025()
     lens = {c: prepared[c][1].size - prepared[c][2] for c in COINS}
     assert len(set(lens.values())) == 1, lens
     um = np.stack([prepared[c][1][prepared[c][2]:] for c in COINS])
@@ -752,6 +806,573 @@ def cost():
     df["machine"] = f"{platform.machine()}, Python {platform.python_version()}, 4 cores shared with other jobs"
     df.to_csv(OUT / "e13e_cost.csv", index=False)
     print(df.round(2).to_string())
+
+
+# ----------------------------------------------------------------------------
+# Review round 3: longer BJV windows offline and online (M3), corrected nominal level of the rolling BJV (m16)
+# ----------------------------------------------------------------------------
+
+def _read(path, **kw):
+    """Read a results file without changing its floats in the last digit when it is written back (round trip)."""
+    return pd.read_csv(path, float_precision="round_trip", **kw)
+
+
+# Added after the first runs, in review round 3. The window lengths were fixed before any of these runs: 250 and 500
+# returns are the longest overlapping windows that fit the offline design twice and four times over (500 = the
+# e-detector's calibration window there); every other setting is as above.
+OFF_METHODS_LONG = [
+    ("BJV overlap, k=250, truncated", dict(variant="overlap", k=250, trunc_c=TRUNC)),
+    ("BJV overlap, k=500, truncated", dict(variant="overlap", k=500, trunc_c=TRUNC)),
+]
+K_ONLINE_LONG = (250, 500)
+
+
+def offline_long_job(args):
+    """Regenerate one offline set of windows (same seed as Q13a) and compute the long-window BJV statistics on it."""
+    kind, name, ratio, reps, seed = args
+    rng = np.random.default_rng(seed)
+    nu = None if kind == "null" else NU_OFF
+    r = gen(name, reps, N_OFF, rng, nu=nu, ratio=ratio)
+    out, cp, nominal = {}, {}, {}
+    if kind == "calib":  # reproduction check on the regenerated windows: one of the original methods
+        out["BJV blocks, k=50, truncated"] = C.bjv_test(r, 50, 0.05, "blocks", TRUNC).stat
+    for m, kw in OFF_METHODS_LONG:
+        res = C.bjv_test(r, kw["k"], 0.05, kw["variant"], kw["trunc_c"], method="sums")
+        out[m], cp[m], nominal[m] = res.stat, res.cp_index, res.crit
+    return kind, name, ratio, out, cp, nominal
+
+
+def _replace_rows(fname, new, key="method"):
+    """Write ``new`` into results/fname, replacing the rows of the same methods (so that a rerun is idempotent)."""
+    old = _read(OUT / fname)
+    df = pd.concat([old[~old[key].isin(set(new[key]))], new], ignore_index=True)
+    df.to_csv(OUT / fname, index=False)
+    return df
+
+
+def offline_long():
+    """Q13a rows for BJV with windows of 250 and 500 returns, on exactly the windows of Q13a (same seeds)."""
+    jobs = [("calib", "gaussian", 1.0, 1000, 13100), ("calib", "gaussian", 1.0, 1000, 13101)]
+    jobs += [("null", nm, 1.0, 1000, 13110 + i) for i, nm in enumerate(NULL_SCEN)]
+    jobs += [("change", nm, ratio, 300, 13200 + 10 * i + j) for i, nm in enumerate(("gaussian", "jumps", "student t5"))
+             for j, ratio in enumerate(RATIOS)]
+    with Pool(2) as pool:
+        res = pool.map(offline_long_job, jobs)
+    cal = [x for x in res if x[0] == "calib"]
+    s_cal = {m: np.concatenate([c[3][m] for c in cal]) for m in cal[0][3]}
+    crit_old = _read(OUT / "e13a_offline_crit.csv").set_index("method")
+    check = float(np.quantile(s_cal.pop("BJV blocks, k=50, truncated"), 0.95))
+    assert check == crit_old.loc["BJV blocks, k=50, truncated", "crit_matched"], "regenerated windows differ from Q13a"
+    nominal = cal[0][5]
+    crit_new = pd.DataFrame([dict(method=m, crit_matched=float(np.quantile(v, 0.95)), crit_nominal=nominal[m],
+                                  calibration_paths=v.size) for m, v in s_cal.items()])
+    crit = _replace_rows("e13a_offline_crit.csv", crit_new)
+    size_rows, size_stats, pow_rows, pow_stats = [], [], [], []
+    for m, v in s_cal.items():
+        size_rows.append(dict(kind="calibration set", scenario="gaussian", ratio=1.0, method=m, paths=v.size))
+        size_stats.append(v)
+    cm = crit.set_index("method")
+    for kind, name, ratio, s, cp, _ in res:
+        for m, v in s.items():
+            if m not in s_cal:
+                continue
+            row = dict(kind=kind, scenario=name, ratio=ratio, method=m, paths=v.size)
+            if kind == "change":
+                hit = v > cm.loc[m, "crit_matched"]
+                err = np.abs(cp[m][hit] - NU_OFF)
+                row["cp_median_abs_error"] = float(np.median(err)) if err.size else np.nan
+                row["cp_share_within_25"] = float(np.mean(err <= 25)) if err.size else np.nan
+                pow_rows.append(row)
+                pow_stats.append(v)
+            elif kind == "null":
+                size_rows.append(row)
+                size_stats.append(v)
+    _print_offline(_replace_rows("e13a_offline_size.csv", _offline_frame(size_rows, size_stats, crit)))
+    _print_offline(_replace_rows("e13a_offline_power.csv", _offline_frame(pow_rows, pow_stats, crit)))
+
+
+def bjv_rolling(r_full, k, norm="gaussian", method="windows"):
+    """Rolling BJV statistic on the monitored part of r_full = [calibration CAL | monitored] (same as online_paths)."""
+    hist = r_full[:, CAL - 2 * k :]
+    return C.bjv_online_statistic(hist, k, TRUNC, norm=norm, method=method)[:, 2 * k :]
+
+
+def rolling_alarms(Z, thresholds):
+    """First alarm and its direction for |Z| >= h, for each named threshold."""
+    rows = np.arange(Z.shape[0])
+    out = {}
+    for name, h in thresholds.items():
+        a = C.first_crossing(np.abs(Z), h)
+        out[name] = (a, np.where(a >= 0, np.sign(Z[rows, np.maximum(a, 0)]), 0.0))
+    return out
+
+
+def online_long():
+    """Q13b and Q13c rows for the rolling BJV with k = 250 and 500 on the clean Gaussian cells (same paths as Q13b, Q13c).
+
+    Thresholds are matched, as for k = 120, to the e-detector's false alarm rate per 390-step day on the same 4000 Gaussian
+    calibration paths (seeds 13300 and 13301). As a reproduction check, the k = 120 threshold is recomputed on the
+    regenerated paths and compared with ``e13b_thresholds.csv``.
+    """
+    th = _read(OUT / "e13b_thresholds.csv").iloc[0].to_dict()
+    fa = th["edetector_fa_per_day"]
+    ks = (K_ONLINE,) + K_ONLINE_LONG
+    maxes = {k: [] for k in ks}
+    for seed in (13300, 13301):  # matched_thresholds(..., reps=4000, seed=13300) uses 2000 paths per seed
+        r = gen("gaussian", 2000, CAL + DAY, np.random.default_rng(seed))
+        for k in ks:
+            maxes[k].append(np.nanmax(np.abs(bjv_rolling(r, k, method="sums")), axis=1))
+    thr = {k: float(np.quantile(np.concatenate(v), 1 - fa)) for k, v in maxes.items()}
+    assert abs(thr[K_ONLINE] - th["bjv_threshold"]) < 1e-8, (thr[K_ONLINE], th["bjv_threshold"])
+    pd.DataFrame([dict(day=DAY, k=k, edetector_fa_per_day=fa, bjv_threshold=thr[k], paths=4000) for k in K_ONLINE_LONG]
+                 ).to_csv(OUT / "e13b_thresholds_long_windows.csv", index=False)
+    names = {k: f"BJV rolling, k={k}, matched" for k in K_ONLINE_LONG}
+    r = gen("gaussian", 1000, CAL + 2 * DAY, np.random.default_rng(13310))  # seed of the Gaussian column of Q13b
+    al = {}
+    for k in K_ONLINE_LONG:
+        al.update(rolling_alarms(bjv_rolling(r, k, method="sums"), {names[k]: thr[k]}))
+    nd = _replace_rows("e13b_online_null.csv", pd.DataFrame(null_rows("gaussian", 1000, al)))
+    print(nd[nd.scenario == "gaussian"].round(4).to_string(), flush=True)
+    cells = [(nm, ratio) for nm in CHANGE_SCEN for ratio in RATIOS]
+    rows = []
+    for i, (nm, ratio) in enumerate(cells):
+        if nm != "gaussian":
+            continue
+        r = gen(nm, 200, CAL + N_ON, np.random.default_rng(13400 + i), nu=CAL + NU_ON, ratio=ratio)
+        al = {}
+        for k in K_ONLINE_LONG:
+            al.update(rolling_alarms(bjv_rolling(r, k, method="sums"), {names[k]: thr[k]}))
+        rows += change_rows(nm, ratio, 200, al)
+    df = pd.DataFrame(rows)
+    df.to_csv(OUT / "e13c_online_change_part2_long_windows.csv", index=False)
+    print(df.round(3).to_string(), flush=True)
+
+
+def nominal_fix_job(args):
+    """Regenerate one Q13b or Q13c set of paths and recompute the rolling BJV (k = 120) alarms at the matched threshold
+    (a reproduction check) and at the corrected nominal threshold."""
+    kind, name, ratio, reps, seed, h_matched, h_nominal = args
+    rng = np.random.default_rng(seed)
+    if kind == "null":
+        r = gen(name, reps, CAL + 2 * DAY, rng)
+    else:
+        r = gen(name, reps, CAL + N_ON, rng, nu=CAL + NU_ON, ratio=ratio)
+    al = rolling_alarms(bjv_rolling(r, K_ONLINE), {"BJV rolling, matched": h_matched,
+                                                  "BJV rolling, nominal 5% per day": h_nominal})
+    return null_rows(name, reps, al) if kind == "null" else change_rows(name, ratio, reps, al)
+
+
+def _in_place(old, new, key, method="BJV rolling, nominal 5% per day"):
+    """Replace the rows of ``method`` in ``old`` by the rows of ``new`` with the same key, keeping the row order."""
+    out = old.copy()
+    src = new[new.method == method].set_index(key)
+    for i in out.index[out.method == method]:
+        k = tuple(out.loc[i, key]) if len(key) > 1 else out.loc[i, key[0]]
+        for c in out.columns:
+            if c not in key:
+                out.loc[i, c] = src.loc[k, c]
+    return out
+
+
+def fix_nominal_sim():
+    """m16: rerun the 'BJV rolling, nominal 5% per day' rows of Q13b and Q13c with the corrected critical value."""
+    th = _read(OUT / "e13b_thresholds.csv")
+    h_old, h_new = float(th.bjv_nominal.iloc[0]), bjv_nominal_crit(DAY, K_ONLINE)
+    print(f"nominal critical value: {h_old:.6f} (series length {DAY}) -> {h_new:.6f} (length {DAY + 2 * K_ONLINE - 1})")
+    hm = float(th.bjv_threshold.iloc[0])
+    cells = [(nm, ratio) for nm in CHANGE_SCEN for ratio in RATIOS]
+    jobs = [("null", nm, 1.0, 1000, 13310 + i, hm, h_new) for i, nm in enumerate(NULL_SCEN)]
+    jobs += [("change", nm, ratio, 200, 13400 + i, hm, h_new) for i, (nm, ratio) in enumerate(cells)]
+    with Pool(2) as pool:
+        res = pool.map(nominal_fix_job, jobs)
+    null_new = pd.DataFrame(sum(res[: len(NULL_SCEN)], []))
+    ch_new = pd.DataFrame(sum(res[len(NULL_SCEN) :], []))
+    # reproduction check: the matched rows must equal the saved ones exactly
+    nd = _read(OUT / "e13b_online_null.csv")
+    a = nd[nd.method == "BJV rolling, matched"].set_index("scenario")[["fa_one_day", "fa_two_days"]]
+    b = null_new[null_new.method == "BJV rolling, matched"].set_index("scenario")[["fa_one_day", "fa_two_days"]]
+    assert np.allclose(a.loc[b.index].to_numpy(), b.to_numpy(), rtol=0, atol=1e-12), "Q13b paths not reproduced"
+    _in_place(nd, null_new, ["scenario"]).to_csv(OUT / "e13b_online_null.csv", index=False)
+    cols = ["detected", "false_alarm_before_change", "median_delay", "correct_direction"]
+    for part in (0, 1):
+        f = OUT / f"e13c_online_change_part{part}.csv"
+        old = _read(f)
+        key = ["scenario", "ratio"]
+        a = old[old.method == "BJV rolling, matched"].set_index(key)[cols]
+        b = ch_new[ch_new.method == "BJV rolling, matched"].set_index(key).loc[a.index, cols]
+        assert np.allclose(a.to_numpy(), b.to_numpy(), rtol=0, atol=1e-12, equal_nan=True), "Q13c paths not reproduced"
+        _in_place(old, ch_new, key).to_csv(f, index=False)
+    th["bjv_nominal"] = h_new
+    th["bjv_nominal_series_length"] = DAY + 2 * K_ONLINE - 1
+    th.to_csv(OUT / "e13b_thresholds.csv", index=False)
+    print(_read(OUT / "e13b_online_null.csv").pivot(index="method", columns="scenario", values="fa_one_day")
+          .round(3).to_string())
+
+
+# ----------------------------------------------------------------------------
+# Review round 3: real data with longer competitor windows (M4) and a test that allows clustered alarms
+# ----------------------------------------------------------------------------
+
+# Window lengths for the real-data rerun, fixed before it: a third of a day and one day for BJV, half a day and one day
+# for BOCPD (crypto, 1440-minute days); one session for Nifty (375 bars; its first runs already used windows of a third
+# and two thirds of a session). The run-length cap is twice the short-run window, as 512 was for w = 250.
+REAL_LONG = {"crypto": dict(ks=(480, 1440), ws=(720, 1440)), "nifty": dict(ks=(375,), ws=(375,))}
+HORIZON_SHORT = 240  # a second outcome: the next four hours against a four-hour forecast
+
+
+def long_bocpd_job(args):
+    um, prior, hazard, cal_len, truncated, w = args
+    t0 = time.time()
+    _, S, L = real_bocpd(um, prior, hazard, cal_len, truncated, r_max=2 * w, short=w)
+    print(f"BOCPD w={w} truncated={truncated}: {time.time() - t0:.0f} s for {um.shape}", flush=True)
+    return w, truncated, S, L
+
+
+def score_events(V, events):
+    """Per alarm: 1 if the next period is beyond the forecast in the alarm's direction, 0 if not, NaN if not scorable."""
+    if not events:
+        return np.array([])
+    t = np.array([e[0] for e in events], int)
+    up = np.array([e[1] == "up" for e in events])
+    F, y = V.forecast(t), V.y[t]
+    ok = np.isfinite(F) & np.isfinite(y)
+    hit = np.where(up, y > F, y < F).astype(float)
+    return np.where(ok, hit, np.nan)
+
+
+def _events_from_csv(path, idx, label):
+    ev = _read(path)
+    ev = ev[ev.series == label]
+    out = {}
+    for m, g in ev.groupby("method", sort=False):
+        pos = idx.get_indexer(pd.DatetimeIndex(pd.to_datetime(g.time, utc=True)).tz_convert(idx.tz))
+        assert np.all(pos >= 0), (label, m)
+        out[m] = list(zip(pos.tolist(), g.direction.tolist()))
+    return out
+
+
+def run_real_series_long(label, u, i0, day, a_level, cal_len, bocpd, ks, th, old_events):
+    """Longer-window competitors on one deseasonalised series, rate-matched to the e-detector as in run_real_series.
+
+    ``bocpd`` maps (w, truncated) to the (S, L) arrays of this series; ``old_events`` are the saved events of the first
+    run (positions in u), used for two reproduction checks and for the corrected nominal BJV row (m16).
+    """
+    from avmonitor.monitor import VolatilityMonitor
+
+    um = u[i0:]
+    n = um.size
+    start, dead = cal_len, cal_len
+    events, matched = {}, []
+    for b in (0.0, 0.25):
+        ev = VolatilityMonitor(threshold=a_level, c=3.0, cal_len=cal_len, null_band=b).run(um)
+        events[f"e-detector, band {b}"] = [(e.index, e.direction) for e in ev]
+    # first-run k = 120 statistic: reproduction check of the Gaussian-matched row, and the corrected nominal row
+    Dz = C.bjv_online_statistic(um[None, :], K_ONLINE, TRUNC)[0]
+    events["BJV rolling, Gaussian-matched"] = C.scan_alarms(Dz, -Dz, th["bjv_threshold"], th["bjv_threshold"], start, dead)
+    h_nom = bjv_nominal_crit(day, K_ONLINE)
+    events["BJV rolling, nominal 5% per day"] = C.scan_alarms(Dz, -Dz, h_nom, h_nom, start, dead)
+    for m in ("e-detector, band 0.0", "e-detector, band 0.25", "BJV rolling, Gaussian-matched"):
+        got = [(t + i0, d) for t, d in events[m]]
+        assert got == old_events[m], f"{label}: {m} not reproduced"
+    stats_ = {}
+    for k in ks:  # history before the monitored period is used, so that the statistic exists from the first possible alarm
+        assert i0 >= 2 * k
+        for nm, norm in (("BJV rolling", "gaussian"), ("BJV rolling, studentised", "empirical")):
+            Z = C.bjv_online_statistic(u[None, i0 - 2 * k :], k, TRUNC, norm=norm, method="sums")[0, 2 * k :]
+            stats_[f"{nm}, k={k}"] = ("bjv", Z, -Z)
+    for (w, trunc), (S, L) in bocpd.items():
+        nm = "BOCPD on truncated returns" if trunc else "BOCPD"
+        stats_[f"{nm}, w={w}"] = ("bocpd", np.where(S > 0, L, -np.inf), np.where(S < 0, L, -np.inf))
+    for b in (0.0, 0.25):
+        ref = events[f"e-detector, band {b}"]
+        nu_ = sum(1 for e in ref if e[1] == "up")
+        nd_ = len(ref) - nu_
+        for nm, (kind, su, sd) in stats_.items():
+            lo_hi = (0.0, 1000.0) if kind == "bjv" else (-50.0, 1000.0)
+            hu, hd = C.match_alarm_counts(su, sd, nu_, nd_, start, dead, lo_hi=lo_hi, iters=50)
+            events[f"{nm}, matched to band {b}"] = C.scan_alarms(su, sd, hu, hd, start, dead)
+            matched.append(dict(series=label, band=b, method=nm, h_up=hu, h_down=hd, target_up=nu_, target_down=nd_))
+    events = {m: [(t + i0, d) for t, d in ev] for m, ev in events.items()}
+    return events, matched, n
+
+
+def real_long(market):
+    """M4: rerun the rate-matched real-data comparison with longer competitor windows, and score every alarm one by one.
+
+    crypto: both half-years (Jul to Dec 2025 and the held-out Jan to Jun 2025), BJV k = 480 and 1440, BOCPD w = 720 and
+    1440 (plain and on truncated returns). nifty: k = 375 and w = 375. Everything else as in real_crypto / real_nifty:
+    Gaussian-matched hazard 1 / A, predictable prior, pause after each alarm, matching per series and direction to the
+    e-detector's alarm counts. Also writes the per-alarm outcomes of the first-run methods, which the clustered test needs.
+    """
+    cfg = REAL_LONG[market]
+    if market == "crypto":
+        from e06b_five_coins_monitor import COINS, prepare
+
+        th = _read(OUT / "e13d_real_thresholds.csv").set_index("day").loc[1440].to_dict()
+        halves = {"five Binance coins, Jul to Dec 2025": ({c: prepare(c, "Jul-Dec 2025") for c in COINS}, "crypto"),
+                  "five Binance coins, Jan to Jun 2025": (prepare_h1_2025(), "crypto_h1_2025")}
+        day, a_level, cal_len = 1440, 28800.0, 1440
+    else:
+        from e07_nifty import deseasonalise, load_clean
+
+        th = _read(OUT / "e13d_real_thresholds.csv").set_index("day").loc[375].to_dict()
+        df, _, _ = load_clean("2023-10-01", "2026-01-01")
+        u = deseasonalise(df).to_numpy()
+        i0 = int(np.searchsorted(df.index, pd.Timestamp("2024-01-01", tz="Asia/Kolkata")))
+        halves = {"Nifty 50": ({"Nifty 50": (df.index, u, i0)}, "nifty")}
+        day, a_level, cal_len = 375, 7500.0, 750
+    hazard = 1 / a_level
+    series = [(mk, c) for mk, (prep, _) in halves.items() for c in prep]
+    n_max = max(halves[mk][0][c][1].size - halves[mk][0][c][2] for mk, c in series)
+    um = np.full((len(series), n_max), np.nan)
+    prior = np.full((len(series), n_max), np.nan)
+    for j, (mk, c) in enumerate(series):
+        _, u, i0 = halves[mk][0][c]
+        um[j, : u.size - i0] = u[i0:]
+        prior[j, : u.size - i0] = trailing_robust_var(u, day)[i0:]
+    jobs = [(um, prior, hazard, cal_len, tr, w) for w in sorted(cfg["ws"], reverse=True) for tr in (False, True)]
+    cache = os.environ.get("E13_CACHE")  # optional folder that keeps the BOCPD arrays between attempts (not results)
+    cfile = Path(cache) / f"bocpd_{market}.npz" if cache else None
+    if cfile is not None and cfile.exists():
+        z = np.load(cfile)
+        res = [(int(w), bool(tr), z[f"S_{w}_{tr}"], z[f"L_{w}_{tr}"]) for w, tr in z["keys"]]
+    else:
+        with Pool(2) as pool:
+            res = pool.map(long_bocpd_job, jobs)
+        if cfile is not None:
+            np.savez(cfile, keys=np.array([(w, int(tr)) for w, tr, _, _ in res]),
+                     **{f"S_{w}_{int(tr)}": S for w, tr, S, _ in res}, **{f"L_{w}_{int(tr)}": L for w, tr, _, L in res})
+    rows, matched, alarms, rnd, fixes = [], [], [], [], []
+    for j, (mk, c) in enumerate(series):
+        idx, u, i0 = halves[mk][0][c]
+        tag = halves[mk][1]
+        n_mon = u.size - i0
+        bocpd = {(w, tr): (S[j, :n_mon], L[j, :n_mon]) for w, tr, S, L in res}
+        old = _events_from_csv(OUT / f"e13d_real_{tag}_events.csv", idx, c)
+        events, mt, n = run_real_series_long(c, u, i0, day, a_level, cal_len, bocpd, cfg["ks"], th, old)
+        matched += [dict(market=mk, **m) for m in mt]
+        V, V4 = Validation(u, day), Validation(u, HORIZON_SHORT)
+        # first-run matched methods (from the saved events) and the new ones, scored alarm by alarm
+        allev = {m: ev for m, ev in old.items() if "matched to band" in m}
+        allev.update({m: ev for m, ev in events.items() if m.startswith("e-detector") or "matched to band" in m})
+        for m, ev in allev.items():
+            h1, h4 = score_events(V, ev), score_events(V4, ev)
+            alarms += [dict(market=mk, series=c, method=m, time=idx[t], direction=d, hit_next_day=a, hit_next_4h=b)
+                       for (t, d), a, b in zip(ev, h1, h4)]
+        for m, ev in events.items():
+            if m.startswith("e-detector") or "k=" in m or "w=" in m:
+                rec = dict(market=mk, series=c, method=m, days=n / day, alarms=len(ev), alarms_per_day=len(ev) / (n / day))
+                rec.update(V.score(ev))
+                rows.append(rec)
+        # the corrected nominal BJV row of the first run (m16), in the format of e13d_real_*_summary.csv
+        ev = events["BJV rolling, nominal 5% per day"]
+        rec = dict(series=c, method="BJV rolling, nominal 5% per day", days=n / day, alarms=len(ev),
+                   alarms_per_day=len(ev) / (n / day))
+        rec.update(V.score(ev))
+        fixes.append((tag, rec, [dict(series=c, method=rec["method"], time=idx[t], direction=d) for t, d in ev]))
+        rnd.append(dict(market=mk, series=c, horizon_minutes=HORIZON_SHORT,
+                        **V4.random_times(i0, np.random.default_rng(1700 + j))))
+        print(f"done {mk} {c}", flush=True)
+    pd.DataFrame(rows).to_csv(OUT / f"e13d_real_long_windows_{market}_summary.csv", index=False)
+    pd.DataFrame(matched).to_csv(OUT / f"e13d_real_long_windows_{market}_matched_thresholds.csv", index=False)
+    pd.DataFrame(alarms).to_csv(OUT / f"e13d_real_long_windows_{market}_alarms.csv", index=False)
+    pd.DataFrame(rnd).to_csv(OUT / f"e13d_real_long_windows_{market}_random_4h.csv", index=False)
+    # m16: replace the nominal BJV rows of the first run's summary and event files
+    for tag in sorted({f[0] for f in fixes}):
+        summ = _read(OUT / f"e13d_real_{tag}_summary.csv")
+        new = pd.DataFrame([f[1] for f in fixes if f[0] == tag])
+        for _, r in new.iterrows():
+            i = summ.index[(summ.series == r.series) & (summ.method == r.method)]
+            assert len(i) == 1
+            for col in new.columns:
+                summ.loc[i[0], col] = r[col]
+        summ.to_csv(OUT / f"e13d_real_{tag}_summary.csv", index=False)
+        evf = _read(OUT / f"e13d_real_{tag}_events.csv")
+        add = pd.DataFrame(sum([f[2] for f in fixes if f[0] == tag], []))
+        blocks = []  # keep the file's order: the new rows go where the old rows of the same series and method were
+        for (ser, m), blk in evf.groupby(["series", "method"], sort=False):
+            blocks.append(add[add.series == ser] if m == "BJV rolling, nominal 5% per day" else blk)
+        pd.concat(blocks, ignore_index=True).to_csv(OUT / f"e13d_real_{tag}_events.csv", index=False)
+    rt = _read(OUT / "e13d_real_thresholds.csv")
+    rt["bjv_nominal"] = [bjv_nominal_crit(int(d), int(k)) for d, k in zip(rt.day, rt.k)]
+    rt["bjv_nominal_series_length"] = rt.day + 2 * rt.k - 1
+    rt.to_csv(OUT / "e13d_real_thresholds.csv", index=False)
+    long_pooled()
+
+
+def cluster_z(h_a, g_a, h_b, g_b, paired=True):
+    """Two-sided p-value for equal hit rates of two sets of alarms whose outcomes may be dependent within clusters.
+
+    The difference of the two shares is divided by a cluster-robust (sandwich) standard error, with clusters taken as
+    independent and a small-sample factor G / (G - 1) for G clusters. ``paired=True``: residuals are summed within each
+    cluster over both sets, so alarms of either method in the same cluster may be correlated (the two methods often alarm
+    on the same days, which makes their outcomes positively correlated and lowers the variance of the difference).
+    ``paired=False``: each set has its own clusters and the two sets are treated as independent (only the dependence
+    within a method is allowed for; a sensitivity check).
+    """
+    pa, pb = h_a.mean(), h_b.mean()
+    ea = pd.Series((h_a - pa) / h_a.size).groupby(g_a).sum()
+    eb = pd.Series((h_b - pb) / h_b.size).groupby(g_b).sum()
+    if paired:
+        e = ea.sub(eb, fill_value=0.0)
+        G = e.size
+        v = G / (G - 1) * float(np.sum(e.to_numpy() ** 2)) if G > 1 else np.nan
+    else:
+        Ga, Gb = ea.size, eb.size
+        v = (Ga / (Ga - 1) * float(np.sum(ea.to_numpy() ** 2)) + Gb / (Gb - 1) * float(np.sum(eb.to_numpy() ** 2))
+             if min(Ga, Gb) > 1 else np.nan)
+    return float(2 * stats.norm.sf(abs(pa - pb) / np.sqrt(v))) if v > 0 else np.nan
+
+
+def two_prop_p(k1, n1, k2, n2):
+    pp = (k1 + k2) / (n1 + n2)
+    se = np.sqrt(pp * (1 - pp) * (1 / n1 + 1 / n2))
+    return float(2 * stats.norm.sf(abs(k1 / n1 - k2 / n2) / se)) if se > 0 else np.nan
+
+
+def long_pooled():
+    """Pooled table of every rate-matched method (first-run and longer windows) with the z-test and clustered tests."""
+    parts = [_read(p) for p in sorted(OUT.glob("e13d_real_long_windows_*_alarms.csv"))]
+    al = pd.concat(parts, ignore_index=True)
+    tz = al.time.str[-6:]
+    t = pd.to_datetime(al.time.str[:-6])  # local clock time of the market (UTC for crypto, IST for Nifty)
+    al["cl_day"] = t.dt.strftime("%Y-%m-%d")
+    al["cl_week"] = t.dt.strftime("%G-W%V")
+    assert tz.nunique() <= 2
+    rows = []
+    for (mk, m), g in al.groupby(["market", "method"], sort=False):
+        band = "0.0" if m.endswith("band 0.0") else "0.25"
+        ref = al[(al.market == mk) & (al.method == f"e-detector, band {band}")]
+        rec = dict(market=mk, method=m, band=float(band))
+        for dn in ("up", "down"):
+            for hz, col in (("day", "hit_next_day"), ("4h", "hit_next_4h")):
+                a = g[(g.direction == dn) & g[col].notna()]
+                b = ref[(ref.direction == dn) & ref[col].notna()]
+                k, n = int(a[col].sum()), len(a)
+                rec[f"n_{dn}_{hz}"] = n
+                rec[f"{dn}_rate_{hz}"] = k / n if n else np.nan
+                lo, hi = wilson(k, n)
+                rec[f"{dn}_{hz}_lo"], rec[f"{dn}_{hz}_hi"] = lo, hi
+                if m.startswith("e-detector") or n == 0 or len(b) == 0:
+                    continue
+                rec[f"{dn}_{hz}_p_ztest"] = two_prop_p(int(b[col].sum()), len(b), k, n)
+                for cl in ("cl_day", "cl_week"):
+                    rec[f"{dn}_{hz}_p_{cl[3:]}_clustered"] = cluster_z(b[col].to_numpy(), b[cl].to_numpy(),
+                                                                       a[col].to_numpy(), a[cl].to_numpy())
+                rec[f"{dn}_{hz}_p_week_clustered_unpaired"] = cluster_z(b[col].to_numpy(), b.cl_week.to_numpy(),
+                                                                        a[col].to_numpy(), a.cl_week.to_numpy(), False)
+        rec["alarms"] = len(g)
+        rows.append(rec)
+    out = pd.DataFrame(rows)
+    out.to_csv(OUT / "e13d_real_long_windows_pooled.csv", index=False)
+    pd.set_option("display.width", 300)
+    cols = ["market", "method", "alarms", "n_up_day", "up_rate_day", "up_day_p_ztest", "up_day_p_week_clustered",
+            "n_down_day", "down_rate_day", "down_day_p_ztest", "down_day_p_week_clustered", "up_rate_4h", "down_rate_4h"]
+    print(out[[c for c in cols if c in out]].round(4).to_string(index=False), flush=True)
+    return out
+
+
+def cap_check():
+    """m9: the capped BOCPD filter of E13 (r_max = 512, w = 250, H = 1 / 7800, alpha0 = 2, warm start on 2000 calibration
+    returns) against the exact run-length recursion without a cap, on one Gaussian path of 1500 monitored steps per case.
+    Same check as review round 3 (D4). Writes results/e13_bocpd_cap_check.csv.
+    """
+    from scipy.special import gammaln, logsumexp
+
+    def lpdf(v, a, b):
+        return gammaln(a + 0.5) - gammaln(a) - 0.5 * np.log(2 * np.pi * b) - (a + 0.5) * np.log1p(v * v / (2 * b))
+
+    h_alarm = float(_read(OUT / "e13b_thresholds.csv").bocpd_threshold_log_odds.iloc[0])
+    rows = []
+    for case, ratio in (("no change", 1.0), ("sd x 1.25 at step 500", 1.25), ("sd x 0.8 at step 500", 0.8)):
+        rng = np.random.default_rng(11)
+        cal = rng.standard_normal(2000)
+        x = rng.standard_normal(1500) * np.r_[np.ones(500), ratio * np.ones(1000)]
+        b0 = (ALPHA0 - 1) * np.mean(cal**2)
+        f = C.BOCPDVariance(1, H_SIM, ALPHA0, b0, r_max=R_MAX, short=W_SHORT)
+        f.warm_start(2000, np.sum(cal**2))
+        logR, al, be = np.array([0.0]), np.array([ALPHA0 + 1000.0]), np.array([b0 + 0.5 * np.sum(cal**2)])
+        runlen = np.array([10**6])  # the calibration run counts as a long run
+        d_mass, d_lo, first_e, first_c = 0.0, 0.0, -1, -1
+        for t, v in enumerate(x):
+            lj = logR + lpdf(v, al, be)
+            new = np.r_[logsumexp(lj) + np.log(H_SIM), lj + np.log1p(-H_SIM)]
+            logR = new - logsumexp(new)
+            al, be, runlen = np.r_[ALPHA0, al + 0.5], np.r_[b0, be + v * v / 2], np.r_[0, runlen + 1]
+            f.update(v)
+            short = runlen < W_SHORT
+            lo_e, lo_c = logsumexp(logR[short]) - logsumexp(logR[~short]), f.short_log_odds()[0]
+            d_mass = max(d_mass, abs(np.exp(logsumexp(logR[short])) - f.short_mass()[0]))
+            d_lo = max(d_lo, abs(lo_e - lo_c))
+            if first_e < 0 and lo_e >= h_alarm:
+                first_e = t
+            if first_c < 0 and lo_c >= h_alarm:
+                first_c = t
+        rows.append(dict(case=case, steps=x.size, max_abs_diff_short_run_probability=d_mass, max_abs_diff_log_odds=d_lo,
+                         alarm_level_log_odds=h_alarm, first_crossing_exact=first_e, first_crossing_capped=first_c))
+    df = pd.DataFrame(rows)
+    df.to_csv(OUT / "e13_bocpd_cap_check.csv", index=False)
+    print(df.to_string())
+
+
+def figure_long_windows():
+    """Rate-matched real-data scores by competitor window length (review round 3)."""
+    import matplotlib
+
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    g = _read(OUT / "e13d_real_long_windows_pooled.csv")
+    g = g[g.band == 0.25]
+    markets = [m for m in ("five Binance coins, Jul to Dec 2025", "five Binance coins, Jan to Jun 2025", "Nifty 50")
+               if m in set(g.market)]
+    fams = [("BOCPD", "BOCPD, {}matched to band 0.25", "#eb6834"),
+            ("BOCPD on truncated returns", "BOCPD on truncated returns, {}matched to band 0.25", "#a83c0c"),
+            ("BJV rolling", "BJV rolling, {}matched to band 0.25", "#7a52c7"),
+            ("BJV rolling, studentised", "BJV rolling, studentised, {}matched to band 0.25", "#c43c8a")]
+    fig, axes = plt.subplots(2, len(markets), figsize=(5.2 * len(markets), 6.4), sharey=True, squeeze=False)
+    for j, mk in enumerate(markets):
+        gm = g[g.market == mk].set_index("method")
+        for i, dn in enumerate(("up", "down")):
+            ax = axes[i, j]
+            ref = gm.loc["e-detector, band 0.25", f"{dn}_rate_day"]
+            ax.axhline(ref, color="#2a78d6", lw=1.5, label="e-detector, band 0.25")
+            ax.axhline(0.5, color="#9a9893", ls="--", lw=0.8)
+            for lab, pat, col in fams:
+                pts = []
+                for m in gm.index:
+                    if not m.startswith(lab + ",") or not m.endswith("matched to band 0.25"):
+                        continue
+                    rest = m[len(lab) + 2 :]
+                    if rest.startswith("matched"):
+                        win = W_SHORT if lab.startswith("BOCPD") else K_ONLINE
+                    elif rest[:2] in ("k=", "w="):
+                        win = int(rest[2:].split(",")[0])
+                    else:
+                        continue
+                    pts.append((win, gm.loc[m, f"{dn}_rate_day"], gm.loc[m, f"{dn}_day_lo"], gm.loc[m, f"{dn}_day_hi"]))
+                pts.sort()
+                if pts:
+                    x, v, lo, hi = map(np.array, zip(*pts))
+                    ax.errorbar(x, v, yerr=np.clip([v - lo, hi - v], 0, None), color=col, marker="o", ms=4, lw=1,
+                                capsize=2, label=lab)
+            ax.set_xscale("log")
+            ticks = [120, 250, 375] if mk == "Nifty 50" else [120, 250, 480, 720, 1440]
+            ax.set_xticks(ticks)
+            ax.set_xticklabels([str(t) for t in ticks], fontsize=7)
+            ax.minorticks_off()
+            ax.set_title(f"{mk}, after {dn} alarms [REAL]", fontsize=8, loc="left")
+            ax.set_xlabel("competitor window (steps, log scale)", fontsize=8)
+            _style(ax)
+        axes[0, j].set_ylim(0.4, 1.0)
+    axes[0, 0].set_ylabel("next day beyond forecast (up: above)")
+    axes[1, 0].set_ylabel("next day beyond forecast (down: below)")
+    axes[0, 0].legend(fontsize=6, frameon=False, loc="lower left")
+    fig.suptitle("Rate-matched validation by competitor window length (Wilson 95%); e-detector as a horizontal line",
+                 fontsize=9, x=0.01, ha="left")
+    fig.tight_layout()
+    fig.savefig(FIG / "e13_real_long_windows.png", dpi=130)
+    plt.close(fig)
 
 
 # ----------------------------------------------------------------------------
@@ -888,19 +1509,23 @@ def figures():
     off = pd.read_csv(OUT / "e13a_offline_power.csv")
     ch = off[off.kind == "change"]
     om = list(ch.method.unique())
-    pal = ["#7a52c7", "#9b7fd8", "#c9b8ec", "#4b2a9a", "#eb6834", "#2a78d6"]
-    fig, axes = plt.subplots(1, 3, figsize=(13, 3.8), sharey=True)
+    pal = {"BJV blocks, k=50, truncated": "#c9b8ec", "BJV overlap, k=50, truncated": "#b9a3e3",
+           "BJV overlap, k=50, plain": "#d8cdf2", "BJV overlap, k=125, truncated": "#9b7fd8",
+           "BJV overlap, k=250, truncated": "#7a52c7", "BJV overlap, k=500, truncated": "#4b2a9a",
+           "BJV overlap, k=50, truncated, studentised": "#c43c8a", "BOCPD, w=250": "#eb6834",
+           "e-detector, plug-in": "#2a78d6", "e-detector, CS baseline": "#1baf7a"}
+    fig, axes = plt.subplots(1, 3, figsize=(15, 3.8), sharey=True)
     for ax, sc in zip(axes, ("gaussian", "jumps", "student t5")):
-        for c_, m in zip(pal, om):
+        for m in om:
             s = ch[(ch.scenario == sc) & (ch.method == m)].sort_values("ratio")
-            ax.plot(np.log(s.ratio), s.reject_matched, marker="o", ms=3, lw=1, color=c_, label=m)
+            ax.plot(np.log(s.ratio), s.reject_matched, marker="o", ms=3, lw=1, color=pal.get(m, "#0b0b0b"), label=m)
         ax.set_xticks(np.log(RATIOS))
         ax.set_xticklabels([str(x) for x in RATIOS], fontsize=7)
         ax.set_title(f"{sc}", fontsize=9, loc="left")
         ax.set_xlabel("sd ratio (log scale)", fontsize=8)
         _style(ax)
     axes[0].set_ylabel("power at 5% size (matched on Gaussian)")
-    axes[0].legend(fontsize=6, frameon=False)
+    axes[2].legend(fontsize=6, frameon=False, loc="center left", bbox_to_anchor=(1.02, 0.5))
     fig.suptitle("Offline test on a 2000-step window, change at step 1000 [SYNTHETIC]", fontsize=9, x=0.01, ha="left")
     fig.tight_layout()
     fig.savefig(FIG / "e13_offline_power.png", dpi=130)
@@ -960,6 +1585,19 @@ def main():
         real_nifty()
     elif cmd == "cost":
         cost()
+    elif cmd == "offline-long":
+        offline_long()
+    elif cmd == "online-long":
+        online_long()
+    elif cmd == "fix-nominal":
+        fix_nominal_sim()
+    elif cmd == "real-long":
+        real_long(sys.argv[2] if len(sys.argv) > 2 else "crypto")
+    elif cmd == "long-pooled":
+        long_pooled()
+        figure_long_windows()
+    elif cmd == "cap-check":
+        cap_check()
     elif cmd == "figures":
         figures()
     else:
