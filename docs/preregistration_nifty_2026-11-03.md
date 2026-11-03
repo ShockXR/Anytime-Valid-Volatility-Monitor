@@ -41,7 +41,7 @@ No setting will be changed after the session, and no other quantity will be adde
 
 The same command with `--dry-run` was run on the session of 2 November 2026 (already in the mirror) before this file was committed, to check the pipeline end to end. Result [REAL]: the monitor was monitoring at the open; one down alarm at 11:42 IST against a baseline scale of 0.00030; the rest of the session had 0.84 times that robust volatility (agreeing with the alarm); the whole session had 0.77 times the baseline at the open; the monitor then recalibrated (750 returns, two sessions) and monitored 39% of the session's minutes. Files: `results/live/dryrun_2026-11-02/`. This check is not part of the pre-registered run.
 
-## Result (added after the session, 3 November 2026, about 12:00 UTC)
+## Result (added after the session, 3 November 2026; run at 11:54 UTC)
 
 *Everything above this heading is unchanged since it was committed before the open.*
 
