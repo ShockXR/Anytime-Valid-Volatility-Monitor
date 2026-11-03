@@ -1,0 +1,63 @@
+family,test,p_original,p_holm,note
+F5,"robust e-detector, 0.0, Binance, Bitstamp",0.001998,0.00799201,"circular-shift p-value, same-direction alarm within 60 minutes"
+F5,"robust e-detector, 0.0, Bitstamp, Binance",0.000999001,0.00799201,"circular-shift p-value, same-direction alarm within 60 minutes"
+F5,"robust e-detector, 0.25, Binance, Bitstamp",0.000999001,0.00799201,"circular-shift p-value, same-direction alarm within 60 minutes"
+F5,"robust e-detector, 0.25, Bitstamp, Binance",0.000999001,0.00799201,"circular-shift p-value, same-direction alarm within 60 minutes"
+F5,"robust e-detector, 0.5, Binance, Bitstamp",0.000999001,0.00799201,"circular-shift p-value, same-direction alarm within 60 minutes"
+F5,"robust e-detector, 0.5, Bitstamp, Binance",0.000999001,0.00799201,"circular-shift p-value, same-direction alarm within 60 minutes"
+F5,"Gaussian LR, 0.0, Binance, Bitstamp",0.000999001,0.00799201,"circular-shift p-value, same-direction alarm within 60 minutes"
+F5,"Gaussian LR, 0.0, Bitstamp, Binance",0.000999001,0.00799201,"circular-shift p-value, same-direction alarm within 60 minutes"
+F10a,"budget, any alarm, all",0.00012418,0.0006209,Fisher exact test
+F10a,"rbi_policy, any alarm, all",0.361081,0.722161,Fisher exact test
+F10a,"election_result, any alarm, all",0.0617281,0.185184,Fisher exact test
+F10a,"covid_window, any alarm, all",0.621366,0.722161,Fisher exact test
+F10a,"expiry, any alarm, all",0.00237489,0.00949955,Fisher exact test
+F10c,"budget, any alarm, monitoring at open",0.00214265,0.0107132,"Fisher exact test, sessions monitoring at the open"
+F10c,"rbi_policy, any alarm, monitoring at open",0.679444,1,"Fisher exact test, sessions monitoring at the open"
+F10c,"election_result, any alarm, monitoring at open",0.171593,0.514779,"Fisher exact test, sessions monitoring at the open"
+F10c,"covid_window, any alarm, monitoring at open",1,1,"Fisher exact test, sessions monitoring at the open"
+F10c,"expiry, any alarm, monitoring at open",0.00226307,0.0107132,"Fisher exact test, sessions monitoring at the open"
+F11,"dev, up, same",3.91587e-09,3.13269e-08,"Fisher exact test, primary configuration"
+F11,"dev, up, next",0.614021,1,"Fisher exact test, primary configuration"
+F11,"dev, down, same",1.36855e-05,9.57983e-05,"Fisher exact test, primary configuration"
+F11,"dev, down, next",0.854187,1,"Fisher exact test, primary configuration"
+F11,"held-out, up, same",0.0615916,0.246366,"Fisher exact test, primary configuration"
+F11,"held-out, up, next",0.799187,1,"Fisher exact test, primary configuration"
+F11,"held-out, down, same",0.000612475,0.00367485,"Fisher exact test, primary configuration"
+F11,"held-out, down, next",0.0356374,0.178187,"Fisher exact test, primary configuration"
+F12a,"BTC, streaming, fomc",0.00012382,0.00024764,pre-registered primary family (Holm as published)
+F12a,"BTC, streaming, cpi",0.109842,0.109842,pre-registered primary family (Holm as published)
+F12b,"ETH, streaming, fomc",0.000166211,0.000498633,replications
+F12b,"ETH, streaming, cpi",0.0031548,0.0031548,replications
+F12b,"SOL, streaming, fomc",0.000458376,0.000916752,replications
+F12b,"SOL, streaming, cpi",3.80306e-05,0.000152122,replications
+F12c,"BTC, fresh calibration, fomc",3.48714e-06,1.74357e-05,secondary design added after the first results
+F12c,"BTC, fresh calibration, cpi",0.000400983,0.000400983,secondary design added after the first results
+F12c,"ETH, fresh calibration, fomc",1.01306e-05,4.05226e-05,secondary design added after the first results
+F12c,"ETH, fresh calibration, cpi",2.13401e-05,6.40202e-05,secondary design added after the first results
+F12c,"SOL, fresh calibration, fomc",6.07314e-07,3.64388e-06,secondary design added after the first results
+F12c,"SOL, fresh calibration, cpi",5.64114e-05,0.000112823,secondary design added after the first results
+F12d,"BTC, streaming, fomc, monitoring at start",1.26878e-05,7.6127e-05,post hoc restriction to releases with the monitor awake
+F12d,"BTC, streaming, cpi, monitoring at start",0.273138,0.273138,post hoc restriction to releases with the monitor awake
+F12d,"ETH, streaming, fomc, monitoring at start",0.000105052,0.000525258,post hoc restriction to releases with the monitor awake
+F12d,"ETH, streaming, cpi, monitoring at start",0.00524932,0.0104986,post hoc restriction to releases with the monitor awake
+F12d,"SOL, streaming, fomc, monitoring at start",0.000355672,0.00106701,post hoc restriction to releases with the monitor awake
+F12d,"SOL, streaming, cpi, monitoring at start",0.00010645,0.000525258,post hoc restriction to releases with the monitor awake
+F13,"BTC, B-lr, cpi",0.00111148,0.0066689,"E14 Q14g, restarted and rank monitors"
+F13,"BTC, B-lr, fomc",0.000846821,0.00592775,"E14 Q14g, restarted and rank monitors"
+F13,"BTC, awake-A, cpi",0.00264011,0.0105604,"E14 Q14g, restarted and rank monitors"
+F13,"BTC, awake-A, fomc",4.02849e-08,7.25128e-07,"E14 Q14g, restarted and rank monitors"
+F13,"BTC, awake-B, cpi",0.000265283,0.00265283,"E14 Q14g, restarted and rank monitors"
+F13,"BTC, awake-B, fomc",2.04268e-07,3.26829e-06,"E14 Q14g, restarted and rank monitors"
+F13,"ETH, B-lr, cpi",0.00353507,0.0105604,"E14 Q14g, restarted and rank monitors"
+F13,"ETH, B-lr, fomc",0.00127224,0.0066689,"E14 Q14g, restarted and rank monitors"
+F13,"ETH, awake-A, cpi",1.88916e-05,0.000245591,"E14 Q14g, restarted and rank monitors"
+F13,"ETH, awake-A, fomc",2.61316e-05,0.000313579,"E14 Q14g, restarted and rank monitors"
+F13,"ETH, awake-B, cpi",0.000388358,0.00349522,"E14 Q14g, restarted and rank monitors"
+F13,"ETH, awake-B, fomc",0.000197345,0.00217079,"E14 Q14g, restarted and rank monitors"
+F13,"SOL, B-lr, cpi",0.00279868,0.0105604,"E14 Q14g, restarted and rank monitors"
+F13,"SOL, B-lr, fomc",4.88978e-06,6.8457e-05,"E14 Q14g, restarted and rank monitors"
+F13,"SOL, awake-A, cpi",0.00593179,0.0105604,"E14 Q14g, restarted and rank monitors"
+F13,"SOL, awake-A, fomc",9.6429e-08,1.63929e-06,"E14 Q14g, restarted and rank monitors"
+F13,"SOL, awake-B, cpi",0.00041628,0.00349522,"E14 Q14g, restarted and rank monitors"
+F13,"SOL, awake-B, fomc",2.26787e-06,3.40181e-05,"E14 Q14g, restarted and rank monitors"

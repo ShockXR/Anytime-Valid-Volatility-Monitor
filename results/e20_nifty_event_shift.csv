@@ -1,0 +1,6 @@
+event_type,event_sessions,with_alarm,shift_mean,shift_q025,shift_q975,p_shift_two_sided,ordinary_with,ordinary_sessions,check_against_e07d,fisher_p_original,p_shift_holm,fisher_p_holm
+budget,11,9,2.84668,0,6,0.000423549,540,2178,True,0.00012418,0.00211775,0.0006209
+rbi_policy,41,13,10.6103,6,16,0.502753,540,2178,True,0.361081,1,0.722161
+election_result,2,2,0.517577,0,2,0.077086,540,2178,True,0.0617281,0.231258,0.185184
+covid_window,21,6,5.43456,3,8,0.748835,540,2178,True,0.621366,1,0.722161
+expiry,110,42,28.4668,20,38,0.00381194,540,2178,True,0.00237489,0.0152478,0.00949955
