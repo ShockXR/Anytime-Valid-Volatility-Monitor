@@ -1,5 +1,7 @@
 # Second referee report on "Anytime-valid detection of volatility changes in high-frequency returns with robust truncation" (revised version)
 
+> *Note added 3 November 2026: the "independent reviewer" or "referee" below was a separate AI agent (Claude, by Anthropic) instructed to act as a sceptical referee. It was not a human expert, and the review has not been confirmed by a human.*
+
 Manuscript read: `paper/short_paper.md` at commit 25806aa (1121 lines; main text about 9,980 words by my count, then Supplement S1 to S9) and the companion note `paper/extensions.md`. First report: `docs/review/referee_report_paper.md` (points M1 to M8 and m1 to m35).
 
 What I did. I read the main text and the supplement in full, and checked every numbered theorem, proposition and corollary against its proof (Supplement S1 to S6, and `docs/theory_per_period.md` and `docs/theory_limits.md` where the paper defers to them). I recomputed the closed-form constants, solved the linear programme behind the randomised collapse delay, and checked 36 reported numbers against the committed CSV files in `results/` or against closed forms. I ran `scripts/trace_numbers.py` (2379 numbers, 0 untraced; the script rewrites the tracked file `results/trace/paper_trace.csv`, which I restored). I could not open arxiv.org or CRAN from my environment and did not try to get around that; claims that depend on those sources are marked as unverified below.

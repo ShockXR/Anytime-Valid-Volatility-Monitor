@@ -1,0 +1,10 @@
+page_h 29.561695098876953
+student_t3 done in 129 s
+gaussian done in 201 s
+student_t5 done in 136 s
+jumps_p1pct_sd8 done in 135 s
+pareto_alpha1.5 done in 127 s
+garch_0.08_0.90 done in 44 s
+garch_0.05_0.90 done in 107 s
+unremoved_seasonality done in 100 s
+EXIT

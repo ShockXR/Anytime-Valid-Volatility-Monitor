@@ -101,7 +101,7 @@ Five candidate directions were scored from 1 (weak) to 10 (strong) on the seven 
 
 | Criterion | Met? |
 |---|---|
-| Every theorem has a complete proof with stated assumptions, checked by an independent reviewer. | Yes for sections 5 and 6 of `docs/math.md` (section 5: review round 1; section 6: review round 2a, no errors found, a few statements sharpened). The delay theory (`docs/theory_delay.md`) and the panel theory (`docs/theory_panel.md`) were checked in review round 2b: no proof step was wrong, but the 73-step decrease floor holds for the default bets only (58 steps for any valid bets), the rounded-price test of c_down was mis-modelled (c_down = 2 is slower for a 20% fall at a tick of 0.5 sd), and the optimality claim was narrowed and credited to Ram and Ramdas (2026); all fixed. The running-truncation theory (`docs/theory_running_tau.md`) is in review round 3. |
+| Every theorem has a complete proof with stated assumptions, checked by an independent AI-agent reviewer (not a human expert). | Yes for sections 5 and 6 of `docs/math.md` (section 5: review round 1; section 6: review round 2a, no errors found, a few statements sharpened). The delay theory (`docs/theory_delay.md`) and the panel theory (`docs/theory_panel.md`) were checked in review round 2b: no proof step was wrong, but the 73-step decrease floor holds for the default bets only (58 steps for any valid bets), the rounded-price test of c_down was mis-modelled (c_down = 2 is slower for a 20% fall at a tick of 0.5 sd), and the optimality claim was narrowed and credited to Ram and Ramdas (2026); all fixed. The running-truncation theory (`docs/theory_running_tau.md`) is in review round 3. |
 | The false alarm rate stays below the proved bound in every null scenario the theorem covers, with Monte Carlo error small enough to see the slack. | Yes (E9: 4000 paths; E8: 10,000 paths). |
 | Every published number we discuss is either reproduced or has a stated, tested hypothesis for why not. | Yes for Tables 5 to 8, with open questions listed (E1, E6). |
 | Real-data alarms beat a random-time control and a forecast, out of sample, on several assets. | Yes (E6, E7); not beyond a hindsight-tuned naive rule (E6e). |
@@ -112,7 +112,7 @@ Five candidate directions were scored from 1 (weak) to 10 (strong) on the seven 
 | Risk | Handling |
 |---|---|
 | Findings about the paper could read as criticism. | Framed as questions about the code, with evidence (`PITCH_BAPAT.md`). The prototype builds on the idea and does not replace it. |
-| Overstated claims. | Independent review round 1 corrected the wording of the impossibility result, the role of the kernel, noise robustness and the strength of the real-data check. |
+| Overstated claims. | AI-agent review round 1 corrected the wording of the impossibility result, the role of the kernel, noise robustness and the strength of the real-data check. |
 | The guarantee needs the true baseline. | Confidence-sequence baseline with a proof (E8); plug-in effect measured (E4e, E10). |
 | Real volatility clusters, so the null is often false. | Stated precisely (`docs/limitations.md`); forecast-relative monitoring (E10). |
 | Data come from third-party mirrors. | Loaders report gaps and duplicates; SHA-256 manifest pins the bytes; cross-venue check BTC Binance against Bitstamp (E6d: 72% of alarms matched within an hour against 3% by chance). |
@@ -120,7 +120,7 @@ Five candidate directions were scored from 1 (weak) to 10 (strong) on the seven 
 
 ## 11. Development roadmap
 
-**Done in rounds 1 to 3.** Everything in sections 3 to 6, about 570 automated tests, experiments E1 to E25, theory work streams TH4 to TH6 (robustness to drift, limits for every valid procedure, per-day guarantees), alternatives ALT1 to ALT6, eleven rounds of independent review (the ninth an audit of the package code, the tenth of the blind-segment guard, the eleventh of the anytime-valid release test) and three referee passes on the paper with responses, a one-command reproduction script (`scripts/reproduce.py`), a short paper draft with a supplement (`paper/`), a release-ready package (version 0.3.0, not released) and a replay page of two landmark days.
+**Done in rounds 1 to 3.** Everything in sections 3 to 6, 581 automated tests, experiments E1 to E25, theory work streams TH4 to TH6 (robustness to drift, limits for every valid procedure, per-day guarantees), alternatives ALT1 to ALT6, eleven rounds of review by separate AI agents (the ninth an audit of the package code, the tenth of the blind-segment guard, the eleventh of the anytime-valid release test) and three AI referee passes on the paper with responses, a one-command reproduction script (`scripts/reproduce.py`), a short paper draft with a supplement (`paper/`), a release-ready package (version 0.3.0, not released) and a replay page of two landmark days.
 
 **Next, after a first meeting with Prof. Bapat (about 2 to 3 weeks).**
 1. Confirm the code conventions (weight normalisation, MAD scaling, simulation σ, the σ_J = 0.10 design, the RMSE definition, the DOGE data) and rerun E1 and E6 with his settings.

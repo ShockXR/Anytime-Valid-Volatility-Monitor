@@ -1,5 +1,7 @@
 # Third referee report on "Anytime-valid detection of volatility changes in high-frequency returns with robust truncation" (second revision)
 
+> *Note added 3 November 2026: the "independent reviewer" or "referee" below was a separate AI agent (Claude, by Anthropic) instructed to act as a sceptical referee. It was not a human expert, and the review has not been confirmed by a human.*
+
 Version reviewed: `paper/short_paper.md` at commit fa46822 (1178 lines), which applies the second report; the paper is unchanged up to 9c5786d. I read `git diff ad02390 fa46822 -- paper/short_paper.md`, the first and second reports, `docs/theory_running_tau.md`, `docs/theory_per_period.md`, `docs/math.md` Section 6, `docs/report_parts/E22.md`, `docs/preregistration_e22.md`, `results/e22_*.csv` and `experiments/e22_guaranteed_events.py`, and, for K1, `docs/preregistration_e23.md` (commit b5c1573), `docs/report_parts/E23.md` and `results/e23_*.csv` (commit cd63941). Line numbers below refer to `paper/short_paper.md` at fa46822. arxiv.org is blocked from my machine; claims that I could not verify for that reason are listed in Section 5.
 
 ## 1. Recommendation

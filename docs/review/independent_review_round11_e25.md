@@ -1,5 +1,7 @@
 # Independent review, round 11: E25 (an anytime-valid version of the forward release test)
 
+> *Note added 3 November 2026: the "independent reviewer" or "referee" below was a separate AI agent (Claude, by Anthropic) instructed to act as a sceptical referee. It was not a human expert, and the review has not been confirmed by a human.*
+
 Reviewer: independent referee, 3 November 2026. Reviewed at HEAD `333b147` (E25 files as of `42207d0`): `docs/preregistration_e25_sequential.md` (with Amendment 1), `docs/theory_sequential_events.md`, `experiments/e25_sequential_events.py`, `tests/test_e25.py`, `docs/report_parts/E25.md`, `docs/iterations/E25.md`, `results/e25_*.csv`, and for context F24a's pre-registration and E12, E22, E23, E24. Every check below was run with scripts in `docs/review/round11_scripts/` (outputs in `docs/review/round11_scripts/outputs/`). The scripts read only committed CSVs, the event files and Binance files already on disk that end at 24 October 2026 23:59 UTC; nothing was downloaded, the October 2026 files are unchanged (modified 3 November 06:37 UTC, last bar 24 October 23:59), and no file outside `docs/review/` was edited.
 
 ## Verdict

@@ -1,5 +1,7 @@
 # Independent review, round 10: E24, the guard against blind segments of the cs baseline
 
+> *Note added 3 November 2026: the "independent reviewer" or "referee" below was a separate AI agent (Claude, by Anthropic) instructed to act as a sceptical referee. It was not a human expert, and the review has not been confirmed by a human.*
+
 Scope: commits `4c294e4`, `09866ec`, `22f1988`, `d83e5f0` and `5df43c8`, reviewed at `95a4ed5` (no file in scope changed after `5df43c8`). Files: `docs/theory_blind_guard.md`, `src/avmonitor/guard.py`, `tests/test_guard.py`, `docs/report_parts/E24.md`, `docs/iterations/E24.md`, `docs/preregistration_e24_future.md`, `data/events/us_macro_events_e24_future.csv`, and the parts of `experiments/e24_blind_guard.py` they rest on. Every number below was recomputed with the scripts in `docs/review/round10_scripts/` (outputs in `docs/review/round10_scripts/outputs/`). Labels: [PROVED] re-derived by hand, [NUMERICAL] exact arithmetic, [SYNTHETIC] simulation, [REAL] recomputed from committed real-data CSVs, [PUBLISHED] official schedules found by web search. No file outside `docs/review/` was edited; fixes are given as replacement text.
 
 ## Recommendation

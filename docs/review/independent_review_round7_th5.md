@@ -1,5 +1,7 @@
 # Independent review, round 7: TH5 (limits for every valid procedure, the plug-in baseline when n, m and A grow together, the decrease bet at its boundary)
 
+> *Note added 3 November 2026: the "independent reviewer" or "referee" below was a separate AI agent (Claude, by Anthropic) instructed to act as a sceptical referee. It was not a human expert, and the review has not been confirmed by a human.*
+
 **Reviewer role.** A sceptical referee for a statistics journal and a code auditor. I did not write any of the files below and did not take their claims on trust: every statement in the scope was re-derived, and the headline numbers were recomputed with my own code where that was cheap.
 
 **Scope.**

@@ -129,13 +129,19 @@ class VolatilityMonitor:
         c_down: float | None = None,
     ):
         self.A = float(threshold)
+        if not self.A > 0:  # also true for NaN; the bound m / A is meaningless otherwise (audit A1-B-001)
+            raise ValueError("threshold must be a positive number (the false alarm bound is m / threshold)")
         self.c = c
+        if not (math.isfinite(c) and c > 0):
+            raise ValueError("c must be a finite positive number")
         # The decrease side may use its own truncation constant (docs/theory_delay.md, 6.3). Each side is an
         # e-detector for its own truncated statistic, so the two-sided guarantee needs only each side's own
         # null; it is proved for a known baseline and for baseline="cs" (docs/math.md, Theorem 6.4).
         self.c_down = float(c) if c_down is None else float(c_down)
-        if self.c_down <= 0:
+        if not self.c_down > 0:
             raise ValueError("c_down must be positive")
+        if int(cal_len) < 2:  # a one-return window gives scale = |r| and a meaningless baseline (audit A1-B-002)
+            raise ValueError("cal_len must be at least 2")
         self.cal_len = cal_len
         self.band = null_band
         self.up_grid = np.asarray(up_grid, float)

@@ -35,3 +35,9 @@ What the prototype does not establish, in one place. Each item says how large th
 * **Delay limits (TH5).** The lower bound on the mean delay of every valid deterministic procedure is for a change at the first monitored step, is estimated by Monte Carlo, and may not be attained, so the e-detectors' ratios to it (1.7 to 2.2) are upper bounds on their inefficiency; a floor after a pre-change history, and the delay cost of the plug-in margin z and of the confidence-sequence baseline, are not derived.
 * One-minute bars only. Tick data, other venues and other asset classes are untested.
 * The risk switch and correlation monitor are minimal prototypes, kept in `alternatives/`, and their results are not claims about trading performance.
+
+## 5. Who has checked what
+
+* **No human expert has reviewed the proofs or the code.** The eleven review rounds and three referee reports in `docs/review/` were written by separate AI agents (Claude) instructed to act as sceptical referees. They found real errors (several were fixed and are logged), but an AI reviewer can share the blind spots of the AI that wrote the files. A human check of the proofs in `docs/math.md` and the `docs/theory_*.md` notes is still needed before any claim is submitted for publication.
+* **Test suite.** 581 tests, all passing, collected and run with `python -m pytest -q` on 3 November 2026 at commit d2e41b6 (OUR CHECK; no data needed). Passing tests show that the code does what the tests say, not that the theory is right.
+* **Number tracing.** `scripts/trace_numbers.py` checks that each number printed in the paper draft, the README and the pitch appears in a committed Markdown report or data file. It cannot tell a right match from a coincidence: a count such as 581 can match an unrelated number elsewhere, so counts and settings are listed here by hand.

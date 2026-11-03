@@ -1,0 +1,235 @@
+law,direction,var_factor,nu,method,paths,detect_rate,det_ci_low,det_ci_high,early_false_alarm,median_delay,q25_delay,q75_delay,valid_level_controlled
+gaussian,increase,1.5,50,e-monitor plugin band0.25 (README),500,0.948,0.9248983617059371,0.9642699800903735,0.0,520.0,329.25,794.5,approximate (plug-in)
+gaussian,increase,1.5,50,e-monitor plugin band0,500,1.0,0.9923753814690964,0.9999999999999999,0.0,130.0,87.0,185.0,approximate (plug-in)
+gaussian,increase,1.5,50,e-monitor cs baseline,500,0.942,0.9179433020026042,0.9593165352160771,0.0,517.0,305.5,758.0,proved (delta + m/A)
+gaussian,increase,1.5,50,Gaussian LR monitor,500,1.0,0.9923753814690964,0.9999999999999999,0.0,111.0,72.75,168.5,only for exactly normal returns
+gaussian,increase,1.5,50,Page CUSUM up (ARL=A on Gaussian),500,0.996,0.9855339859585811,0.9989023924587627,0.004,82.0,48.25,122.0,no finite-sample guarantee
+gaussian,increase,1.5,50,"repeated 60-step z, level tuned to 5%/390 on Gaussian",500,1.0,0.9923753814690964,0.9999999999999999,0.0,78.0,51.0,127.25,not valid (tuned for Gaussian only)
+gaussian,increase,1.5,50,"repeated 60-step z, level 0.05 (naive)",500,1.0,0.9923753814690964,0.9999999999999999,0.0,40.0,21.0,61.0,not valid (certain false alarm)
+gaussian,increase,1.5,400,e-monitor plugin band0.25 (README),500,0.96,0.9390259449029252,0.9739594060486436,0.0,505.5,290.0,819.5,approximate (plug-in)
+gaussian,increase,1.5,400,e-monitor plugin band0,500,0.972,0.9535531794154484,0.9832491806913788,0.028,123.5,75.0,190.0,approximate (plug-in)
+gaussian,increase,1.5,400,e-monitor cs baseline,500,0.948,0.9248983617059371,0.9642699800903735,0.0,483.0,272.25,782.25,proved (delta + m/A)
+gaussian,increase,1.5,400,Gaussian LR monitor,500,0.932,0.9064785429161282,0.9509337866731715,0.068,114.0,66.0,193.0,only for exactly normal returns
+gaussian,increase,1.5,400,Page CUSUM up (ARL=A on Gaussian),500,0.91,0.8816900083946269,0.9320578044100325,0.09,83.0,48.0,141.0,no finite-sample guarantee
+gaussian,increase,1.5,400,"repeated 60-step z, level tuned to 5%/390 on Gaussian",500,0.898,0.8683647750455783,0.9215660286038228,0.102,86.0,52.0,157.0,not valid (tuned for Gaussian only)
+gaussian,increase,1.5,400,"repeated 60-step z, level 0.05 (naive)",500,0.24,0.20463724941868827,0.2793275522173815,0.76,43.0,26.0,66.0,not valid (certain false alarm)
+gaussian,increase,1.5,1500,e-monitor plugin band0.25 (README),500,0.952,0.9295723199393156,0.9675350249087478,0.0,548.5,327.75,862.25,approximate (plug-in)
+gaussian,increase,1.5,1500,e-monitor plugin band0,500,0.79,0.7521544200999409,0.8234233011521351,0.21,127.0,73.5,183.5,approximate (plug-in)
+gaussian,increase,1.5,1500,e-monitor cs baseline,500,0.936,0.9110470662066095,0.954304266434443,0.002,512.0,315.0,846.25,proved (delta + m/A)
+gaussian,increase,1.5,1500,Gaussian LR monitor,500,0.73,0.6894405695613621,0.7670521059144222,0.27,117.0,71.0,186.0,only for exactly normal returns
+gaussian,increase,1.5,1500,Page CUSUM up (ARL=A on Gaussian),500,0.766,0.7269477983375824,0.8009959046039771,0.232,94.0,51.5,155.0,no finite-sample guarantee
+gaussian,increase,1.5,1500,"repeated 60-step z, level tuned to 5%/390 on Gaussian",500,0.73,0.6894405695613621,0.7670521059144222,0.268,93.0,54.0,164.0,not valid (tuned for Gaussian only)
+gaussian,increase,1.5,1500,"repeated 60-step z, level 0.05 (naive)",500,0.004,0.0010976075412372681,0.014466014041418871,0.996,88.0,66.0,110.0,not valid (certain false alarm)
+gaussian,increase,2.0,50,e-monitor plugin band0.25 (README),500,1.0,0.9923753814690964,0.9999999999999999,0.0,110.5,70.75,160.0,approximate (plug-in)
+gaussian,increase,2.0,50,e-monitor plugin band0,500,1.0,0.9923753814690964,0.9999999999999999,0.0,51.0,37.75,70.0,approximate (plug-in)
+gaussian,increase,2.0,50,e-monitor cs baseline,500,1.0,0.9923753814690964,0.9999999999999999,0.0,108.0,70.0,155.25,proved (delta + m/A)
+gaussian,increase,2.0,50,Gaussian LR monitor,500,0.996,0.9855339859585811,0.9989023924587627,0.004,42.0,27.0,63.0,only for exactly normal returns
+gaussian,increase,2.0,50,Page CUSUM up (ARL=A on Gaussian),500,0.994,0.9825094361891064,0.9979574407023611,0.006,34.0,22.0,49.0,no finite-sample guarantee
+gaussian,increase,2.0,50,"repeated 60-step z, level tuned to 5%/390 on Gaussian",500,1.0,0.9923753814690964,0.9999999999999999,0.0,38.0,27.0,50.25,not valid (tuned for Gaussian only)
+gaussian,increase,2.0,50,"repeated 60-step z, level 0.05 (naive)",500,1.0,0.9923753814690964,0.9999999999999999,0.0,21.0,12.0,32.0,not valid (certain false alarm)
+gaussian,increase,2.0,400,e-monitor plugin band0.25 (README),500,1.0,0.9923753814690964,0.9999999999999999,0.0,112.0,77.0,153.25,approximate (plug-in)
+gaussian,increase,2.0,400,e-monitor plugin band0,500,0.986,0.9713865738597492,0.9932022969282127,0.014,53.0,36.0,70.0,approximate (plug-in)
+gaussian,increase,2.0,400,e-monitor cs baseline,500,1.0,0.9923753814690964,0.9999999999999999,0.0,111.0,74.75,155.0,proved (delta + m/A)
+gaussian,increase,2.0,400,Gaussian LR monitor,500,0.94,0.9156384216937552,0.9576519139990498,0.06,43.0,26.0,61.0,only for exactly normal returns
+gaussian,increase,2.0,400,Page CUSUM up (ARL=A on Gaussian),500,0.92,0.8928931229079627,0.9407021975260784,0.08,33.0,22.0,49.0,no finite-sample guarantee
+gaussian,increase,2.0,400,"repeated 60-step z, level tuned to 5%/390 on Gaussian",500,0.912,0.8839229514479334,0.9337943628826022,0.088,39.0,26.0,50.0,not valid (tuned for Gaussian only)
+gaussian,increase,2.0,400,"repeated 60-step z, level 0.05 (naive)",500,0.228,0.19338117351570927,0.2667666189651022,0.772,23.0,14.0,35.0,not valid (certain false alarm)
+gaussian,increase,2.0,1500,e-monitor plugin band0.25 (README),500,1.0,0.9923753814690964,0.9999999999999999,0.0,117.0,77.0,166.0,approximate (plug-in)
+gaussian,increase,2.0,1500,e-monitor plugin band0,500,0.784,0.7458363816926995,0.8178328349817475,0.216,50.0,35.0,71.0,approximate (plug-in)
+gaussian,increase,2.0,1500,e-monitor cs baseline,500,1.0,0.9923753814690964,0.9999999999999999,0.0,113.0,75.0,163.25,proved (delta + m/A)
+gaussian,increase,2.0,1500,Gaussian LR monitor,500,0.73,0.6894405695613621,0.7670521059144222,0.27,42.0,26.0,66.0,only for exactly normal returns
+gaussian,increase,2.0,1500,Page CUSUM up (ARL=A on Gaussian),500,0.726,0.6852936486809578,0.7632600237430738,0.274,37.0,24.0,53.0,no finite-sample guarantee
+gaussian,increase,2.0,1500,"repeated 60-step z, level tuned to 5%/390 on Gaussian",500,0.732,0.6915155074925284,0.7689466695091324,0.268,40.0,28.25,55.0,not valid (tuned for Gaussian only)
+gaussian,increase,2.0,1500,"repeated 60-step z, level 0.05 (naive)",500,0.004,0.0010976075412372681,0.014466014041418871,0.996,73.5,61.75,85.25,not valid (certain false alarm)
+gaussian,increase,3.0,50,e-monitor plugin band0.25 (README),500,1.0,0.9923753814690964,0.9999999999999999,0.0,42.0,31.0,58.0,approximate (plug-in)
+gaussian,increase,3.0,50,e-monitor plugin band0,500,1.0,0.9923753814690964,0.9999999999999999,0.0,27.0,20.0,37.0,approximate (plug-in)
+gaussian,increase,3.0,50,e-monitor cs baseline,500,1.0,0.9923753814690964,0.9999999999999999,0.0,41.0,30.75,58.0,proved (delta + m/A)
+gaussian,increase,3.0,50,Gaussian LR monitor,500,0.998,0.9887590072528046,0.9996468726904154,0.002,17.0,11.0,27.0,only for exactly normal returns
+gaussian,increase,3.0,50,Page CUSUM up (ARL=A on Gaussian),500,0.998,0.9887590072528046,0.9996468726904154,0.002,15.0,11.0,24.0,no finite-sample guarantee
+gaussian,increase,3.0,50,"repeated 60-step z, level tuned to 5%/390 on Gaussian",500,1.0,0.9923753814690964,0.9999999999999999,0.0,20.0,14.0,28.0,not valid (tuned for Gaussian only)
+gaussian,increase,3.0,50,"repeated 60-step z, level 0.05 (naive)",500,1.0,0.9923753814690964,0.9999999999999999,0.0,12.0,10.0,19.0,not valid (certain false alarm)
+gaussian,increase,3.0,400,e-monitor plugin band0.25 (README),500,1.0,0.9923753814690964,0.9999999999999999,0.0,41.0,30.0,55.0,approximate (plug-in)
+gaussian,increase,3.0,400,e-monitor plugin band0,500,0.98,0.9635794314459021,0.9891009347644306,0.02,25.0,19.0,34.0,approximate (plug-in)
+gaussian,increase,3.0,400,e-monitor cs baseline,500,1.0,0.9923753814690964,0.9999999999999999,0.0,41.0,29.0,55.0,proved (delta + m/A)
+gaussian,increase,3.0,400,Gaussian LR monitor,500,0.952,0.9295723199393156,0.9675350249087478,0.048,17.0,9.75,25.0,only for exactly normal returns
+gaussian,increase,3.0,400,Page CUSUM up (ARL=A on Gaussian),500,0.916,0.8884001169044927,0.9372562004777957,0.084,16.0,9.0,23.0,no finite-sample guarantee
+gaussian,increase,3.0,400,"repeated 60-step z, level tuned to 5%/390 on Gaussian",500,0.928,0.9019310525910869,0.9475422739464601,0.072,20.0,13.0,27.0,not valid (tuned for Gaussian only)
+gaussian,increase,3.0,400,"repeated 60-step z, level 0.05 (naive)",500,0.24,0.20463724941868827,0.2793275522173815,0.76,12.0,8.0,17.0,not valid (certain false alarm)
+gaussian,increase,3.0,1500,e-monitor plugin band0.25 (README),500,1.0,0.9923753814690964,0.9999999999999999,0.0,42.0,31.0,56.0,approximate (plug-in)
+gaussian,increase,3.0,1500,e-monitor plugin band0,500,0.808,0.7711789076945584,0.8401243272904052,0.192,27.0,18.0,34.0,approximate (plug-in)
+gaussian,increase,3.0,1500,e-monitor cs baseline,500,0.998,0.9887590072528046,0.9996468726904154,0.002,42.0,31.0,57.0,proved (delta + m/A)
+gaussian,increase,3.0,1500,Gaussian LR monitor,500,0.758,0.7185828923419191,0.7934828044961348,0.242,18.0,11.0,26.0,only for exactly normal returns
+gaussian,increase,3.0,1500,Page CUSUM up (ARL=A on Gaussian),500,0.76,0.7206724477826185,0.7953627505813117,0.24,17.0,11.0,24.0,no finite-sample guarantee
+gaussian,increase,3.0,1500,"repeated 60-step z, level tuned to 5%/390 on Gaussian",500,0.744,0.7039862648123214,0.7802929213445977,0.256,20.5,15.0,29.0,not valid (tuned for Gaussian only)
+gaussian,increase,3.0,1500,"repeated 60-step z, level 0.05 (naive)",500,0.004,0.0010976075412372681,0.014466014041418871,0.996,9.0,7.0,11.0,not valid (certain false alarm)
+gaussian,decrease,0.6667,50,e-monitor plugin band0.25 (README),500,0.782,0.7437328590676937,0.8159668560808768,0.0,920.0,612.5,1309.5,approximate (plug-in)
+gaussian,decrease,0.6667,50,e-monitor plugin band0,500,1.0,0.9923753814690964,0.9999999999999999,0.0,210.0,170.0,253.25,approximate (plug-in)
+gaussian,decrease,0.6667,50,e-monitor cs baseline,500,0.986,0.9713865738597492,0.9932022969282127,0.0,475.0,354.0,680.0,proved (delta + m/A)
+gaussian,decrease,0.6667,50,Gaussian LR monitor,500,0.998,0.9887590072528046,0.9996468726904154,0.002,138.0,91.0,224.0,only for exactly normal returns
+gaussian,decrease,0.6667,50,"repeated 60-step z, level tuned to 5%/390 on Gaussian",500,0.424,0.38142335182762455,0.46773559018907274,0.0,765.5,436.75,1241.5,not valid (tuned for Gaussian only)
+gaussian,decrease,0.6667,50,"repeated 60-step z, level 0.05 (naive)",500,1.0,0.9923753814690964,0.9999999999999999,0.0,53.0,36.0,83.0,not valid (certain false alarm)
+gaussian,decrease,0.6667,400,e-monitor plugin band0.25 (README),500,0.774,0.7353308968855181,0.8084908121595469,0.0,883.0,600.0,1217.0,approximate (plug-in)
+gaussian,decrease,0.6667,400,e-monitor plugin band0,500,0.98,0.9635794314459021,0.9891009347644306,0.02,176.0,137.25,229.0,approximate (plug-in)
+gaussian,decrease,0.6667,400,e-monitor cs baseline,500,0.984,0.9687485245822888,0.9918708446797967,0.0,459.0,318.75,656.0,proved (delta + m/A)
+gaussian,decrease,0.6667,400,Gaussian LR monitor,500,0.938,0.9133397667805389,0.9559810673863897,0.06,138.0,90.0,211.0,only for exactly normal returns
+gaussian,decrease,0.6667,400,"repeated 60-step z, level tuned to 5%/390 on Gaussian",500,0.402,0.35992798652483676,0.4455664387072203,0.1,915.0,361.0,1375.0,not valid (tuned for Gaussian only)
+gaussian,decrease,0.6667,400,"repeated 60-step z, level 0.05 (naive)",500,0.242,0.20651719550386513,0.28141710765808103,0.758,52.0,38.0,75.0,not valid (certain false alarm)
+gaussian,decrease,0.6667,1500,e-monitor plugin band0.25 (README),500,0.77,0.7311370330150648,0.8047456729782474,0.0,874.0,579.0,1170.0,approximate (plug-in)
+gaussian,decrease,0.6667,1500,e-monitor plugin band0,500,0.818,0.7817966571116197,0.8493540855027257,0.182,169.0,123.0,218.0,approximate (plug-in)
+gaussian,decrease,0.6667,1500,e-monitor cs baseline,500,0.978,0.9610387448516022,0.9876721198328542,0.002,451.0,323.0,617.0,proved (delta + m/A)
+gaussian,decrease,0.6667,1500,Gaussian LR monitor,500,0.74,0.6998252722118725,0.7765149108932938,0.26,142.5,96.25,207.0,only for exactly normal returns
+gaussian,decrease,0.6667,1500,"repeated 60-step z, level tuned to 5%/390 on Gaussian",500,0.342,0.3017647943001571,0.3846445851556084,0.304,780.0,408.5,1261.0,not valid (tuned for Gaussian only)
+gaussian,decrease,0.6667,1500,"repeated 60-step z, level 0.05 (naive)",500,0.0,0.0,0.007624618530903363,1.0,,,,not valid (certain false alarm)
+gaussian,decrease,0.5,50,e-monitor plugin band0.25 (README),500,1.0,0.9923753814690964,0.9999999999999999,0.0,266.5,233.0,310.0,approximate (plug-in)
+gaussian,decrease,0.5,50,e-monitor plugin band0,500,1.0,0.9923753814690964,0.9999999999999999,0.0,128.0,113.0,146.0,approximate (plug-in)
+gaussian,decrease,0.5,50,e-monitor cs baseline,500,1.0,0.9923753814690964,0.9999999999999999,0.0,206.0,173.75,241.25,proved (delta + m/A)
+gaussian,decrease,0.5,50,Gaussian LR monitor,500,0.998,0.9887590072528046,0.9996468726904154,0.002,64.0,47.0,84.0,only for exactly normal returns
+gaussian,decrease,0.5,50,"repeated 60-step z, level tuned to 5%/390 on Gaussian",500,0.988,0.9740692922810136,0.9944890800328247,0.0,193.0,91.5,346.75,not valid (tuned for Gaussian only)
+gaussian,decrease,0.5,50,"repeated 60-step z, level 0.05 (naive)",500,1.0,0.9923753814690964,0.9999999999999999,0.0,40.0,27.0,49.0,not valid (certain false alarm)
+gaussian,decrease,0.5,400,e-monitor plugin band0.25 (README),500,1.0,0.9923753814690964,0.9999999999999999,0.0,267.0,229.75,309.0,approximate (plug-in)
+gaussian,decrease,0.5,400,e-monitor plugin band0,500,0.984,0.9687485245822888,0.9918708446797967,0.016,114.0,93.0,131.25,approximate (plug-in)
+gaussian,decrease,0.5,400,e-monitor cs baseline,500,1.0,0.9923753814690964,0.9999999999999999,0.0,196.5,164.75,231.0,proved (delta + m/A)
+gaussian,decrease,0.5,400,Gaussian LR monitor,500,0.924,0.8974030342199025,0.9441312892658914,0.076,66.0,50.0,84.0,only for exactly normal returns
+gaussian,decrease,0.5,400,"repeated 60-step z, level tuned to 5%/390 on Gaussian",500,0.908,0.8794606777802376,0.9303176334985452,0.09,178.0,96.25,362.25,not valid (tuned for Gaussian only)
+gaussian,decrease,0.5,400,"repeated 60-step z, level 0.05 (naive)",500,0.234,0.19900409539602293,0.27305220166241767,0.766,37.0,26.0,48.0,not valid (certain false alarm)
+gaussian,decrease,0.5,1500,e-monitor plugin band0.25 (README),500,1.0,0.9923753814690964,0.9999999999999999,0.0,261.0,223.0,309.25,approximate (plug-in)
+gaussian,decrease,0.5,1500,e-monitor plugin band0,500,0.788,0.7500471496065019,0.8215610701196979,0.212,109.0,87.25,125.0,approximate (plug-in)
+gaussian,decrease,0.5,1500,e-monitor cs baseline,500,1.0,0.9923753814690964,0.9999999999999999,0.0,190.0,160.0,228.25,proved (delta + m/A)
+gaussian,decrease,0.5,1500,Gaussian LR monitor,500,0.782,0.7437328590676937,0.8159668560808768,0.218,59.0,45.0,80.0,only for exactly normal returns
+gaussian,decrease,0.5,1500,"repeated 60-step z, level tuned to 5%/390 on Gaussian",500,0.73,0.6894405695613621,0.7670521059144222,0.268,154.0,84.0,286.0,not valid (tuned for Gaussian only)
+gaussian,decrease,0.5,1500,"repeated 60-step z, level 0.05 (naive)",500,0.0,0.0,0.007624618530903363,1.0,,,,not valid (certain false alarm)
+gaussian,decrease,0.3333,50,e-monitor plugin band0.25 (README),500,1.0,0.9923753814690964,0.9999999999999999,0.0,158.5,146.0,171.0,approximate (plug-in)
+gaussian,decrease,0.3333,50,e-monitor plugin band0,500,1.0,0.9923753814690964,0.9999999999999999,0.0,95.0,86.0,103.0,approximate (plug-in)
+gaussian,decrease,0.3333,50,e-monitor cs baseline,500,1.0,0.9923753814690964,0.9999999999999999,0.0,131.0,115.0,149.0,proved (delta + m/A)
+gaussian,decrease,0.3333,50,Gaussian LR monitor,500,1.0,0.9923753814690964,0.9999999999999999,0.0,33.5,26.0,43.0,only for exactly normal returns
+gaussian,decrease,0.3333,50,"repeated 60-step z, level tuned to 5%/390 on Gaussian",500,1.0,0.9923753814690964,0.9999999999999999,0.0,56.0,50.0,60.0,not valid (tuned for Gaussian only)
+gaussian,decrease,0.3333,50,"repeated 60-step z, level 0.05 (naive)",500,1.0,0.9923753814690964,0.9999999999999999,0.0,30.0,21.0,38.0,not valid (certain false alarm)
+gaussian,decrease,0.3333,400,e-monitor plugin band0.25 (README),500,1.0,0.9923753814690964,0.9999999999999999,0.0,154.0,141.0,165.25,approximate (plug-in)
+gaussian,decrease,0.3333,400,e-monitor plugin band0,500,0.974,0.9560280989556288,0.9847437626770749,0.026,82.0,70.0,93.0,approximate (plug-in)
+gaussian,decrease,0.3333,400,e-monitor cs baseline,500,1.0,0.9923753814690964,0.9999999999999999,0.0,126.0,111.0,143.0,proved (delta + m/A)
+gaussian,decrease,0.3333,400,Gaussian LR monitor,500,0.928,0.9019310525910869,0.9475422739464601,0.072,35.0,26.0,44.0,only for exactly normal returns
+gaussian,decrease,0.3333,400,"repeated 60-step z, level tuned to 5%/390 on Gaussian",500,0.908,0.8794606777802376,0.9303176334985452,0.092,56.0,50.0,60.0,not valid (tuned for Gaussian only)
+gaussian,decrease,0.3333,400,"repeated 60-step z, level 0.05 (naive)",500,0.24,0.20463724941868827,0.2793275522173815,0.76,33.0,24.0,40.0,not valid (certain false alarm)
+gaussian,decrease,0.3333,1500,e-monitor plugin band0.25 (README),500,1.0,0.9923753814690964,0.9999999999999999,0.0,154.0,143.0,168.0,approximate (plug-in)
+gaussian,decrease,0.3333,1500,e-monitor plugin band0,500,0.798,0.7605963875890438,0.8308593397665378,0.202,80.0,66.0,92.0,approximate (plug-in)
+gaussian,decrease,0.3333,1500,e-monitor cs baseline,500,1.0,0.9923753814690964,0.9999999999999999,0.0,124.0,110.0,144.25,proved (delta + m/A)
+gaussian,decrease,0.3333,1500,Gaussian LR monitor,500,0.764,0.7248548911970089,0.7991193102186741,0.236,34.0,27.0,44.0,only for exactly normal returns
+gaussian,decrease,0.3333,1500,"repeated 60-step z, level tuned to 5%/390 on Gaussian",500,0.738,0.6977463146741062,0.7746243669051839,0.262,56.0,50.0,60.0,not valid (tuned for Gaussian only)
+gaussian,decrease,0.3333,1500,"repeated 60-step z, level 0.05 (naive)",500,0.006,0.002042559297638913,0.017490563810893606,0.994,25.0,22.0,28.5,not valid (certain false alarm)
+jumps_p0.5pct_sd8,increase,1.5,50,e-monitor plugin band0.25 (README),500,0.938,0.9133397667805389,0.9559810673863897,0.0,590.0,368.0,916.0,approximate (plug-in)
+jumps_p0.5pct_sd8,increase,1.5,50,e-monitor plugin band0,500,1.0,0.9923753814690964,0.9999999999999999,0.0,133.0,88.75,207.0,approximate (plug-in)
+jumps_p0.5pct_sd8,increase,1.5,50,e-monitor cs baseline,500,0.916,0.8884001169044927,0.9372562004777957,0.0,560.5,354.0,886.75,proved (delta + m/A)
+jumps_p0.5pct_sd8,increase,1.5,50,Gaussian LR monitor,500,0.89,0.8595438141340721,0.9145089834118234,0.11,88.0,50.0,139.0,only for exactly normal returns
+jumps_p0.5pct_sd8,increase,1.5,50,Page CUSUM up (ARL=A on Gaussian),500,0.896,0.8661551236448682,0.9198061784786563,0.104,62.0,38.0,102.0,no finite-sample guarantee
+jumps_p0.5pct_sd8,increase,1.5,50,"repeated 60-step z, level tuned to 5%/390 on Gaussian",500,1.0,0.9923753814690964,0.9999999999999999,0.0,57.5,31.0,97.0,not valid (tuned for Gaussian only)
+jumps_p0.5pct_sd8,increase,1.5,50,"repeated 60-step z, level 0.05 (naive)",500,1.0,0.9923753814690964,0.9999999999999999,0.0,30.0,12.0,47.0,not valid (certain false alarm)
+jumps_p0.5pct_sd8,increase,1.5,400,e-monitor plugin band0.25 (README),500,0.922,0.8951458937794419,0.9424189281804758,0.0,569.0,311.0,846.0,approximate (plug-in)
+jumps_p0.5pct_sd8,increase,1.5,400,e-monitor plugin band0,500,0.98,0.9635794314459021,0.9891009347644306,0.02,128.0,83.0,191.0,approximate (plug-in)
+jumps_p0.5pct_sd8,increase,1.5,400,e-monitor cs baseline,500,0.914,0.8861596159077154,0.9355271999486967,0.0,564.0,313.0,876.0,proved (delta + m/A)
+jumps_p0.5pct_sd8,increase,1.5,400,Gaussian LR monitor,500,0.324,0.2844545847826361,0.3662292809402419,0.676,90.5,48.0,147.0,only for exactly normal returns
+jumps_p0.5pct_sd8,increase,1.5,400,Page CUSUM up (ARL=A on Gaussian),500,0.314,0.2748671671994545,0.35596919089404155,0.686,65.0,34.0,114.0,no finite-sample guarantee
+jumps_p0.5pct_sd8,increase,1.5,400,"repeated 60-step z, level tuned to 5%/390 on Gaussian",500,0.344,0.3036922516120669,0.3866866293695749,0.656,64.5,36.0,120.0,not valid (tuned for Gaussian only)
+jumps_p0.5pct_sd8,increase,1.5,400,"repeated 60-step z, level 0.05 (naive)",500,0.074,0.05416087387750307,0.10033530111082659,0.926,44.0,23.0,58.0,not valid (certain false alarm)
+jumps_p0.5pct_sd8,increase,1.5,1500,e-monitor plugin band0.25 (README),500,0.926,0.8996646988891734,0.945839126122497,0.0,582.0,331.5,927.5,approximate (plug-in)
+jumps_p0.5pct_sd8,increase,1.5,1500,e-monitor plugin band0,500,0.78,0.7416305610182787,0.8140996526044155,0.22,122.0,81.25,190.75,approximate (plug-in)
+jumps_p0.5pct_sd8,increase,1.5,1500,e-monitor cs baseline,500,0.912,0.8839229514479334,0.9337943628826022,0.0,567.0,292.25,909.25,proved (delta + m/A)
+jumps_p0.5pct_sd8,increase,1.5,1500,Gaussian LR monitor,500,0.012,0.0055109199671753584,0.025930707718986326,0.988,60.0,31.75,80.75,only for exactly normal returns
+jumps_p0.5pct_sd8,increase,1.5,1500,Page CUSUM up (ARL=A on Gaussian),500,0.016,0.008129155320203278,0.03125147541771118,0.984,49.5,19.25,59.25,no finite-sample guarantee
+jumps_p0.5pct_sd8,increase,1.5,1500,"repeated 60-step z, level tuned to 5%/390 on Gaussian",500,0.018,0.009498085051756854,0.03385204721203399,0.982,50.0,29.0,67.0,not valid (tuned for Gaussian only)
+jumps_p0.5pct_sd8,increase,1.5,1500,"repeated 60-step z, level 0.05 (naive)",500,0.0,0.0,0.007624618530903363,1.0,,,,not valid (certain false alarm)
+jumps_p0.5pct_sd8,increase,2.0,50,e-monitor plugin band0.25 (README),500,1.0,0.9923753814690964,0.9999999999999999,0.0,118.0,77.0,179.25,approximate (plug-in)
+jumps_p0.5pct_sd8,increase,2.0,50,e-monitor plugin band0,500,1.0,0.9923753814690964,0.9999999999999999,0.0,56.0,36.75,77.25,approximate (plug-in)
+jumps_p0.5pct_sd8,increase,2.0,50,e-monitor cs baseline,500,1.0,0.9923753814690964,0.9999999999999999,0.0,120.5,76.0,180.0,proved (delta + m/A)
+jumps_p0.5pct_sd8,increase,2.0,50,Gaussian LR monitor,500,0.872,0.8398536717738025,0.8984736120392054,0.128,37.5,22.0,61.0,only for exactly normal returns
+jumps_p0.5pct_sd8,increase,2.0,50,Page CUSUM up (ARL=A on Gaussian),500,0.868,0.8355045607103054,0.8948837200509497,0.132,30.0,18.0,47.0,no finite-sample guarantee
+jumps_p0.5pct_sd8,increase,2.0,50,"repeated 60-step z, level tuned to 5%/390 on Gaussian",500,1.0,0.9923753814690964,0.9999999999999999,0.0,30.5,16.0,47.0,not valid (tuned for Gaussian only)
+jumps_p0.5pct_sd8,increase,2.0,50,"repeated 60-step z, level 0.05 (naive)",500,1.0,0.9923753814690964,0.9999999999999999,0.0,16.0,10.0,30.0,not valid (certain false alarm)
+jumps_p0.5pct_sd8,increase,2.0,400,e-monitor plugin band0.25 (README),500,1.0,0.9923753814690964,0.9999999999999999,0.0,114.0,75.75,169.25,approximate (plug-in)
+jumps_p0.5pct_sd8,increase,2.0,400,e-monitor plugin band0,500,0.984,0.9687485245822888,0.9918708446797967,0.016,51.0,35.75,71.0,approximate (plug-in)
+jumps_p0.5pct_sd8,increase,2.0,400,e-monitor cs baseline,500,1.0,0.9923753814690964,0.9999999999999999,0.0,115.0,75.0,169.75,proved (delta + m/A)
+jumps_p0.5pct_sd8,increase,2.0,400,Gaussian LR monitor,500,0.31,0.27103822626974466,0.3518591287719986,0.69,35.0,18.5,53.5,only for exactly normal returns
+jumps_p0.5pct_sd8,increase,2.0,400,Page CUSUM up (ARL=A on Gaussian),500,0.3,0.26148125649400616,0.3415685909183552,0.7,32.0,17.0,44.0,no finite-sample guarantee
+jumps_p0.5pct_sd8,increase,2.0,400,"repeated 60-step z, level tuned to 5%/390 on Gaussian",500,0.322,0.28253539670832967,0.3641789674886719,0.678,35.0,22.0,48.0,not valid (tuned for Gaussian only)
+jumps_p0.5pct_sd8,increase,2.0,400,"repeated 60-step z, level 0.05 (naive)",500,0.054,0.03737409848513375,0.07742706124443205,0.946,20.0,14.5,32.5,not valid (certain false alarm)
+jumps_p0.5pct_sd8,increase,2.0,1500,e-monitor plugin band0.25 (README),500,1.0,0.9923753814690964,0.9999999999999999,0.0,121.0,81.75,174.0,approximate (plug-in)
+jumps_p0.5pct_sd8,increase,2.0,1500,e-monitor plugin band0,500,0.792,0.7542629655971269,0.8252842571808257,0.208,52.0,36.0,73.25,approximate (plug-in)
+jumps_p0.5pct_sd8,increase,2.0,1500,e-monitor cs baseline,500,1.0,0.9923753814690964,0.9999999999999999,0.0,121.5,81.0,170.0,proved (delta + m/A)
+jumps_p0.5pct_sd8,increase,2.0,1500,Gaussian LR monitor,500,0.012,0.0055109199671753584,0.025930707718986326,0.988,41.5,30.5,48.0,only for exactly normal returns
+jumps_p0.5pct_sd8,increase,2.0,1500,Page CUSUM up (ARL=A on Gaussian),500,0.012,0.0055109199671753584,0.025930707718986326,0.988,30.0,26.0,43.0,no finite-sample guarantee
+jumps_p0.5pct_sd8,increase,2.0,1500,"repeated 60-step z, level tuned to 5%/390 on Gaussian",500,0.016,0.008129155320203278,0.03125147541771118,0.984,40.5,32.5,50.25,not valid (tuned for Gaussian only)
+jumps_p0.5pct_sd8,increase,2.0,1500,"repeated 60-step z, level 0.05 (naive)",500,0.0,0.0,0.007624618530903363,1.0,,,,not valid (certain false alarm)
+jumps_p0.5pct_sd8,increase,3.0,50,e-monitor plugin band0.25 (README),500,1.0,0.9923753814690964,0.9999999999999999,0.0,45.0,32.0,60.25,approximate (plug-in)
+jumps_p0.5pct_sd8,increase,3.0,50,e-monitor plugin band0,500,1.0,0.9923753814690964,0.9999999999999999,0.0,28.0,20.0,37.25,approximate (plug-in)
+jumps_p0.5pct_sd8,increase,3.0,50,e-monitor cs baseline,500,1.0,0.9923753814690964,0.9999999999999999,0.0,45.0,33.0,62.0,proved (delta + m/A)
+jumps_p0.5pct_sd8,increase,3.0,50,Gaussian LR monitor,500,0.872,0.8398536717738025,0.8984736120392054,0.128,17.0,10.0,25.0,only for exactly normal returns
+jumps_p0.5pct_sd8,increase,3.0,50,Page CUSUM up (ARL=A on Gaussian),500,0.87,0.8376779926652986,0.8966797896218328,0.13,16.0,10.0,22.0,no finite-sample guarantee
+jumps_p0.5pct_sd8,increase,3.0,50,"repeated 60-step z, level tuned to 5%/390 on Gaussian",500,1.0,0.9923753814690964,0.9999999999999999,0.0,17.0,10.0,25.0,not valid (tuned for Gaussian only)
+jumps_p0.5pct_sd8,increase,3.0,50,"repeated 60-step z, level 0.05 (naive)",500,1.0,0.9923753814690964,0.9999999999999999,0.0,10.0,10.0,17.0,not valid (certain false alarm)
+jumps_p0.5pct_sd8,increase,3.0,400,e-monitor plugin band0.25 (README),500,1.0,0.9923753814690964,0.9999999999999999,0.0,44.0,33.0,60.0,approximate (plug-in)
+jumps_p0.5pct_sd8,increase,3.0,400,e-monitor plugin band0,500,0.978,0.9610387448516022,0.9876721198328542,0.022,28.0,19.0,36.0,approximate (plug-in)
+jumps_p0.5pct_sd8,increase,3.0,400,e-monitor cs baseline,500,1.0,0.9923753814690964,0.9999999999999999,0.0,44.0,33.0,61.0,proved (delta + m/A)
+jumps_p0.5pct_sd8,increase,3.0,400,Gaussian LR monitor,500,0.304,0.2653013836201453,0.3456874668439688,0.696,17.0,9.75,26.0,only for exactly normal returns
+jumps_p0.5pct_sd8,increase,3.0,400,Page CUSUM up (ARL=A on Gaussian),500,0.296,0.2576647234385832,0.33744612092202536,0.704,16.0,9.0,23.0,no finite-sample guarantee
+jumps_p0.5pct_sd8,increase,3.0,400,"repeated 60-step z, level tuned to 5%/390 on Gaussian",500,0.318,0.2786995689688668,0.360075792176382,0.682,19.0,12.0,28.0,not valid (tuned for Gaussian only)
+jumps_p0.5pct_sd8,increase,3.0,400,"repeated 60-step z, level 0.05 (naive)",500,0.082,0.06101875732494105,0.10935542376689417,0.918,10.0,6.0,15.0,not valid (certain false alarm)
+jumps_p0.5pct_sd8,increase,3.0,1500,e-monitor plugin band0.25 (README),500,1.0,0.9923753814690964,0.9999999999999999,0.0,44.0,33.0,58.0,approximate (plug-in)
+jumps_p0.5pct_sd8,increase,3.0,1500,e-monitor plugin band0,500,0.788,0.7500471496065019,0.8215610701196979,0.212,26.0,20.0,36.0,approximate (plug-in)
+jumps_p0.5pct_sd8,increase,3.0,1500,e-monitor cs baseline,500,1.0,0.9923753814690964,0.9999999999999999,0.0,44.0,33.0,58.0,proved (delta + m/A)
+jumps_p0.5pct_sd8,increase,3.0,1500,Gaussian LR monitor,500,0.018,0.009498085051756854,0.03385204721203399,0.982,19.0,9.0,25.0,only for exactly normal returns
+jumps_p0.5pct_sd8,increase,3.0,1500,Page CUSUM up (ARL=A on Gaussian),500,0.016,0.008129155320203278,0.03125147541771118,0.984,21.0,11.5,27.0,no finite-sample guarantee
+jumps_p0.5pct_sd8,increase,3.0,1500,"repeated 60-step z, level tuned to 5%/390 on Gaussian",500,0.018,0.009498085051756854,0.03385204721203399,0.982,19.0,15.0,33.0,not valid (tuned for Gaussian only)
+jumps_p0.5pct_sd8,increase,3.0,1500,"repeated 60-step z, level 0.05 (naive)",500,0.0,0.0,0.007624618530903363,1.0,,,,not valid (certain false alarm)
+jumps_p0.5pct_sd8,decrease,0.6667,50,e-monitor plugin band0.25 (README),500,0.608,0.5645397124401949,0.6498133699571299,0.0,939.0,618.75,1405.75,approximate (plug-in)
+jumps_p0.5pct_sd8,decrease,0.6667,50,e-monitor plugin band0,500,1.0,0.9923753814690964,0.9999999999999999,0.0,224.5,171.0,314.0,approximate (plug-in)
+jumps_p0.5pct_sd8,decrease,0.6667,50,e-monitor cs baseline,500,0.942,0.9179433020026042,0.9593165352160771,0.0,599.0,382.5,892.5,proved (delta + m/A)
+jumps_p0.5pct_sd8,decrease,0.6667,50,Gaussian LR monitor,500,0.884,0.8529575380244137,0.9091867549438526,0.116,107.5,59.0,175.75,only for exactly normal returns
+jumps_p0.5pct_sd8,decrease,0.6667,50,"repeated 60-step z, level tuned to 5%/390 on Gaussian",500,0.992,0.9796126401630988,0.9968847352024922,0.0,262.5,84.25,557.75,not valid (tuned for Gaussian only)
+jumps_p0.5pct_sd8,decrease,0.6667,50,"repeated 60-step z, level 0.05 (naive)",500,1.0,0.9923753814690964,0.9999999999999999,0.0,46.0,19.0,69.25,not valid (certain false alarm)
+jumps_p0.5pct_sd8,decrease,0.6667,400,e-monitor plugin band0.25 (README),500,0.666,0.6235317332195806,0.7059368934281597,0.0,963.0,638.0,1371.0,approximate (plug-in)
+jumps_p0.5pct_sd8,decrease,0.6667,400,e-monitor plugin band0,500,0.982,0.9661479527879661,0.9905019149482431,0.018,191.0,146.0,259.5,approximate (plug-in)
+jumps_p0.5pct_sd8,decrease,0.6667,400,e-monitor cs baseline,500,0.97,0.9510959078150344,0.9817369507659165,0.0,513.0,360.0,807.0,proved (delta + m/A)
+jumps_p0.5pct_sd8,decrease,0.6667,400,Gaussian LR monitor,500,0.316,0.2767829376901094,0.358022921929263,0.684,105.0,62.0,153.75,only for exactly normal returns
+jumps_p0.5pct_sd8,decrease,0.6667,400,"repeated 60-step z, level tuned to 5%/390 on Gaussian",500,0.326,0.2863746168691645,0.36827875037958996,0.672,308.0,145.0,520.0,not valid (tuned for Gaussian only)
+jumps_p0.5pct_sd8,decrease,0.6667,400,"repeated 60-step z, level 0.05 (naive)",500,0.072,0.05245772605354006,0.09806894740891321,0.928,60.5,35.25,95.25,not valid (certain false alarm)
+jumps_p0.5pct_sd8,decrease,0.6667,1500,e-monitor plugin band0.25 (README),500,0.64,0.5970058131108227,0.6808592937005244,0.0,960.0,611.5,1371.5,approximate (plug-in)
+jumps_p0.5pct_sd8,decrease,0.6667,1500,e-monitor plugin band0,500,0.802,0.7648252982841597,0.8345694321231747,0.198,181.0,134.0,250.0,approximate (plug-in)
+jumps_p0.5pct_sd8,decrease,0.6667,1500,e-monitor cs baseline,500,0.954,0.9319217297737272,0.9691551166002124,0.0,523.0,346.0,822.0,proved (delta + m/A)
+jumps_p0.5pct_sd8,decrease,0.6667,1500,Gaussian LR monitor,500,0.018,0.009498085051756854,0.03385204721203399,0.982,96.0,58.0,138.0,only for exactly normal returns
+jumps_p0.5pct_sd8,decrease,0.6667,1500,"repeated 60-step z, level tuned to 5%/390 on Gaussian",500,0.024,0.013781177149521824,0.04147745969189818,0.976,194.5,182.0,340.5,not valid (tuned for Gaussian only)
+jumps_p0.5pct_sd8,decrease,0.6667,1500,"repeated 60-step z, level 0.05 (naive)",500,0.0,0.0,0.007624618530903363,1.0,,,,not valid (certain false alarm)
+jumps_p0.5pct_sd8,decrease,0.5,50,e-monitor plugin band0.25 (README),500,1.0,0.9923753814690964,0.9999999999999999,0.0,313.5,241.0,399.0,approximate (plug-in)
+jumps_p0.5pct_sd8,decrease,0.5,50,e-monitor plugin band0,500,1.0,0.9923753814690964,0.9999999999999999,0.0,132.0,114.0,161.0,approximate (plug-in)
+jumps_p0.5pct_sd8,decrease,0.5,50,e-monitor cs baseline,500,1.0,0.9923753814690964,0.9999999999999999,0.0,226.0,182.0,281.25,proved (delta + m/A)
+jumps_p0.5pct_sd8,decrease,0.5,50,Gaussian LR monitor,500,0.84,0.8052911368285649,0.8695241225704207,0.16,61.0,39.75,80.0,only for exactly normal returns
+jumps_p0.5pct_sd8,decrease,0.5,50,"repeated 60-step z, level tuned to 5%/390 on Gaussian",500,1.0,0.9923753814690964,0.9999999999999999,0.0,118.0,55.0,232.0,not valid (tuned for Gaussian only)
+jumps_p0.5pct_sd8,decrease,0.5,50,"repeated 60-step z, level 0.05 (naive)",500,1.0,0.9923753814690964,0.9999999999999999,0.0,33.5,12.75,46.0,not valid (certain false alarm)
+jumps_p0.5pct_sd8,decrease,0.5,400,e-monitor plugin band0.25 (README),500,1.0,0.9923753814690964,0.9999999999999999,0.0,305.5,242.75,413.5,approximate (plug-in)
+jumps_p0.5pct_sd8,decrease,0.5,400,e-monitor plugin band0,500,0.984,0.9687485245822888,0.9918708446797967,0.016,122.0,96.75,151.0,approximate (plug-in)
+jumps_p0.5pct_sd8,decrease,0.5,400,e-monitor cs baseline,500,1.0,0.9923753814690964,0.9999999999999999,0.0,222.0,169.75,288.0,proved (delta + m/A)
+jumps_p0.5pct_sd8,decrease,0.5,400,Gaussian LR monitor,500,0.326,0.2863746168691645,0.36827875037958996,0.674,61.0,40.5,86.5,only for exactly normal returns
+jumps_p0.5pct_sd8,decrease,0.5,400,"repeated 60-step z, level tuned to 5%/390 on Gaussian",500,0.34,0.29983814768649814,0.382601730243391,0.66,151.5,70.25,273.5,not valid (tuned for Gaussian only)
+jumps_p0.5pct_sd8,decrease,0.5,400,"repeated 60-step z, level 0.05 (naive)",500,0.054,0.03737409848513375,0.07742706124443205,0.946,35.0,22.5,52.5,not valid (certain false alarm)
+jumps_p0.5pct_sd8,decrease,0.5,1500,e-monitor plugin band0.25 (README),500,0.998,0.9887590072528046,0.9996468726904154,0.002,302.0,239.0,398.0,approximate (plug-in)
+jumps_p0.5pct_sd8,decrease,0.5,1500,e-monitor plugin band0,500,0.818,0.7817966571116197,0.8493540855027257,0.182,112.0,90.0,144.0,approximate (plug-in)
+jumps_p0.5pct_sd8,decrease,0.5,1500,e-monitor cs baseline,500,0.998,0.9887590072528046,0.9996468726904154,0.002,213.0,166.0,283.5,proved (delta + m/A)
+jumps_p0.5pct_sd8,decrease,0.5,1500,Gaussian LR monitor,500,0.02,0.010899065235569357,0.03642056855409787,0.98,58.0,54.0,75.5,only for exactly normal returns
+jumps_p0.5pct_sd8,decrease,0.5,1500,"repeated 60-step z, level tuned to 5%/390 on Gaussian",500,0.026,0.0152562373229252,0.04397190104437119,0.974,185.0,113.0,254.0,not valid (tuned for Gaussian only)
+jumps_p0.5pct_sd8,decrease,0.5,1500,"repeated 60-step z, level 0.05 (naive)",500,0.0,0.0,0.007624618530903363,1.0,,,,not valid (certain false alarm)
+jumps_p0.5pct_sd8,decrease,0.3333,50,e-monitor plugin band0.25 (README),500,1.0,0.9923753814690964,0.9999999999999999,0.0,173.5,150.0,210.0,approximate (plug-in)
+jumps_p0.5pct_sd8,decrease,0.3333,50,e-monitor plugin band0,500,1.0,0.9923753814690964,0.9999999999999999,0.0,99.0,87.0,117.0,approximate (plug-in)
+jumps_p0.5pct_sd8,decrease,0.3333,50,e-monitor cs baseline,500,1.0,0.9923753814690964,0.9999999999999999,0.0,144.0,121.0,177.0,proved (delta + m/A)
+jumps_p0.5pct_sd8,decrease,0.3333,50,Gaussian LR monitor,500,0.86,0.82683247567339,0.8876777989843596,0.14,33.0,25.0,43.0,only for exactly normal returns
+jumps_p0.5pct_sd8,decrease,0.3333,50,"repeated 60-step z, level tuned to 5%/390 on Gaussian",500,1.0,0.9923753814690964,0.9999999999999999,0.0,54.0,43.0,61.25,not valid (tuned for Gaussian only)
+jumps_p0.5pct_sd8,decrease,0.3333,50,"repeated 60-step z, level 0.05 (naive)",500,1.0,0.9923753814690964,0.9999999999999999,0.0,26.0,11.0,37.0,not valid (certain false alarm)
+jumps_p0.5pct_sd8,decrease,0.3333,400,e-monitor plugin band0.25 (README),500,1.0,0.9923753814690964,0.9999999999999999,0.0,167.0,145.0,204.25,approximate (plug-in)
+jumps_p0.5pct_sd8,decrease,0.3333,400,e-monitor plugin band0,500,0.98,0.9635794314459021,0.9891009347644306,0.02,89.0,74.25,104.75,approximate (plug-in)
+jumps_p0.5pct_sd8,decrease,0.3333,400,e-monitor cs baseline,500,1.0,0.9923753814690964,0.9999999999999999,0.0,139.0,115.0,168.0,proved (delta + m/A)
+jumps_p0.5pct_sd8,decrease,0.3333,400,Gaussian LR monitor,500,0.338,0.2979123151908617,0.38055806121315106,0.662,33.0,24.0,45.0,only for exactly normal returns
+jumps_p0.5pct_sd8,decrease,0.3333,400,"repeated 60-step z, level tuned to 5%/390 on Gaussian",500,0.37,0.328821530528825,0.4131608702892099,0.63,56.0,48.0,62.0,not valid (tuned for Gaussian only)
+jumps_p0.5pct_sd8,decrease,0.3333,400,"repeated 60-step z, level 0.05 (naive)",500,0.078,0.057581071819524224,0.10485410622055823,0.922,34.0,22.5,39.0,not valid (certain false alarm)
+jumps_p0.5pct_sd8,decrease,0.3333,1500,e-monitor plugin band0.25 (README),500,1.0,0.9923753814690964,0.9999999999999999,0.0,169.0,147.0,199.25,approximate (plug-in)
+jumps_p0.5pct_sd8,decrease,0.3333,1500,e-monitor plugin band0,500,0.804,0.7669417867660043,0.8364224451672065,0.196,84.0,70.0,100.0,approximate (plug-in)
+jumps_p0.5pct_sd8,decrease,0.3333,1500,e-monitor cs baseline,500,1.0,0.9923753814690964,0.9999999999999999,0.0,137.0,115.75,168.25,proved (delta + m/A)
+jumps_p0.5pct_sd8,decrease,0.3333,1500,Gaussian LR monitor,500,0.02,0.010899065235569357,0.03642056855409787,0.98,31.0,24.75,33.75,only for exactly normal returns
+jumps_p0.5pct_sd8,decrease,0.3333,1500,"repeated 60-step z, level tuned to 5%/390 on Gaussian",500,0.016,0.008129155320203278,0.03125147541771118,0.984,53.0,45.25,60.5,not valid (tuned for Gaussian only)
+jumps_p0.5pct_sd8,decrease,0.3333,1500,"repeated 60-step z, level 0.05 (naive)",500,0.0,0.0,0.007624618530903363,1.0,,,,not valid (certain false alarm)

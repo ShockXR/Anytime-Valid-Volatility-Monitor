@@ -1,5 +1,7 @@
 # Independent review, round 2b
 
+> *Note added 3 November 2026: the "independent reviewer" or "referee" below was a separate AI agent (Claude, by Anthropic) instructed to act as a sceptical referee. It was not a human expert, and the review has not been confirmed by a human.*
+
 **Reviewer role.** An adversarial reader: a statistics journal referee and a code auditor. The goal is that every claim in the files below survives an expert reading.
 
 **Scope.**

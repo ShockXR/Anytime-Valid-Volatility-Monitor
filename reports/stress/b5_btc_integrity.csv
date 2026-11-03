@@ -1,0 +1,61 @@
+month,check,value,status
+2024-01,file sha256 equals MANIFEST,f20bb6ce6f4f vs f20bb6ce6f4f,VERIFIED
+2024-01,row count equals MANIFEST,44640 vs 44640,VERIFIED
+2024-01,timestamps strictly increasing in file order,True,VERIFIED
+2024-01,duplicate timestamps,0,VERIFIED
+2024-01,timestamps on whole minutes,True,VERIFIED
+2024-01,missing minutes in month,0,VERIFIED
+2024-01,non-positive or NaN open,0,VERIFIED
+2024-01,non-positive or NaN high,0,VERIFIED
+2024-01,non-positive or NaN low,0,VERIFIED
+2024-01,non-positive or NaN close,0,VERIFIED
+2024-01,OHLC inconsistent bars (high<low or open/close outside range),0,VERIFIED
+2024-01,zero-volume bars,0,info
+2024-01,flat bars (O=H=L=C),0,info
+2024-01,zero returns share,0.018593606487600528,info
+2024-01,max |return| / robust sd,57.791703282610555,info
+2024-01,returns beyond 20 robust sd (count),20,info
+2024-01,max abs return,0.027358206981045186,info
+2024-01,max (high-low)/close,0.03298425772457887,info
+2024-01,package loader checks,{'source': 'Binance spot BTCUSDT via github.com/parshant231234-eng mirror'; 'rows_read': 44640; 'duplicates': 0; 'missing_minutes': 0; 'nonpositive_prices': 0; 'first': '2024-01-01 00:00:00+00:00'; 'l,info
+2024-01,loader NaN returns (gaps+first),1,info
+2024-02,file sha256 equals MANIFEST,b841645065bc vs b841645065bc,VERIFIED
+2024-02,row count equals MANIFEST,41760 vs 41760,VERIFIED
+2024-02,timestamps strictly increasing in file order,True,VERIFIED
+2024-02,duplicate timestamps,0,VERIFIED
+2024-02,timestamps on whole minutes,True,VERIFIED
+2024-02,missing minutes in month,0,VERIFIED
+2024-02,non-positive or NaN open,0,VERIFIED
+2024-02,non-positive or NaN high,0,VERIFIED
+2024-02,non-positive or NaN low,0,VERIFIED
+2024-02,non-positive or NaN close,0,VERIFIED
+2024-02,OHLC inconsistent bars (high<low or open/close outside range),0,VERIFIED
+2024-02,zero-volume bars,0,info
+2024-02,flat bars (O=H=L=C),0,info
+2024-02,zero returns share,0.03110706674010393,info
+2024-02,max |return| / robust sd,70.51301701300314,info
+2024-02,returns beyond 20 robust sd (count),10,info
+2024-02,max abs return,0.02805366656634689,info
+2024-02,max (high-low)/close,0.043702151992788305,info
+2024-02,package loader checks,{'source': 'Binance spot BTCUSDT via github.com/parshant231234-eng mirror'; 'rows_read': 41760; 'duplicates': 0; 'missing_minutes': 0; 'nonpositive_prices': 0; 'first': '2024-02-01 00:00:00+00:00'; 'l,info
+2024-02,loader NaN returns (gaps+first),1,info
+2024-03,file sha256 equals MANIFEST,f16e19b4e9b6 vs f16e19b4e9b6,VERIFIED
+2024-03,row count equals MANIFEST,44640 vs 44640,VERIFIED
+2024-03,timestamps strictly increasing in file order,True,VERIFIED
+2024-03,duplicate timestamps,0,VERIFIED
+2024-03,timestamps on whole minutes,True,VERIFIED
+2024-03,missing minutes in month,0,VERIFIED
+2024-03,non-positive or NaN open,0,VERIFIED
+2024-03,non-positive or NaN high,0,VERIFIED
+2024-03,non-positive or NaN low,0,VERIFIED
+2024-03,non-positive or NaN close,0,VERIFIED
+2024-03,OHLC inconsistent bars (high<low or open/close outside range),0,VERIFIED
+2024-03,zero-volume bars,0,info
+2024-03,flat bars (O=H=L=C),0,info
+2024-03,zero returns share,0.012948318734738682,info
+2024-03,max |return| / robust sd,29.602401474323273,info
+2024-03,returns beyond 20 robust sd (count),6,info
+2024-03,max abs return,0.01883853354860321,info
+2024-03,max (high-low)/close,0.03610805293305188,info
+2024-03,package loader checks,{'source': 'Binance spot BTCUSDT via github.com/parshant231234-eng mirror'; 'rows_read': 44640; 'duplicates': 0; 'missing_minutes': 0; 'nonpositive_prices': 0; 'first': '2024-03-01 00:00:00+00:00'; 'l,info
+2024-03,loader NaN returns (gaps+first),1,info

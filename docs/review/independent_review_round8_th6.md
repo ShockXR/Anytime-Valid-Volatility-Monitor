@@ -1,5 +1,7 @@
 # Independent review, round 8: TH6 (false alarms after the first day; Theorem D restated)
 
+> *Note added 3 November 2026: the "independent reviewer" or "referee" below was a separate AI agent (Claude, by Anthropic) instructed to act as a sceptical referee. It was not a human expert, and the review has not been confirmed by a human.*
+
 **Reviewer role.** A sceptical referee for a statistics journal and a code auditor. I did not write any of the files under review and I did not take their claims on trust: every statement below was rederived, and every number I quote was either read from the committed CSV files with my own code or recomputed with an independent simulator.
 
 **Scope.**

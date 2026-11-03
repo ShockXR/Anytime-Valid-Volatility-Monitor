@@ -1,5 +1,7 @@
 # Independent review, round 9: the package code
 
+> *Note added 3 November 2026: the "independent reviewer" or "referee" below was a separate AI agent (Claude, by Anthropic) instructed to act as a sceptical referee. It was not a human expert, and the review has not been confirmed by a human.*
+
 **Reviewer role.** A code auditor who did not write the package. I did not take the docstrings on trust: every claim below was tested by running the code, and every number comes from a script in `docs/review/round9_scripts/` that can be rerun.
 
 **Scope.** In priority order:

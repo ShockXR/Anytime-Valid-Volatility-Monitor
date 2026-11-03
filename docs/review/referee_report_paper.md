@@ -1,5 +1,7 @@
 # Referee report on "Anytime-valid detection of volatility changes in high-frequency returns with robust truncation"
 
+> *Note added 3 November 2026: the "independent reviewer" or "referee" below was a separate AI agent (Claude, by Anthropic) instructed to act as a sceptical referee. It was not a human expert, and the review has not been confirmed by a human.*
+
 **Manuscript.** `paper/short_paper.md`, draft of November 2026, as of commit `8f71a2e` on branch `claude/project-thread-ytr1da` (879 lines). Line numbers below refer to that file.
 
 **Reviewer.** Anonymous referee, written as for *Sequential Analysis* or the Theory and Methods section of *JASA*. I did not write any part of the paper or of the repository.

@@ -191,8 +191,10 @@ def betting_edetector(
     threshold : float
         Alarm level ``A``; average run length under the null is at least ``A``.
     kind : "SR" or "CUSUM"
-    grid : sequence of bets. Defaults to ``DEFAULT_UP_GRID`` for "up" and to
-        fractions of the largest admissible bet for "down".
+    grid : sequence of numbers in [0, 1). For ``direction="up"`` these are the bets
+        ``lambda`` themselves (default ``DEFAULT_UP_GRID``). For ``direction="down"`` they are
+        FRACTIONS of the largest admissible bet ``lam_max = 1 / (upper / m0 - 1)`` (default
+        ``DEFAULT_DOWN_FRACTIONS``), so the bets used are ``lam_max * grid``.
     adaptive_h : int or None
         If set, add a plug-in bettor ``lambda_t = (mu - 1) / (v + (mu - 1)^2)``
         (the approximate growth-rate optimal bet, Waudby-Smith and Ramdas 2024),
@@ -214,7 +216,13 @@ def betting_edetector(
     """
     if not 0 <= lam_cap <= 1 or not 0 <= adaptive_weight <= 1:
         raise ValueError("lam_cap and adaptive_weight must lie in [0, 1]")
+    if kind not in ("SR", "CUSUM"):
+        raise ValueError("kind must be 'SR' or 'CUSUM'")
+    if not np.all(np.isfinite(m0) & (np.asarray(m0) > 0)):  # audit A1-B-003: m0 <= 0 or NaN silently disabled the detector
+        raise ValueError("m0 must be positive and finite")
     x = np.atleast_2d(np.asarray(x, float))[:, start:]
+    if np.any(x < 0):  # audit A1-B-004: a negative statistic can make a bet factor negative
+        raise ValueError("x must be nonnegative (truncated squared returns)")
     reps, n = x.shape
     y = x / m0
     if direction == "up":
@@ -354,6 +362,8 @@ def repeated_window_ztest(
     """
     r2 = np.atleast_2d(np.asarray(r, float))[:, start:] ** 2
     reps, n = r2.shape
+    if n < window:  # fewer than one full window: no look is possible (audit A1-B-005, was a crash in argmax)
+        return DetectorResult(np.full(reps, -1))
     cs = np.cumsum(r2, axis=1)
     win = cs[:, window - 1 :] - np.concatenate([np.zeros((reps, 1)), cs[:, :-window]], axis=1)
     z = (win - window * sigma0_sq) / np.sqrt(window * var_r2)

@@ -1,5 +1,7 @@
 # Independent review, round 1
 
+> *Note added 3 November 2026: the "independent reviewer" or "referee" below was a separate AI agent (Claude, by Anthropic) instructed to act as a sceptical referee. It was not a human expert, and the review has not been confirmed by a human.*
+
 Reviewer: REV1 (independent research review, not an author of the reviewed files). Date: 2 November 2026.
 
 **Scope.** `docs/math.md` sections 1 to 5, `docs/estimator_issues.md`, `docs/paper_review.md`, `src/avmonitor/{robust,detectors,monitor,simulate,data,forecast}.py`, E1 to E5 in `docs/experiment_report.md`, E9 in `docs/report_parts/E9.md`, `README.md` and `PITCH_BAPAT.md`. The reviewed documents did not change between commit `b08b7a3` (start of review) and `98a1e83`. During the review, `monitor.py` and `detectors.py` gained a confidence-sequence baseline (`e90cfd0`, `d0c539e`) and `math.md` gained section 6. I reviewed the plug-in path of the current code. I did not review the confidence-sequence path, `confseq.py`, math.md section 6, or E6 to E8 and E10.

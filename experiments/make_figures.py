@@ -15,6 +15,24 @@ RES = Path(__file__).resolve().parents[1] / "results"
 FIG = RES / "figures"
 
 
+def _e04_config():
+    """The alarm level A and the number of pre-change steps that E4 used, read from E4's own script so that the
+    dashed line and the title of the E4 figure cannot drift away from what was computed."""
+    import re
+    import sys
+
+    here = Path(__file__).resolve().parent
+    sys.path.insert(0, str(here))
+    try:
+        import e04_detection as E04
+    finally:
+        sys.path.remove(str(here))
+    m = re.search(r"^\s*nu, n = (\d+), (\d+)\s*$", (here / "e04_detection.py").read_text(), re.M)
+    if m is None:
+        raise RuntimeError("could not read the pre-change length from experiments/e04_detection.py")
+    return float(E04.A), int(m.group(1))
+
+
 def fig_e01():
     df = pd.read_csv(RES / "e01_reproduce_tables.csv")
     t7 = df[df.table == 7]
@@ -36,16 +54,18 @@ def fig_e01():
     hs = np.arange(5, 61)
     fig, ax = plt.subplots(figsize=(6, 4))
     ax.plot(hs, [R.kernel_weight_sum(h) for h in hs], label="sum of raw Gaussian kernel weights W(h)")
-    ax.plot(hs, [R.kernel_weight_sum(h) * R.truncated_moment_factor(R.effective_cutoff(3, False), 4) for h in hs],
-            label="W(h) x 0.705 (after c = 3 raw-MAD truncation)")
+    trunc = R.truncated_moment_factor(R.effective_cutoff(3, False), 4)
+    ax.plot(hs, [R.kernel_weight_sum(h) * trunc for h in hs],
+            label=f"W(h) x {trunc:.3f} (after c = 3 raw-MAD truncation)")
     ax.axhline(1, color="k", lw=0.8, ls="--"); ax.text(6, 1.3, "correct scale (weights sum to 1)")
     ax.set_xlabel("bandwidth h"); ax.set_ylabel("estimate / per-step quarticity")
-    ax.set_title("Why RMSE grows with h in Tables 7 and 8"); ax.legend(fontsize=8)
+    ax.set_title("Why RMSE grows with h in Tables 7 and 8 (formula check, no data)"); ax.legend(fontsize=8)
     fig.tight_layout(); fig.savefig(FIG / "e01_scale_factor.png", dpi=130)
 
 
 def fig_e04():
     cd = pd.read_csv(RES / "e04b_change.csv")
+    A, NU = _e04_config()
     dets_up = ["e-det up (grid)", "e-det up on raw r^2 (no truncation)", "Gaussian LR e-det up", "Page CUSUM up (calibrated)"]
     dets_dn = ["e-det down (grid)", "Gaussian LR e-det down"]
     fig, ax = plt.subplots(1, 3, figsize=(13, 4), sharey=False)
@@ -54,11 +74,11 @@ def fig_e04():
         for d in dets_up + dets_dn:
             q = s[(s.detector == d) & ((s.ratio > 1) if d in dets_up else (s.ratio < 1))].sort_values("ratio")
             ax[k].plot(q.ratio, q.false_alarm_before_change, marker="o", label=d)
-        ax[k].axhline(500 / 7800, color="k", lw=0.8, ls="--")
+        ax[k].axhline(NU / A, color="k", lw=0.8, ls="--")
         ax[k].set_title(f"{sc}: false alarm before change"); ax[k].set_xlabel("sd ratio after change")
         ax[k].set_ylim(0, 1)
     ax[0].set_ylabel("share of paths"); ax[2].legend(fontsize=7)
-    fig.suptitle("E4: dashed line = guaranteed bound 500 / A for 500 pre-change steps (synthetic)")
+    fig.suptitle(f"E4 (synthetic): dashed line = guaranteed bound {NU} / A = {NU / A:.3f} for {NU} pre-change steps, A = {A:g}")
     fig.tight_layout(); fig.savefig(FIG / "e04_false_alarms.png", dpi=130)
 
 
