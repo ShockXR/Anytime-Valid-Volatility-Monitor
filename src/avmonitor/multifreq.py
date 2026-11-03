@@ -72,7 +72,7 @@ from dataclasses import dataclass, field
 
 import numpy as np
 
-from .detectors import DEFAULT_DOWN_FRACTIONS, DEFAULT_UP_GRID
+from .detectors import DEFAULT_DOWN_FRACTIONS, DEFAULT_UP_GRID, check_bets
 from .robust import MAD_NORMAL_SCALE
 
 DEFAULT_FREQS = (1, 5, 15)
@@ -356,6 +356,7 @@ class MultiFrequencyMonitor:
         self.band = float(null_band)
         self.up_grid = np.asarray(up_grid, float)
         self.down_fractions = np.asarray(down_fractions, float)
+        check_bets(self.up_grid, self.down_fractions)
         self.l_up = 1.0 - self.up_grid
         self.l_dn = 1.0 - self.down_fractions
         self.scale_floor = float(scale_floor)

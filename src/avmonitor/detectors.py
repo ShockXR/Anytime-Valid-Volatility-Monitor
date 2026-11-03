@@ -101,6 +101,9 @@ def calibrate(
     tau = max(c * scale, floor)
     x = np.minimum(r_cal**2, tau**2)
     m0 = float(x.mean())
+    if not (tau > 0 and m0 > 0):
+        raise ValueError("degenerate calibration window (scale or truncated mean 0, for example more than half "
+                         "zero returns); pass floor > 0 or use a longer window")
     v = float(x.var(ddof=1))
     se = np.sqrt(v / len(x))
     up = (m0 + margin_z * se) * (1 + null_band)
@@ -114,6 +117,14 @@ def calibrate(
 
 DEFAULT_UP_GRID = (0.02, 0.05, 0.1, 0.2, 0.35, 0.5)
 DEFAULT_DOWN_FRACTIONS = (0.1, 0.25, 0.5, 0.75, 0.95)
+
+
+def check_bets(up_grid, down_fractions) -> None:
+    """Raise unless every increase bet and every decrease fraction lies in [0, 1), so that every factor is positive."""
+    for name, v in (("increase bets", up_grid), ("decrease fractions", down_fractions)):
+        v = np.asarray(v, float)
+        if v.size == 0 or not np.all(np.isfinite(v)) or np.any(v < 0) or np.any(v >= 1):
+            raise ValueError(f"{name} must be finite and lie in [0, 1)")
 
 
 @dataclass
@@ -194,11 +205,15 @@ def betting_edetector(
     start : int
         Monitoring starts at this index (earlier entries are ignored).
 
-    Missing values (NaN) in ``x`` are skipped: the bet factor is 1 at that step
-    (valid when missingness does not depend on the missing value, see
-    ``docs/math.md`` 5.6). Before November 2026 a single NaN silently disabled
-    the detector (independent review, m17).
+    Missing values (NaN) in ``x`` are skipped: the statistic is left unchanged at
+    that step (no bet and no new chain), as in ``VolatilityMonitor`` (valid when
+    missingness does not depend on the missing value, see ``docs/math.md`` 5.6).
+    Before November 2026 a single NaN silently disabled the detector (independent
+    review, m17), and until review round 9 (M1) a NaN step still added 1 to the
+    Shiryaev-Roberts statistic.
     """
+    if not 0 <= lam_cap <= 1 or not 0 <= adaptive_weight <= 1:
+        raise ValueError("lam_cap and adaptive_weight must lie in [0, 1]")
     x = np.atleast_2d(np.asarray(x, float))[:, start:]
     reps, n = x.shape
     y = x / m0
@@ -239,7 +254,8 @@ def betting_edetector(
     lam_path = np.empty(n) if (return_path and lam_adapt is not None) else None
     for t in range(n):
         g = sign * (y[:, t] - 1.0)  # gain per unit bet
-        g = np.where(np.isfinite(g), g, 0.0)  # missing value: no bet
+        ok = np.isfinite(g)  # missing value: no bet and no new chain
+        g = np.where(ok, g, 0.0)
         f = 1.0 + grid[None, :] * g[:, None]
         if lam_adapt is not None:
             f = np.concatenate([f, (1.0 + lam_adapt[:, t] * g)[:, None]], axis=1)
@@ -247,9 +263,9 @@ def betting_edetector(
                 lam_path[t] = lam_adapt[0, t]
         with np.errstate(over="ignore"):
             if kind == "SR":
-                S = f * (S + 1.0)
+                S = np.where(ok[:, None], f * (S + 1.0), S)
             elif kind == "CUSUM":
-                S = f * np.maximum(S, 1.0)
+                S = np.where(ok[:, None], f * np.maximum(S, 1.0), S)
             else:
                 raise ValueError("kind must be 'SR' or 'CUSUM'")
         M = S @ weights
@@ -265,12 +281,10 @@ def betting_edetector(
 
 def two_sided_alarm(up: DetectorResult, down: DetectorResult) -> np.ndarray:
     """First alarm of either side. Run each side at threshold ``2 A`` to keep ARL >= A overall."""
-    a, b = up.alarm.copy(), down.alarm.copy()
-    a[a < 0] = np.iinfo(a.dtype).max
-    b[b < 0] = np.iinfo(b.dtype).max
-    out = np.minimum(a, b)
-    out[out == np.iinfo(a.dtype).max] = -1
-    return out
+    a, b = np.asarray(up.alarm, np.int64), np.asarray(down.alarm, np.int64)
+    big = np.iinfo(np.int64).max
+    out = np.minimum(np.where(a < 0, big, a), np.where(b < 0, big, b))
+    return np.where(out == big, -1, out)
 
 
 # ----------------------------------------------------------------------------

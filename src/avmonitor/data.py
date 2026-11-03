@@ -55,8 +55,10 @@ def load_bitstamp_csv(path: str | Path, start: str | None = None, end: str | Non
         df = df[df.index >= pd.Timestamp(start, tz="UTC")]
     if end is not None:
         df = df[df.index < pd.Timestamp(end, tz="UTC")]
-    df["logret"] = np.log(df["close"]).diff()
     df["zero_volume"] = df["volume"] <= 0
+    # A filled (tradeless) minute repeats the previous close: no price was observed, so the returns on both
+    # sides of it are missing, not zero (docs/math.md 5.6, item 5), as for the gaps of load_binance.
+    df["logret"] = np.log(df["close"].where(~df["zero_volume"])).diff()
     return df
 
 

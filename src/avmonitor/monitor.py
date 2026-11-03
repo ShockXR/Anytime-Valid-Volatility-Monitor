@@ -76,7 +76,7 @@ from dataclasses import dataclass
 import numpy as np
 
 from .confseq import StreamingEBConfSeq
-from .detectors import DEFAULT_DOWN_FRACTIONS, DEFAULT_UP_GRID
+from .detectors import DEFAULT_DOWN_FRACTIONS, DEFAULT_UP_GRID, check_bets
 from .robust import MAD_NORMAL_SCALE
 
 
@@ -140,6 +140,9 @@ class VolatilityMonitor:
         self.band = null_band
         self.up_grid = np.asarray(up_grid, float)
         self.down_fractions = np.asarray(down_fractions, float)
+        check_bets(self.up_grid, self.down_fractions)
+        if not null_band >= 0:
+            raise ValueError("null_band must be nonnegative")
         self.scale_floor = scale_floor
         if baseline not in ("plugin", "cs"):
             raise ValueError("baseline must be 'plugin' or 'cs'")

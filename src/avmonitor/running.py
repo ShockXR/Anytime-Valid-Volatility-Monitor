@@ -52,7 +52,7 @@ import numpy as np
 from scipy import optimize, special, stats
 
 from .confseq import eb_confseq, psi_coef
-from .detectors import DEFAULT_DOWN_FRACTIONS, DEFAULT_UP_GRID
+from .detectors import DEFAULT_DOWN_FRACTIONS, DEFAULT_UP_GRID, check_bets
 from .monitor import Event
 from .robust import MAD_NORMAL_SCALE
 
@@ -352,7 +352,8 @@ def two_sided_sr(x, tau2, m_up, m_dn, levels, up_grid=DEFAULT_UP_GRID, down_frac
     out = {L: [np.full(reps, -1), np.full(reps, -1)] for L in levels}
     top = levels[-1]
     for t in range(n):
-        xt = x[:, t]
+        ok = np.isfinite(x[:, t])  # a missing return leaves both statistics unchanged, as in RunningTauMonitor
+        xt = np.where(ok, x[:, t], 0.0)
         yu = xt / m_up[:, t]
         on = (m_dn[:, t] > 0) & (tau2[:, t] > m_dn[:, t])
         md = np.where(on, m_dn[:, t], 1.0)
@@ -362,11 +363,11 @@ def two_sided_sr(x, tau2, m_up, m_dn, levels, up_grid=DEFAULT_UP_GRID, down_frac
         fd = 1.0 + lam * (1.0 - (xt / md)[:, None])  # exactly 1 at an off step
         with np.errstate(over="ignore"):
             if kind == "SR":
-                Su = fu * (Su + 1.0)
-                Sd = fd * (Sd + on[:, None])  # an off step starts no chain
+                Su = np.where(ok[:, None], fu * (Su + 1.0), Su)
+                Sd = np.where(ok[:, None], fd * (Sd + on[:, None]), Sd)  # an off step starts no chain
             else:
-                Su = fu * np.maximum(Su, 1.0)
-                Sd = np.where(on[:, None], fd * np.maximum(Sd, 1.0), Sd)
+                Su = np.where(ok[:, None], fu * np.maximum(Su, 1.0), Su)
+                Sd = np.where((on & ok)[:, None], fd * np.maximum(Sd, 1.0), Sd)
         Mu = Su.mean(axis=1)
         Md = Sd.mean(axis=1)
         for L in levels:
@@ -654,6 +655,7 @@ class RunningTauMonitor:
         self.every = every
         self.up_grid = np.asarray(up_grid, float)
         self.down_fractions = np.asarray(down_fractions, float)
+        check_bets(self.up_grid, self.down_fractions)
         self.n_pilot = n_pilot
         self.t = -1
         self.events: list[Event] = []
@@ -1055,6 +1057,7 @@ class AwakeRunningTauMonitor:
         self.epochs = set(int(e) for e in awake_epochs(n_learn))
         self.up_grid = np.asarray(up_grid, float)
         self.down_fractions = np.asarray(down_fractions, float)
+        check_bets(self.up_grid, self.down_fractions)
         self.K = GRID_KMAX - GRID_KMIN + 1
         self.t = -1
         self.events: list[Event] = []

@@ -401,8 +401,10 @@ def sr_steps_constant_factor(A: float, F: float) -> int:
     if not F > 1:
         raise ValueError("F must exceed 1")
     n = int(np.ceil(np.log1p(A * (F - 1.0) / F) / np.log(F)))
-    while F * (F**n - 1.0) / (F - 1.0) < A:  # guard against rounding at an exact integer
+    while F * (F**n - 1.0) / (F - 1.0) < A:  # guard against rounding at an exact integer, both ways
         n += 1
+    while n > 1 and F * (F ** (n - 1) - 1.0) / (F - 1.0) >= A:
+        n -= 1
     return max(n, 1)
 
 

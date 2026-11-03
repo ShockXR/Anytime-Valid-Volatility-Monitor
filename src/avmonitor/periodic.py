@@ -382,8 +382,9 @@ class PeriodicVolatilityMonitor(VolatilityMonitor):
         if baseline == "known":
             if tau is None or m0 is None:
                 raise ValueError("baseline='known' needs tau and m0")
-            if kw.get("margin_z") or kw.get("target_rel_width") is not None:
-                raise ValueError("margin_z and target_rel_width do not apply to a known baseline")
+            if kw.get("margin_z") or kw.get("target_rel_width") is not None or kw.get("c_down") is not None:
+                raise ValueError("margin_z, target_rel_width and c_down do not apply to a known baseline "
+                                 "(give tau_down and m0_down for the decrease side)")
             td = float(tau) if tau_down is None else float(tau_down)
             md = float(m0) if m0_down is None else float(m0_down)
             for name, (tt, mm) in (("increase", (float(tau), float(m0))), ("decrease", (td, md))):
