@@ -100,6 +100,28 @@ def collapse_floor(A: float, B: float, side: str = "down", alpha=None) -> int:
     return -1
 
 
+def randomised_path_delay(log_w, A: float, horizon: int | None = None):
+    """Smallest mean delay on one path over randomised rules valid at levels ``n / A`` (Theorem 2b, sharp form).
+
+    ``log_w[j - 1] = log W_j(y)`` for j = 1, 2, ... (nondecreasing). With ``q_j = P_U(T = j | y)``, the product
+    law of Theorem 2c gives the path probability ``1 / W_j`` at every j at once, so validity requires
+    ``sum_{j <= k} q_j / W_j <= k / A`` for every k; and a rule that alarms only on this path with these
+    ``q_j`` is valid, because every null law gives the path at most ``1 / W_j``. The linear programme
+    ``min sum_j j q_j`` subject to these constraints and ``sum_j q_j = 1`` is therefore the exact minimum.
+    Returns ``(mean delay, q)``; ``horizon`` defaults to three times the deterministic floor."""
+    lw = np.asarray(log_w, float)
+    n_det = int(np.argmax(lw + np.log(np.arange(1, lw.size + 1) / A) >= -1e-12)) + 1
+    H = int(horizon or min(lw.size, 3 * n_det))
+    j = np.arange(1, H + 1)
+    inv_w = np.exp(-lw[:H])
+    A_ub = np.tril(np.ones((H, H))) * inv_w[None, :]
+    res = optimize.linprog(j.astype(float), A_ub=A_ub, b_ub=j / A, A_eq=np.ones((1, H)), b_eq=[1.0],
+                           bounds=(0, None), method="highs")
+    if not res.success:
+        raise RuntimeError(res.message)
+    return float(res.fun), res.x
+
+
 def randomised_floor_cdf(logw, A: float):
     """``E[min(1, (n / A) W_n)]`` over the rows of ``logw``, for n = 1, ..., horizon: an upper bound on
     ``P(T <= n)`` for every randomised rule valid at levels n / A (Corollary of the floor lemma)."""
@@ -317,22 +339,45 @@ def distribution_free_constants(c: float = 3.0, up_grid=None, down_fractions=Non
     return float(k1), float(k2)
 
 
+def distribution_free_rate_constant(c: float = 3.0) -> float:
+    """``C_DF = k1 I0 / 4`` of Theorem 8 (b), with ``I0 = int_0^inf min(1, 2 e^(-2 u^2)) du
+    = u0 + sqrt(2 pi) Phi_bar(2 u0)``, ``u0 = sqrt(log 2 / 2)`` (0.888; 1.79 at c = 3)."""
+    k1, _ = distribution_free_constants(c)
+    u0 = np.sqrt(np.log(2) / 2)
+    return float(k1 * (u0 + np.sqrt(2 * np.pi) * stats.norm.sf(2 * u0)) / 4)
+
+
 def dkw_log_moment(n: int, t: float) -> float:
     """Logarithm of a bound on ``E[D_n exp(t D_n)]`` for the Kolmogorov distance ``D_n`` of n i.i.d. draws
     from any continuous law: ``E[g(D_n)] = int_0^1 g'(x) P(D_n > x) dx`` with ``g(x) = x e^(t x)`` and
     ``P(D_n > x) <= min(1, 2 exp(-2 n x^2))`` (Dvoretzky-Kiefer-Wolfowitz inequality with Massart's
-    constant). Computed in log space because ``t`` can be large."""
-    x0 = np.sqrt(np.log(2) / (2 * n))
+    constant). Computed in log space because ``t`` can be large.
 
-    def h(x):
-        tail = 0.0 if x <= x0 else np.log(2) - 2 * n * x * x
-        return tail + np.log1p(t * x) + t * x
+    With ``u = sqrt(n) x`` and ``s = t / sqrt(n)`` the integral is ``n^(-1/2) int_0^sqrt(n) (1 + s u) e^(s u)
+    min(1, 2 e^(-2 u^2)) du``. On ``[0, u0]``, ``u0 = sqrt(log 2 / 2)``, it equals ``u0 e^(s u0)`` exactly.
+    Beyond ``u0`` the log integrand is concave with its maximum near ``s / 4`` and curvature ``-4``, so the
+    integral is taken over ``[u0, min(sqrt(n), max(u0, s / 4) + 30)]`` with breakpoints at the maximum;
+    the part beyond is below ``e^(-1800)`` of the peak. (A first version integrated over all of x in
+    [0, 1] and under-resolved the tail for n >= 10^6; see docs/iterations/TH5.md.)"""
+    rn = np.sqrt(n)
+    s = t / rn
+    u0 = np.sqrt(np.log(2) / 2)
+    head = np.log(u0) + s * u0  # log of int_0^u0 (1 + s u) e^(s u) du; n >= 1 gives sqrt(n) > u0
+    peak = min(max(u0, s / 4), rn)
+    u_end = min(rn, max(u0, s / 4) + 30.0)
 
-    grid = np.unique(np.clip(np.concatenate([np.linspace(0, 1, 2001), [x0, t / (4 * n)]]), 0, 1))
-    hmax = max(h(x) for x in grid)
-    pts = [p for p in (x0, t / (4 * n)) if 0 < p < 1]
-    val = integrate.quad(lambda x: np.exp(h(x) - hmax), 0.0, 1.0, limit=800, points=pts)[0]
-    return float(hmax + np.log(val))
+    def h(u):
+        return np.log(2) - 2 * u * u + np.log1p(s * u) + s * u
+
+    grid = np.unique(np.concatenate([np.linspace(u0, u_end, 4001), [peak, u_end]]))
+    grid = grid[(grid >= u0) & (grid <= u_end)]
+    hmax = float(np.max(h(grid)))
+    offsets = 2.0 ** -np.arange(0, 24)
+    cuts = sorted({u0, u_end, *[p for p in np.concatenate([[peak], peak - offsets, peak + offsets]) if u0 < p < u_end]})
+    val = sum(integrate.quad(lambda u: np.exp(h(u) - hmax), a, b, limit=400, epsabs=0, epsrel=1e-9)[0]
+              for a, b in zip(cuts[:-1], cuts[1:]))
+    tail = hmax + np.log(val) if val > 0 else -np.inf
+    return float(np.logaddexp(head, tail) - np.log(rn))
 
 
 def dkw_moment(n: int, t: float) -> float:

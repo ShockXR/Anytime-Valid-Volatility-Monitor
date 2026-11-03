@@ -89,6 +89,26 @@ def test_collapse_floors():
     assert D.speed_limit(A, 1 + np.asarray(DEFAULT_DOWN_FRACTIONS) / (B3 - 1), np.full(5, 0.2)) == 73
 
 
+def test_randomised_rules_on_the_collapse():
+    """Corollary 4 is for deterministic rules. A randomised valid rule alarms by step n on the collapse with
+    probability at most min(1, n W_n / A) (0.978 at step 44), and its smallest mean delay there is 43.4
+    (linear programme); on the explosion the largest probability at step 3 is 0.285."""
+    _, _, _, B = _gauss(3.0)
+    F = B / (B - 1)
+    assert min(1.0, 44 * F**44 / A) == pytest.approx(0.978, abs=1e-3)
+    lw = np.arange(1, 301) * np.log(F)
+    mean, q = L.randomised_path_delay(lw, A)
+    assert mean == pytest.approx(43.39, abs=0.01) and 43 < mean < 45
+    j = np.arange(1, q.size + 1)
+    assert q.sum() == pytest.approx(1.0, abs=1e-9) and np.all(q >= -1e-12)
+    assert np.all(np.cumsum(q * np.exp(-lw[: q.size])) <= j / A + 1e-12)  # validity on every k
+    assert q[41] == pytest.approx(0.738, abs=2e-3)  # most of the mass at step 42
+    # the deterministic rule (all mass at the floor) is feasible and slower
+    assert mean < L.collapse_floor(A, B, "down")
+    assert min(1.0, 3 * B**3 / A) == pytest.approx(0.285, abs=1e-3)
+    assert L.randomised_path_delay(np.arange(1, 41) * np.log(B), A)[0] == pytest.approx(3.715, abs=1e-3)
+
+
 def test_singleton_rule_is_valid_and_attains_the_floor():
     """Sharpness: the rule 'alarm at n iff Y_{1:n} = y' has sup P(T <= k) = 1 / W_n(y) (chain rule), so it is
     valid at levels k / A exactly when W_n(y) >= A / n; it then alarms at the floor time."""
@@ -146,7 +166,7 @@ def test_np_bound_is_below_simulated_alarm_cdf_of_valid_rules():
     """beta_n bounds P(T <= n) for every valid rule: the e-detectors' empirical CDF stays below it."""
     model, tau, m0, B = _gauss(3.0)
     law = D.y_law(model, 0.5, tau, m0)
-    lam, _ = D.best_bet(law, "down")
+    lam, _ = L.least_favourable_bet(law, "down")
     rng = np.random.default_rng(11)
     y = D.sample_y(model, 0.5, tau, m0, (2000, 400), rng)
     lw = L.log_floor_factor(y, B, "down")
@@ -198,13 +218,46 @@ def test_distribution_free_bound_is_finite_and_tends_to_nominal():
     k1, k2 = L.distribution_free_constants(3.0)
     assert k1 == pytest.approx(8.045, abs=1e-3) and k2 == pytest.approx(19.783, abs=1e-3)
     r = [L.distribution_free_bound(n, 10, A) / (10 / A) for n in (10**5, 10**6, 10**7, 10**8)]
-    assert all(np.isfinite(r)) and r == sorted(r, reverse=True) and r[-1] < 1.002
+    assert all(np.isfinite(r)) and r == sorted(r, reverse=True)
+    # first-order rate: (ratio - 1) / ((m + 1) / sqrt(n)) -> C_DF = k1 I0 / 4 = 1.79 (m6 of review round 7)
+    cdf = L.distribution_free_rate_constant(3.0)
+    assert cdf == pytest.approx(1.787, abs=1e-3)
+    excess = [(L.distribution_free_bound(n, 10, A) / (10 / A) - 1) / (11 / np.sqrt(n)) for n in (10**8, 10**10, 10**12)]
+    assert excess == sorted(excess, reverse=True) and excess[-1] == pytest.approx(cdf, rel=1e-3)
     # Monte Carlo check of the moment bound: E[D exp(t D)] for Gaussian |r| at n = 390
     rng = np.random.default_rng(2)
     a = np.sort(np.abs(rng.standard_normal((4000, 390))), axis=1)
     Dn = L.kolmogorov_distance(a, "gaussian")
     t = 20.0
     assert np.mean(Dn * np.exp(t * Dn)) <= L.dkw_moment(390, t)
+
+
+@pytest.mark.parametrize("n,m", [(390, 5), (92160, 39), (10**6, 98), (10**7, 98), (10**7, 390), (10**8, 390),
+                                 (10**8, 1950)])
+def test_dkw_moment_against_closed_form(n, m):
+    """With u = sqrt(n) x and s = t / sqrt(n), the integral of (1 + t x) e^(t x) min(1, 2 e^(-2 n x^2)) over
+    [0, 1] is n^(-1/2) [u0 e^(s u0) + 2 e^(s^2 / 8) ((1 + s^2 / 4) sqrt(pi / 2) (Phi(2 vb) - Phi(2 va))
+    + (s / 4)(e^(-2 va^2) - e^(-2 vb^2)))] with va = u0 - s / 4, vb = sqrt(n) - s / 4. A first version of
+    dkw_log_moment under-integrated for n >= 10^6 (review round 7, M2)."""
+    _, k2 = L.distribution_free_constants(3.0)
+    t = k2 * m
+    rn = np.sqrt(n)
+    s = t / rn
+    u0 = np.sqrt(np.log(2) / 2)
+    va, vb = u0 - s / 4, rn - s / 4
+    gauss = np.sqrt(np.pi / 2) * (stats.norm.cdf(2 * vb) - stats.norm.cdf(2 * va))
+    tail = 2 * np.exp(s * s / 8) * ((1 + s * s / 4) * gauss + (s / 4) * (np.exp(-2 * va**2) - np.exp(-2 * vb**2)))
+    exact = np.log(u0 * np.exp(s * u0) + tail) - np.log(rn)
+    assert L.dkw_log_moment(n, t) == pytest.approx(exact, rel=1e-8, abs=1e-8)
+
+
+def test_distribution_free_table_values():
+    """Values quoted in docs/theory_limits.md section 4.7 (ratio to m / A)."""
+    ratio = lambda n, m: L.distribution_free_bound(n, m, A) / (m / A)
+    assert ratio(10**6, 39) == pytest.approx(1.1525, abs=1e-3)
+    assert ratio(10**8, 98) == pytest.approx(1.0213, abs=1e-3)
+    assert ratio(10**8, 390) == pytest.approx(1.1491, abs=1e-3)
+    assert ratio(10**7, 390) == pytest.approx(3.9409, abs=1e-3)
 
 
 def test_first_order_constant():

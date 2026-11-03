@@ -7,8 +7,9 @@ tau^2)], c = 3, A = 7800 (one 390-step day has m / A = 5%).
 
 Parts
   collapse     Closed-form floors for the most extreme paths (complete collapse, Y = 0 at every step, and
-               complete explosion, Y = B at every step) for c = 1.5 to 5, at A and 2A: every valid procedure
-               (floor lemma), every Shiryaev-Roberts e-detector with linear bets (Corollary 4 of docs/theory_delay.md), the default
+               complete explosion, Y = B at every step) for c = 1.5 to 5, at A and 2A: every deterministic valid
+               procedure (floor lemma), the smallest mean delay of a randomised valid procedure on the path (a
+               linear programme) and its largest alarm probability one step before the floor, every Shiryaev-Roberts e-detector with linear bets (Corollary 4 of docs/theory_delay.md), the default
                grid (th5_collapse.csv). No simulation.
   floors       18 post-change laws (Gaussian, Student t3, jumps; sd ratios 0.5, 0.67, 0.8, 1.25, 1.5, 2), change
                at the first monitored step, 10,000 paths of 4,000 steps each: the pathwise floor of every
@@ -26,7 +27,9 @@ Parts
                Theorem 8 (a), the distribution-free bound of Theorem 8 (b), the noise-free stream and the hold-then-bold
                lower bound (Proposition 9), the inflated plug-in bound, the confidence-sequence baseline's
                effective z, and the share of windows whose plug-in has a positive growth rate under the i.i.d.
-               law (Proposition A.6) (th5_plugin_bound.csv, th5_plugin_drift.csv).
+               law (Proposition A.6) (th5_plugin_bound.csv, th5_plugin_drift.csv); also runs part dfree.
+  dfree        The distribution-free bound of Theorem 8 (b) for n = 390 to 10^8 and m = 5 to 1950, and the
+               rate constant C_DF (th5_distribution_free.csv). No simulation.
   plugin_sim   Monitoring simulation: Gaussian and Student t3 returns, n = 390 to 23,040, 10,000 paths per cell,
                each with its own calibration window, 7800 monitored steps of the same law; the default
                two-sided detector with the plug-in baseline, the inflated plug-in (z = 1, 2, 2.576), the
@@ -134,12 +137,16 @@ def part_collapse():
                                  floor_sr_linear_bets=D.sr_steps_constant_factor(AA, F),
                                  floor_sr_linear_bets_fractional=np.log1p(AA * (F - 1) / F) / np.log(F),
                                  floor_default_grid=D.speed_limit(AA, fac, w),
-                                 first_order_log_A_over_log_F=np.log(AA) / np.log(F)))
+                                 first_order_log_A_over_log_F=np.log(AA) / np.log(F),
+                                 rand_max_prob_by_floor_minus_1=min(1.0, (n_any - 1) * F ** (n_any - 1) / AA),
+                                 rand_min_mean_delay=L.randomised_path_delay(np.arange(1, 4 * n_any + 1) * np.log(F), AA)[0]))
     df = pd.DataFrame(rows)
     df.to_csv(OUT / "th5_collapse.csv", index=False)
     print(df[(df.side == "down")][["c", "B", "level", "floor_any_procedure", "floor_any_procedure_fractional",
+                                   "rand_min_mean_delay", "rand_max_prob_by_floor_minus_1",
                                    "floor_sr_linear_bets_fractional", "floor_default_grid"]].to_string(index=False))
-    print(df[(df.side == "up")][["c", "B", "level", "floor_any_procedure", "floor_sr_linear_bets",
+    print(df[(df.side == "up")][["c", "B", "level", "floor_any_procedure", "rand_min_mean_delay",
+                                 "rand_max_prob_by_floor_minus_1", "floor_sr_linear_bets",
                                  "floor_default_grid"]].to_string(index=False))
 
 
@@ -195,6 +202,20 @@ def floors_cell(name, rho, N, H, seed, levels=(A, 2 * A), keep_cdf=False):
         row[f"lower_bound_det_{tag}"] = lb_det
         row[f"efficiency_grid_{tag}"] = row[f"grid_{tag}_mean"] / lb_det
         row[f"efficiency_oracle_{tag}"] = row[f"oracle_{tag}_mean"] / lb_det
+        lb_rand = max(row[f"floor_rand_{tag}"], row[f"np_rand_{tag}"])
+        row[f"lower_bound_rand_{tag}"] = lb_rand
+        row[f"efficiency_grid_rand_{tag}"] = row[f"grid_{tag}_mean"] / lb_rand
+        row[f"efficiency_oracle_rand_{tag}"] = row[f"oracle_{tag}_mean"] / lb_rand
+        if AA == A:
+            # batch-means Monte Carlo standard errors (10 batches of the same paths; no new random numbers)
+            gm, om = np.where(g < 0, H, g), np.where(o < 0, H, o)
+            est = []
+            for ii in np.array_split(np.arange(N), 10):
+                lb_b = max(float(np.mean(nf[ii])), L.delay_lower_bound(L.np_cdf(S_star[ii], AA, lw[ii], "det")))
+                est.append((lb_b, np.mean(gm[ii]) / lb_b, np.mean(om[ii]) / lb_b))
+            se = np.std(np.asarray(est), axis=0, ddof=1) / np.sqrt(10)
+            row.update({"se_lower_bound_det_A": float(se[0]), "se_efficiency_grid_A": float(se[1]),
+                        "se_efficiency_oracle_A": float(se[2])})
         if keep_cdf:
             nmax = int(min(H, max(np.quantile(np.where(g < 0, H, g), 0.999), 50)))
             ns = np.arange(1, nmax + 1)
@@ -204,6 +225,11 @@ def floors_cell(name, rho, N, H, seed, levels=(A, 2 * A), keep_cdf=False):
                                           np_det=np.pad(b_det, (0, max(0, nmax - b_det.size)), constant_values=1)[:nmax],
                                           np_any=np.pad(b_np, (0, max(0, nmax - b_np.size)), constant_values=1)[:nmax],
                                           floor_rand=rf[:nmax], grid=ecdf(g), oracle=ecdf(o))))
+    if len(levels) == 2:
+        # each side of the two-sided monitor runs at 2A, but the monitor is valid at n / A over H=: compare
+        # the side at 2A with the bound for rules valid at n / A
+        row["efficiency_grid_2A_vs_A"] = row["grid_2A_mean"] / row["lower_bound_det_A"]
+        row["efficiency_oracle_2A_vs_A"] = row["oracle_2A_mean"] / row["lower_bound_det_A"]
     return row, cdfs
 
 
@@ -414,17 +440,25 @@ def part_plugin_bound():
                 f"({time.time() - t0:.0f} s)")
     df = pd.DataFrame(rows)
     df.to_csv(OUT / "th5_plugin_bound.csv", index=False)
-    k1, k2 = L.distribution_free_constants(C)
-    lo_b, hi_b = L.b_range(C)
-    dfree = [dict(n=n, m=m, A=A, k1=k1, k2=k2, b_lo=lo_b, b_hi=hi_b, nominal=m / A,
-                  bound=min(1.0, L.distribution_free_bound(n, m, A, C)),
-                  ratio=L.distribution_free_bound(n, m, A, C) / (m / A))
-             for n in (390, 1440, 5760, 23040, 92160, 10**6, 10**7, 10**8) for m in (5, 10, 39, 98, 390, 1950)]
-    pd.DataFrame(dfree).to_csv(OUT / "th5_distribution_free.csv", index=False)
+    part_dfree()
     pd.DataFrame(drows).to_csv(OUT / "th5_plugin_drift.csv", index=False)
     print(pd.DataFrame(drows).round(4).to_string(index=False))
     print(df[["law", "n", "m", "m_over_sqrt_n", "corollary1_ratio", "first_order_ratio", "explicit_ratio",
               "distribution_free_ratio", "noise_free", "hold_bold_lower_ratio", "inflated_2.576_bound"]].round(3).to_string(index=False))
+
+
+def part_dfree():
+    """The distribution-free bound of Theorem 8 (b) on a grid of n and m (no randomness)."""
+    k1, k2 = L.distribution_free_constants(C)
+    lo_b, hi_b = L.b_range(C)
+    cdf = L.distribution_free_rate_constant(C)
+    dfree = [dict(n=n, m=m, A=A, k1=k1, k2=k2, b_lo=lo_b, b_hi=hi_b, C_DF=cdf, nominal=m / A,
+                  bound=min(1.0, L.distribution_free_bound(n, m, A, C)),
+                  ratio=L.distribution_free_bound(n, m, A, C) / (m / A),
+                  first_order_ratio=1 + cdf * (m + 1) / np.sqrt(n))
+             for n in (390, 1440, 5760, 23040, 92160, 10**6, 10**7, 10**8) for m in (5, 10, 39, 98, 390, 1950)]
+    pd.DataFrame(dfree).to_csv(OUT / "th5_distribution_free.csv", index=False)
+    log("dfree", f"C_DF {cdf:.4f}")
 
 
 # ----------------------------------------------------------------------------
@@ -594,7 +628,7 @@ def figures():
         _style(ax)
     h, lab = axes[0, 0].get_legend_handles_labels()
     fig.legend(h, lab, loc="lower center", ncol=2, fontsize=8, frameon=False)
-    fig.suptitle("Delay of every valid rule (curves to the right of the black line) against the e-detector, A = 7800 [synthetic]",
+    fig.suptitle("Every deterministic valid rule has its alarm-time CDF below the black curve; e-detectors simulated, A = 7800 [synthetic]",
                  fontsize=10, color=INK)
     fig.tight_layout(rect=(0, 0.07, 1, 0.96))
     fig.savefig(FIG / "th5_floors.png", dpi=150)
@@ -636,7 +670,8 @@ if __name__ == "__main__":
     parts = sys.argv[1:] or ["collapse", "floors", "asymptotic", "boundary", "plugin_bound", "plugin_sim", "holdbold",
                              "figures"]
     fns = dict(collapse=part_collapse, floors=part_floors, asymptotic=part_asymptotic, boundary=part_boundary,
-               plugin_bound=part_plugin_bound, plugin_sim=part_plugin_sim, holdbold=part_holdbold, figures=figures)
+               plugin_bound=part_plugin_bound, dfree=part_dfree, plugin_sim=part_plugin_sim, holdbold=part_holdbold,
+               figures=figures)
     for p in parts:
         t0 = time.time()
         log("start", p)
