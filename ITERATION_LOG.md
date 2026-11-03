@@ -442,6 +442,28 @@ NEXT ITERATION: E14's monitors without a blind period on the same events (explor
 
 ---
 
+ITERATION NUMBER: 21 (the real-data inference, re-analysed after the referee report, E20)
+
+OBJECTIVE: Answer the referee's point that the real-data inference used unadjusted subgroups, pooled dependent alarms and a weak notion of "information beyond a forecast".
+
+PROBLEM IDENTIFIED: Several tests per table without adjustment; p-values that treat alarms on the same calendar day across coins as independent; post hoc comparisons reported next to pre-specified ones; and hit rates against slow forecasts, which a trailing ratio rule also achieves.
+
+HYPOTHESIS: The comparisons with random times are strong enough to survive any adjustment, the comparisons with the ratio rule and the longer-window competitors are not, and against a forecast with an intraday component the alarms add little.
+
+CHANGES IMPLEMENTED: `docs/preregistration_e20.md` (families, Holm, day-block bootstrap, regressions and loss comparison fixed before any adjusted result), `experiments/e20_inference.py`, `tests/test_e20_inference.py`.
+
+EXPERIMENTS PERFORMED: Classification of 36 real-data claims; Holm within families; a bootstrap resampling calendar days jointly across coins; regressions of next-day log realised variance on log forecasts (EWMA, HAR, HAR with the last hour's realised variance) and alarm indicators with day-clustered errors; a QLIKE comparison of forecasts scaled at alarms.
+
+RESULTS: One claim rests on a pre-specified primary test (FOMC on BTC holds; CPI in the same family does not). All 16 comparisons of alarms with random times or controls hold (Holm p ≤ 0.0016); 1 of 48 comparisons with the ratio rule does (the post hoc subgroup the paper had highlighted); the 6-point margin over the best day-long competitor does not (Holm 0.44 and 0.53). Against HAR with the last hour's realised variance, increase alarms add nothing significant (Holm 0.32) and decrease alarms a little (Holm 0.046), no more than a 240-minute ratio rule; no QLIKE gain out of sample. The rank restart of E14 had 6.7 points fewer confirmed up alarms than the plug-in (Holm 0.006). Failed first: a pandas key-matching bug (NaN keys dropped), a family of 12 tests where 8 were pre-registered (corrected; the 12-test version is not reported), and an alarm-count check that missed alarms off the grid.
+
+IMPROVEMENTS: Every real-data claim now has a class (primary, secondary, exploratory) and an adjusted status; README, pitch and limitations now say that alarms beat random times but not a strong forecast.
+
+REMAINING ISSUES: Only one pre-specified primary test exists; new confirmatory evidence would need a new pre-registered study (the live Nifty run is a demonstration, not that study).
+
+NEXT ITERATION: The paper's real-data section is rewritten with these classifications; E19 (real-data null streams) and E21 (stronger benchmarks).
+
+---
+
 Further work streams (E13, E14, E16, E17, the alternative prototypes, logs ALT1 to ALT6) keep their own iteration notes in `docs/iterations/`. Their main results are summarised in `docs/experiment_report.md` and `alternatives/ALTERNATIVES.md`.
 
 ---

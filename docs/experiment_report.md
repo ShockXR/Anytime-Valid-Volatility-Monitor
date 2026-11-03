@@ -33,6 +33,7 @@ To rerun: `pip install -r requirements.txt && pip install -e .`, then `python sc
 | E17 | Can e-detectors at 1, 5 and 15 minutes be combined with one proved bound, and does that beat each frequency? | The usual proof does not cover the plain every-minute average (a coarse detector is not a fair bet between its block ends; a union bound proves three times the budget for balanced weights); a certified average has P(false alarm within m) ≤ Σ w_k ⌈m/k⌉ / A when each frequency's null holds (for example independent returns with any tails and the true baselines; no proof with the plug-in baselines used on real data). It never beats the best single frequency in independent-return designs but stays within 0% to 5% (equal weights) or 11% to 18% (balanced) of it on persistent changes, and catches 95% to 97% of paths (84% to 89% for Student t3) after a jump in the lag-one autocorrelation of returns from 0 to 0.3, which the one-minute detector almost never sees (3.8%). Under price noise only the 5 and 15 minute gap average is valid, and it helps only for persistent increases at the strongest noise level, which was added after seeing the first results. On five coins it behaves like the one-minute monitor, and at matched alarm counts (a check added after review) the 5 and 15 minute detectors alone are no more precise than it. |
 | TH4 | How much can a small drift of the conditional mean inflate the false alarm probability? | Proved: P(false alarm within m) ≤ (m / A) I_m(δ) with a closed-form inflation factor, attained by a deterministic stream where it reaches 1 (below that the strongest stream found reaches 0.33 to 0.63 of it at one day); the one-day bound reaches 10% at a drift of 1.63% and 25% at 2.66% (downward drift only: 6.36% and 10.51%). Pathwise bounds cover a drift that varies (Theorem 2 for any predictable drift, Theorem 3 for an exogenous one); the mean drift alone cannot give a C m / A bound, and Theorem 3's formula is not a bound when the drift responds to the data. The plug-in baseline is bounded by averaging over calibration windows (41.8% at one day with 390 steps, within 1.3 of E16's worst stream). Against E16 no proved bound is below a measured rate; for GARCH the proved bound is below 1 in 22 of 64 cells at one day, all with a small drift. |
 | E18 | How fast do the monitors flag landmark shocks (Indian election results 4 Jun 2024, sell-offs of 5 Aug 2024 and 7 Apr 2025, crypto cascade 10 Oct 2025)? Pre-registered case studies | Case studies, not evidence. On Nifty the streaming e-detector flagged all three shocks (11, 104 and 172 minutes after the open). On crypto it flagged none of the fifteen coin and event pairs within 24 hours of the reference time: it had raised up alarms 4.5 to 6.9 hours earlier, as each episode began, and was recalibrating. At matched alarm rates most competitors were paused for the same reason and most of their catches came the minute a pause ended, except the day-long two-window variance-ratio scan (inspired by Bibinger, Jirak and Vetter 2017), which flagged 10 Oct 2025 on all five coins within 17 to 73 minutes. With a fresh calibration just before the reference time the e-detector flagged all 18 cases in 15 to 207 minutes. |
+| E20 | Which real-data claims survive multiplicity, dependence between days and a strong forecast? | Re-analysis with methods fixed before its results. Only E12's FOMC and CPI family was a pre-specified primary test (FOMC on BTC holds, CPI does not). Every alarm-against-control comparison holds (Holm p ≤ 0.0016), but only 1 of 48 e-detector-against-ratio-rule comparisons does, and the 6-point margin over the best day-long competitor does not. Against HAR with the last hour's realised variance only the decrease alarms add information (Holm 0.046), no more than a 240-minute ratio rule, and there is no out-of-sample QLIKE gain. |
 | ALT1 | Quarticity stream; pre-averaging for noise | Price noise breaks the raw-return guarantee; non-overlapping pre-averaged blocks restore it. |
 | ALT2 | Risk switch | Tails on par with daily volatility targeting, worse tracking, no Sharpe difference; the robust trigger beats the Gaussian one. |
 | ALT3 | Robust local IQ estimator | Squaring a local variance is 95% efficient in simulation, against 86% for the kappa-corrected kernel with an estimated MAD (98% with an oracle cut-off) and 74% for untruncated RQ; one daily MAD stops converging when volatility moves within the day; on BTC and DOGE large returns come in bursts, and our version of the robust kernel is 0.33 to 0.42 times MedRQ. |
@@ -1187,15 +1188,17 @@ The "jump only" column does not support that reading on its own. At releases the
 
 ## E13. Benchmarks against strong published competitors
 
-Script `experiments/e13_benchmarks.py`; code `src/avmonitor/competitors.py` (tests in `tests/test_competitors.py`); outputs `results/e13*.csv` and `results/figures/e13_*.png`. Seeds are fixed in the script. Every tuning constant was fixed before the reported runs (a Gaussian pilot with its own seed, `docs/iterations/E13.md`, iteration 2). Three methods, marked below as our modifications or as the CS baseline, were added after the first runs (the studentised BJV and the CS-baseline e-detector in iteration 3, BOCPD on truncated returns in iteration 5); no constant was tuned on the reported runs. Review round 3 added longer competitor windows (iterations 9 and 10): BJV with windows of 250 and 500 returns on simulated data, and on real data BJV with 480 and 1440 minutes and BOCPD with 720 and 1440 minutes (one session, 375 bars, for both on Nifty). These lengths were fixed before those runs, as simple fractions of the window or the day, and nothing else was changed.
+Script `experiments/e13_benchmarks.py`; code `src/avmonitor/competitors.py` (tests in `tests/test_competitors.py`); outputs `results/e13*.csv` and `results/figures/e13_*.png`. Seeds are fixed in the script. Every tuning constant was fixed before the reported runs (a Gaussian pilot with its own seed, `docs/iterations/E13.md`, iteration 2). Three methods, marked below as our modifications or as the CS baseline, were added after the first runs (the studentised VR scan and the CS-baseline e-detector in iteration 3, BOCPD on truncated returns in iteration 5); no constant was tuned on the reported runs. Review round 3 added longer competitor windows (iterations 9 and 10): the VR scan with windows of 250 and 500 returns on simulated data, and on real data the VR scan with 480 and 1440 minutes and BOCPD with 720 and 1440 minutes (one session, 375 bars, for both on Nifty). These lengths were fixed before those runs, as simple fractions of the window or the day, and nothing else was changed.
 
-**Question.** Until now the e-detector was compared only with weak or non-robust benchmarks (a Gaussian likelihood ratio detector, Page's CUSUM, a repeated z-test, raw r²), and the independent review (point M3) showed that a naive trailing-window rule matches its real-data validation score. How does it compare with the two strongest relevant published methods: the nonparametric volatility jump test of Bibinger, Jirak and Vetter (2017), the reference *offline* (after-the-fact) method for this question in high-frequency econometrics, and Bayesian online change-point detection (Adams and MacKay 2007), the reference *online* method in machine learning?
+**Question.** Until now the e-detector was compared only with weak or non-robust benchmarks (a Gaussian likelihood ratio detector, Page's CUSUM, a repeated z-test, raw r²), and the independent review (point M3) showed that a naive trailing-window rule matches its real-data validation score. How does it compare with two strong relevant methods: a two-window local variance-ratio scan test inspired by the nonparametric volatility jump test of Bibinger, Jirak and Vetter (2017), the reference *offline* (after-the-fact) method for this question in high-frequency econometrics, and Bayesian online change-point detection (Adams and MacKay 2007), the reference *online* method in machine learning?
 
 ### The competitors and how they were made comparable
 
-**BJV (adjacent-window volatility jump test).** For each candidate change point, compare the realised variance (mean squared return) of the k returns before it with that of the k returns after it, standardise the difference so that it is approximately standard normal when volatility does not jump, and take the maximum over the sample. Under no change, the maximum follows an extreme value (Gumbel) law, which gives the critical value. The jump-robust version drops returns larger than 4 times a local bipower scale (bipower variation, (π/2) mean |r_i||r_{i-1}|, is a variance estimate that a single price jump cannot inflate much), and the location of the maximum estimates the change point. Two versions: non-overlapping blocks (the paper's main statistic) and overlapping windows (the paper's second statistic, reported as more powerful). We also add a *studentised* version (our modification, not in the paper) that standardises with the sample variance of the squared returns instead of the Gaussian value 2σ⁴.
+*Naming (changed in November 2026, after the referee report; no number of E13 changed).* The test called "BJV" in earlier versions of this section is what it is: a **two-window local variance-ratio scan test ("VR scan")**, inspired by Bibinger, Jirak and Vetter (2017). It is not their published procedure, because their paper could not be obtained from this environment and its equations were never checked. The method labels in `results/e13*.csv` and in the code still begin with "BJV".
 
-*Verification gap, stated plainly.* The paper text could not be opened from this environment (arxiv.org, its ar5iv mirror and the authors' university repository were blocked by the network policy). Web search verified the paper's metadata and its structure (rescaled differences of local spot volatility estimates on adjacent windows, a non-overlapping and an overlapping statistic, a Gumbel-type limit, k_n = 125 in its simulations), but not its exact normalisation or equation numbers. Our Gumbel constants come from standard extreme value theory for maxima of Gaussian sequences (Leadbetter, Lindgren and Rootzén 1983) and, for overlapping windows, from the moving-sum limit as coded in the CRAN package `mosum` (Eichinger and Kirch 2018). To make the conclusions independent of these constants, **every comparison below also uses critical values calibrated by simulation**. The implementation should be checked against the paper's equations before it is cited as "the BJV test".
+**VR scan (two-window local variance-ratio scan test).** For each candidate change point, compare the realised variance (mean squared return) of the k returns before it with that of the k returns after it, standardise the difference so that it is approximately standard normal when volatility does not jump, and take the maximum over the sample. Under no change, the maximum follows an extreme value (Gumbel) law, which gives the critical value. The jump-robust version drops returns larger than 4 times a local bipower scale (bipower variation, (π/2) mean |r_i||r_{i-1}|, is a variance estimate that a single price jump cannot inflate much), and the location of the maximum estimates the change point. Two versions: non-overlapping blocks (modelled on the main statistic of Bibinger, Jirak and Vetter) and overlapping windows (modelled on their second statistic, which they report as more powerful). We also add a *studentised* version (our modification, not in their paper) that standardises with the sample variance of the squared returns instead of the Gaussian value 2σ⁴.
+
+*Verification gap, stated plainly.* The paper text could not be opened from this environment (arxiv.org, its ar5iv mirror and the authors' university repository were blocked by the network policy). Web search verified the paper's metadata and its structure (rescaled differences of local spot volatility estimates on adjacent windows, a non-overlapping and an overlapping statistic, a Gumbel-type limit, k_n = 125 in its simulations), but not its exact normalisation or equation numbers. Our Gumbel constants come from standard extreme value theory for maxima of Gaussian sequences (Leadbetter, Lindgren and Rootzén 1983) and, for overlapping windows, from the moving-sum limit as coded in the CRAN package `mosum` (Eichinger and Kirch 2018). To make the conclusions independent of these constants, **every comparison below also uses critical values calibrated by simulation**. For this reason the method is called a VR scan inspired by their test, not "the BJV test".
 
 **BOCPD.** Inside a regime, returns are N(0, σ²) with an inverse gamma prior on σ² (a conjugate prior, so the posterior and the predictive Student t density are exact). With a constant hazard H (the prior probability of a change at each step), Algorithm 1 of Adams and MacKay updates the posterior of the *run length* (time since the last change) exactly. We cap run lengths at 512. This is an approximation: runs of 511 steps or more share one bucket, which keeps the statistics of the heavier run. One unit test checks the recursion before the cap is reached; a second one, in which the cap binds, checks the merge rule and shows that the alarm statistic then departs from the exact recursion. Against the exact recursion in the E13 setting (`results/e13_bocpd_cap_check.csv`, one simulated path per case), the posterior probability of a short run differs by at most 0.0003 when nothing changes, and the first crossing of the alarm level is at the same step after a change of sd × 1.25 or × 0.8; later on that path the two differ by up to 0.56. So the first alarm in simulation is not affected in these checks, but on real data, where the filter runs on through many changes, BOCPD here is the capped approximation. We alarm when the posterior probability of a run shorter than w = 250 steps exceeds a threshold. Settings: α₀ = 2, prior mean of σ² from the calibration window, H = 1 / A (one change per 20 days a priori). We also run BOCPD on returns clipped at the e-detector's truncation level τ = 3 × scaled MAD ("BOCPD on truncated returns", our modification), to separate what truncation buys from what betting buys.
 
@@ -1204,8 +1207,8 @@ Script `experiments/e13_benchmarks.py`; code `src/avmonitor/competitors.py` (tes
 * the **CS-baseline e-detector**: the confidence-sequence baseline of E8 (δ = 0.01), whose false alarm bound (δ + m / A) is **proved** with an estimated baseline.
 
 **Fair comparisons.**
-* *Offline (Q13a).* A fixed window of 2000 steps, change (if any) at step 1000. BJV uses the whole window. BOCPD and the e-detector use the first 500 steps as a change-free calibration window and monitor the remaining 1500, so they get one piece of information BJV does not use: where a clean stretch is. Each method's statistic is its maximum over the window. Critical values are set to give exactly 5% rejections on 2000 clean Gaussian windows ("matched size"); we also report the nominal levels (Gumbel for BJV; A = 1500 / 0.05 for the plug-in e-detector, a level that would hold only with a known baseline; A = 1500 / 0.04 for the CS-baseline e-detector, so that its proved bound δ + m / A is 5%). Review round 3 adds the overlapping BJV statistic with k = 250 and k = 500 on exactly the same windows (`offline-long` in the script).
-* *Online (Q13b, Q13c).* The E4 design: 2000 calibration steps, then monitoring; A = 7800 (a bound of 5% false alarms per 390-step "day", proved for the CS-baseline e-detector and for the plug-in only if its baseline were known). BJV becomes a rolling test: at each step, compare the last k = 120 returns with the 120 before them and alarm when |statistic| exceeds a threshold. BOCPD alarms on its posterior rule. The competitor thresholds are set so that their false alarm rate per 390-step day on 4000 clean Gaussian paths equals the plug-in e-detector's (1.55% on that calibration set). Neither competitor has an anytime guarantee, so their false alarm rates are measured, not assumed. We also report BJV with its nominal daily Gumbel level and BOCPD with the natural rule "probability above one half". The nominal level uses the MOSUM formula for a series of 390 + 2k - 1 returns, the returns that 390 window positions span (the first runs used 390 by mistake; review round 3, m16, and the rows were rerun). On clean Gaussian data, review round 3 adds the rolling BJV with k = 250 and k = 500, matched in the same way (`online-long`).
+* *Offline (Q13a).* A fixed window of 2000 steps, change (if any) at step 1000. The VR scan uses the whole window. BOCPD and the e-detector use the first 500 steps as a change-free calibration window and monitor the remaining 1500, so they get one piece of information the VR scan does not use: where a clean stretch is. Each method's statistic is its maximum over the window. Critical values are set to give exactly 5% rejections on 2000 clean Gaussian windows ("matched size"); we also report the nominal levels (Gumbel for VR scan; A = 1500 / 0.05 for the plug-in e-detector, a level that would hold only with a known baseline; A = 1500 / 0.04 for the CS-baseline e-detector, so that its proved bound δ + m / A is 5%). Review round 3 adds the overlapping VR scan statistic with k = 250 and k = 500 on exactly the same windows (`offline-long` in the script).
+* *Online (Q13b, Q13c).* The E4 design: 2000 calibration steps, then monitoring; A = 7800 (a bound of 5% false alarms per 390-step "day", proved for the CS-baseline e-detector and for the plug-in only if its baseline were known). The VR scan becomes a rolling test: at each step, compare the last k = 120 returns with the 120 before them and alarm when |statistic| exceeds a threshold. BOCPD alarms on its posterior rule. The competitor thresholds are set so that their false alarm rate per 390-step day on 4000 clean Gaussian paths equals the plug-in e-detector's (1.55% on that calibration set). Neither competitor has an anytime guarantee, so their false alarm rates are measured, not assumed. We also report the VR scan with its nominal daily Gumbel level and BOCPD with the natural rule "probability above one half". The nominal level uses the MOSUM formula for a series of 390 + 2k - 1 returns, the returns that 390 window positions span (the first runs used 390 by mistake; review round 3, m16, and the rows were rerun). On clean Gaussian data, review round 3 adds the rolling VR scan with k = 250 and k = 500, matched in the same way (`online-long`).
 
 All simulated results are [SYNTHETIC]. "Jumps": probability 0.005 per step, size N(0, 8²). "Student t5": unit-variance t innovations with 5 degrees of freedom. "Price noise": i.i.d. N(0, 0.5²) noise on log prices. "Ticks": returns rounded to 0.5 sd (about 20% zeros). "Slow SV": log-volatility AR(1) with sd 0.15 and half-life 390. "GARCH 0.99": GARCH(1,1), α = 0.05, β = 0.94. Under slow SV and GARCH the e-detector's null is false by design (E4c, E9c): volatility does move.
 
@@ -1215,13 +1218,13 @@ Rejection rate with no change (1000 windows per column; Monte Carlo standard err
 
 | Method | Gaussian | jumps | Student t5 | price noise | ticks | slow SV | GARCH 0.99 |
 |---|---|---|---|---|---|---|---|
-| BJV blocks, k = 50, truncated | 4.3% | 5.5% | **37.0%** | 5.2% | 3.9% | 8.0% | 84.5% |
-| BJV overlap, k = 50, truncated | 3.9% | 7.8% | **53.4%** | 6.8% | 4.9% | 8.7% | 90.7% |
-| BJV overlap, k = 50, plain | 3.9% | **97.5%** | **86.7%** | 6.8% | 4.9% | 8.7% | 90.7% |
-| BJV overlap, k = 125, truncated | 4.0% | 6.6% | **45.8%** | 6.9% | 4.7% | 39.8% | 100% |
-| BJV overlap, k = 250, truncated (round 3) | 3.0% | 6.0% | **33.5%** | 6.3% | 3.9% | 75.1% | 99.6% |
-| BJV overlap, k = 500, truncated (round 3) | 6.1% | 6.7% | **24.2%** | 6.4% | 5.7% | 86.9% | 98.6% |
-| BJV overlap, k = 50, truncated, studentised* | 5.2% | 3.7% | 1.7% | 7.4% | 4.3% | 7.7% | 88.2% |
+| VR scan, blocks, k = 50, truncated | 4.3% | 5.5% | **37.0%** | 5.2% | 3.9% | 8.0% | 84.5% |
+| VR scan, overlap, k = 50, truncated | 3.9% | 7.8% | **53.4%** | 6.8% | 4.9% | 8.7% | 90.7% |
+| VR scan, overlap, k = 50, plain | 3.9% | **97.5%** | **86.7%** | 6.8% | 4.9% | 8.7% | 90.7% |
+| VR scan, overlap, k = 125, truncated | 4.0% | 6.6% | **45.8%** | 6.9% | 4.7% | 39.8% | 100% |
+| VR scan, overlap, k = 250, truncated (round 3) | 3.0% | 6.0% | **33.5%** | 6.3% | 3.9% | 75.1% | 99.6% |
+| VR scan, overlap, k = 500, truncated (round 3) | 6.1% | 6.7% | **24.2%** | 6.4% | 5.7% | 86.9% | 98.6% |
+| VR scan, overlap, k = 50, truncated, studentised* | 5.2% | 3.7% | 1.7% | 7.4% | 4.3% | 7.7% | 88.2% |
 | BOCPD | 4.8% | **97.7%** | **94.0%** | 6.3% | 4.2% | 66.5% | 99.8% |
 | e-detector, plug-in | 5.4% | 6.1% | 7.5% | 6.9% | 4.4% | 80.9% | 97.8% |
 | e-detector, CS baseline | 6.5% | 5.1% | 6.0% | 7.0% | **11.3%** | 80.0% | 99.2% |
@@ -1230,11 +1233,11 @@ Rejection rate with no change (1000 windows per column; Monte Carlo standard err
 
 | Method | Gaussian | jumps | Student t5 | price noise | ticks |
 |---|---|---|---|---|---|
-| BJV blocks, k = 50, truncated (Gumbel) | 1.5% | 2.8% | 23.8% | 2.0% | 1.8% |
-| BJV overlap, k = 50, truncated (MOSUM Gumbel) | 0.3% | 0.3% | 12.8% | 0.4% | 0.1% |
-| BJV overlap, k = 125, truncated (MOSUM Gumbel) | 0.3% | 1.6% | 17.3% | 1.0% | 0.3% |
-| BJV overlap, k = 250, truncated (MOSUM Gumbel) | 0.2% | 1.1% | 12.8% | 0.8% | 0.8% |
-| BJV overlap, k = 500, truncated (MOSUM Gumbel) | 0.3% | 0.7% | 5.5% | 0.5% | 0.6% |
+| VR scan, blocks, k = 50, truncated (Gumbel) | 1.5% | 2.8% | 23.8% | 2.0% | 1.8% |
+| VR scan, overlap, k = 50, truncated (MOSUM Gumbel) | 0.3% | 0.3% | 12.8% | 0.4% | 0.1% |
+| VR scan, overlap, k = 125, truncated (MOSUM Gumbel) | 0.3% | 1.6% | 17.3% | 1.0% | 0.3% |
+| VR scan, overlap, k = 250, truncated (MOSUM Gumbel) | 0.2% | 1.1% | 12.8% | 0.8% | 0.8% |
+| VR scan, overlap, k = 500, truncated (MOSUM Gumbel) | 0.3% | 0.7% | 5.5% | 0.5% | 0.6% |
 | e-detector, plug-in (A = 30,000; would hold only with a known baseline) | **14.7%** | **16.0%** | **16.7%** | **18.6%** | **11.4%** |
 | e-detector, CS baseline (proved bound δ + m / A = 5%) | 0.0% | 0.0% | 0.0% | 0.0% | 0.0% |
 
@@ -1242,16 +1245,16 @@ Power at matched size (300 windows per cell; standard error at most 2.9 points),
 
 | Method | Gaussian 1.25 | 1.5 | 2 | 0.8 | 0.67 | 0.5 | jumps 1.25 | jumps 0.8 | t5 1.25 | t5 0.8 |
 |---|---|---|---|---|---|---|---|---|---|---|
-| BJV blocks, k = 50, truncated | 8% | 37% | 96% | 7% | 35% | 94% | 10% | 11% | (41%) | (37%) |
-| BJV overlap, k = 125, truncated | 30% | 93% | 100% | 33% | 91% | 100% | 38% | 30% | (61%) | (64%) |
-| BJV overlap, k = 250, truncated (round 3) | 76% | 100% | 100% | 77% | 100% | 100% | 79% | 76% | (78%) | (75%) |
-| BJV overlap, k = 500, truncated (round 3) | 99% | 100% | 100% | 100% | 100% | 100% | 99% | 99% | (98%) | (98%) |
-| BJV overlap, k = 50, truncated, studentised* | 6% | 22% | 66% | 5% | 19% | 63% | 8% | 5% | 3% | 3% |
+| VR scan, blocks, k = 50, truncated | 8% | 37% | 96% | 7% | 35% | 94% | 10% | 11% | (41%) | (37%) |
+| VR scan, overlap, k = 125, truncated | 30% | 93% | 100% | 33% | 91% | 100% | 38% | 30% | (61%) | (64%) |
+| VR scan, overlap, k = 250, truncated (round 3) | 76% | 100% | 100% | 77% | 100% | 100% | 79% | 76% | (78%) | (75%) |
+| VR scan, overlap, k = 500, truncated (round 3) | 99% | 100% | 100% | 100% | 100% | 100% | 99% | 99% | (98%) | (98%) |
+| VR scan, overlap, k = 50, truncated, studentised* | 6% | 22% | 66% | 5% | 19% | 63% | 8% | 5% | 3% | 3% |
 | BOCPD | 79% | 100% | 100% | 81% | 100% | 100% | (99%) | (100%) | (98%) | (99%) |
 | e-detector, plug-in | 100% | 100% | 100% | 100% | 100% | 100% | 100% | 99% | 99% | 96% |
 | e-detector, CS baseline | 97% | 100% | 100% | 100% | 100% | 100% | 92% | 99% | 76% | 94% |
 
-Numbers in brackets come from a method whose size in that scenario is far above 5% (table above), so they are not power. Change-point estimate of BJV (overlap, truncated, Gaussian): with k = 125, within 25 steps of the truth in 94% to 95% of rejections for sd ratios 2 and 0.5, and in 63% to 65% for ratios 1.25 and 0.8. With k = 500 the share for ratios 2 and 0.5 is the same (95% to 96%), but for ratios 1.25 and 0.8 it falls to 49% to 54% (median error 22 to 26 steps against 17 to 18), although over many more rejections (99% to 100% of windows against 30% to 33%); k = 250 is in between (57% to 59%). (The block version's exact hits for large changes are an artefact: the change sits on a block boundary.) Under jumps the *plain* BJV "detects" in 93% to 100% of windows, but its median location error is 269 to 522 steps: it finds the price jumps, not the volatility change.
+Numbers in brackets come from a method whose size in that scenario is far above 5% (table above), so they are not power. Change-point estimate of the VR scan (overlap, truncated, Gaussian): with k = 125, within 25 steps of the truth in 94% to 95% of rejections for sd ratios 2 and 0.5, and in 63% to 65% for ratios 1.25 and 0.8. With k = 500 the share for ratios 2 and 0.5 is the same (95% to 96%), but for ratios 1.25 and 0.8 it falls to 49% to 54% (median error 22 to 26 steps against 17 to 18), although over many more rejections (99% to 100% of windows against 30% to 33%); k = 250 is in between (57% to 59%). (The block version's exact hits for large changes are an artefact: the change sits on a block boundary.) Under jumps the *plain* VR scan "detects" in 93% to 100% of windows, but its median location error is 269 to 522 steps: it finds the price jumps, not the volatility change.
 
 ### Q13b. Online use: false alarms per day [SYNTHETIC]
 
@@ -1264,17 +1267,17 @@ Share of 1000 paths with an alarm within the first 390 monitored steps; competit
 | BOCPD (matched) | 1.0% | **73.2%** | **53.2%** | 2.4% | 1.6% | 39.0% | 83.6% |
 | BOCPD, p ≥ 0.5 | 1.6% | **76.9%** | **60.6%** | 3.8% | 2.5% | 43.5% | 86.9% |
 | BOCPD on truncated returns* (matched) | 0.9% | 1.6% | **7.5%** | 2.3% | 1.0% | 37.3% | 81.3% |
-| BJV rolling, k = 120 (matched) | 1.5% | 1.5% | **14.9%** | 2.2% | 1.8% | 10.1% | 80.8% |
-| BJV rolling, nominal 5% per day | 0.6% | 0.1% | **6.3%** | 0.2% | 0.6% | 4.4% | 70.6% |
-| BJV rolling, studentised* (matched) | 1.6% | 0.7% | 0.6% | 2.4% | 2.4% | 7.7% | 79.3% |
-| BJV rolling, k = 250 (matched; round 3, Gaussian only) | 2.5% | | | | | | |
-| BJV rolling, k = 500 (matched; round 3, Gaussian only) | 1.7% | | | | | | |
+| VR scan, rolling, k = 120 (matched) | 1.5% | 1.5% | **14.9%** | 2.2% | 1.8% | 10.1% | 80.8% |
+| VR scan, rolling, nominal 5% per day | 0.6% | 0.1% | **6.3%** | 0.2% | 0.6% | 4.4% | 70.6% |
+| VR scan, rolling, studentised* (matched) | 1.6% | 0.7% | 0.6% | 2.4% | 2.4% | 7.7% | 79.3% |
+| VR scan, rolling, k = 250 (matched; round 3, Gaussian only) | 2.5% | | | | | | |
+| VR scan, rolling, k = 500 (matched; round 3, Gaussian only) | 1.7% | | | | | | |
 
-Wilson 95% intervals for the Gaussian column are about ±0.8 points. Over two days the plug-in e-detector is at 4.7% to 7.6% in the first five columns (measured; no proved bound), the CS-baseline e-detector at 0.0% to 0.1%, and BOCPD at 79% to 91% under jumps and t5 (`results/e13b_online_null.csv`). The nominal BJV row was rerun with the corrected series length (m16): it moved by at most 0.2 points (it was 0.7%, 0.1%, 6.5%, 0.2%, 0.6%, 4.4% and 70.7%), and it stays far below its nominal 5% on clean data.
+Wilson 95% intervals for the Gaussian column are about ±0.8 points. Over two days the plug-in e-detector is at 4.7% to 7.6% in the first five columns (measured; no proved bound), the CS-baseline e-detector at 0.0% to 0.1%, and BOCPD at 79% to 91% under jumps and t5 (`results/e13b_online_null.csv`). The nominal VR scan row was rerun with the corrected series length (m16): it moved by at most 0.2 points (it was 0.7%, 0.1%, 6.5%, 0.2%, 0.6%, 4.4% and 70.7%), and it stays far below its nominal 5% on clean data.
 
 ### Q13c. Online detection [SYNTHETIC]
 
-Change at step 500 of monitoring, 1500 steps observed after it, 200 paths per cell. Median delay in steps (share of paths whose first alarm comes after the change), with the share of paths that raised a false alarm before the change in bold when it is 5% or more. All methods see the same paths. A "detection" is the first alarm after the change, in either direction. The share of detections whose first alarm points the right way, at sd × 1.25 and × 0.8 over the five laws (column `correct_direction` of `results/e13c_online_change.csv`), is 99.5% to 100% for the plug-in e-detector, 100% for the CS-baseline e-detector, 99% to 100% for BOCPD on truncated returns, 69% to 100% for plain BOCPD (69% under jumps at × 0.8), 77% to 95% for the matched rolling BJV and 74% to 96% for the studentised one.
+Change at step 500 of monitoring, 1500 steps observed after it, 200 paths per cell. Median delay in steps (share of paths whose first alarm comes after the change), with the share of paths that raised a false alarm before the change in bold when it is 5% or more. All methods see the same paths. A "detection" is the first alarm after the change, in either direction. The share of detections whose first alarm points the right way, at sd × 1.25 and × 0.8 over the five laws (column `correct_direction` of `results/e13c_online_change.csv`), is 99.5% to 100% for the plug-in e-detector, 100% for the CS-baseline e-detector, 99% to 100% for BOCPD on truncated returns, 69% to 100% for plain BOCPD (69% under jumps at × 0.8), 77% to 95% for the matched rolling VR scan and 74% to 96% for the studentised one.
 
 **Gaussian**
 
@@ -1284,12 +1287,12 @@ Change at step 500 of monitoring, 1500 steps observed after it, 200 paths per ce
 | e-detector (CS baseline) | 201 (100%) | 55 (100%) | 25 (100%) | 336 (100%) | 178 (100%) | 136 (100%) |
 | BOCPD | 120 (90%) | 35 (98%) | 13 (98%) | 137 (86%) | 51 (98%) | 26 (98%) |
 | BOCPD on truncated returns* | 130 (85%) | 44 (98%) | 19 (98%) | 137 (88%) | 50 (98%) | 26 (97%) |
-| BJV rolling | 113 (30%) | 78 (94%) | 40 (97%) | 112 (32%) | 96 (85%) | 75 (98%) |
-| BJV rolling, studentised* | 115 (29%) | 88 (90%) | 55 (98%) | 114 (25%) | 98 (76%) | 80 (98%) |
-| BJV rolling, k = 250 (round 3) | 196 (81%) | 98.5 (98%) | 52 (98%) | 213 (74%) | 151 (98%) | 114.5 (97%) |
-| BJV rolling, k = 500 (round 3) | 277 (96%) | 131 (98%) | 67.5 (99%) | 326.5 (96%) | 218.5 (98%) | 171 (98%) |
+| VR scan, rolling | 113 (30%) | 78 (94%) | 40 (97%) | 112 (32%) | 96 (85%) | 75 (98%) |
+| VR scan, rolling, studentised* | 115 (29%) | 88 (90%) | 55 (98%) | 114 (25%) | 98 (76%) | 80 (98%) |
+| VR scan, rolling, k = 250 (round 3) | 196 (81%) | 98.5 (98%) | 52 (98%) | 213 (74%) | 151 (98%) | 114.5 (97%) |
+| VR scan, rolling, k = 500 (round 3) | 277 (96%) | 131 (98%) | 67.5 (99%) | 326.5 (96%) | 218.5 (98%) | 171 (98%) |
 
-With longer windows the rolling BJV detects small changes far more often (96% of the 25% increases and 20% decreases with k = 500, against 30% and 32% with k = 120) but takes much longer: 277 and 326.5 steps against 104 and 169 for the plug-in e-detector, and 67.5 steps against 20 for a doubling of the sd.
+With longer windows the rolling VR scan detects small changes far more often (96% of the 25% increases and 20% decreases with k = 500, against 30% and 32% with k = 120) but takes much longer: 277 and 326.5 steps against 104 and 169 for the plug-in e-detector, and 67.5 steps against 20 for a doubling of the sd.
 
 **Jumps**
 
@@ -1299,8 +1302,8 @@ With longer windows the rolling BJV detects small changes far more often (96% of
 | e-detector (CS baseline) | 252 (100%) | 65 (100%) | 24 (100%) | 344 (100%) | 204 (100%) | 128 (100%) |
 | BOCPD | 180 (18%, **FA 82%**) | 64 (22%, **FA 78%**) | 19 (20%, **FA 80%**) | 84 (18%, **FA 82%**) | 39 (18%, **FA 82%**) | 22 (17%, **FA 83%**) |
 | BOCPD on truncated returns* | 132 (81%) | 49 (98%) | 18 (98%) | 117 (89%) | 51 (100%) | 25 (96%) |
-| BJV rolling | 111 (28%) | 83 (88%) | 38 (98%) | 117 (35%) | 100 (90%) | 79 (96%) |
-| BJV rolling, studentised* | 108 (18%) | 94 (83%) | 56 (97%) | 118 (28%) | 105 (84%) | 85 (98%) |
+| VR scan, rolling | 111 (28%) | 83 (88%) | 38 (98%) | 117 (35%) | 100 (90%) | 79 (96%) |
+| VR scan, rolling, studentised* | 108 (18%) | 94 (83%) | 56 (97%) | 118 (28%) | 105 (84%) | 85 (98%) |
 
 **Student t5**
 
@@ -1310,18 +1313,18 @@ With longer windows the rolling BJV detects small changes far more often (96% of
 | e-detector (CS baseline) | 413 (100%) | 86 (100%) | 32 (100%) | 473 (99%) | 174 (100%) | 116 (100%) |
 | BOCPD | 108 (37%, **FA 63%**) | 43 (42%, **FA 58%**) | 15 (38%, **FA 62%**) | 93 (40%, **FA 60%**) | 34 (40%, **FA 60%**) | 23 (41%, **FA 59%**) |
 | BOCPD on truncated returns* | 170 (61%, **FA 8%**) | 67 (91%, **FA 9%**) | 27 (88%, **FA 12%**) | 146 (86%, **FA 10%**) | 51 (88%, **FA 12%**) | 25 (90%, **FA 10%**) |
-| BJV rolling | 138 (56%, **FA 16%**) | 80 (74%, **FA 14%**) | 45 (82%, **FA 18%**) | 171 (52%, **FA 14%**) | 101 (78%, **FA 16%**) | 76 (78%, **FA 22%**) |
-| BJV rolling, studentised* | 117 (11%) | 109 (50%) | 78 (97%) | 137 (9%) | 110 (40%) | 98 (94%) |
+| VR scan, rolling | 138 (56%, **FA 16%**) | 80 (74%, **FA 14%**) | 45 (82%, **FA 18%**) | 171 (52%, **FA 14%**) | 101 (78%, **FA 16%**) | 76 (78%, **FA 22%**) |
+| VR scan, rolling, studentised* | 117 (11%) | 109 (50%) | 78 (97%) | 137 (9%) | 110 (40%) | 98 (94%) |
 
 **Price noise and ticks** (full tables in `results/e13c_online_change.csv`). With price noise, BOCPD is faster for decreases (66 against 122 steps for sd × 0.5; 123 against 166.5 for × 0.67; 270 against 286 for × 0.8) but detects only 53% to 66% of the small changes (sd × 1.25 or × 0.8) against 97% to 98.5%. With ticks, BOCPD is faster for large decreases (28 against 53 steps for × 0.5; 56 against 72 for × 0.67) and equal for × 0.8 (132 steps each); it detects 84.5% to 98.5% of the changes and the e-detector 95.5% to 99%; BOCPD on truncated returns detects only 46.5% of a 25% increase.
 
 ### Q13d. Real data [REAL]
 
-**Set-up.** One-minute returns divided by a predictable intraday volatility profile (E6b for crypto, E7's session profile for Nifty). The e-detector uses its frozen real-data settings: crypto A = 28,800 per day, cal 1440, c = 3; Nifty A = 7500 per session, cal 750 (E7's primary). The competitors run continuously: BOCPD with a predictable prior (robust variance of the previous day) and H = 1 / A; BOCPD on returns clipped at 3 times the robust sd of the previous day; rolling BJV with k = 120 (truncated, Gaussian-normalised and studentised). After every alarm each method pauses for as long as the e-detector recalibrates (1440 or 750 steps). Gaussian-matched thresholds come from 2000 simulated Gaussian paths with the same day length, calibration length and A (`results/e13d_real_thresholds.csv`; the e-detector's simulated rate there is 3.95% per 1440-step day and 1.45% per 375-step session). Lag-one autocorrelation of the deseasonalised returns is -0.016 to 0.027 for BTC, ETH, XRP and SOL, 0.013 for Nifty and 0.132 for DOGE, so microstructure noise is small at one minute except for DOGE (coarse price ticks); this is why plain, not pre-averaged, realised variance is used.
+**Set-up.** One-minute returns divided by a predictable intraday volatility profile (E6b for crypto, E7's session profile for Nifty). The e-detector uses its frozen real-data settings: crypto A = 28,800 per day, cal 1440, c = 3; Nifty A = 7500 per session, cal 750 (E7's primary). The competitors run continuously: BOCPD with a predictable prior (robust variance of the previous day) and H = 1 / A; BOCPD on returns clipped at 3 times the robust sd of the previous day; rolling VR scan with k = 120 (truncated, Gaussian-normalised and studentised). After every alarm each method pauses for as long as the e-detector recalibrates (1440 or 750 steps). Gaussian-matched thresholds come from 2000 simulated Gaussian paths with the same day length, calibration length and A (`results/e13d_real_thresholds.csv`; the e-detector's simulated rate there is 3.95% per 1440-step day and 1.45% per 375-step session). Lag-one autocorrelation of the deseasonalised returns is -0.016 to 0.027 for BTC, ETH, XRP and SOL, 0.013 for Nifty and 0.132 for DOGE, so microstructure noise is small at one minute except for DOGE (coarse price ticks); this is why plain, not pre-averaged, realised variance is used.
 
 **Validation.** As in E6e: after an up alarm, is the robust volatility of the next day (1440 minutes or 375 bars) above an EWMA forecast made with past data only; after a down alarm, is it below? At random times the next day is above the forecast 46.5% to 50.1% of the time and below it 49.9% to 53.5% (each coin, both half-years), and 50.3% and 49.7% for Nifty. "Rate-matched": each competitor's up and down thresholds are set, per series, so that it raises the same numbers of up and down alarms as the e-detector (this uses the real data, but not the outcome). p-values: two-proportion z-test against the e-detector, which treats every alarm as an independent trial. They are not: alarms of one method cluster in time (volatility clusters, and the five coins move together), and the methods often alarm on the same days. The section "Longer competitor windows" below adds a test that allows for both.
 
-**What the outcome measures.** The outcome asks whether the next *day* stays beyond a *one-day* forecast. That is the time scale of the e-detector, whose baseline is calibrated on a window of 1440 minutes (750 bars for Nifty) before it starts monitoring, so its alarms mark shifts against a day-long reference level by construction. The first-run competitors compare much shorter stretches: rolling BJV two windows of 120 minutes, BOCPD runs shorter than 250 minutes. Their alarms flag changes over 2 to 4 hours, which can be real and still not last a day. The tables below therefore show how often alarms are followed by a day beyond the forecast *at these window lengths*; they do not by themselves show that the published methods are less precise. Longer windows are tried further down.
+**What the outcome measures.** The outcome asks whether the next *day* stays beyond a *one-day* forecast. That is the time scale of the e-detector, whose baseline is calibrated on a window of 1440 minutes (750 bars for Nifty) before it starts monitoring, so its alarms mark shifts against a day-long reference level by construction. The first-run competitors compare much shorter stretches: rolling VR scan two windows of 120 minutes, BOCPD runs shorter than 250 minutes. Their alarms flag changes over 2 to 4 hours, which can be real and still not last a day. The tables below therefore show how often alarms are followed by a day beyond the forecast *at these window lengths*; they do not by themselves show that the published methods are less precise. Longer windows are tried further down.
 
 **Five Binance coins, 1 July to 31 December 2025 (184 days each), matched to the e-detector with null band 0.25:**
 
@@ -1330,8 +1333,8 @@ With longer windows the rolling BJV detects small changes far more often (96% of
 | e-detector | 0.68 | 369 | 78.5% (74.0% to 82.4%) |  | 258 | 80.5% (75.2% to 84.9%) |  |
 | BOCPD | 0.68 | 364 | 67.8% (62.8% to 72.4%) | 0.001 | 257 | 61.7% (55.6% to 67.5%) | < 0.001 |
 | BOCPD on truncated returns | 0.68 | 369 | 68.0% (63.1% to 72.6%) | 0.001 | 255 | 71.7% (65.8% to 76.8%) | 0.020 |
-| BJV rolling | 0.68 | 367 | 65.6% (60.6% to 70.3%) | < 0.001 | 254 | 58.7% (52.6% to 64.6%) | < 0.001 |
-| BJV rolling, studentised | 0.68 | 368 | 66.5% (61.5% to 71.1%) | < 0.001 | 257 | 62.4% (56.3% to 68.1%) | < 0.001 |
+| VR scan, rolling | 0.68 | 367 | 65.6% (60.6% to 70.3%) | < 0.001 | 254 | 58.7% (52.6% to 64.6%) | < 0.001 |
+| VR scan, rolling, studentised | 0.68 | 368 | 66.5% (61.5% to 71.1%) | < 0.001 | 257 | 62.4% (56.3% to 68.1%) | < 0.001 |
 
 The e-detector scores highest in all ten coin and direction cells against all four competitors (`results/e13d_real_crypto_summary.csv`). Matched to band 0 instead (about 0.83 alarms per day), the e-detector scores 74.9% (up) and 68.3% (down) against 57.7% to 65.3% and 53.2% to 58.4% (p ≤ 0.007).
 
@@ -1342,8 +1345,8 @@ The e-detector scores highest in all ten coin and direction cells against all fo
 | e-detector | 0.68 | 308 | 82.0% (77.3% to 85.9%) |  | 304 | 69.7% (64.4% to 74.6%) |  |
 | BOCPD | 0.67 | 305 | 69.2% (63.8% to 74.1%) | < 0.001 | 302 | 56.7% (51.0% to 62.2%) | < 0.001 |
 | BOCPD on truncated returns | 0.67 | 306 | 71.5% (66.2% to 76.3%) | 0.002 | 304 | 67.0% (61.5% to 72.0%) | 0.468 |
-| BJV rolling | 0.67 | 306 | 68.6% (63.2% to 73.6%) | < 0.001 | 303 | 59.8% (54.2% to 65.2%) | 0.011 |
-| BJV rolling, studentised | 0.67 | 304 | 67.8% (62.3% to 72.8%) | < 0.001 | 302 | 58.3% (52.7% to 63.8%) | 0.003 |
+| VR scan, rolling | 0.67 | 306 | 68.6% (63.2% to 73.6%) | < 0.001 | 303 | 59.8% (54.2% to 65.2%) | 0.011 |
+| VR scan, rolling, studentised | 0.67 | 304 | 67.8% (62.3% to 72.8%) | < 0.001 | 302 | 58.3% (52.7% to 63.8%) | 0.003 |
 
 Per coin (`results/e13d_real_crypto_h1_2025_summary.csv`), the e-detector scores highest in nine of the ten coin and direction cells and ties the truncated BOCPD in the tenth (DOGE, down alarms, 41 of 58 each). Matched to band 0: e-detector 74.8% and 66.3%; competitors 61.8% to 65.0% (p ≤ 0.007) and 54.9% to 63.4% (truncated BOCPD 63.4%, p = 0.37).
 
@@ -1354,14 +1357,14 @@ Per coin (`results/e13d_real_crypto_h1_2025_summary.csv`), the e-detector scores
 | e-detector | 0.30 | 79 | 81.0% (71.0% to 88.1%) |  | 69 | 82.6% (72.0% to 89.8%) |  |
 | BOCPD | 0.30 | 78 | 78.2% (67.8% to 85.9%) | 0.662 | 69 | 75.4% (64.0% to 84.0%) | 0.296 |
 | BOCPD on truncated returns | 0.29 | 76 | 77.6% (67.1% to 85.5%) | 0.603 | 69 | 76.8% (65.6% to 85.2%) | 0.397 |
-| BJV rolling | 0.30 | 79 | 78.5% (68.2% to 86.1%) | 0.692 | 69 | 69.1% (57.4% to 78.8%) | 0.065 |
-| BJV rolling, studentised | 0.30 | 79 | 77.2% (66.8% to 85.1%) | 0.557 | 69 | 70.6% (58.9% to 80.1%) | 0.096 |
+| VR scan, rolling | 0.30 | 79 | 78.5% (68.2% to 86.1%) | 0.692 | 69 | 69.1% (57.4% to 78.8%) | 0.065 |
+| VR scan, rolling, studentised | 0.30 | 79 | 77.2% (66.8% to 85.1%) | 0.557 | 69 | 70.6% (58.9% to 80.1%) | 0.096 |
 
 Matched to band 0 the five methods are within 70.0% to 83.1% (up) and 66.7% to 72.0% (down), with no difference significant (p ≥ 0.11).
 
 #### Longer competitor windows, a four-hour outcome and clustered tests (review round 3)
 
-**Set-up.** Same data, same e-detector, same matching of up and down alarm counts per series (band 0.25 below; band 0 in `results/e13d_real_long_windows_pooled.csv`). Only the competitor windows were made longer, with lengths fixed before the run: BJV with k = 480 (a third of a day) and k = 1440 minutes (one day), computed with the returns before the monitored period so that it exists from the first possible alarm; BOCPD with short-run windows w = 720 (half a day) and w = 1440 (one day) and run-length caps of 2w; on Nifty k = w = 375 (one session; the first-run windows of 120 and 250 bars are already a third and two thirds of a session). Hazard, priors, clipping and the pause after each alarm are unchanged. The e-detector's alarms and the first-run Gaussian-matched BJV alarms were reproduced exactly (checked in the script). Every alarm is also scored on a **four-hour outcome**: is the robust volatility of the next 240 minutes (bars) above (up alarm) or below (down alarm) a forecast built in the same way at that scale (an EWMA with a half-life of 240 steps, rescaled by the median ratio over the previous 30 four-hour blocks)? At random times the next four hours are above that forecast 48.7% to 52.4% of the time for the coins and 53.3% for Nifty (`results/e13d_real_long_windows_*_random_4h.csv`).
+**Set-up.** Same data, same e-detector, same matching of up and down alarm counts per series (band 0.25 below; band 0 in `results/e13d_real_long_windows_pooled.csv`). Only the competitor windows were made longer, with lengths fixed before the run: the VR scan with k = 480 (a third of a day) and k = 1440 minutes (one day), computed with the returns before the monitored period so that it exists from the first possible alarm; BOCPD with short-run windows w = 720 (half a day) and w = 1440 (one day) and run-length caps of 2w; on Nifty k = w = 375 (one session; the first-run windows of 120 and 250 bars are already a third and two thirds of a session). Hazard, priors, clipping and the pause after each alarm are unchanged. The e-detector's alarms and the first-run Gaussian-matched VR scan alarms were reproduced exactly (checked in the script). Every alarm is also scored on a **four-hour outcome**: is the robust volatility of the next 240 minutes (bars) above (up alarm) or below (down alarm) a forecast built in the same way at that scale (an EWMA with a half-life of 240 steps, rescaled by the median ratio over the previous 30 four-hour blocks)? At random times the next four hours are above that forecast 48.7% to 52.4% of the time for the coins and 53.3% for Nifty (`results/e13d_real_long_windows_*_random_4h.csv`).
 
 **Tests.** "z-test" is the two-proportion test of the first run. "Week-clustered" replaces its standard error by a cluster-robust ("sandwich") one in which all alarms of the same calendar week, on any coin and of either method, may be dependent, and different weeks are taken as independent (`cluster_z` in the script; clustering by calendar day gives similar values and is in the CSV). Clustering can move a p-value either way: dependence within a method widens the standard error, but two methods that alarm in the same weeks have positively correlated outcomes, which narrows the standard error of their difference. A more conservative version that treats the two methods as independent samples, each clustered by week, is in the CSV as `p_week_clustered_unpaired`. The share is over the alarms whose outcome can be scored (a few alarms near the end of a period cannot).
 
@@ -1376,12 +1379,12 @@ Matched to band 0 the five methods are within 70.0% to 83.1% (up) and 66.7% to 7
 | BOCPD on truncated returns | w = 250 (first run) | 68.0% (369) | 0.001 / < 0.001 | 71.7% (254) | 0.020 / 0.006 | 76.7% / 74.4% |
 | BOCPD on truncated returns | w = 720 | 72.6% (365) | 0.065 / 0.047 | 77.9% (258) | 0.474 / 0.484 | 72.7% / 71.7% |
 | BOCPD on truncated returns | w = 1440 | 69.6% (368) | 0.006 / 0.003 | 81.7% (257) | 0.719 / 0.758 | 66.3% / 68.6% |
-| BJV rolling | k = 120 (first run) | 65.6% (366) | < 0.001 / < 0.001 | 58.7% (252) | < 0.001 / < 0.001 | 76.2% / 73.0% |
-| BJV rolling | k = 480 | 69.9% (365) | 0.008 / 0.007 | 74.0% (254) | 0.082 / 0.121 | 61.7% / 59.8% |
-| BJV rolling | k = 1440 | 67.9% (368) | 0.001 / 0.003 | 77.7% (256) | 0.447 / 0.498 | 51.6% / 46.1% |
-| BJV rolling, studentised | k = 120 (first run) | 66.5% (367) | < 0.001 / < 0.001 | 62.4% (255) | < 0.001 / < 0.001 | 72.6% / 70.6% |
-| BJV rolling, studentised | k = 480 | 68.2% (362) | 0.002 / 0.003 | 71.3% (258) | 0.015 / 0.050 | 59.0% / 60.5% |
-| BJV rolling, studentised | k = 1440 | 66.3% (368) | < 0.001 / < 0.001 | 77.8% (257) | 0.461 / 0.527 | 49.2% / 48.1% |
+| VR scan, rolling | k = 120 (first run) | 65.6% (366) | < 0.001 / < 0.001 | 58.7% (252) | < 0.001 / < 0.001 | 76.2% / 73.0% |
+| VR scan, rolling | k = 480 | 69.9% (365) | 0.008 / 0.007 | 74.0% (254) | 0.082 / 0.121 | 61.7% / 59.8% |
+| VR scan, rolling | k = 1440 | 67.9% (368) | 0.001 / 0.003 | 77.7% (256) | 0.447 / 0.498 | 51.6% / 46.1% |
+| VR scan, rolling, studentised | k = 120 (first run) | 66.5% (367) | < 0.001 / < 0.001 | 62.4% (255) | < 0.001 / < 0.001 | 72.6% / 70.6% |
+| VR scan, rolling, studentised | k = 480 | 68.2% (362) | 0.002 / 0.003 | 71.3% (258) | 0.015 / 0.050 | 59.0% / 60.5% |
+| VR scan, rolling, studentised | k = 1440 | 66.3% (368) | < 0.001 / < 0.001 | 77.8% (257) | 0.461 / 0.527 | 49.2% / 48.1% |
 
 **Held out: the same coins, 1 January to 30 June 2025, band 0.25:**
 
@@ -1394,12 +1397,12 @@ Matched to band 0 the five methods are within 70.0% to 83.1% (up) and 66.7% to 7
 | BOCPD on truncated returns | w = 250 (first run) | 71.5% (305) | 0.002 / < 0.001 | 67.0% (303) | 0.468 / 0.415 | 84.3% / 71.1% |
 | BOCPD on truncated returns | w = 720 | 74.8% (302) | 0.031 / 0.016 | 69.3% (303) | 0.908 / 0.887 | 82.2% / 70.3% |
 | BOCPD on truncated returns | w = 1440 | 73.7% (304) | 0.013 / 0.012 | 71.9% (303) | 0.549 / 0.530 | 72.7% / 64.5% |
-| BJV rolling | k = 120 (first run) | 68.6% (306) | < 0.001 / < 0.001 | 59.8% (301) | 0.011 / 0.010 | 80.1% / 68.4% |
-| BJV rolling | k = 480 | 75.7% (304) | 0.054 / 0.028 | 68.3% (303) | 0.705 / 0.610 | 63.4% / 61.1% |
-| BJV rolling | k = 1440 | 69.3% (303) | < 0.001 / < 0.001 | 73.7% (304) | 0.280 / 0.288 | 51.1% / 49.7% |
-| BJV rolling, studentised | k = 120 (first run) | 67.8% (304) | < 0.001 / < 0.001 | 58.3% (300) | 0.003 / 0.001 | 73.7% / 65.7% |
-| BJV rolling, studentised | k = 480 | 75.5% (306) | 0.048 / 0.018 | 66.8% (304) | 0.433 / 0.267 | 61.7% / 62.2% |
-| BJV rolling, studentised | k = 1440 | 69.3% (303) | < 0.001 / < 0.001 | 72.7% (304) | 0.420 / 0.428 | 49.5% / 48.4% |
+| VR scan, rolling | k = 120 (first run) | 68.6% (306) | < 0.001 / < 0.001 | 59.8% (301) | 0.011 / 0.010 | 80.1% / 68.4% |
+| VR scan, rolling | k = 480 | 75.7% (304) | 0.054 / 0.028 | 68.3% (303) | 0.705 / 0.610 | 63.4% / 61.1% |
+| VR scan, rolling | k = 1440 | 69.3% (303) | < 0.001 / < 0.001 | 73.7% (304) | 0.280 / 0.288 | 51.1% / 49.7% |
+| VR scan, rolling, studentised | k = 120 (first run) | 67.8% (304) | < 0.001 / < 0.001 | 58.3% (300) | 0.003 / 0.001 | 73.7% / 65.7% |
+| VR scan, rolling, studentised | k = 480 | 75.5% (306) | 0.048 / 0.018 | 66.8% (304) | 0.433 / 0.267 | 61.7% / 62.2% |
+| VR scan, rolling, studentised | k = 1440 | 69.3% (303) | < 0.001 / < 0.001 | 72.7% (304) | 0.420 / 0.428 | 49.5% / 48.4% |
 
 **Nifty 50, 2024 to 2025, band 0.25:**
 
@@ -1410,37 +1413,37 @@ Matched to band 0 the five methods are within 70.0% to 83.1% (up) and 66.7% to 7
 | BOCPD | w = 375 | 75.9% (79) | 0.439 / 0.406 | 73.9% (69) | 0.216 / 0.206 | 79.7% / 71.0% |
 | BOCPD on truncated returns | w = 250 (first run) | 77.6% (76) | 0.603 / 0.574 | 76.8% (69) | 0.397 / 0.349 | 73.7% / 73.9% |
 | BOCPD on truncated returns | w = 375 | 74.7% (79) | 0.338 / 0.215 | 69.6% (69) | 0.072 / 0.045 | 77.2% / 72.5% |
-| BJV rolling | k = 120 (first run) | 78.5% (79) | 0.692 / 0.638 | 69.1% (68) | 0.065 / 0.051 | 82.3% / 62.3% |
-| BJV rolling | k = 375 | 68.4% (79) | 0.067 / 0.061 | 62.3% (69) | 0.008 / 0.003 | 67.1% / 56.5% |
-| BJV rolling, studentised | k = 120 (first run) | 77.2% (79) | 0.557 / 0.504 | 70.6% (68) | 0.096 / 0.093 | 78.5% / 68.1% |
-| BJV rolling, studentised | k = 375 | 67.1% (79) | 0.046 / 0.016 | 65.2% (69) | 0.020 / 0.005 | 67.1% / 58.0% |
+| VR scan, rolling | k = 120 (first run) | 78.5% (79) | 0.692 / 0.638 | 69.1% (68) | 0.065 / 0.051 | 82.3% / 62.3% |
+| VR scan, rolling | k = 375 | 68.4% (79) | 0.067 / 0.061 | 62.3% (69) | 0.008 / 0.003 | 67.1% / 56.5% |
+| VR scan, rolling, studentised | k = 120 (first run) | 77.2% (79) | 0.557 / 0.504 | 70.6% (68) | 0.096 / 0.093 | 78.5% / 68.1% |
+| VR scan, rolling, studentised | k = 375 | 67.1% (79) | 0.046 / 0.016 | 65.2% (69) | 0.020 / 0.005 | 67.1% / 58.0% |
 
-* **First-run windows, with clustering.** The first-run comparisons hold with the clustered test: week-clustered p ≤ 0.006 in Jul to Dec 2025 and p ≤ 0.010 in Jan to Jun 2025, except the truncated BOCPD's held-out down alarms (p = 0.42). With the conservative unpaired version the p-values are larger, ≤ 0.043 and ≤ 0.035, except the held-out down alarms of rolling BJV (p = 0.062) and of the truncated BOCPD (p = 0.63).
-* **Down alarms: day-long windows close the gap.** With windows of a day (BJV and studentised BJV with k = 1440, BOCPD on truncated returns with w = 720 or 1440), the competitors' down alarms are as informative as the e-detector's: 77.7% to 81.7% against 80.5% in Jul to Dec 2025 (p ≥ 0.45) and 69.3% to 73.7% against 69.7% held out (p ≥ 0.28); three of these are above the e-detector in the held-out half-year and one in the other. Plain BOCPD stays lower (59.5% to 69.9%).
-* **Up alarms: the gap shrinks but stays.** No competitor configuration reaches the e-detector's up alarms in either half-year: the eight longer-window ones score 66.3% to 72.6% against 78.5%, and 69.3% to 75.7% against 82.0% held out. The best of them, picked after seeing the results (which favours the competitors), are about 6 points lower: BOCPD on truncated returns with w = 720, 72.6% (z-test p = 0.065, week-clustered 0.047, unpaired 0.21), and BJV with k = 480, 75.7% held out (p = 0.054, 0.028 and 0.19). So the remaining up-alarm advantage is borderline, not clear. Matched to band 0 (more alarms), the up-alarm gap to the best longer-window competitor is 5.6 and 3.7 points (p = 0.10 and 0.29), and on down alarms the best one equals the e-detector (68.2% against 68.3%; 66.6% against 66.3%).
-* **At four hours the order changes.** On the four-hour outcome, the first-run (short-window) competitors do as well as the e-detector or better: 72.6% to 85.4% (up) and 69.1% to 74.4% (down) against 77.9% and 66.9% in Jul to Dec 2025, where BOCPD's up alarms are significantly higher (85.4%, p = 0.009), and 73.7% to 87.9% and 65.7% to 71.1% against 84.4% and 67.4% held out, where the only significant difference is a lower score for the studentised BJV's up alarms (73.7%, p = 0.001). The day-long BJV windows score near chance on this horizon (46.1% to 51.6%).
-* **Nifty.** Longer windows do not help on Nifty: BJV with k = 375 scores lower than with k = 120 (68.4% and 62.3%, against 81.0% and 82.6% for the e-detector; down alarms p = 0.008), and BOCPD with w = 375 is not significantly different from the e-detector (p ≥ 0.07).
+* **First-run windows, with clustering.** The first-run comparisons hold with the clustered test: week-clustered p ≤ 0.006 in Jul to Dec 2025 and p ≤ 0.010 in Jan to Jun 2025, except the truncated BOCPD's held-out down alarms (p = 0.42). With the conservative unpaired version the p-values are larger, ≤ 0.043 and ≤ 0.035, except the held-out down alarms of rolling VR scan (p = 0.062) and of the truncated BOCPD (p = 0.63).
+* **Down alarms: day-long windows close the gap.** With windows of a day (VR scan and studentised VR scan with k = 1440, BOCPD on truncated returns with w = 720 or 1440), the competitors' down alarms are as informative as the e-detector's: 77.7% to 81.7% against 80.5% in Jul to Dec 2025 (p ≥ 0.45) and 69.3% to 73.7% against 69.7% held out (p ≥ 0.28); three of these are above the e-detector in the held-out half-year and one in the other. Plain BOCPD stays lower (59.5% to 69.9%).
+* **Up alarms: the gap shrinks but stays.** No competitor configuration reaches the e-detector's up alarms in either half-year: the eight longer-window ones score 66.3% to 72.6% against 78.5%, and 69.3% to 75.7% against 82.0% held out. The best of them, picked after seeing the results (which favours the competitors), are about 6 points lower: BOCPD on truncated returns with w = 720, 72.6% (z-test p = 0.065, week-clustered 0.047, unpaired 0.21), and the VR scan with k = 480, 75.7% held out (p = 0.054, 0.028 and 0.19). So the remaining up-alarm advantage is borderline, not clear. Matched to band 0 (more alarms), the up-alarm gap to the best longer-window competitor is 5.6 and 3.7 points (p = 0.10 and 0.29), and on down alarms the best one equals the e-detector (68.2% against 68.3%; 66.6% against 66.3%).
+* **At four hours the order changes.** On the four-hour outcome, the first-run (short-window) competitors do as well as the e-detector or better: 72.6% to 85.4% (up) and 69.1% to 74.4% (down) against 77.9% and 66.9% in Jul to Dec 2025, where BOCPD's up alarms are significantly higher (85.4%, p = 0.009), and 73.7% to 87.9% and 65.7% to 71.1% against 84.4% and 67.4% held out, where the only significant difference is a lower score for the studentised VR scan's up alarms (73.7%, p = 0.001). The day-long VR scan windows score near chance on this horizon (46.1% to 51.6%).
+* **Nifty.** Longer windows do not help on Nifty: the VR scan with k = 375 scores lower than with k = 120 (68.4% and 62.3%, against 81.0% and 82.6% for the e-detector; down alarms p = 0.008), and BOCPD with w = 375 is not significantly different from the e-detector (p ≥ 0.07).
 * **What this means.** Much of the first-run crypto gap was a matter of time scale: the outcome asks about the next day, the e-detector's own scale, and competitors with day-long windows match its down alarms. Its up alarms keep a borderline advantage of about 6 points, and at a four-hour scale the short-window competitors do at least as well. What the comparison does not take away is that the e-detector reaches its score without a window to choose, with settings frozen in advance; but on real data it runs with the plug-in baseline, which has no proved false alarm bound either.
 
 Figure: `results/figures/e13_real_long_windows.png` (share by competitor window, with the e-detector as a horizontal line).
 
-**Alarm rates at the Gaussian-matched thresholds.** Real volatility moves far more than the Gaussian null, so every method alarms much more often than its Gaussian rate (about 0.04 per day). Crypto, Jul to Dec 2025: e-detector 0.83 alarms per day (band 0) and 0.68 (band 0.25); BOCPD 0.95; BOCPD on truncated returns 0.91; rolling BJV 0.87 (0.825 at its nominal 5% per day, with the corrected critical value of m16; 0.83 before); studentised BJV 0.72. Nifty, per session: 0.38 and 0.30; 0.46; 0.41; 0.39 (0.37); 0.29. At these unmatched rates the competitors' forecast scores are 52.9% to 66.2% on crypto and 58.0% to 74.7% on Nifty (`results/e13d_real_pooled.csv`).
+**Alarm rates at the Gaussian-matched thresholds.** Real volatility moves far more than the Gaussian null, so every method alarms much more often than its Gaussian rate (about 0.04 per day). Crypto, Jul to Dec 2025: e-detector 0.83 alarms per day (band 0) and 0.68 (band 0.25); BOCPD 0.95; BOCPD on truncated returns 0.91; rolling VR scan 0.87 (0.825 at its nominal 5% per day, with the corrected critical value of m16; 0.83 before); studentised VR scan 0.72. Nifty, per session: 0.38 and 0.30; 0.46; 0.41; 0.39 (0.37); 0.29. At these unmatched rates the competitors' forecast scores are 52.9% to 66.2% on crypto and 58.0% to 74.7% on Nifty (`results/e13d_real_pooled.csv`).
 
 ### Q13e. Cost per step
 
-One series, 20,000 steps, Python and numpy on the shared 4-core machine (`results/e13e_cost.csv`; indicative): e-detector (`VolatilityMonitor.update`, two sides, 11 bets) 10.8 µs per step; BOCPD 300 µs (run-length cap 256) and 317 µs (cap 512), dominated by numpy call overhead on a few hundred run lengths; rolling BJV 211 µs per step if one truncated window pair is recomputed at each step, 27 µs per step vectorised over a whole series, 0.19 µs per step without truncation (running sums). The e-detector is the cheapest of the robust online methods by a factor of about 2.5 to 30; all are far below one minute per step.
+One series, 20,000 steps, Python and numpy on the shared 4-core machine (`results/e13e_cost.csv`; indicative): e-detector (`VolatilityMonitor.update`, two sides, 11 bets) 10.8 µs per step; BOCPD 300 µs (run-length cap 256) and 317 µs (cap 512), dominated by numpy call overhead on a few hundred run lengths; rolling VR scan 211 µs per step if one truncated window pair is recomputed at each step, 27 µs per step vectorised over a whole series, 0.19 µs per step without truncation (running sums). The e-detector is the cheapest of the robust online methods by a factor of about 2.5 to 30; all are far below one minute per step.
 
 ### Reading
 
 * **Where the competitors win.** On clean Gaussian data BOCPD detects large decreases two to three times faster than the plug-in e-detector (26 against 81 steps for a halving of the sd, 51 against 109 for sd × 0.67); for sd × 0.8, and with ticks or price noise, it is 1.0 to 1.9 times faster (for example 137 against 169 steps for sd × 0.8 on Gaussian data, 132 against 132 with ticks, 66 against 122 for a halving with price noise), and in the cells with sd × 0.8 it detects fewer of the changes (86.5%, 85.5% and 64.5% against 97.5% to 98.5%). It also detects large increases faster (13 against 20 steps for a doubling), at the same false alarm rate. Clipping the returns first (our "BOCPD on truncated returns") keeps most of the speed for decreases under jumps (25 against 81 steps) with 1.6% false alarms per day. On real crypto data, with day-long windows, the competitors' down alarms were as informative as the e-detector's in both half-years, and in the held-out half-year even the first-run truncated BOCPD's down alarms were not significantly different (67.0% against 69.7%, p = 0.47). These are real advantages, and a practitioner who trusts the Gaussian shape of returns, or cares mostly about decreases, could prefer BOCPD on truncated returns.
 * **Where they lose.** Plain BOCPD is not usable on returns with jumps or fat tails: false alarms on 73% (jumps) and 53% (Student t5) of days at a threshold that gives 1% on Gaussian data. Truncation fixes jumps but not fat tails: 7.5% per day under t5, against 1.2% for the plug-in e-detector, which has no proved bound (measured), and 0.0% for the CS-baseline e-detector, whose 5% bound is a theorem. Neither BOCPD version detects small increases as reliably: 81% to 90% of 25% increases with Gaussian returns or jumps and 46.5% to 84.5% with ticks or price noise, against 97% to 99% for the plug-in e-detector.
-* **BJV.** Truncation makes it robust to price jumps (as designed); Gaussian normalisation does not survive fat tails (24% to 53% size under t5 for the truncated versions at every window length, 87% for the plain one) unless the statistic is studentised. With the short windows of the first runs its power is much lower: offline, a 25% change is found in 6% to 8% of windows with k = 50 and 30% with k = 125, against 100% for the e-detector at the same size. **The gap is window length**, not the lack of betting: with windows of 250 returns the same truncated statistic finds 76% of 25% increases and 77% of 20% decreases, and with windows of 500 returns, as long as the e-detector's calibration window, 99% and 100%, at matched size on Gaussian data. Long windows have costs. The statistic needs k returns on both sides of the change and is centred on it, which a monitor is not; another change within k steps would blur it. It locates small changes less precisely among its rejections (within 25 steps in 49% to 54% of rejections with k = 500 against 63% to 65% with k = 125). Run online as a rolling test with k = 500, it detects 96% of 25% increases and 20% decreases on Gaussian data (k = 120: 30% and 32%), but with median delays of 277 and 326.5 steps against 104 and 169 for the plug-in e-detector, and 67.5 against 20 steps for a doubling. The e-detector's real advantages over BJV are that it does not have to choose a window or know where the change is, and that it is online and fast. This is not a flaw of the paper: BJV is built to find *local* volatility jumps inside smoothly moving volatility, so its windows are meant to be short, and it has no reference period. Its asymptotic Gumbel critical values were very conservative here (0.2% to 1.5% for a nominal 5% on Gaussian data). As an online rolling test with k = 120 it is a Shewhart-type chart and misses most small changes (9% to 35% detected for sd ratios 1.25 and 0.8, of which 77% to 95% in the right direction for the matched version).
-* **Real data, rate-matched (first review, point M3; review round 3, point M4).** With the first-run windows (2 to 4 hours), the e-detector's alarms on crypto were followed by a day beyond an EWMA forecast more often than the competitors' (78.5% and 80.5% against 58.7% to 71.7% in Jul to Dec 2025; 82.0% and 69.7% against 56.7% to 71.5% in the held-out Jan to Jun 2025), and this holds with tests clustered by week. But the outcome asks whether the next day stays beyond a one-day forecast, the time scale of the e-detector's 1440-minute baseline, and the first-run competitor windows were not chosen for it. With windows of half a day to a day, the competitors' down alarms are as informative as the e-detector's in both half-years, the e-detector's up-alarm advantage shrinks to about 6 points against the best competitor (p = 0.065 and 0.054 with the z-test, 0.047 and 0.028 week-clustered), and on a four-hour outcome the short-window competitors do as well or better. So the e-detector is not more precise on crypto in general; its alarms are better aligned with day-long shifts than those of competitors with short windows. On Nifty all methods score 62% to 83% at band 0.25 and longer windows do not help the competitors (BJV with k = 375 is worse). A plausible reason for the remaining up-alarm gap, not tested here: the e-detector compares against a fixed calibrated baseline and alarms only after evidence has accumulated against it.
+* **VR scan.** Truncation makes it robust to price jumps (as designed); Gaussian normalisation does not survive fat tails (24% to 53% size under t5 for the truncated versions at every window length, 87% for the plain one) unless the statistic is studentised. With the short windows of the first runs its power is much lower: offline, a 25% change is found in 6% to 8% of windows with k = 50 and 30% with k = 125, against 100% for the e-detector at the same size. **The gap is window length**, not the lack of betting: with windows of 250 returns the same truncated statistic finds 76% of 25% increases and 77% of 20% decreases, and with windows of 500 returns, as long as the e-detector's calibration window, 99% and 100%, at matched size on Gaussian data. Long windows have costs. The statistic needs k returns on both sides of the change and is centred on it, which a monitor is not; another change within k steps would blur it. It locates small changes less precisely among its rejections (within 25 steps in 49% to 54% of rejections with k = 500 against 63% to 65% with k = 125). Run online as a rolling test with k = 500, it detects 96% of 25% increases and 20% decreases on Gaussian data (k = 120: 30% and 32%), but with median delays of 277 and 326.5 steps against 104 and 169 for the plug-in e-detector, and 67.5 against 20 steps for a doubling. The e-detector's real advantages over the VR scan are that it does not have to choose a window or know where the change is, and that it is online and fast. This is not a flaw of the published method: the test of Bibinger, Jirak and Vetter is built to find *local* volatility jumps inside smoothly moving volatility, so its windows are meant to be short, and it has no reference period. Its asymptotic Gumbel critical values were very conservative here (0.2% to 1.5% for a nominal 5% on Gaussian data). As an online rolling test with k = 120 it is a Shewhart-type chart and misses most small changes (9% to 35% detected for sd ratios 1.25 and 0.8, of which 77% to 95% in the right direction for the matched version).
+* **Real data, rate-matched (first review, point M3; review round 3, point M4).** With the first-run windows (2 to 4 hours), the e-detector's alarms on crypto were followed by a day beyond an EWMA forecast more often than the competitors' (78.5% and 80.5% against 58.7% to 71.7% in Jul to Dec 2025; 82.0% and 69.7% against 56.7% to 71.5% in the held-out Jan to Jun 2025), and this holds with tests clustered by week. But the outcome asks whether the next day stays beyond a one-day forecast, the time scale of the e-detector's 1440-minute baseline, and the first-run competitor windows were not chosen for it. With windows of half a day to a day, the competitors' down alarms are as informative as the e-detector's in both half-years, the e-detector's up-alarm advantage shrinks to about 6 points against the best competitor (p = 0.065 and 0.054 with the z-test, 0.047 and 0.028 week-clustered), and on a four-hour outcome the short-window competitors do as well or better. So the e-detector is not more precise on crypto in general; its alarms are better aligned with day-long shifts than those of competitors with short windows. On Nifty all methods score 62% to 83% at band 0.25 and longer windows do not help the competitors (the VR scan with k = 375 is worse). A plausible reason for the remaining up-alarm gap, not tested here: the e-detector compares against a fixed calibrated baseline and alarms only after evidence has accumulated against it.
 * **The guarantee needs the CS baseline.** With only 500 calibration steps, the plug-in e-detector's nominal offline size was 11.4% to 18.6% instead of 5% (review point M4 of the first review again). The CS baseline restores it (0.0%) at a cost of 1.25 to 2.6 times the median delay in Q13c with Gaussian returns, jumps or Student t5 (up to 2.6 with price noise, and 3.7 to 3.9 for decreases with ticks).
 
 ### Caveats
 
-* The BJV implementation follows the published idea, not the published equations, which could not be read here (see above). Results with simulation-calibrated critical values do not depend on the asymptotic constants, but the exact standardisation might differ from the paper's.
+* The VR scan follows the published idea of Bibinger, Jirak and Vetter (2017), not their equations, which could not be read here (see above); it is not their procedure. Results with simulation-calibrated critical values do not depend on the asymptotic constants, but the exact standardisation might differ from the paper's.
 * BOCPD settings (w = 250, run-length cap 512, α₀ = 2, H = 1 / A) were chosen on a Gaussian pilot to help BOCPD; a Student t likelihood or a learned hazard might do better under fat tails and was not tried. On real data, w = 720 and 1440 (375 on Nifty) were also run; no other setting was varied. The run-length cap makes BOCPD here an approximation of Adams and MacKay's exact recursion once runs reach the cap (see "BOCPD" above).
 * Competitor thresholds matched "per day" rest on about 60 false alarms in 4000 Gaussian paths; online change cells have 200 paths (standard error of a detection share up to 3.5 points; medians are noisy).
 * The real-data validation is a proxy (next-day robust volatility against an EWMA forecast) on the e-detector's own time scale of one day. Alarms are not independent (volatility clusters); the clustered tests allow for dependence within a day or a week but take different weeks as independent. The matching of alarm counts uses the same data, but not the outcome. The e-detector's settings were frozen in E5 on Bitstamp BTC in Jul to Dec 2025, so only the Jan to Jun 2025 crypto run is fully held out for it.
@@ -2512,13 +2515,13 @@ The matched-delay random-time controls are 48% to 56% in every row (`e17_ratemat
 
 ## E18. Landmark market shocks: how fast do the monitors flag them? (pre-registered case studies)
 
-Script `experiments/e18_landmark_events.py`; outputs `results/e18_events.csv`, `e18_outcomes.csv`, `e18_alarms.csv`, `e18_thresholds.csv`, `e18_rates.csv`, `e18_context.csv` and `results/figures/e18_events.png`. All results **[REAL]** and **case studies, not evidence**. Pre-registration: [`docs/preregistration_e18_events.md`](../preregistration_e18_events.md), committed on its own as `b8ee0f7` at 00:37 UTC on 3 November 2026, before the script existed and before any return in the event windows was loaded for this study. The run follows it; nothing in its sections 1 to 4 was changed. Two things were added after the run and are labelled where they appear: a descriptive table of return sizes around the e-detector's alarms (`e18_context.csv`, not pre-registered), and two technical changes to the script after a container restart killed the first run, which only save intermediate arrays so that finished work is not lost (`docs/iterations/E18.md`, iteration 2).
+Script `experiments/e18_landmark_events.py`; outputs `results/e18_events.csv`, `e18_outcomes.csv`, `e18_alarms.csv`, `e18_thresholds.csv`, `e18_rates.csv`, `e18_context.csv`, `e18_awake.csv` and `results/figures/e18_events.png`. All results **[REAL]** and **case studies, not evidence**. Pre-registration: [`docs/preregistration_e18_events.md`](../preregistration_e18_events.md), committed on its own as `b8ee0f7` at 00:37 UTC on 3 November 2026, before the script existed and before any return in the event windows was loaded for this study. The run follows it; nothing in its sections 1 to 4 was changed. Three things were added after the run and are labelled where they appear: a descriptive table of return sizes around the e-detector's alarms (`e18_context.csv`, not pre-registered), an exploratory run of E14's monitors with no blind period (last section, `e18_awake.csv`, not pre-registered and decided after seeing the results), and two technical changes to the script after a container restart killed the first run, which only save intermediate arrays so that finished work is not lost (`docs/iterations/E18.md`, iteration 2).
 
 **Question.** When one of the large market shocks that everyone remembers happens, how quickly do the e-detector and its published competitors (E13) raise an "up" alarm (a detected rise in volatility)? Were they watching at that moment, or blind because they were recalibrating or pausing after an earlier alarm? And how many alarms did they raise in the ordinary week before?
 
 **What this can and cannot show.** Four events and up to six assets per event. The five coins move together within an event, so each crypto event is closer to one case than to five. With so few cases nothing here is a test: there is no pooled statistic, no p-value, and the cases do not rank the methods. They show what a user of each method would have seen on those days. The evidence about the methods is in E6, E7, E12 and E13.
 
-**Headline [REAL], primary design (streaming, thresholds matched outside the event windows).** "Competitor configurations" counts the nine crypto settings (BOCPD, BOCPD on truncated returns and the BJV-type test, three window lengths each) on each of five coins, or the six Nifty settings.
+**Headline [REAL], primary design (streaming, thresholds matched outside the event windows).** "Competitor configurations" counts the nine crypto settings (BOCPD, BOCPD on truncated returns and the variance-ratio scan, three window lengths each) on each of five coins, or the six Nifty settings.
 
 | Event (reference time T) | e-detector at T | e-detector: first up alarm within 24 hours of T | Competitor configurations watching at T | Competitor configurations with an up alarm within 24 hours (of which in the first minute after a pause ended) |
 |---|---|---|---|---|
@@ -2527,7 +2530,7 @@ Script `experiments/e18_landmark_events.py`; outputs `results/e18_events.csv`, `
 | N2, global sell-off, Nifty (09:15 IST, 5 Aug 2024) | recalibrating after a down alarm on 1 Aug; back at 10:31 IST | 104 minutes | 4 of 6 | 4 of 6 (0) |
 | C2, tariff sell-off, five coins (00:00 UTC, 7 Apr 2025) | recalibrating on all five, after up alarms at 17:05 to 17:48 UTC on Sunday 6 Apr (6.2 to 6.9 hours before T) | none on any coin | 3 of 45 | 9 of 45 (7) |
 | N3, tariff sell-off, Nifty (09:15 IST, 7 Apr 2025) | recalibrating after a down alarm on 3 Apr; back at 11:07 IST | 172 minutes | 0 of 6 | 4 of 6 (4) |
-| C3, crypto liquidation cascade, five coins (20:00 UTC, 10 Oct 2025; the tariff post came by 20:57 UTC) | recalibrating on all five, after up alarms at 15:23 to 15:30 UTC that day (4.5 to 4.6 hours before T) | none on any coin | 5 of 45 (BJV-type, k = 1440, on all five coins) | 10 of 45 (1); the five watching configurations within 17 to 73 minutes |
+| C3, crypto liquidation cascade, five coins (20:00 UTC, 10 Oct 2025; the tariff post came by 20:57 UTC) | recalibrating on all five, after up alarms at 15:23 to 15:30 UTC that day (4.5 to 4.6 hours before T) | none on any coin | 5 of 45 (variance-ratio scan, k = 1440, on all five coins) | 10 of 45 (1); the five watching configurations within 17 to 73 minutes |
 
 A sentence that can be quoted: "In four pre-registered case studies, the streaming e-detector flagged all three Nifty shocks, 11 to 172 minutes after the open, but none of the fifteen crypto coin and event pairs within 24 hours, because on each crypto event it had raised an up alarm 4.5 to 6.9 hours before the reference time, as the turbulence began, and was still recalibrating; the competitors, at the same alarm rates, were mostly paused for the same reason. With a fresh calibration just before the reference time it flagged all 18 cases within 15 to 207 minutes."
 
@@ -2535,7 +2538,7 @@ A sentence that can be quoted: "In four pre-registered case studies, the streami
 
 * **Streams, as a user would have run them.** Crypto: Binance one-minute bars of BTC, ETH, XRP, SOL and DOGE, divided by the predictable intraday volatility profile (E6b), in three half-year streams, each run without interruption from its first minute: July to December 2024 (for C1, new), January to June 2025 (for C2) and July to December 2025 (for C3), the last two exactly E13's samples. Nifty 50: E13's stream, 2024 to 2025, divided by E7's session profile. All three Nifty events are in it.
 * **e-detector.** Frozen settings of E6 and E7: A = 28,800 per 1440-minute day (crypto) or 7,500 per 375-bar session (Nifty), each side alarming at 2A, c = 3, null band 0.25, plug-in baseline. After every alarm it **recalibrates**: it collects a new baseline from the next 1440 minutes (crypto) or 750 bars, two sessions (Nifty), and cannot alarm during that time. On real data its false alarm rate is measured, not proved (E14).
-* **Competitors**, E13's real-data code with the first-run windows and the longer windows of review round 3: BOCPD (Bayesian online change point detection, Adams and MacKay 2007) with short-run windows w = 250, 720 and 1440 minutes (Nifty 250 and 375 bars); BOCPD on returns clipped at 3 robust standard deviations (our modification), same windows; and the truncated BJV-type rolling test (our reconstruction of the idea of Bibinger, Jirak and Vetter 2017), which compares the last k returns with the k before them, k = 120, 480 and 1440 (Nifty 120 and 375). As in E13 each competitor **pauses** for 1440 minutes (750 bars) after each of its alarms.
+* **Competitors**, E13's real-data code with the first-run windows and the longer windows of review round 3: BOCPD (Bayesian online change point detection, Adams and MacKay 2007) with short-run windows w = 250, 720 and 1440 minutes (Nifty 250 and 375 bars); BOCPD on returns clipped at 3 robust standard deviations (our modification), same windows; and a truncated **two-window variance-ratio scan** (inspired by Bibinger, Jirak and Vetter 2017; we could not obtain the paper, so this is not their test, and earlier versions of E13 and E18 called it the "variance-ratio scan" test), which compares the realised variance of the last k returns with that of the k before them, k = 120, 480 and 1440 (Nifty 120 and 375). As in E13 each competitor **pauses** for 1440 minutes (750 bars) after each of its alarms.
 * **Rate matching without the events.** Each competitor's up and down thresholds are set by E13's bisection so that it raises as many up and as many down alarms as the e-detector on the same stream, **counting only alarms outside the windows from 8 days before to 2 days after each reference time**. So every method alarms about equally often on ordinary days, and the event windows do not enter the thresholds.
 * **Reference time T.** The triggering announcement if the market was open, otherwise the next open; for crypto on the two Monday sell-offs that started in Asia, the Tokyo open (00:00 UTC). Fixed before looking at any return. An alarm before T counts as an alarm before T, even if it belongs to the same episode.
 * **Outcomes**, for every event, asset and method: (1) state at T; (2) minutes from T to the first up alarm within 24 hours, or "missed"; (3) up and down alarms in the 7 days before T, with the number expected at the method's average rate, and the last up alarm before T; (4) up and down alarms in the 24 hours after T, and the direction of the first. Secondary: S1, a fresh start at T; S2, the e-detector streamed from another start date; S3, thresholds matched on the whole sample (E13's rule).
@@ -2566,10 +2569,10 @@ How to read the tables. Times are UTC for crypto and IST for Nifty. **State at T
 |  | BOCPD, w = 375 | paused since up alarm 31 May 15:27 (back 04 Jun 15:28) | missed | 1 / 0 (1.5) | 31 May 15:27 (89.8 h before) | 0 / 1 | down 04 Jun 15:28 |
 |  | BOCPD, truncated, w = 250 | watching | 8 (04 Jun 09:23) | 1 / 0 (1.5) | 30 May 15:18 (114.0 h before) | 1 / 0 | up 04 Jun 09:23 |
 |  | BOCPD, truncated, w = 375 | paused since down alarm 03 Jun 15:20 (back 05 Jun 15:21) | missed | 1 / 1 (1.5) | 30 May 15:19 (113.9 h before) | 0 / 0 |  |
-|  | BJV-type, k = 120 | paused since up alarm 31 May 15:16 (back 04 Jun 15:17) | missed | 2 / 0 (1.5) | 31 May 15:16 (90.0 h before) | 0 / 1 | down 04 Jun 15:17 |
-|  | BJV-type, k = 375 | watching | 68 (04 Jun 10:23) | 0 / 0 (1.5) | none | 1 / 0 | up 04 Jun 10:23 |
+|  | variance-ratio scan, k = 120 | paused since up alarm 31 May 15:16 (back 04 Jun 15:17) | missed | 2 / 0 (1.5) | 31 May 15:16 (90.0 h before) | 0 / 1 | down 04 Jun 15:17 |
+|  | variance-ratio scan, k = 375 | watching | 68 (04 Jun 10:23) | 0 / 0 (1.5) | none | 1 / 0 | up 04 Jun 10:23 |
 
-The e-detector was monitoring at the open and raised an up alarm 11 minutes later (09:26 IST, the alarm already reported in E7). BOCPD on truncated returns with w = 250 was also watching and alarmed 3 minutes earlier (09:23); the BJV-type test with k = 375 alarmed at 10:23. The other four configurations were paused at the open after alarms on 31 May or 3 June and missed the session.
+The e-detector was monitoring at the open and raised an up alarm 11 minutes later (09:26 IST, the alarm already reported in E7). BOCPD on truncated returns with w = 250 was also watching and alarmed 3 minutes earlier (09:23); the variance-ratio scan with k = 375 alarmed at 10:23. The other four configurations were paused at the open after alarms on 31 May or 3 June and missed the session.
 
 #### C1 and N2. Global sell-off, 5 August 2024 (five coins, T = 00:00 UTC; Nifty 50, T = 09:15 IST)
 
@@ -2582,9 +2585,9 @@ The e-detector was monitoring at the open and raised an up alarm 11 minutes late
 |  | BOCPD, truncated, w = 250 | paused since down alarm 04 Aug 13:53 (back 05 Aug 13:54) | missed | 1 / 4 (4.8) | 29 Jul 13:56 (154.1 h before) | 0 / 1 | down 05 Aug 16:14 |
 |  | BOCPD, truncated, w = 720 | paused since up alarm 04 Aug 17:23 (back 05 Aug 17:24) | missed | 6 / 1 (5.0) | 04 Aug 17:23 (6.6 h before) | 0 / 1 | down 05 Aug 17:59 |
 |  | BOCPD, truncated, w = 1440 | paused since down alarm 04 Aug 07:06 (back 05 Aug 07:07) | 427 (05 Aug 07:07) | 3 / 2 (4.9) | 01 Aug 18:32 (77.5 h before) | 1 / 0 | up 05 Aug 07:07 |
-|  | BJV-type, k = 120 | paused since down alarm 04 Aug 14:26 (back 05 Aug 14:27) | missed | 0 / 6 (4.9) | none | 0 / 1 | down 05 Aug 15:37 |
-|  | BJV-type, k = 480 | paused since up alarm 04 Aug 20:00 (back 05 Aug 20:01) | missed | 4 / 2 (4.9) | 04 Aug 20:00 (4.0 h before) | 0 / 1 | down 05 Aug 20:01 |
-|  | BJV-type, k = 1440 | paused since down alarm 04 Aug 00:55 (back 05 Aug 00:56) | 92 (05 Aug 01:32) | 3 / 2 (4.9) | 02 Aug 15:35 (56.4 h before) | 1 / 0 | up 05 Aug 01:32 |
+|  | variance-ratio scan, k = 120 | paused since down alarm 04 Aug 14:26 (back 05 Aug 14:27) | missed | 0 / 6 (4.9) | none | 0 / 1 | down 05 Aug 15:37 |
+|  | variance-ratio scan, k = 480 | paused since up alarm 04 Aug 20:00 (back 05 Aug 20:01) | missed | 4 / 2 (4.9) | 04 Aug 20:00 (4.0 h before) | 0 / 1 | down 05 Aug 20:01 |
+|  | variance-ratio scan, k = 1440 | paused since down alarm 04 Aug 00:55 (back 05 Aug 00:56) | 92 (05 Aug 01:32) | 3 / 2 (4.9) | 02 Aug 15:35 (56.4 h before) | 1 / 0 | up 05 Aug 01:32 |
 | ETH | e-detector | calibrating since up alarm 04 Aug 17:49 (back 05 Aug 17:50) | missed | 5 / 0 (5.0) | 04 Aug 17:49 (6.2 h before) | 0 / 1 | down 05 Aug 19:54 |
 |  | BOCPD, w = 250 | paused since up alarm 04 Aug 17:09 (back 05 Aug 17:10) | missed | 5 / 0 (4.9) | 04 Aug 17:09 (6.8 h before) | 0 / 1 | down 05 Aug 17:10 |
 |  | BOCPD, w = 720 | paused since up alarm 04 Aug 18:13 (back 05 Aug 18:14) | missed | 4 / 1 (5.0) | 04 Aug 18:13 (5.8 h before) | 0 / 1 | down 05 Aug 18:14 |
@@ -2592,9 +2595,9 @@ The e-detector was monitoring at the open and raised an up alarm 11 minutes late
 |  | BOCPD, truncated, w = 250 | paused since up alarm 04 Aug 15:58 (back 05 Aug 15:59) | missed | 5 / 0 (4.9) | 04 Aug 15:58 (8.0 h before) | 0 / 1 | down 05 Aug 17:44 |
 |  | BOCPD, truncated, w = 720 | paused since up alarm 04 Aug 18:45 (back 05 Aug 18:46) | missed | 6 / 0 (5.0) | 04 Aug 18:45 (5.2 h before) | 0 / 1 | down 05 Aug 18:46 |
 |  | BOCPD, truncated, w = 1440 | paused since up alarm 04 Aug 19:45 (back 05 Aug 19:46) | missed | 6 / 0 (5.0) | 04 Aug 19:45 (4.2 h before) | 0 / 1 | down 05 Aug 19:46 |
-|  | BJV-type, k = 120 | paused since up alarm 04 Aug 17:47 (back 05 Aug 17:48) | missed | 2 / 4 (5.0) | 04 Aug 17:47 (6.2 h before) | 0 / 0 |  |
-|  | BJV-type, k = 480 | paused since up alarm 04 Aug 21:06 (back 05 Aug 21:07) | missed | 6 / 0 (5.0) | 04 Aug 21:06 (2.9 h before) | 0 / 1 | down 05 Aug 21:07 |
-|  | BJV-type, k = 1440 | paused since down alarm 04 Aug 01:25 (back 05 Aug 01:26) | 86 (05 Aug 01:26) | 3 / 2 (5.0) | 03 Aug 01:05 (46.9 h before) | 1 / 0 | up 05 Aug 01:26 |
+|  | variance-ratio scan, k = 120 | paused since up alarm 04 Aug 17:47 (back 05 Aug 17:48) | missed | 2 / 4 (5.0) | 04 Aug 17:47 (6.2 h before) | 0 / 0 |  |
+|  | variance-ratio scan, k = 480 | paused since up alarm 04 Aug 21:06 (back 05 Aug 21:07) | missed | 6 / 0 (5.0) | 04 Aug 21:06 (2.9 h before) | 0 / 1 | down 05 Aug 21:07 |
+|  | variance-ratio scan, k = 1440 | paused since down alarm 04 Aug 01:25 (back 05 Aug 01:26) | 86 (05 Aug 01:26) | 3 / 2 (5.0) | 03 Aug 01:05 (46.9 h before) | 1 / 0 | up 05 Aug 01:26 |
 | XRP | e-detector | calibrating since up alarm 04 Aug 17:44 (back 05 Aug 17:45) | missed | 3 / 3 (4.9) | 04 Aug 17:44 (6.3 h before) | 0 / 1 | down 05 Aug 20:51 |
 |  | BOCPD, w = 250 | watching | 55 (05 Aug 00:55) | 3 / 3 (4.9) | 03 Aug 16:30 (31.5 h before) | 1 / 0 | up 05 Aug 00:55 |
 |  | BOCPD, w = 720 | paused since up alarm 04 Aug 19:55 (back 05 Aug 19:56) | missed | 4 / 3 (4.9) | 04 Aug 19:55 (4.1 h before) | 0 / 1 | down 05 Aug 19:56 |
@@ -2602,9 +2605,9 @@ The e-detector was monitoring at the open and raised an up alarm 11 minutes late
 |  | BOCPD, truncated, w = 250 | paused since up alarm 04 Aug 14:52 (back 05 Aug 14:53) | missed | 3 / 3 (4.8) | 04 Aug 14:52 (9.1 h before) | 0 / 1 | down 05 Aug 17:04 |
 |  | BOCPD, truncated, w = 720 | paused since down alarm 04 Aug 07:07 (back 05 Aug 07:08) | 428 (05 Aug 07:08) | 4 / 2 (4.9) | 01 Aug 19:52 (76.1 h before) | 1 / 0 | up 05 Aug 07:08 |
 |  | BOCPD, truncated, w = 1440 | paused since down alarm 04 Aug 09:57 (back 05 Aug 09:58) | 598 (05 Aug 09:58) | 2 / 3 (4.9) | 01 Aug 05:00 (91.0 h before) | 1 / 0 | up 05 Aug 09:58 |
-|  | BJV-type, k = 120 | paused since down alarm 04 Aug 20:51 (back 05 Aug 20:52) | missed | 3 / 3 (4.9) | 03 Aug 16:41 (31.3 h before) | 0 / 0 |  |
-|  | BJV-type, k = 480 | paused since up alarm 04 Aug 17:34 (back 05 Aug 17:35) | missed | 3 / 3 (4.9) | 04 Aug 17:34 (6.4 h before) | 0 / 1 | down 05 Aug 21:26 |
-|  | BJV-type, k = 1440 | paused since down alarm 04 Aug 04:47 (back 05 Aug 04:48) | 288 (05 Aug 04:48) | 3 / 2 (4.9) | 03 Aug 04:46 (43.2 h before) | 1 / 0 | up 05 Aug 04:48 |
+|  | variance-ratio scan, k = 120 | paused since down alarm 04 Aug 20:51 (back 05 Aug 20:52) | missed | 3 / 3 (4.9) | 03 Aug 16:41 (31.3 h before) | 0 / 0 |  |
+|  | variance-ratio scan, k = 480 | paused since up alarm 04 Aug 17:34 (back 05 Aug 17:35) | missed | 3 / 3 (4.9) | 04 Aug 17:34 (6.4 h before) | 0 / 1 | down 05 Aug 21:26 |
+|  | variance-ratio scan, k = 1440 | paused since down alarm 04 Aug 04:47 (back 05 Aug 04:48) | 288 (05 Aug 04:48) | 3 / 2 (4.9) | 03 Aug 04:46 (43.2 h before) | 1 / 0 | up 05 Aug 04:48 |
 | SOL | e-detector | calibrating since up alarm 04 Aug 17:23 (back 05 Aug 17:24) | missed | 3 / 1 (4.8) | 04 Aug 17:23 (6.6 h before) | 0 / 1 | down 05 Aug 19:31 |
 |  | BOCPD, w = 250 | paused since up alarm 04 Aug 17:10 (back 05 Aug 17:11) | missed | 5 / 1 (4.8) | 04 Aug 17:10 (6.8 h before) | 0 / 1 | down 05 Aug 17:11 |
 |  | BOCPD, w = 720 | paused since down alarm 04 Aug 06:58 (back 05 Aug 06:59) | 419 (05 Aug 06:59) | 3 / 2 (4.8) | 01 Aug 18:02 (78.0 h before) | 1 / 0 | up 05 Aug 06:59 |
@@ -2612,9 +2615,9 @@ The e-detector was monitoring at the open and raised an up alarm 11 minutes late
 |  | BOCPD, truncated, w = 250 | paused since up alarm 04 Aug 16:58 (back 05 Aug 16:59) | missed | 6 / 0 (4.7) | 04 Aug 16:58 (7.0 h before) | 0 / 1 | down 05 Aug 16:59 |
 |  | BOCPD, truncated, w = 720 | paused since down alarm 04 Aug 06:34 (back 05 Aug 06:35) | 395 (05 Aug 06:35) | 3 / 2 (4.8) | 01 Aug 18:36 (77.4 h before) | 1 / 0 | up 05 Aug 06:35 |
 |  | BOCPD, truncated, w = 1440 | paused since up alarm 04 Aug 20:03 (back 05 Aug 20:04) | missed | 5 / 0 (4.8) | 04 Aug 20:03 (4.0 h before) | 0 / 1 | down 05 Aug 20:04 |
-|  | BJV-type, k = 120 | paused since up alarm 04 Aug 18:52 (back 05 Aug 18:53) | missed | 4 / 2 (4.7) | 04 Aug 18:52 (5.1 h before) | 0 / 0 |  |
-|  | BJV-type, k = 480 | paused since up alarm 04 Aug 00:15 (back 05 Aug 00:16) | 16 (05 Aug 00:16) | 5 / 0 (4.7) | 04 Aug 00:15 (23.8 h before) | 1 / 0 | up 05 Aug 00:16 |
-|  | BJV-type, k = 1440 | paused since down alarm 04 Aug 08:57 (back 05 Aug 08:58) | 538 (05 Aug 08:58) | 4 / 1 (4.8) | 03 Aug 08:56 (39.1 h before) | 1 / 0 | up 05 Aug 08:58 |
+|  | variance-ratio scan, k = 120 | paused since up alarm 04 Aug 18:52 (back 05 Aug 18:53) | missed | 4 / 2 (4.7) | 04 Aug 18:52 (5.1 h before) | 0 / 0 |  |
+|  | variance-ratio scan, k = 480 | paused since up alarm 04 Aug 00:15 (back 05 Aug 00:16) | 16 (05 Aug 00:16) | 5 / 0 (4.7) | 04 Aug 00:15 (23.8 h before) | 1 / 0 | up 05 Aug 00:16 |
+|  | variance-ratio scan, k = 1440 | paused since down alarm 04 Aug 08:57 (back 05 Aug 08:58) | 538 (05 Aug 08:58) | 4 / 1 (4.8) | 03 Aug 08:56 (39.1 h before) | 1 / 0 | up 05 Aug 08:58 |
 | DOGE | e-detector | calibrating since up alarm 04 Aug 17:45 (back 05 Aug 17:46) | missed | 5 / 0 (4.9) | 04 Aug 17:45 (6.2 h before) | 0 / 1 | down 05 Aug 20:12 |
 |  | BOCPD, w = 250 | paused since up alarm 04 Aug 17:16 (back 05 Aug 17:17) | missed | 3 / 2 (4.7) | 04 Aug 17:16 (6.7 h before) | 0 / 1 | down 05 Aug 17:17 |
 |  | BOCPD, w = 720 | paused since up alarm 04 Aug 17:47 (back 05 Aug 17:48) | missed | 2 / 3 (4.8) | 04 Aug 17:47 (6.2 h before) | 0 / 1 | down 05 Aug 17:48 |
@@ -2622,18 +2625,18 @@ The e-detector was monitoring at the open and raised an up alarm 11 minutes late
 |  | BOCPD, truncated, w = 250 | paused since up alarm 04 Aug 08:37 (back 05 Aug 08:38) | missed | 3 / 3 (4.8) | 04 Aug 08:37 (15.4 h before) | 0 / 1 | down 05 Aug 17:52 |
 |  | BOCPD, truncated, w = 720 | paused since down alarm 04 Aug 05:40 (back 05 Aug 05:41) | 341 (05 Aug 05:41) | 1 / 3 (4.9) | 31 Jul 19:36 (100.4 h before) | 1 / 0 | up 05 Aug 05:41 |
 |  | BOCPD, truncated, w = 1440 | paused since down alarm 04 Aug 07:10 (back 05 Aug 07:11) | 431 (05 Aug 07:11) | 2 / 2 (4.8) | 01 Aug 21:05 (74.9 h before) | 1 / 0 | up 05 Aug 07:11 |
-|  | BJV-type, k = 120 | paused since up alarm 04 Aug 16:20 (back 05 Aug 16:21) | missed | 2 / 3 (4.9) | 04 Aug 16:20 (7.7 h before) | 0 / 1 | down 05 Aug 16:21 |
-|  | BJV-type, k = 480 | paused since up alarm 04 Aug 20:50 (back 05 Aug 20:51) | missed | 2 / 3 (4.9) | 04 Aug 20:50 (3.2 h before) | 0 / 1 | down 05 Aug 20:51 |
-|  | BJV-type, k = 1440 | paused since down alarm 04 Aug 02:04 (back 05 Aug 02:05) | 125 (05 Aug 02:05) | 2 / 1 (4.9) | 03 Aug 02:03 (46.0 h before) | 1 / 0 | up 05 Aug 02:05 |
+|  | variance-ratio scan, k = 120 | paused since up alarm 04 Aug 16:20 (back 05 Aug 16:21) | missed | 2 / 3 (4.9) | 04 Aug 16:20 (7.7 h before) | 0 / 1 | down 05 Aug 16:21 |
+|  | variance-ratio scan, k = 480 | paused since up alarm 04 Aug 20:50 (back 05 Aug 20:51) | missed | 2 / 3 (4.9) | 04 Aug 20:50 (3.2 h before) | 0 / 1 | down 05 Aug 20:51 |
+|  | variance-ratio scan, k = 1440 | paused since down alarm 04 Aug 02:04 (back 05 Aug 02:05) | 125 (05 Aug 02:05) | 2 / 1 (4.9) | 03 Aug 02:03 (46.0 h before) | 1 / 0 | up 05 Aug 02:05 |
 | Nifty 50 | e-detector | calibrating since down alarm 01 Aug 10:30 (back 05 Aug 10:31) | 104 (05 Aug 10:59) | 0 / 1 (1.5) | none | 1 / 0 | up 05 Aug 10:59 |
 |  | BOCPD, w = 250 | watching | 113 (05 Aug 11:08) | 1 / 0 (1.5) | 29 Jul 12:11 (165.1 h before) | 1 / 0 | up 05 Aug 11:08 |
 |  | BOCPD, w = 375 | watching | 113 (05 Aug 11:08) | 1 / 0 (1.5) | 29 Jul 12:11 (165.1 h before) | 1 / 0 | up 05 Aug 11:08 |
 |  | BOCPD, truncated, w = 250 | watching | 87 (05 Aug 10:42) | 1 / 0 (1.5) | 29 Jul 12:18 (164.9 h before) | 1 / 0 | up 05 Aug 10:42 |
 |  | BOCPD, truncated, w = 375 | paused since up alarm 02 Aug 12:07 (back 06 Aug 12:08) | missed | 2 / 0 (1.5) | 02 Aug 12:07 (69.1 h before) | 0 / 0 |  |
-|  | BJV-type, k = 120 | watching | 114 (05 Aug 11:09) | 0 / 0 (1.5) | none | 1 / 0 | up 05 Aug 11:09 |
-|  | BJV-type, k = 375 | paused since up alarm 02 Aug 14:24 (back 06 Aug 14:25) | missed | 2 / 0 (1.5) | 02 Aug 14:24 (66.8 h before) | 0 / 0 |  |
+|  | variance-ratio scan, k = 120 | watching | 114 (05 Aug 11:09) | 0 / 0 (1.5) | none | 1 / 0 | up 05 Aug 11:09 |
+|  | variance-ratio scan, k = 375 | paused since up alarm 02 Aug 14:24 (back 06 Aug 14:25) | missed | 2 / 0 (1.5) | 02 Aug 14:24 (66.8 h before) | 0 / 0 |  |
 
-On all five coins the e-detector raised an up alarm on Sunday afternoon (17:23 to 17:49 UTC), 6.2 to 6.6 hours before T, and was recalibrating until Monday evening. It therefore missed the 24 hours after T, and its first alarm after T was a **down** alarm on Monday evening (19:31 to 20:51 UTC): having taken the crash day as its new baseline, it flagged the calmer evening as a decrease. Of the 45 competitor configurations, 44 were paused at T: 25 after up alarms on Sunday 4 August (22 of them between 15:58 and 21:52 UTC) and 19 after down alarms. Of the 16 competitor up alarms within 24 hours, 14 came in the very first minute after a pause ended, that is, the statistic was still above its threshold when the method was allowed to alarm again; the delay then measures when the pause ended, not how fast the method reacted. The two exceptions are BOCPD with w = 250 on XRP, which was watching and alarmed at 00:55 UTC (55 minutes), and the BJV-type test with k = 1440 on BTC, which resumed at 00:56 and alarmed at 01:32 (92 minutes). On Nifty the e-detector had been recalibrating since a down alarm on 1 August, came back at 10:31 IST and raised an up alarm at 10:59 (104 minutes after the open); four of the six competitors were watching and alarmed after 87 to 114 minutes, the other two were paused after up alarms on 2 August and missed the session.
+On all five coins the e-detector raised an up alarm on Sunday afternoon (17:23 to 17:49 UTC), 6.2 to 6.6 hours before T, and was recalibrating until Monday evening. It therefore missed the 24 hours after T, and its first alarm after T was a **down** alarm on Monday evening (19:31 to 20:51 UTC): having taken the crash day as its new baseline, it flagged the calmer evening as a decrease. Of the 45 competitor configurations, 44 were paused at T: 25 after up alarms on Sunday 4 August (22 of them between 15:58 and 21:52 UTC) and 19 after down alarms. Of the 16 competitor up alarms within 24 hours, 14 came in the very first minute after a pause ended, that is, the statistic was still above its threshold when the method was allowed to alarm again; the delay then measures when the pause ended, not how fast the method reacted. The two exceptions are BOCPD with w = 250 on XRP, which was watching and alarmed at 00:55 UTC (55 minutes), and the variance-ratio scan with k = 1440 on BTC, which resumed at 00:56 and alarmed at 01:32 (92 minutes). On Nifty the e-detector had been recalibrating since a down alarm on 1 August, came back at 10:31 IST and raised an up alarm at 10:59 (104 minutes after the open); four of the six competitors were watching and alarmed after 87 to 114 minutes, the other two were paused after up alarms on 2 August and missed the session.
 
 #### C2 and N3. Tariff sell-off, 7 April 2025 (five coins, T = 00:00 UTC; Nifty 50, T = 09:15 IST)
 
@@ -2646,9 +2649,9 @@ On all five coins the e-detector raised an up alarm on Sunday afternoon (17:23 t
 |  | BOCPD, truncated, w = 250 | watching | 327 (07 Apr 05:27) | 3 / 0 (4.9) | 05 Apr 21:34 (26.4 h before) | 1 / 0 | up 07 Apr 05:27 |
 |  | BOCPD, truncated, w = 720 | paused since up alarm 06 Apr 18:14 (back 07 Apr 18:15) | missed | 3 / 0 (4.9) | 06 Apr 18:14 (5.8 h before) | 0 / 1 | down 07 Apr 21:17 |
 |  | BOCPD, truncated, w = 1440 | paused since up alarm 06 Apr 21:07 (back 07 Apr 21:08) | missed | 4 / 1 (4.8) | 06 Apr 21:07 (2.9 h before) | 0 / 1 | down 07 Apr 21:08 |
-|  | BJV-type, k = 120 | watching | missed | 3 / 0 (4.8) | 05 Apr 21:29 (26.5 h before) | 0 / 1 | down 07 Apr 02:15 |
-|  | BJV-type, k = 480 | paused since up alarm 06 Apr 18:43 (back 07 Apr 18:44) | missed | 3 / 0 (4.9) | 06 Apr 18:43 (5.3 h before) | 0 / 1 | down 07 Apr 22:18 |
-|  | BJV-type, k = 1440 | paused since down alarm 06 Apr 02:33 (back 07 Apr 02:34) | 154 (07 Apr 02:34) | 4 / 1 (4.9) | 05 Apr 02:32 (45.5 h before) | 1 / 0 | up 07 Apr 02:34 |
+|  | variance-ratio scan, k = 120 | watching | missed | 3 / 0 (4.8) | 05 Apr 21:29 (26.5 h before) | 0 / 1 | down 07 Apr 02:15 |
+|  | variance-ratio scan, k = 480 | paused since up alarm 06 Apr 18:43 (back 07 Apr 18:44) | missed | 3 / 0 (4.9) | 06 Apr 18:43 (5.3 h before) | 0 / 1 | down 07 Apr 22:18 |
+|  | variance-ratio scan, k = 1440 | paused since down alarm 06 Apr 02:33 (back 07 Apr 02:34) | 154 (07 Apr 02:34) | 4 / 1 (4.9) | 05 Apr 02:32 (45.5 h before) | 1 / 0 | up 07 Apr 02:34 |
 | ETH | e-detector | calibrating since up alarm 06 Apr 17:05 (back 07 Apr 17:06) | missed | 2 / 3 (4.7) | 06 Apr 17:05 (6.9 h before) | 0 / 1 | down 07 Apr 20:18 |
 |  | BOCPD, w = 250 | paused since up alarm 06 Apr 20:42 (back 07 Apr 20:43) | missed | 3 / 3 (4.7) | 06 Apr 20:42 (3.3 h before) | 0 / 0 |  |
 |  | BOCPD, w = 720 | paused since up alarm 06 Apr 22:53 (back 07 Apr 22:54) | missed | 3 / 3 (4.7) | 06 Apr 22:53 (67 min before) | 0 / 1 | down 07 Apr 22:54 |
@@ -2656,9 +2659,9 @@ On all five coins the e-detector raised an up alarm on Sunday afternoon (17:23 t
 |  | BOCPD, truncated, w = 250 | paused since up alarm 06 Apr 18:08 (back 07 Apr 18:09) | missed | 3 / 1 (4.7) | 06 Apr 18:08 (5.9 h before) | 0 / 1 | down 07 Apr 18:09 |
 |  | BOCPD, truncated, w = 720 | paused since up alarm 06 Apr 21:24 (back 07 Apr 21:25) | missed | 4 / 0 (4.7) | 06 Apr 21:24 (2.6 h before) | 0 / 1 | down 07 Apr 21:25 |
 |  | BOCPD, truncated, w = 1440 | paused since up alarm 06 Apr 20:53 (back 07 Apr 20:54) | missed | 4 / 2 (4.7) | 06 Apr 20:53 (3.1 h before) | 0 / 1 | down 07 Apr 20:54 |
-|  | BJV-type, k = 120 | watching | 318 (07 Apr 05:18) | 4 / 0 (4.7) | 05 Apr 20:44 (27.3 h before) | 1 / 0 | up 07 Apr 05:18 |
-|  | BJV-type, k = 480 | paused since up alarm 06 Apr 02:39 (back 07 Apr 02:40) | 160 (07 Apr 02:40) | 3 / 1 (4.7) | 06 Apr 02:39 (21.4 h before) | 1 / 0 | up 07 Apr 02:40 |
-|  | BJV-type, k = 1440 | paused since down alarm 06 Apr 13:50 (back 07 Apr 13:51) | 831 (07 Apr 13:51) | 2 / 2 (4.7) | 02 Apr 22:22 (97.6 h before) | 1 / 0 | up 07 Apr 13:51 |
+|  | variance-ratio scan, k = 120 | watching | 318 (07 Apr 05:18) | 4 / 0 (4.7) | 05 Apr 20:44 (27.3 h before) | 1 / 0 | up 07 Apr 05:18 |
+|  | variance-ratio scan, k = 480 | paused since up alarm 06 Apr 02:39 (back 07 Apr 02:40) | 160 (07 Apr 02:40) | 3 / 1 (4.7) | 06 Apr 02:39 (21.4 h before) | 1 / 0 | up 07 Apr 02:40 |
+|  | variance-ratio scan, k = 1440 | paused since down alarm 06 Apr 13:50 (back 07 Apr 13:51) | 831 (07 Apr 13:51) | 2 / 2 (4.7) | 02 Apr 22:22 (97.6 h before) | 1 / 0 | up 07 Apr 13:51 |
 | XRP | e-detector | calibrating since up alarm 06 Apr 17:47 (back 07 Apr 17:48) | missed | 2 / 3 (4.9) | 06 Apr 17:47 (6.2 h before) | 0 / 1 | down 07 Apr 21:40 |
 |  | BOCPD, w = 250 | paused since up alarm 06 Apr 17:45 (back 07 Apr 17:46) | missed | 2 / 4 (4.9) | 06 Apr 17:45 (6.2 h before) | 0 / 1 | down 07 Apr 17:46 |
 |  | BOCPD, w = 720 | paused since up alarm 06 Apr 22:32 (back 07 Apr 22:33) | missed | 4 / 1 (4.9) | 06 Apr 22:32 (88 min before) | 0 / 1 | down 07 Apr 22:33 |
@@ -2666,9 +2669,9 @@ On all five coins the e-detector raised an up alarm on Sunday afternoon (17:23 t
 |  | BOCPD, truncated, w = 250 | paused since up alarm 06 Apr 17:47 (back 07 Apr 17:48) | missed | 3 / 2 (4.9) | 06 Apr 17:47 (6.2 h before) | 0 / 1 | down 07 Apr 17:48 |
 |  | BOCPD, truncated, w = 720 | paused since up alarm 06 Apr 18:33 (back 07 Apr 18:34) | missed | 3 / 2 (4.9) | 06 Apr 18:33 (5.5 h before) | 0 / 1 | down 07 Apr 21:08 |
 |  | BOCPD, truncated, w = 1440 | paused since up alarm 06 Apr 18:28 (back 07 Apr 18:29) | missed | 3 / 3 (4.9) | 06 Apr 18:28 (5.5 h before) | 0 / 1 | down 07 Apr 18:29 |
-|  | BJV-type, k = 120 | paused since up alarm 06 Apr 18:02 (back 07 Apr 18:03) | missed | 3 / 2 (4.9) | 06 Apr 18:02 (6.0 h before) | 0 / 1 | down 07 Apr 18:03 |
-|  | BJV-type, k = 480 | paused since up alarm 06 Apr 18:52 (back 07 Apr 18:53) | missed | 3 / 2 (4.9) | 06 Apr 18:52 (5.1 h before) | 0 / 1 | down 07 Apr 18:53 |
-|  | BJV-type, k = 1440 | paused since down alarm 06 Apr 14:15 (back 07 Apr 14:16) | 856 (07 Apr 14:16) | 2 / 4 (4.9) | 02 Apr 22:53 (97.1 h before) | 1 / 0 | up 07 Apr 14:16 |
+|  | variance-ratio scan, k = 120 | paused since up alarm 06 Apr 18:02 (back 07 Apr 18:03) | missed | 3 / 2 (4.9) | 06 Apr 18:02 (6.0 h before) | 0 / 1 | down 07 Apr 18:03 |
+|  | variance-ratio scan, k = 480 | paused since up alarm 06 Apr 18:52 (back 07 Apr 18:53) | missed | 3 / 2 (4.9) | 06 Apr 18:52 (5.1 h before) | 0 / 1 | down 07 Apr 18:53 |
+|  | variance-ratio scan, k = 1440 | paused since down alarm 06 Apr 14:15 (back 07 Apr 14:16) | 856 (07 Apr 14:16) | 2 / 4 (4.9) | 02 Apr 22:53 (97.1 h before) | 1 / 0 | up 07 Apr 14:16 |
 | SOL | e-detector | calibrating since up alarm 06 Apr 17:21 (back 07 Apr 17:22) | missed | 2 / 3 (4.6) | 06 Apr 17:21 (6.7 h before) | 0 / 1 | down 07 Apr 20:56 |
 |  | BOCPD, w = 250 | paused since up alarm 06 Apr 20:42 (back 07 Apr 20:43) | missed | 4 / 1 (4.6) | 06 Apr 20:42 (3.3 h before) | 0 / 0 |  |
 |  | BOCPD, w = 720 | paused since up alarm 06 Apr 20:44 (back 07 Apr 20:45) | missed | 5 / 0 (4.5) | 06 Apr 20:44 (3.3 h before) | 0 / 1 | down 07 Apr 20:45 |
@@ -2676,9 +2679,9 @@ On all five coins the e-detector raised an up alarm on Sunday afternoon (17:23 t
 |  | BOCPD, truncated, w = 250 | paused since up alarm 06 Apr 18:14 (back 07 Apr 18:15) | missed | 3 / 1 (4.6) | 06 Apr 18:14 (5.8 h before) | 0 / 1 | down 07 Apr 18:39 |
 |  | BOCPD, truncated, w = 720 | paused since up alarm 06 Apr 18:15 (back 07 Apr 18:16) | missed | 3 / 0 (4.7) | 06 Apr 18:15 (5.8 h before) | 0 / 1 | down 07 Apr 20:58 |
 |  | BOCPD, truncated, w = 1440 | paused since up alarm 06 Apr 18:15 (back 07 Apr 18:16) | 1096 (07 Apr 18:16) | 4 / 1 (4.6) | 06 Apr 18:15 (5.8 h before) | 1 / 0 | up 07 Apr 18:16 |
-|  | BJV-type, k = 120 | paused since up alarm 06 Apr 18:00 (back 07 Apr 18:01) | missed | 3 / 1 (4.6) | 06 Apr 18:00 (6.0 h before) | 0 / 1 | down 07 Apr 18:01 |
-|  | BJV-type, k = 480 | paused since up alarm 06 Apr 18:12 (back 07 Apr 18:13) | missed | 4 / 0 (4.6) | 06 Apr 18:12 (5.8 h before) | 0 / 1 | down 07 Apr 22:27 |
-|  | BJV-type, k = 1440 | paused since down alarm 06 Apr 15:28 (back 07 Apr 15:29) | 929 (07 Apr 15:29) | 2 / 4 (4.6) | 02 Apr 22:19 (97.7 h before) | 1 / 0 | up 07 Apr 15:29 |
+|  | variance-ratio scan, k = 120 | paused since up alarm 06 Apr 18:00 (back 07 Apr 18:01) | missed | 3 / 1 (4.6) | 06 Apr 18:00 (6.0 h before) | 0 / 1 | down 07 Apr 18:01 |
+|  | variance-ratio scan, k = 480 | paused since up alarm 06 Apr 18:12 (back 07 Apr 18:13) | missed | 4 / 0 (4.6) | 06 Apr 18:12 (5.8 h before) | 0 / 1 | down 07 Apr 22:27 |
+|  | variance-ratio scan, k = 1440 | paused since down alarm 06 Apr 15:28 (back 07 Apr 15:29) | 929 (07 Apr 15:29) | 2 / 4 (4.6) | 02 Apr 22:19 (97.7 h before) | 1 / 0 | up 07 Apr 15:29 |
 | DOGE | e-detector | calibrating since up alarm 06 Apr 17:46 (back 07 Apr 17:47) | missed | 2 / 3 (4.6) | 06 Apr 17:46 (6.2 h before) | 0 / 1 | down 07 Apr 21:06 |
 |  | BOCPD, w = 250 | paused since up alarm 06 Apr 20:43 (back 07 Apr 20:44) | missed | 4 / 0 (4.5) | 06 Apr 20:43 (3.3 h before) | 0 / 0 |  |
 |  | BOCPD, w = 720 | paused since up alarm 06 Apr 20:45 (back 07 Apr 20:46) | missed | 4 / 0 (4.6) | 06 Apr 20:45 (3.2 h before) | 0 / 1 | down 07 Apr 20:46 |
@@ -2686,18 +2689,18 @@ On all five coins the e-detector raised an up alarm on Sunday afternoon (17:23 t
 |  | BOCPD, truncated, w = 250 | paused since up alarm 06 Apr 18:00 (back 07 Apr 18:01) | missed | 3 / 1 (4.6) | 06 Apr 18:00 (6.0 h before) | 0 / 0 |  |
 |  | BOCPD, truncated, w = 720 | paused since up alarm 06 Apr 18:13 (back 07 Apr 18:14) | missed | 3 / 0 (4.6) | 06 Apr 18:13 (5.8 h before) | 0 / 1 | down 07 Apr 21:10 |
 |  | BOCPD, truncated, w = 1440 | paused since up alarm 06 Apr 18:24 (back 07 Apr 18:25) | missed | 4 / 1 (4.6) | 06 Apr 18:24 (5.6 h before) | 0 / 1 | down 07 Apr 18:25 |
-|  | BJV-type, k = 120 | paused since up alarm 06 Apr 18:01 (back 07 Apr 18:02) | missed | 3 / 1 (4.6) | 06 Apr 18:01 (6.0 h before) | 0 / 1 | down 07 Apr 18:02 |
-|  | BJV-type, k = 480 | paused since up alarm 06 Apr 18:22 (back 07 Apr 18:23) | missed | 3 / 1 (4.6) | 06 Apr 18:22 (5.6 h before) | 0 / 1 | down 07 Apr 22:23 |
-|  | BJV-type, k = 1440 | paused since down alarm 06 Apr 14:52 (back 07 Apr 14:53) | 893 (07 Apr 14:53) | 2 / 4 (4.6) | 02 Apr 20:49 (99.2 h before) | 1 / 0 | up 07 Apr 14:53 |
+|  | variance-ratio scan, k = 120 | paused since up alarm 06 Apr 18:01 (back 07 Apr 18:02) | missed | 3 / 1 (4.6) | 06 Apr 18:01 (6.0 h before) | 0 / 1 | down 07 Apr 18:02 |
+|  | variance-ratio scan, k = 480 | paused since up alarm 06 Apr 18:22 (back 07 Apr 18:23) | missed | 3 / 1 (4.6) | 06 Apr 18:22 (5.6 h before) | 0 / 1 | down 07 Apr 22:23 |
+|  | variance-ratio scan, k = 1440 | paused since down alarm 06 Apr 14:52 (back 07 Apr 14:53) | 893 (07 Apr 14:53) | 2 / 4 (4.6) | 02 Apr 20:49 (99.2 h before) | 1 / 0 | up 07 Apr 14:53 |
 | Nifty 50 | e-detector | calibrating since down alarm 03 Apr 11:06 (back 07 Apr 11:07) | 172 (07 Apr 12:07) | 0 / 1 (1.2) | none | 1 / 0 | up 07 Apr 12:07 |
 |  | BOCPD, w = 250 | paused since down alarm 03 Apr 13:04 (back 07 Apr 13:05) | missed | 0 / 1 (1.2) | none | 0 / 0 |  |
 |  | BOCPD, w = 375 | paused since down alarm 03 Apr 13:52 (back 07 Apr 13:53) | 278 (07 Apr 13:53) | 0 / 1 (1.2) | none | 1 / 0 | up 07 Apr 13:53 |
 |  | BOCPD, truncated, w = 250 | paused since down alarm 03 Apr 12:12 (back 07 Apr 12:13) | 178 (07 Apr 12:13) | 0 / 1 (1.2) | none | 1 / 0 | up 07 Apr 12:13 |
 |  | BOCPD, truncated, w = 375 | paused since down alarm 03 Apr 13:23 (back 07 Apr 13:24) | 249 (07 Apr 13:24) | 0 / 1 (1.2) | none | 1 / 0 | up 07 Apr 13:24 |
-|  | BJV-type, k = 120 | paused since down alarm 03 Apr 13:20 (back 07 Apr 13:21) | missed | 0 / 1 (1.2) | none | 0 / 0 |  |
-|  | BJV-type, k = 375 | paused since down alarm 03 Apr 14:19 (back 07 Apr 14:20) | 305 (07 Apr 14:20) | 1 / 1 (1.2) | 01 Apr 14:18 (138.9 h before) | 1 / 0 | up 07 Apr 14:20 |
+|  | variance-ratio scan, k = 120 | paused since down alarm 03 Apr 13:20 (back 07 Apr 13:21) | missed | 0 / 1 (1.2) | none | 0 / 0 |  |
+|  | variance-ratio scan, k = 375 | paused since down alarm 03 Apr 14:19 (back 07 Apr 14:20) | 305 (07 Apr 14:20) | 1 / 1 (1.2) | 01 Apr 14:18 (138.9 h before) | 1 / 0 | up 07 Apr 14:20 |
 
-The pattern on the coins repeats: e-detector up alarms on Sunday 6 April at 17:05 to 17:48 UTC, 6.2 to 6.9 hours before T, recalibration over the whole 24 hours after T, and a down alarm on Monday evening as its first alarm afterwards. Of the 45 competitor configurations, 42 were paused at T, 36 of them after up alarms on Sunday 6 April (35 between 17:42 and 22:53 UTC), and 9 raised an up alarm within 24 hours, 7 of them in the first minute after a pause ended. Two configurations were watching and alarmed on their own: BOCPD on truncated returns, w = 250, on BTC at 05:27 UTC (327 minutes) and the BJV-type test, k = 120, on ETH at 05:18 (318 minutes); the same BJV-type test on BTC was watching and missed. On Nifty every method was paused or recalibrating at the open, after down alarms on 3 April. The e-detector came back at 11:07 IST and raised an up alarm at 12:07 (172 minutes); four competitors alarmed in the first bar after their pause ended (178 to 305 minutes), two missed.
+The pattern on the coins repeats: e-detector up alarms on Sunday 6 April at 17:05 to 17:48 UTC, 6.2 to 6.9 hours before T, recalibration over the whole 24 hours after T, and a down alarm on Monday evening as its first alarm afterwards. Of the 45 competitor configurations, 42 were paused at T, 36 of them after up alarms on Sunday 6 April (35 between 17:42 and 22:53 UTC), and 9 raised an up alarm within 24 hours, 7 of them in the first minute after a pause ended. Two configurations were watching and alarmed on their own: BOCPD on truncated returns, w = 250, on BTC at 05:27 UTC (327 minutes) and the variance-ratio scan, k = 120, on ETH at 05:18 (318 minutes); the same variance-ratio scan on BTC was watching and missed. On Nifty every method was paused or recalibrating at the open, after down alarms on 3 April. The e-detector came back at 11:07 IST and raised an up alarm at 12:07 (172 minutes); four competitors alarmed in the first bar after their pause ended (178 to 305 minutes), two missed.
 
 #### C3. Crypto liquidation cascade, 10 October 2025 (five coins, T = 20:00 UTC, latest possible time of the post 20:57 UTC)
 
@@ -2710,9 +2713,9 @@ The pattern on the coins repeats: e-detector up alarms on Sunday 6 April at 17:0
 |  | BOCPD, truncated, w = 250 | paused since up alarm 10 Oct 15:16 (back 11 Oct 15:17) | missed | 4 / 1 (4.9) | 10 Oct 15:16 (4.7 h before) | 0 / 1 | down 11 Oct 15:17 |
 |  | BOCPD, truncated, w = 720 | paused since up alarm 10 Oct 15:41 (back 11 Oct 15:42) | missed | 4 / 1 (4.9) | 10 Oct 15:41 (4.3 h before) | 0 / 1 | down 11 Oct 15:42 |
 |  | BOCPD, truncated, w = 1440 | paused since up alarm 10 Oct 16:05 (back 11 Oct 16:06) | missed | 3 / 1 (4.9) | 10 Oct 16:05 (3.9 h before) | 0 / 1 | down 11 Oct 16:06 |
-|  | BJV-type, k = 120 | paused since up alarm 10 Oct 15:28 (back 11 Oct 15:29) | missed | 4 / 0 (4.8) | 10 Oct 15:28 (4.5 h before) | 0 / 1 | down 11 Oct 15:32 |
-|  | BJV-type, k = 480 | paused since up alarm 10 Oct 16:33 (back 11 Oct 16:34) | missed | 5 / 0 (4.9) | 10 Oct 16:33 (3.5 h before) | 0 / 1 | down 11 Oct 16:34 |
-|  | BJV-type, k = 1440 | watching | 63 / 6 (10 Oct 21:03) | 2 / 1 (4.9) | 08 Oct 11:31 (56.5 h before) | 1 / 0 | up 10 Oct 21:03 |
+|  | variance-ratio scan, k = 120 | paused since up alarm 10 Oct 15:28 (back 11 Oct 15:29) | missed | 4 / 0 (4.8) | 10 Oct 15:28 (4.5 h before) | 0 / 1 | down 11 Oct 15:32 |
+|  | variance-ratio scan, k = 480 | paused since up alarm 10 Oct 16:33 (back 11 Oct 16:34) | missed | 5 / 0 (4.9) | 10 Oct 16:33 (3.5 h before) | 0 / 1 | down 11 Oct 16:34 |
+|  | variance-ratio scan, k = 1440 | watching | 63 / 6 (10 Oct 21:03) | 2 / 1 (4.9) | 08 Oct 11:31 (56.5 h before) | 1 / 0 | up 10 Oct 21:03 |
 | ETH | e-detector | calibrating since up alarm 10 Oct 15:23 (back 11 Oct 15:24) | missed | 2 / 2 (4.7) | 10 Oct 15:23 (4.6 h before) | 0 / 1 | down 11 Oct 17:13 |
 |  | BOCPD, w = 250 | paused since up alarm 10 Oct 15:21 (back 11 Oct 15:22) | 1415 / 1358 (11 Oct 19:35) | 4 / 0 (4.7) | 10 Oct 15:21 (4.7 h before) | 1 / 0 | up 11 Oct 19:35 |
 |  | BOCPD, w = 720 | paused since up alarm 10 Oct 15:30 (back 11 Oct 15:31) | missed | 5 / 0 (4.7) | 10 Oct 15:30 (4.5 h before) | 0 / 1 | down 11 Oct 15:33 |
@@ -2720,9 +2723,9 @@ The pattern on the coins repeats: e-detector up alarms on Sunday 6 April at 17:0
 |  | BOCPD, truncated, w = 250 | paused since down alarm 10 Oct 01:16 (back 11 Oct 01:17) | missed | 1 / 3 (4.6) | 07 Oct 14:11 (77.8 h before) | 0 / 1 | down 11 Oct 14:18 |
 |  | BOCPD, truncated, w = 720 | paused since up alarm 10 Oct 08:48 (back 11 Oct 08:49) | missed | 5 / 0 (4.6) | 10 Oct 08:48 (11.2 h before) | 0 / 1 | down 11 Oct 14:15 |
 |  | BOCPD, truncated, w = 1440 | paused since up alarm 10 Oct 15:33 (back 11 Oct 15:34) | missed | 3 / 2 (4.7) | 10 Oct 15:33 (4.5 h before) | 0 / 1 | down 11 Oct 15:34 |
-|  | BJV-type, k = 120 | paused since up alarm 10 Oct 04:17 (back 11 Oct 04:18) | missed | 4 / 0 (4.7) | 10 Oct 04:17 (15.7 h before) | 0 / 1 | down 11 Oct 14:56 |
-|  | BJV-type, k = 480 | paused since up alarm 10 Oct 19:25 (back 11 Oct 19:26) | missed | 5 / 0 (4.7) | 10 Oct 19:25 (35 min before) | 0 / 1 | down 11 Oct 19:26 |
-|  | BJV-type, k = 1440 | watching | 17 / -40 (10 Oct 20:17) | 2 / 1 (4.7) | 08 Oct 03:52 (64.1 h before) | 1 / 0 | up 10 Oct 20:17 |
+|  | variance-ratio scan, k = 120 | paused since up alarm 10 Oct 04:17 (back 11 Oct 04:18) | missed | 4 / 0 (4.7) | 10 Oct 04:17 (15.7 h before) | 0 / 1 | down 11 Oct 14:56 |
+|  | variance-ratio scan, k = 480 | paused since up alarm 10 Oct 19:25 (back 11 Oct 19:26) | missed | 5 / 0 (4.7) | 10 Oct 19:25 (35 min before) | 0 / 1 | down 11 Oct 19:26 |
+|  | variance-ratio scan, k = 1440 | watching | 17 / -40 (10 Oct 20:17) | 2 / 1 (4.7) | 08 Oct 03:52 (64.1 h before) | 1 / 0 | up 10 Oct 20:17 |
 | XRP | e-detector | calibrating since up alarm 10 Oct 15:24 (back 11 Oct 15:25) | missed | 3 / 1 (5.0) | 10 Oct 15:24 (4.6 h before) | 0 / 1 | down 11 Oct 16:53 |
 |  | BOCPD, w = 250 | paused since up alarm 10 Oct 15:21 (back 11 Oct 15:22) | missed | 3 / 1 (4.9) | 10 Oct 15:21 (4.7 h before) | 0 / 1 | down 11 Oct 16:15 |
 |  | BOCPD, w = 720 | paused since up alarm 10 Oct 15:27 (back 11 Oct 15:28) | missed | 3 / 0 (5.0) | 10 Oct 15:27 (4.5 h before) | 0 / 1 | down 11 Oct 16:05 |
@@ -2730,9 +2733,9 @@ The pattern on the coins repeats: e-detector up alarms on Sunday 6 April at 17:0
 |  | BOCPD, truncated, w = 250 | paused since up alarm 10 Oct 15:23 (back 11 Oct 15:24) | missed | 2 / 1 (5.0) | 10 Oct 15:23 (4.6 h before) | 0 / 1 | down 11 Oct 15:34 |
 |  | BOCPD, truncated, w = 720 | paused since down alarm 10 Oct 02:29 (back 11 Oct 02:30) | 390 / 333 (11 Oct 02:30) | 3 / 1 (5.0) | 07 Oct 15:08 (76.9 h before) | 1 / 0 | up 11 Oct 02:30 |
 |  | BOCPD, truncated, w = 1440 | paused since up alarm 10 Oct 15:45 (back 11 Oct 15:46) | missed | 2 / 1 (5.0) | 10 Oct 15:45 (4.2 h before) | 0 / 1 | down 11 Oct 15:46 |
-|  | BJV-type, k = 120 | paused since up alarm 10 Oct 15:23 (back 11 Oct 15:24) | missed | 3 / 1 (5.0) | 10 Oct 15:23 (4.6 h before) | 0 / 0 |  |
-|  | BJV-type, k = 480 | paused since up alarm 10 Oct 19:20 (back 11 Oct 19:21) | missed | 4 / 1 (4.9) | 10 Oct 19:20 (40 min before) | 0 / 1 | down 11 Oct 19:21 |
-|  | BJV-type, k = 1440 | watching | 56 / -1 (10 Oct 20:56) | 2 / 1 (4.9) | 08 Oct 08:00 (60.0 h before) | 1 / 0 | up 10 Oct 20:56 |
+|  | variance-ratio scan, k = 120 | paused since up alarm 10 Oct 15:23 (back 11 Oct 15:24) | missed | 3 / 1 (5.0) | 10 Oct 15:23 (4.6 h before) | 0 / 0 |  |
+|  | variance-ratio scan, k = 480 | paused since up alarm 10 Oct 19:20 (back 11 Oct 19:21) | missed | 4 / 1 (4.9) | 10 Oct 19:20 (40 min before) | 0 / 1 | down 11 Oct 19:21 |
+|  | variance-ratio scan, k = 1440 | watching | 56 / -1 (10 Oct 20:56) | 2 / 1 (4.9) | 08 Oct 08:00 (60.0 h before) | 1 / 0 | up 10 Oct 20:56 |
 | SOL | e-detector | calibrating since up alarm 10 Oct 15:23 (back 11 Oct 15:24) | missed | 3 / 1 (4.7) | 10 Oct 15:23 (4.6 h before) | 0 / 1 | down 11 Oct 17:07 |
 |  | BOCPD, w = 250 | paused since up alarm 10 Oct 15:21 (back 11 Oct 15:22) | missed | 3 / 0 (4.7) | 10 Oct 15:21 (4.7 h before) | 0 / 1 | down 11 Oct 16:19 |
 |  | BOCPD, w = 720 | paused since up alarm 10 Oct 15:23 (back 11 Oct 15:24) | missed | 4 / 0 (4.7) | 10 Oct 15:23 (4.6 h before) | 0 / 1 | down 11 Oct 17:08 |
@@ -2740,9 +2743,9 @@ The pattern on the coins repeats: e-detector up alarms on Sunday 6 April at 17:0
 |  | BOCPD, truncated, w = 250 | paused since down alarm 10 Oct 00:52 (back 11 Oct 00:53) | missed | 3 / 2 (4.7) | 08 Oct 15:07 (52.9 h before) | 0 / 1 | down 11 Oct 15:26 |
 |  | BOCPD, truncated, w = 720 | paused since up alarm 10 Oct 15:29 (back 11 Oct 15:30) | missed | 4 / 0 (4.7) | 10 Oct 15:29 (4.5 h before) | 0 / 1 | down 11 Oct 16:14 |
 |  | BOCPD, truncated, w = 1440 | paused since up alarm 10 Oct 15:36 (back 11 Oct 15:37) | missed | 3 / 1 (4.7) | 10 Oct 15:36 (4.4 h before) | 0 / 1 | down 11 Oct 15:37 |
-|  | BJV-type, k = 120 | paused since up alarm 10 Oct 15:15 (back 11 Oct 15:16) | 1439 / 1382 (11 Oct 19:59) | 3 / 2 (4.7) | 10 Oct 15:15 (4.8 h before) | 1 / 0 | up 11 Oct 19:59 |
-|  | BJV-type, k = 480 | paused since up alarm 10 Oct 15:52 (back 11 Oct 15:53) | missed | 3 / 0 (4.7) | 10 Oct 15:52 (4.1 h before) | 0 / 1 | down 11 Oct 17:32 |
-|  | BJV-type, k = 1440 | watching | 73 / 16 (10 Oct 21:13) | 2 / 1 (4.7) | 08 Oct 11:24 (56.6 h before) | 1 / 0 | up 10 Oct 21:13 |
+|  | variance-ratio scan, k = 120 | paused since up alarm 10 Oct 15:15 (back 11 Oct 15:16) | 1439 / 1382 (11 Oct 19:59) | 3 / 2 (4.7) | 10 Oct 15:15 (4.8 h before) | 1 / 0 | up 11 Oct 19:59 |
+|  | variance-ratio scan, k = 480 | paused since up alarm 10 Oct 15:52 (back 11 Oct 15:53) | missed | 3 / 0 (4.7) | 10 Oct 15:52 (4.1 h before) | 0 / 1 | down 11 Oct 17:32 |
+|  | variance-ratio scan, k = 1440 | watching | 73 / 16 (10 Oct 21:13) | 2 / 1 (4.7) | 08 Oct 11:24 (56.6 h before) | 1 / 0 | up 10 Oct 21:13 |
 | DOGE | e-detector | calibrating since up alarm 10 Oct 15:30 (back 11 Oct 15:31) | missed | 3 / 1 (4.9) | 10 Oct 15:30 (4.5 h before) | 0 / 1 | down 11 Oct 17:04 |
 |  | BOCPD, w = 250 | paused since up alarm 10 Oct 15:29 (back 11 Oct 15:30) | missed | 2 / 1 (4.8) | 10 Oct 15:29 (4.5 h before) | 0 / 1 | down 11 Oct 15:30 |
 |  | BOCPD, w = 720 | paused since up alarm 10 Oct 15:35 (back 11 Oct 15:36) | missed | 1 / 1 (4.8) | 10 Oct 15:35 (4.4 h before) | 0 / 1 | down 11 Oct 15:36 |
@@ -2750,11 +2753,11 @@ The pattern on the coins repeats: e-detector up alarms on Sunday 6 April at 17:0
 |  | BOCPD, truncated, w = 250 | paused since down alarm 10 Oct 01:22 (back 11 Oct 01:23) | missed | 3 / 2 (4.8) | 08 Oct 14:08 (53.9 h before) | 0 / 1 | down 11 Oct 14:56 |
 |  | BOCPD, truncated, w = 720 | paused since up alarm 10 Oct 15:47 (back 11 Oct 15:48) | missed | 2 / 2 (4.8) | 10 Oct 15:47 (4.2 h before) | 0 / 1 | down 11 Oct 15:48 |
 |  | BOCPD, truncated, w = 1440 | paused since up alarm 10 Oct 16:10 (back 11 Oct 16:11) | missed | 2 / 1 (4.8) | 10 Oct 16:10 (3.8 h before) | 0 / 1 | down 11 Oct 16:11 |
-|  | BJV-type, k = 120 | paused since up alarm 10 Oct 15:31 (back 11 Oct 15:32) | 1423 / 1366 (11 Oct 19:43) | 2 / 3 (4.8) | 10 Oct 15:31 (4.5 h before) | 1 / 0 | up 11 Oct 19:43 |
-|  | BJV-type, k = 480 | paused since up alarm 10 Oct 19:50 (back 11 Oct 19:51) | missed | 1 / 1 (4.8) | 10 Oct 19:50 (10 min before) | 0 / 1 | down 11 Oct 19:51 |
-|  | BJV-type, k = 1440 | watching | 73 / 16 (10 Oct 21:13) | 1 / 1 (4.9) | 05 Oct 18:21 (121.7 h before) | 1 / 0 | up 10 Oct 21:13 |
+|  | variance-ratio scan, k = 120 | paused since up alarm 10 Oct 15:31 (back 11 Oct 15:32) | 1423 / 1366 (11 Oct 19:43) | 2 / 3 (4.8) | 10 Oct 15:31 (4.5 h before) | 1 / 0 | up 11 Oct 19:43 |
+|  | variance-ratio scan, k = 480 | paused since up alarm 10 Oct 19:50 (back 11 Oct 19:51) | missed | 1 / 1 (4.8) | 10 Oct 19:50 (10 min before) | 0 / 1 | down 11 Oct 19:51 |
+|  | variance-ratio scan, k = 1440 | watching | 73 / 16 (10 Oct 21:13) | 1 / 1 (4.9) | 05 Oct 18:21 (121.7 h before) | 1 / 0 | up 10 Oct 21:13 |
 
-The e-detector raised an up alarm on every coin between 15:23 and 15:30 UTC, about half an hour after the earlier tariff threat of that day (shortly before 11 a.m. EDT, 15:00 UTC), and was recalibrating when the evening post and the liquidation cascade came; its first alarm afterwards was a down alarm on 11 October. Of the 45 competitor configurations, 40 were paused at T: 34 after up alarms between 15:15 and 19:50 UTC, 2 after earlier up alarms that day and 4 after down alarms. The BJV-type test with k = 1440 was watching on all five coins (its last up alarms were 2 to 5 days earlier) and flagged the cascade at 20:17 (ETH), 20:56 (XRP), 21:03 (BTC) and 21:13 (SOL, DOGE) UTC. On ETH that is 40 minutes before, and on XRP 1 minute before, the latest possible time of the post; since the post's minute is unknown, these two may have reacted to price moves before it. The other five competitor alarms within 24 hours came 6.5 hours (XRP, first minute after a pause) or 23 to 24 hours later.
+The e-detector raised an up alarm on every coin between 15:23 and 15:30 UTC, about half an hour after the earlier tariff threat of that day (shortly before 11 a.m. EDT, 15:00 UTC), and was recalibrating when the evening post and the liquidation cascade came; its first alarm afterwards was a down alarm on 11 October. Of the 45 competitor configurations, 40 were paused at T: 34 after up alarms between 15:15 and 19:50 UTC, 2 after earlier up alarms that day and 4 after down alarms. The variance-ratio scan with k = 1440 was watching on all five coins (its last up alarms were 2 to 5 days earlier) and flagged the cascade at 20:17 (ETH), 20:56 (XRP), 21:03 (BTC) and 21:13 (SOL, DOGE) UTC. On ETH that is 40 minutes before, and on XRP 1 minute before, the latest possible time of the post; since the post's minute is unknown, these two may have reacted to price moves before it. The other five competitor alarms within 24 hours came 6.5 hours (XRP, first minute after a pause) or 23 to 24 hours later.
 
 ### Descriptive context: how large were the returns around the e-detector's earlier alarms? (not pre-registered)
 
@@ -2793,8 +2796,8 @@ N1, 4 June 2024 (Nifty 50):
 | BOCPD, w = 375 | 1 |
 | BOCPD, truncated, w = 250 | 8 |
 | BOCPD, truncated, w = 375 | 5 |
-| BJV-type, k = 120 | 18 |
-| BJV-type, k = 375 | 68 |
+| variance-ratio scan, k = 120 | 18 |
+| variance-ratio scan, k = 375 | 68 |
 
 C1 and N2, 5 August 2024:
 
@@ -2807,12 +2810,12 @@ C1 and N2, 5 August 2024:
 | BOCPD, truncated, w = 250 | 57 | 67 | 54 | 68 | 65 | 87 |
 | BOCPD, truncated, w = 720 | 0 | 0 | 47 | 0 | 0 |  |
 | BOCPD, truncated, w = 1440 | 0 | 0 | 0 | 0 | 0 |  |
-| BJV-type, k = 120 | 57 | 20 | 66 | 68 | 58 | 114 |
-| BJV-type, k = 480 | 0 | 0 | 0 | 0 | 22 |  |
-| BJV-type, k = 1440 | 92 | 48 | 136 | 69 | 108 |  |
+| variance-ratio scan, k = 120 | 57 | 20 | 66 | 68 | 58 | 114 |
+| variance-ratio scan, k = 480 | 0 | 0 | 0 | 0 | 22 |  |
+| variance-ratio scan, k = 1440 | 92 | 48 | 136 | 69 | 108 |  |
 | BOCPD, w = 375 |  |  |  |  |  | 113 |
 | BOCPD, truncated, w = 375 |  |  |  |  |  | 94 |
-| BJV-type, k = 375 |  |  |  |  |  | 58 |
+| variance-ratio scan, k = 375 |  |  |  |  |  | 58 |
 
 C2 and N3, 7 April 2025:
 
@@ -2825,14 +2828,14 @@ C2 and N3, 7 April 2025:
 | BOCPD, truncated, w = 250 | 327 | 327 | 301 | 330 | 310 | 16 |
 | BOCPD, truncated, w = 720 | 0 | 0 | 0 | 0 | 0 |  |
 | BOCPD, truncated, w = 1440 | 0 | 0 | 0 | 0 | 0 |  |
-| BJV-type, k = 120 | 305 | 318 | 260 | 318 | 286 | 74 |
-| BJV-type, k = 480 | 0 | 0 | 0 | 0 | 0 |  |
-| BJV-type, k = 1440 | 0 | 0 | 0 | 0 | 0 |  |
+| variance-ratio scan, k = 120 | 305 | 318 | 260 | 318 | 286 | 74 |
+| variance-ratio scan, k = 480 | 0 | 0 | 0 | 0 | 0 |  |
+| variance-ratio scan, k = 1440 | 0 | 0 | 0 | 0 | 0 |  |
 | BOCPD, w = 375 |  |  |  |  |  | 6 |
 | BOCPD, truncated, w = 375 |  |  |  |  |  | 19 |
-| BJV-type, k = 375 |  |  |  |  |  | 0 |
+| variance-ratio scan, k = 375 |  |  |  |  |  | 0 |
 
-C3, 10 October 2025 (minutes from 20:00 UTC; from 20:57 UTC subtract 57: the e-detector's 60 to 65 minutes are 3 to 8 minutes after 20:57, BOCPD with w = 250 and the BJV-type test with k = 120 crossed 1 to 7 minutes before 20:57 on four coins):
+C3, 10 October 2025 (minutes from 20:00 UTC; from 20:57 UTC subtract 57: the e-detector's 60 to 65 minutes are 3 to 8 minutes after 20:57, BOCPD with w = 250 and the variance-ratio scan with k = 120 crossed 1 to 7 minutes before 20:57 on four coins):
 
 | Method | BTC | ETH | XRP | SOL | DOGE |
 |---|---|---|---|---|---|
@@ -2843,26 +2846,26 @@ C3, 10 October 2025 (minutes from 20:00 UTC; from 20:57 UTC subtract 57: the e-d
 | BOCPD, truncated, w = 250 | 88 | 110 | 97 | 82 | 77 |
 | BOCPD, truncated, w = 720 | 0 | 0 | 0 | 0 | 0 |
 | BOCPD, truncated, w = 1440 | 0 | 0 | 0 | 0 | 0 |
-| BJV-type, k = 120 | 56 | 0 | 52 | 55 | 56 |
-| BJV-type, k = 480 | 0 | 0 | 0 | 0 | 0 |
-| BJV-type, k = 1440 | 63 | 17 | 56 | 73 | 73 |
+| variance-ratio scan, k = 120 | 56 | 0 | 52 | 55 | 56 |
+| variance-ratio scan, k = 480 | 0 | 0 | 0 | 0 | 0 |
+| variance-ratio scan, k = 1440 | 63 | 17 | 56 | 73 | 73 |
 
-With a fresh calibration the e-detector flagged all 18 cases: 18 to 32 minutes on the coins on 5 August 2024, 27 to 207 minutes on 7 April 2025, 60 to 65 minutes on 10 October 2025, and 15, 85 and 26 minutes on Nifty. Against the short-window competitors (w = 250, k = 120) it was earlier on all ten coin cases of 5 August 2024 and 7 April 2025 and on Nifty on 5 August 2024. Plain BOCPD with w = 250 and the BJV-type test with k = 120 were earlier on 10 October 2025 (by 4 to 10 minutes on four coins, and already above their thresholds at T on ETH); plain and truncated BOCPD with w = 250 were earlier on Nifty on 4 June 2024 (1 and 8 against 15 minutes) and 7 April 2025 (6 and 16 against 26). The longer-window competitors were mostly already above their thresholds at T on the coins.
+With a fresh calibration the e-detector flagged all 18 cases: 18 to 32 minutes on the coins on 5 August 2024, 27 to 207 minutes on 7 April 2025, 60 to 65 minutes on 10 October 2025, and 15, 85 and 26 minutes on Nifty. Against the short-window competitors (w = 250, k = 120) it was earlier on all ten coin cases of 5 August 2024 and 7 April 2025 and on Nifty on 5 August 2024. Plain BOCPD with w = 250 and the variance-ratio scan with k = 120 were earlier on 10 October 2025 (by 4 to 10 minutes on four coins, and already above their thresholds at T on ETH); plain and truncated BOCPD with w = 250 were earlier on Nifty on 4 June 2024 (1 and 8 against 15 minutes) and 7 April 2025 (6 and 16 against 26). The longer-window competitors were mostly already above their thresholds at T on the coins.
 
 **S2. Another start date for the e-detector.** Streamed from 21 January 2024 to 31 December 2025 on the coins (E12's stream) and over all Nifty sessions from April 2017 (E7's stream), the e-detector's outcomes are **identical** to the primary ones for all 18 cases: the same state at T, the same alarm that started the recalibration, the same delays (11, 104 and 172 minutes on Nifty; missed on all fifteen coin cases) and the same counts in the 7 days before and the 24 hours after. Only the expected weekly count changes a little (4.7 to 5.0 per week on the coins; 1.3, 1.3 and 1.0 on Nifty), because it comes from the longer stream. The reason is the recalibration: after an alarm the monitor's state depends only on the data since that alarm, so two streams that once alarm in the same minute agree from then on. Where the user started does not matter here.
 
-**S3. Thresholds matched on the whole sample (E13's own rule).** The state at T is the same in all 153 competitor rows. The first up alarm within 24 hours differs in 23 rows: in 18 it moves by 1 to 29 minutes (largest: truncated BOCPD, w = 250, on Nifty on 7 April 2025, 178 to 207 minutes), four misses become alarms (XRP on 5 August 2024: BOCPD w = 1440 at 13:40 UTC and the BJV-type test k = 480 at 09:38; ETH on 7 April 2025: truncated BOCPD w = 1440 at 17:46; ETH on 10 October 2025: BJV-type k = 480 at 03:18 the next day) and one alarm becomes a miss (ETH on 7 April 2025, BJV-type k = 480, 02:40 UTC). The counts of alarms in the 7 days before or the 24 hours after differ by one in 21 rows. All S3 rows are in `results/e18_outcomes.csv` (design `S3`). The S3 thresholds equal E13's to the last digit for the two 2025 crypto samples and Nifty (96 rows).
+**S3. Thresholds matched on the whole sample (E13's own rule).** The state at T is the same in all 153 competitor rows. The first up alarm within 24 hours differs in 23 rows: in 18 it moves by 1 to 29 minutes (largest: truncated BOCPD, w = 250, on Nifty on 7 April 2025, 178 to 207 minutes), four misses become alarms (XRP on 5 August 2024: BOCPD w = 1440 at 13:40 UTC and the variance-ratio scan k = 480 at 09:38; ETH on 7 April 2025: truncated BOCPD w = 1440 at 17:46; ETH on 10 October 2025: variance-ratio scan k = 480 at 03:18 the next day) and one alarm becomes a miss (ETH on 7 April 2025, variance-ratio scan k = 480, 02:40 UTC). The counts of alarms in the 7 days before or the 24 hours after differ by one in 21 rows. All S3 rows are in `results/e18_outcomes.csv` (design `S3`). The S3 thresholds equal E13's to the last digit for the two 2025 crypto samples and Nifty (96 rows).
 
 ### The week before: alarms with no landmark event
 
-Summed over all 18 event and asset rows, the e-detector raised 73 alarms in the 7 days before T against 76.6 expected at its average rate; the competitors raised 210 (BJV-type), 215 (BOCPD) and 217 (truncated BOCPD) against about 224 expected each. By event, all methods together: 269 against 244 expected before 5 August 2024, 232 against 236 before 7 April 2025, 190 against 241 before 10 October 2025, and 8 against 10.5, 10.5 and 8.4 before the three Nifty events. So, for every method, the weeks before these shocks looked like ordinary weeks: the totals are 0.76 to 1.10 times the expected numbers (the rows are strongly dependent, so these are not tests). Many of the alarms in the last hours before T belong to the run-up of the same episode (the Sunday alarms of C1 and C2, the Friday afternoon alarms of C3).
+Summed over all 18 event and asset rows, the e-detector raised 73 alarms in the 7 days before T against 76.6 expected at its average rate; the competitors raised 210 (variance-ratio scan), 215 (BOCPD) and 217 (truncated BOCPD) against about 224 expected each. By event, all methods together: 269 against 244 expected before 5 August 2024, 232 against 236 before 7 April 2025, 190 against 241 before 10 October 2025, and 8 against 10.5, 10.5 and 8.4 before the three Nifty events. So, for every method, the weeks before these shocks looked like ordinary weeks: the totals are 0.76 to 1.10 times the expected numbers (the rows are strongly dependent, so these are not tests). Many of the alarms in the last hours before T belong to the run-up of the same episode (the Sunday alarms of C1 and C2, the Friday afternoon alarms of C3).
 
 ### Reading
 
 * **On Nifty the e-detector flagged all three shocks; on crypto it flagged none of them after the reference time.** On Nifty the open is a natural start: the e-detector was monitoring on 4 June 2024 and caught the election shock in 11 minutes; on 5 August 2024 and 7 April 2025 it was still recalibrating after a down alarm in a quiet session a few days earlier and alarmed 28 and 60 minutes after it came back. Only truncated BOCPD with w = 250 also flagged all three (8, 87 and 178 minutes).
-* **On crypto every shock started before the pre-registered reference time, and the e-detector reacted to the start.** On all fifteen coin cases it raised an up alarm 4.5 to 6.9 hours before T, as the turbulence began (on Sunday afternoon in UTC before the two Monday sell-offs, after the morning tariff threat on 10 October 2025), and then spent the next 24 hours collecting a new baseline, unable to alarm, while the largest moves came. This is the limit E7 found in March 2020 and E12 measured (the streaming monitor blind about 70% of the time while recalibrating): the e-detector answers "has volatility changed from the recent baseline?", once per change, and then goes quiet. A user who wants to hear about a second, larger leg of the same episode needs a shorter recalibration or a second monitor; neither was tested here.
-* **The competitors behaved the same way.** At the same alarm rates, and with the same 24-hour pause that E13 gives them, they also reacted to the start of each crypto episode and were mostly paused at T (1, 3 and 5 of 45 configurations watching). Most of their crypto alarms within 24 hours came the first minute after a pause ended, which says their statistic was still high, not that they were fast. The clean exception is the day-long BJV-type test on 10 October 2025, which was watching on all five coins and flagged the cascade within 17 to 73 minutes of the US close.
-* **Without an earlier alarm in the way (S1) the e-detector was earlier than the short-window competitors on the two Monday sell-offs in crypto, and later than plain BOCPD and the short BJV-type test on 10 October 2025 (by 4 to 10 minutes on four coins) and than plain BOCPD on Nifty on 4 June 2024 and 7 April 2025 (by 14 and 20 minutes).** These are single cases on co-moving assets. They are in line with E13's simulations, where BOCPD reacts faster than the e-detector to large changes on clean data (for a doubling of the sd, 13 against 20 steps), but they cannot confirm or refute them.
+* **On crypto every shock started before the pre-registered reference time, and the e-detector reacted to the start.** On all fifteen coin cases it raised an up alarm 4.5 to 6.9 hours before T, as the turbulence began (on Sunday afternoon in UTC before the two Monday sell-offs, after the morning tariff threat on 10 October 2025), and then spent the next 24 hours collecting a new baseline, unable to alarm, while the largest moves came. This is the limit E7 found in March 2020 and E12 measured (the streaming monitor blind about 70% of the time while recalibrating): the e-detector answers "has volatility changed from the recent baseline?", once per change, and then goes quiet. A user who wants to hear about a second, larger leg of the same episode needs a shorter recalibration or a second monitor; neither was part of the pre-registered design (the exploratory section at the end tries E14's monitors with no blind period).
+* **The competitors behaved the same way.** At the same alarm rates, and with the same 24-hour pause that E13 gives them, they also reacted to the start of each crypto episode and were mostly paused at T (1, 3 and 5 of 45 configurations watching). Most of their crypto alarms within 24 hours came the first minute after a pause ended, which says their statistic was still high, not that they were fast. The clean exception is the day-long variance-ratio scan on 10 October 2025, which was watching on all five coins and flagged the cascade within 17 to 73 minutes of the US close.
+* **Without an earlier alarm in the way (S1) the e-detector was earlier than the short-window competitors on the two Monday sell-offs in crypto, and later than plain BOCPD and the short variance-ratio scan on 10 October 2025 (by 4 to 10 minutes on four coins) and than plain BOCPD on Nifty on 4 June 2024 and 7 April 2025 (by 14 and 20 minutes).** These are single cases on co-moving assets. They are in line with E13's simulations, where BOCPD reacts faster than the e-detector to large changes on clean data (for a doubling of the sd, 13 against 20 steps), but they cannot confirm or refute them.
 
 ### Caveats
 
@@ -2870,7 +2873,7 @@ Summed over all 18 event and asset rows, the e-detector raised 73 alarms in the 
 * **The reference time decides the crypto outcomes.** The rule (announcement if the market is open, else the next open; the Tokyo open for the Monday sell-offs) was fixed before looking at returns, and it puts T after the start of the crypto falls of 4 August 2024 and 6 April 2025, as the sources say. With an earlier reference time the e-detector's Sunday alarms would count as fast detections; the rule is kept as registered and those alarms are reported as alarms before T.
 * **C3's time is known only to within an hour** (20:00 to 20:57 UTC); delays are given from both ends. An earlier tariff threat the same day (about 15:00 UTC) triggered most of the alarms before T.
 * **Rate matching uses data from after the events.** The thresholds are matched on the whole half-year (or two years), outside the event windows; a user could not have set them this way in real time, which favours the competitors. The matching is also not exact, because a pause after each alarm makes the alarm count jump as the threshold moves: for 79 of the 141 competitor series the up and down counts match exactly, for 133 within two alarms, at worst five up alarms off (8%); E13's whole-sample rule has the same imprecision (76 exact). Alarms inside the exclusion windows do not enter the thresholds, but they still shape the pauses around them.
-* **Pausing after each alarm is part of the design for every method here.** For the e-detector it is its recalibration; for the competitors it was imposed in E13 so that all methods see the same amount of data. Shorter pauses would change the crypto results; they were not tried because the pre-registration fixed E13's settings.
+* **Pausing after each alarm is part of the design for every method here.** For the e-detector it is its recalibration; for the competitors it was imposed in E13 so that all methods see the same amount of data. Shorter pauses would change the crypto results; they were not part of the pre-registered design, which fixed E13's settings (see the exploratory section at the end for E14's monitors with no pause).
 * **Competitor zeros in S1** mean "already above threshold at T", not a detection at T (see S1).
 * **Prior knowledge.** Several of these alarms were known before the pre-registration (E7's 09:26 IST alarm on 4 June 2024, ALT1's alarms at about 15:30 UTC on 10 October 2025, E6's extremes on 10 October 2025), and the 2025 crypto streams and the Nifty stream are E13's, whose alarm lists existed but had not been opened around these dates. Only the matching rule and the July to December 2024 crypto stream are new. Section 6 of the pre-registration lists what was known.
 * **The e-detector here uses the plug-in baseline**, which has no proved false alarm bound (E14); its alarm rates, like the competitors', are measured.
@@ -2881,7 +2884,371 @@ Summed over all 18 event and asset rows, the e-detector raised 73 alarms in the 
 * With E13's whole-sample rule (S3) the matched thresholds equal E13's saved thresholds in all 96 rows (largest relative difference 0).
 * The run took 1940 seconds with two processes. A container restart killed the first attempt; the BOCPD arrays and finished series are now saved as they finish (`E18_CACHE`), and the rerun recomputed only what was lost. No setting changed.
 
-Figure: `results/figures/e18_events.png`, one panel per event and asset (18 panels): raw one-minute log returns from 7 days before to 24 hours after T, and one row of alarm marks per method (filled triangle up = up alarm, open triangle down = down alarm; blue e-detector, orange BOCPD, green truncated BOCPD, purple BJV-type test), with a dashed line at T and, on 10 October 2025, a grey band for the hour in which the post came. Nifty panels use a trading-minute axis in sessions. Full rows: `results/e18_outcomes.csv` (all designs), every alarm from 7 days before to 24 hours after T: `results/e18_alarms.csv`, thresholds and achieved counts: `results/e18_thresholds.csv`, alarm rates: `results/e18_rates.csv`.
+Figure: `results/figures/e18_events.png`, one panel per event and asset (18 panels): raw one-minute log returns from 7 days before to 24 hours after T, and one row of alarm marks per method (filled triangle up = up alarm, open triangle down = down alarm; blue e-detector, orange BOCPD, green truncated BOCPD, purple variance-ratio scan), with a dashed line at T and, on 10 October 2025, a grey band for the hour in which the post came. Nifty panels use a trading-minute axis in sessions. In the CSV files the scan keeps E13's internal label `BJV rolling, k=...`. Full rows: `results/e18_outcomes.csv` (all designs), every alarm from 7 days before to 24 hours after T: `results/e18_alarms.csv`, thresholds and achieved counts: `results/e18_thresholds.csv`, alarm rates: `results/e18_rates.csv`.
+
+### Exploratory, not pre-registered: E14's monitors with no blind period [REAL, post hoc]
+
+**Why, and what this is.** This section was decided **after** seeing that the e-detector was recalibrating at every crypto event. It is post hoc and exploratory: it is not in the pre-registration, it uses the same four events that prompted it, and it cannot count as evidence for or against any method. E14 built two monitors that never stop watching after an alarm (`src/avmonitor/running.py`). They run here with E14's committed settings unchanged (`experiments/e14_running_tau.py`, `make_monitor`):
+
+* **awake-A** (route A with a learning band): after an alarm a new segment starts at the very next return; the band around the baseline is learned from the returns of the new segment while the monitor keeps betting against snapshots of the band taken earlier. A = 36,000 per crypto day (9,375 per Nifty session), δ = 0.01, c = 3.
+* **awake-B** (the rank, or conformal, detector restarted at once): each new return is ranked among the absolute returns since the last alarm and the monitor bets on that rank; after an alarm the reference set starts empty, with no warm-up (only the first 120 returns of the stream are a warm-up). A = 28,800 per crypto day (7,500 per Nifty session), random tie-breaking with E14's seed.
+
+Each runs with E14's two null bands: **0.25**, E12's frozen setting and the band the e-detector uses here (for awake-B it divides each bet's payoff by 1.25), and **0**, the setting at which E14 found awake-B raising 3.6 to 4.3 alarms per crypto day. Same streams, events and reference times as the primary design. There is no rate matching: each monitor keeps its own threshold, so its cost is shown as its alarm rate. Check: on the July to December 2025 coins and on Nifty, all 24 alarm lists (six series, two monitors, two bands) are identical to E14's saved ones (`results/e14d_real_alarms.csv`). Source: `results/e18_awake.csv` (one row per event, asset, monitor and band, with the counts in the 24 hours after T as well).
+
+Both monitors were watching at T in all 72 rows. Columns: minutes from T to the first up alarm within 24 hours, with the clock time (UTC for crypto, IST for Nifty; for C3 from 20:00 / from 20:57 UTC); up and down alarms in the 7 days before T, and in brackets alarms per day (per session for Nifty); the last alarm before T. The first data column repeats the e-detector's primary outcome and its alarm rate in the same week.
+
+**Null band 0.25 (the e-detector's band):**
+
+| Event | Asset | e-detector (band 0.25): first up alarm; alarms per day in the week before | awake-A: first up alarm, minutes (time) | awake-A: week before, up / down (per day) | awake-A: last alarm before T | awake-B: first up alarm, minutes (time) | awake-B: week before, up / down (per day) | awake-B: last alarm before T |
+|---|---|---|---|---|---|---|---|---|
+| N1, 4 Jun 2024 | Nifty 50 | 11; 0.20 | 20 (09:35) | 1 / 0 (0.20) | up 31 May 15:19 (89.9 h before) | 7 (09:22) | 1 / 0 (0.20) | up 31 May 15:24 (89.8 h before) |
+| C1, 5 Aug 2024 | BTC | missed; 0.71 | 45 (00:45) | 5 / 2 (1.00) | up 04 Aug 17:53 (6.1 h before) | 37 (00:37) | 5 / 1 (0.86) | up 04 Aug 17:46 (6.2 h before) |
+|  | ETH | missed; 0.71 | 54 (00:54) | 5 / 3 (1.14) | up 04 Aug 17:19 (6.7 h before) | 54 (00:54) | 4 / 0 (0.57) | up 04 Aug 17:18 (6.7 h before) |
+|  | XRP | missed; 0.86 | 66 (01:06) | 3 / 3 (0.86) | up 04 Aug 14:55 (9.1 h before) | 45 (00:45) | 2 / 2 (0.57) | up 02 Aug 15:15 (56.8 h before) |
+|  | SOL | missed; 0.57 | 70 (01:10) | 4 / 1 (0.71) | up 04 Aug 17:24 (6.6 h before) | 68 (01:08) | 4 / 0 (0.57) | up 04 Aug 17:23 (6.6 h before) |
+|  | DOGE | missed; 0.71 | 58 (00:58) | 3 / 2 (0.71) | up 04 Aug 17:45 (6.2 h before) | 45 (00:45) | 2 / 0 (0.29) | up 02 Aug 12:52 (59.1 h before) |
+| N2, 5 Aug 2024 | Nifty 50 | 104; 0.20 | 107 (11:02) | 1 / 0 (0.20) | up 29 Jul 12:22 (164.9 h before) | 107 (11:02) | 1 / 0 (0.20) | up 29 Jul 12:17 (165.0 h before) |
+| C2, 7 Apr 2025 | BTC | missed; 0.71 | missed | 0 / 0 (0.00) | down 23 Mar 10:38 (349.4 h before) | 863 (14:23) | 3 / 2 (0.71) | up 06 Apr 17:52 (6.1 h before) |
+|  | ETH | missed; 0.71 | missed | 4 / 3 (1.00) | up 06 Apr 17:12 (6.8 h before) | 420 (07:00) | 6 / 1 (1.00) | up 06 Apr 17:03 (7.0 h before) |
+|  | XRP | missed; 0.71 | 421 (07:01) | 6 / 3 (1.29) | up 06 Apr 17:57 (6.0 h before) | 414 (06:54) | 5 / 2 (1.00) | up 06 Apr 17:46 (6.2 h before) |
+|  | SOL | missed; 0.71 | 874 (14:34) | 3 / 3 (0.86) | up 06 Apr 17:46 (6.2 h before) | 867 (14:27) | 3 / 2 (0.71) | up 06 Apr 17:45 (6.2 h before) |
+|  | DOGE | missed; 0.71 | missed | 2 / 2 (0.57) | up 06 Apr 17:57 (6.0 h before) | missed | 2 / 1 (0.43) | up 06 Apr 17:47 (6.2 h before) |
+| N3, 7 Apr 2025 | Nifty 50 | 172; 0.25 | 51 (10:06) | 0 / 1 (0.25) | down 03 Apr 13:23 (91.9 h before) | 20 (09:35) | 0 / 1 (0.25) | down 03 Apr 12:12 (93.0 h before) |
+| C3, 10 Oct 2025 | BTC | missed; 0.57 | 676 / 619 (07:16) | 0 / 0 (0.00) | down 28 Sep 05:59 (302.0 h before) | 56 / -1 (20:56) | 5 / 2 (1.00) | up 10 Oct 15:28 (4.5 h before) |
+|  | ETH | missed; 0.57 | 77 / 20 (21:17) | 3 / 2 (0.71) | up 10 Oct 15:29 (4.5 h before) | 61 / 4 (21:01) | 5 / 1 (0.86) | up 10 Oct 15:24 (4.6 h before) |
+|  | XRP | missed; 0.57 | 74 / 17 (21:14) | 2 / 2 (0.57) | up 10 Oct 15:28 (4.5 h before) | 58 / 1 (20:58) | 3 / 0 (0.43) | up 10 Oct 15:22 (4.6 h before) |
+|  | SOL | missed; 0.57 | 74 / 17 (21:14) | 3 / 2 (0.71) | up 10 Oct 15:25 (4.6 h before) | 58 / 1 (20:58) | 4 / 0 (0.57) | up 10 Oct 15:21 (4.7 h before) |
+|  | DOGE | missed; 0.57 | 70 / 13 (21:10) | 2 / 2 (0.57) | up 10 Oct 15:31 (4.5 h before) | 58 / 1 (20:58) | 2 / 0 (0.29) | up 10 Oct 15:30 (4.5 h before) |
+
+**Null band 0:**
+
+| Event | Asset | e-detector (band 0.25): first up alarm; alarms per day in the week before | awake-A: first up alarm, minutes (time) | awake-A: week before, up / down (per day) | awake-A: last alarm before T | awake-B: first up alarm, minutes (time) | awake-B: week before, up / down (per day) | awake-B: last alarm before T |
+|---|---|---|---|---|---|---|---|---|
+| N1, 4 Jun 2024 | Nifty 50 | 11; 0.20 | 16 (09:31) | 2 / 0 (0.40) | up 31 May 15:27 (89.8 h before) | 5 (09:20) | 2 / 2 (0.80) | down 03 Jun 11:23 (21.9 h before) |
+| C1, 5 Aug 2024 | BTC | missed; 0.71 | 32 (00:32) | 7 / 7 (2.00) | up 04 Aug 15:00 (9.0 h before) | 18 (00:18) | 12 / 20 (4.57) | up 04 Aug 17:44 (6.3 h before) |
+|  | ETH | missed; 0.71 | 38 (00:38) | 6 / 3 (1.29) | up 04 Aug 17:10 (6.8 h before) | 18 (00:18) | 16 / 17 (4.71) | down 04 Aug 21:26 (2.6 h before) |
+|  | XRP | missed; 0.86 | 54 (00:54) | 8 / 7 (2.14) | up 04 Aug 14:51 (9.2 h before) | 38 (00:38) | 15 / 17 (4.57) | up 04 Aug 14:40 (9.3 h before) |
+|  | SOL | missed; 0.57 | 58 (00:58) | 5 / 2 (1.00) | up 04 Aug 17:23 (6.6 h before) | 19 (00:19) | 15 / 14 (4.14) | down 04 Aug 20:41 (3.3 h before) |
+|  | DOGE | missed; 0.71 | 55 (00:55) | 6 / 4 (1.43) | up 04 Aug 17:19 (6.7 h before) | 22 (00:22) | 15 / 12 (3.86) | up 04 Aug 17:46 (6.2 h before) |
+| N2, 5 Aug 2024 | Nifty 50 | 104; 0.20 | 51 (10:06) | 1 / 1 (0.40) | down 30 Jul 11:43 (141.5 h before) | 50 (10:05) | 2 / 4 (1.20) | up 01 Aug 14:49 (90.4 h before) |
+| C2, 7 Apr 2025 | BTC | missed; 0.71 | 874 (14:34) | 3 / 4 (1.00) | up 06 Apr 17:54 (6.1 h before) | 261 (04:21) | 10 / 11 (3.00) | up 06 Apr 17:43 (6.3 h before) |
+|  | ETH | missed; 0.71 | missed | 6 / 3 (1.29) | up 06 Apr 17:11 (6.8 h before) | 224 (03:44) | 11 / 13 (3.43) | up 06 Apr 18:52 (5.1 h before) |
+|  | XRP | missed; 0.71 | 412 (06:52) | 5 / 3 (1.14) | up 06 Apr 17:47 (6.2 h before) | 216 (03:36) | 11 / 14 (3.57) | up 06 Apr 17:28 (6.5 h before) |
+|  | SOL | missed; 0.71 | 874 (14:34) | 4 / 4 (1.14) | up 06 Apr 17:44 (6.3 h before) | 227 (03:47) | 9 / 10 (2.71) | down 06 Apr 19:56 (4.1 h before) |
+|  | DOGE | missed; 0.71 | missed | 6 / 3 (1.29) | up 06 Apr 17:47 (6.2 h before) | 217 (03:37) | 9 / 11 (2.86) | up 06 Apr 18:57 (5.0 h before) |
+| N3, 7 Apr 2025 | Nifty 50 | 172; 0.25 | 51 (10:06) | 1 / 1 (0.50) | up 04 Apr 10:54 (70.3 h before) | 16 (09:31) | 2 / 4 (1.50) | down 04 Apr 12:44 (68.5 h before) |
+| C3, 10 Oct 2025 | BTC | missed; 0.57 | 67 / 10 (21:07) | 5 / 5 (1.43) | up 10 Oct 15:23 (4.6 h before) | 58 / 1 (20:58) | 11 / 15 (3.71) | up 10 Oct 19:30 (30 min before) |
+|  | ETH | missed; 0.57 | 73 / 16 (21:13) | 5 / 5 (1.43) | up 10 Oct 15:23 (4.6 h before) | 1394 / 1337 (19:14) | 11 / 17 (4.00) | up 10 Oct 19:25 (35 min before) |
+|  | XRP | missed; 0.57 | 71 / 14 (21:11) | 4 / 3 (1.00) | up 10 Oct 15:27 (4.5 h before) | 56 / -1 (20:56) | 10 / 13 (3.29) | up 10 Oct 19:30 (30 min before) |
+|  | SOL | missed; 0.57 | 70 / 13 (21:10) | 5 / 3 (1.14) | up 10 Oct 15:20 (4.7 h before) | 58 / 1 (20:58) | 12 / 14 (3.71) | down 10 Oct 16:58 (3.0 h before) |
+|  | DOGE | missed; 0.57 | 65 / 8 (21:05) | 3 / 3 (0.86) | up 10 Oct 15:31 (4.5 h before) | 58 / 1 (20:58) | 12 / 15 (3.86) | up 10 Oct 19:29 (31 min before) |
+
+**Alarm rate over the whole stream**, outside the event windows, per crypto day / per Nifty session: e-detector 0.66 to 0.71 / 0.30; awake-A 0.62 to 0.91 / 0.24 (band 0.25) and 1.25 to 1.61 / 0.42 (band 0); awake-B 0.59 to 0.94 / 0.22 (band 0.25) and 3.59 to 4.56 / 1.13 (band 0).
+
+**Reading (exploratory).**
+
+* **At band 0.25 the awake monitors cost about as many alarms as the e-detector and flag most of the cases.** In the week before T they raised 0 to 1.29 (awake-A) and 0.29 to 1.00 (awake-B) alarms per crypto day against 0.57 to 0.86 for the e-detector, and 0.20 to 0.25 per Nifty session like the e-detector; over the whole streams 0.59 to 0.94 per crypto day against 0.66 to 0.71. They flagged 15 (awake-A) and 17 (awake-B) of the 18 cases within 24 hours, against 3 for the e-detector.
+* **They reacted to the start of each crypto episode as the e-detector did, but then kept watching.** On most coins their last alarm before T was the same kind of up alarm on Sunday afternoon (C1, C2) or at 15:21 to 15:31 UTC on 10 October 2025 (C3). Because they restarted at once instead of recalibrating for a day, they flagged the second, larger leg: on 5 August 2024 both monitors within 37 to 70 minutes of the Tokyo open on all five coins; on 10 October 2025 awake-B within 56 to 61 minutes of 20:00 UTC on all five coins (1 minute before to 4 minutes after 20:57) and awake-A within 70 to 77 minutes on four coins (13 to 20 minutes after 20:57; on BTC only the next morning).
+* **On 7 April 2025 they were slow.** The returns after T were not larger than in the hours between the Sunday alarms and T (descriptive table above), and the restarted monitors measured them against those turbulent hours: awake-B flagged four coins after 414 to 867 minutes (about 7 to 14.5 hours) and missed DOGE; awake-A flagged two (421 and 874 minutes) and missed three.
+* **Nifty.** awake-B 7, 107 and 20 minutes and awake-A 20, 107 and 51 minutes after the open, against 11, 104 and 172 for the e-detector; the difference on 7 April 2025 is the e-detector's recalibration after its down alarm on 3 April.
+* **Without the band the rank monitor is faster but noisy.** awake-B at band 0 flagged 5 August 2024 within 18 to 38 minutes and 7 April 2025 within 216 to 261 minutes on all five coins, but raised 2.7 to 4.7 alarms per crypto day in the week before (3.6 to 4.6 over the streams), five to seven times the e-detector's rate. Restarting at once also has a failure mode: on ETH on 10 October 2025 it raised an up alarm at 19:25 and a down alarm at 20:38, so the cascade arrived when its reference set held only a few dozen returns, and it did not flag the cascade until 19:14 the next day.
+
+**Caveats for this section.** Post hoc, on the four events that prompted it: the monitors and their settings are E14's, fixed before this section, but the decision to look was made after seeing the primary results. Their guarantees (δ + m / A for awake-A, m / A for awake-B) need independent, identically distributed or exchangeable returns within a segment, which real returns are not, so their alarm rates here are measured, like every other method's. A similar alarm rate does not mean equally useful alarms: in E14 (Q14d, band 0.25), 74% of awake-B's up alarms were followed by higher volatility against 80% for awake-A and 82% for the plug-in e-detector. The awake monitors are not rate matched to the e-detector, and the pre-registered competitors were not rerun without their pause.
+
+---
+
+## E20. Re-analysis of the real-data inference: multiplicity, dependence between days, and information beyond a strong forecast
+
+Script `experiments/e20_inference.py` (parts `checks`, `bootstrap`, `holm`, `events`, `forecast`, `classify`), tests `tests/test_e20_inference.py`. Outputs: `results/e20_checks.csv`, `e20_items_e6.csv.gz`, `e20_items_e17.csv.gz`, `e20_bootstrap.csv`, `e20_holm_existing.csv`, `e20_nifty_event_shift.csv`, `e20_forecast_choice.csv`, `e20_forecast_regressions.csv`, `e20_forecast_qlike.csv`, `e20_forecast_alarm_counts.csv`, `e20_classification.csv`, `e20_primary_endpoints.csv`. All results **[REAL]**. Pre-registration: [`docs/preregistration_e20.md`](../preregistration_e20.md), committed on its own as `bbc8f87` at 01:52 UTC on 3 November 2026, before any Holm adjustment, bootstrap, regression, loss comparison or shift test of this study was run; the result files `results/e20_*` were all written after it. It answers referee items 4, 5, 9, 15, 17 and 18, section 4.1 and major comment M6 of `docs/review/referee_report_paper.md`.
+
+**What this is, and what it is not.** Every alarm list, hit rate and p-value re-examined here had been computed and read before (E6, E7, E12, E13, E14, E15, E17). E20 is therefore a **re-analysis whose methods were fixed before their own results, not a confirmatory study**: the families, the adjustment, the resampling scheme, the regression and loss specifications and the rules that classify each claim were committed first, but the questions were chosen by people who had seen the data. E20 changes no monitor setting and does not edit the paper; the last table proposes wording, which the authors may apply. Line numbers refer to `paper/short_paper.md` at commit `8f71a2e`.
+
+### Summary
+
+* **Only one real-data family was pre-specified as primary.** Of 36 real-data claims, one rests on a pre-specified primary test (E12: FOMC and CPI on BTC, streaming monitor, Holm), and its plan was committed together with its results (`47a5982`), so "fixed before the first run" is stated, not verifiable from the commit order. 19 claims rest on secondary tests described in advance (6 verifiable, 13 stated), 12 are exploratory or post hoc, and 4 mix classes. No other data set has a pre-specified primary endpoint (`results/e20_classification.csv`, `e20_primary_endpoints.csv`).
+* **Alarms against random times and controls: every claim holds.** With days resampled jointly across coins (7-day circular blocks) and Holm within each family, all 16 comparisons of alarms with random times or matched-delay controls (E6 Q6d and Q6e, E7 Q7b) keep Holm $p \le 0.0016$, with differences of 21 to 38 points. The pooled crypto intervals are 1.2 to 1.5 times as wide as the Wilson intervals of Table 7; for the Nifty 50 they are about as wide (`e20_bootstrap.csv`, F1, F2, F9a).
+* **E-detector against the rate-matched ratio rules: 1 of 48 comparisons survives Holm.** That one (band 0.5, held-out period, decrease alarms, EWMA forecast, 60-minute rule: +10.5 points, 95% interval 5.5 to 15.6, Holm $p = 0.0096$) was singled out after the results were seen. At band 0.25 no difference is significant. Equivalence within 5 points is shown in 7 of the 8 held-out cells and in none of the 8 July to December 2025 cells, whose intervals reach 9.7 points (F3).
+* **Published competitors (E13).** With the first-run windows the e-detector's alarms were confirmed more often in 15 of 16 cells (Holm $p \le 0.021$). Among the longer windows added after the first run, it was ahead for up alarms in 10 of 16 cells after Holm and for down alarms in 1 of 16. The two "about 6 points lower" comparisons of the paper hold only before adjustment (Holm $p = 0.53$ and 0.44) (F6, F7).
+* **Scheduled events.** Union Budget sessions keep their excess of alarms under a circular-shift test that preserves the serial dependence of the alarms ($p = 0.0004$, Holm 0.0021). E12's primary family stands as published: FOMC on BTC holds (Holm $p = 0.00025$), CPI on BTC does not ($p = 0.11$). E14's BTC CPI p-values survive Holm within their own family (0.011 and 0.0027), but that analysis was designed after E12's CPI test had failed and cannot replace it (F10a, F10b, F12a, F13).
+* **Restarts (E14 Q14d).** "Confirmed about as often" does not hold for the increase alarms of the rank restart (72.9% against 79.6%, difference -6.7 points, interval -10.8 to -2.7, Holm $p = 0.006$). For the band restart the differences are not significant, but the intervals (-6.8 to 4.8 and -10.7 to 3.7) are too wide to show equivalence (F14).
+* **Information beyond a forecast (Part 3).** Regressed on the log of an EWMA or HAR forecast of next-day realised variance, every rule's up and down alarm indicators are significant: coefficients +0.16 to +0.60 for up alarms and -0.15 to -0.49 for down alarms, Holm $p \le 0.002$ in every block. The strongest forecast on July to December 2025 was a HAR with the last hour's realised variance (HAR-I). On the held-out period (primary family F17) the e-detector's up alarms added nothing significant beyond it (+0.038, standard error 0.027, Holm $p = 0.32$), while its down alarms did (-0.064, standard error 0.025, Holm $p = 0.046$). The 240-minute ratio rule did at least as well (down -0.087, Holm $p = 0.0007$; up +0.063, Holm $p = 0.056$).
+* **No out-of-sample loss gain.** Scaling the HAR-I forecast at alarms by factors fitted on July to December 2025 *raised* the held-out QLIKE loss for all three rules, by 0.29% to 0.38% (F18). None of the 72 loss comparisons showed a significant gain (`e20_forecast_qlike.csv`).
+
+A sentence that can be quoted: "After Holm adjustment within pre-registered families and a block bootstrap that resamples calendar days jointly across coins, every comparison of alarms with random times or controls holds (Holm $p \le 0.0016$), but only 1 of 48 comparisons with a hindsight-tuned ratio rule does, and against a HAR forecast that includes the last hour's realised variance, only the decrease alarms add information about next-day realised variance, no more than a 240-minute ratio rule's."
+
+### 1. Classification of the real-data claims
+
+Classes (pre-registration Part 1): **P** pre-specified primary; **S** pre-specified secondary; **X** exploratory or post hoc. **Verifiable**: the commit that describes the test is strictly earlier than the first commit with its results. **Stated**: the description was committed together with the results, with or without a statement that it was fixed in advance. The full evidence for each row, with the docstring sentences, is in `results/e20_classification.csv`.
+
+| ID | Claim (short) | Line | Source | Class | Evidence |
+|---|---|---|---|---|---|
+| C1 | Alarms carry information beyond EWMA and HAR forecasts (five coins) | 9, 404 to 419 | E6 Q6e | S, stated | Q6e in the E6b docstring, first committed with its results (`d0caeb1`); no primary test; monitor settings frozen earlier in E5 (`bf67e2b`). HAR training history changed after the first full run (`docs/iterations/E6.md`, iteration 5). |
+| C2 | Alarms follow scheduled events far more often than control times (Nifty 50, FOMC) | 9 | E7 Q7d, E12 | S (Budget); P (FOMC on BTC), stated | Budget: one of five event types, committed with results (`c20ea73`). FOMC on BTC: primary family in the E12 docstring, committed with results (`47a5982`). |
+| C3 | A ratio rule tuned with hindsight is about as precise | 9, 419 | E6 Q6e | S, stated | Rate-matched rule in the E6b docstring (`d0caeb1`); windows fixed before running (E6 iteration 6). Equivalence claim without a margin set in advance. |
+| C4 | Published methods given day-long windows come close | 9, 441 | E13, longer windows | X, verifiable | Longer windows added in review round 3 (`fca74a5`) after the first real results (`53f9eba`). |
+| C5 | Restarted monitors confirmed about as often (five coins) | 379, 457, 788 | E14 Q14d | S, verifiable | Q14d in the E14 docstring at `d9871f4` (21:20), before the results (`e955821`, 21:52). Equivalence claim without a margin. |
+| C6 | Restarts: BTC CPI cell $p = 0.003$ and 0.0003 instead of 0.11 | 379, 449, 792 | E14 Q14g | X, verifiable | Described before its run (`d9871f4`), but designed after E12's results, in which the BTC CPI test failed, were committed (`47a5982`, 21:01). |
+| C7 | At matched alarm counts the 5- and 15-minute detectors were no more precise than the one-minute monitor | 381, 834 | E17 Q17g | X, verifiable | Marked "POST HOC (review round 4)" (`ef65698`), after the real results (`5da9ac2`). |
+| C8 | 75% to 84% of up and 83% to 93% of down alarms on the flagged side of the baseline, about 50% at matched-delay random times | 402 | E6 Q6d | S, stated | Q6d in the E6b docstring, committed with results (`d0caeb1`). |
+| C9 | Out of sample these shares fell by only 1 to 4 points | 402 | E6 Q6d | S, stated | Descriptive comparison of the two periods of the docstring. |
+| C10 | Bitstamp and Binance alarms coincide within 60 minutes (72%, 73%; about 3% when shifted) | 402 | E6 Q6d | S, stated | In the E6b docstring (`d0caeb1`). |
+| C11 | Next-day volatility beyond both forecasts after 76% to 81% of up alarms (48% to 51% at random times); short of them after 71% to 81% of down alarms | 404 to 419 | E6 Q6e | S (EWMA); X (HAR), stated | As C1. |
+| C12 | Ratio rule within 0 to 5 points at band 0.25, none significant | 419 | E6 Q6e | S, stated | As C3; 48 cells compared without a multiplicity plan. |
+| C13 | Band 0.5, out of sample, EWMA: e-detector better by about 4 points (up) and 10 points (down, 60-minute rule) | 419 | E6 Q6e | X, verifiable | One subgroup of 48 cells, highlighted after the results were seen (E6 iteration 6; referee item 17). |
+| C14 | Gaussian LR up alarms 7 to 14 points less informative | 419 | E6 Q6e | S, stated | Benchmark in E6's configurations and docstring (`d0caeb1`). |
+| C15 | First-run windows: e-detector ahead of every competitor ($p \le 0.02$; week-clustered $\le 0.010$) | 441 | E13 Q13d | S, verifiable | Q13d in the E13 docstring at `6cfe39c` (21:24), before the real results (`53f9eba`, 22:14). The week-clustered tests came in review round 3 (`fca74a5`): X. |
+| C16 | Held-out half-year: the same, except truncated BOCPD down alarms | 441 | E13 held-out | X, verifiable | Added after the first real results (`9c782d5`) as a replication with every setting frozen. |
+| C17 | Day-long windows: competitors' down alarms as informative ($p \ge 0.28$) | 441 | E13, longer windows | X, verifiable | As C4. |
+| C18 | Best longer-window competitor about 6 points lower for up alarms ($p$ = 0.065 and 0.054) | 441 | E13, longer windows | X, verifiable | Comparator picked after the results (referee item 18). |
+| C19 | On the next four hours, short-window competitors did as well or better | 441 | E13, four-hour outcome | X, verifiable | Outcome added in review round 3 (`fca74a5`). |
+| C20 | Nifty 50: all five methods 69% to 83%, no significant difference; session-long BJV worse | 441 | E13 Nifty | S (first-run); X (session-long), verifiable | As C15 and C4. |
+| C21 | Nifty held-out: 78% of up alarms (47% at random times) and 76% of down alarms (53%) confirmed | 445, 842 | E7 Q7b | S, stated | "Pre-registered primary configuration" in the E7 docstring, committed with the results (`38856a3`): a configuration, not an endpoint. |
+| C22 | Against 61% for the Gaussian LR monitor's up alarms | 445, 842 | E7 Q7b | S, stated | Benchmark in the E7 docstring (`38856a3`). |
+| C23 | India VIX agreed on the same day but did not lead | 445, 842 | E7 Q7c | S, verifiable | Q7c in the docstring at `0627d14`, before the VIX results (`83ce131`), after the alarms were known (`38856a3`). |
+| C24 | 9 of 11 Union Budget sessions had an alarm (25% of ordinary sessions; $p = 0.0001$) | 445, 842 | E7 Q7d | S, stated | As C2 (Budget). |
+| C25 | All 7 budget sessions monitored at the open had an alarm | 842 | E7 Q7d | X, stated | The filter replaced a flawed first filter after the results (E7 iteration 5). |
+| C26 | RBI policy days did not differ (32% against 25%, $p = 0.36$) | 445, 842 | E7 Q7d | S, stated | As C24. |
+| C27 | Expiry days had more alarms (38%, $p = 0.002$), perhaps an artefact | 842 | E7 Q7d | S (test); X (reading), stated | As C24. |
+| C28 | March 2020: only 6 of 21 sessions had an alarm | 445, 842 | E7 Q7d | S, stated | Descriptive; one of the five event types (`c20ea73`). |
+| C29 | Primary test (BTC, streaming, Holm): FOMC 9 of 16 against 14% ($p = 0.0002$); CPI $p = 0.11$ | 449, 846 to 848 | E12 | **P, stated** | "the PRIMARY family, fixed before the first run" in the E12 docstring at its first commit, which also holds the results (`47a5982`). The event calendar (`08fb1bf`) holds no analysis plan. |
+| C30 | CPI replicated on ETH ($p = 0.003$) and SOL ($p = 0.00004$) | 449, 848 | E12 | S, stated | "ETH and SOL are replications" in the same docstring. |
+| C31 | At FOMC statements with the monitor awake, it alarmed every time | 449, 848 | E12 | X, stated | Restriction to awake releases introduced after the first run (`docs/iterations/EV1.md`, iteration 1). |
+| C32 | Fresh calibration: 14 to 15 of 16 FOMC; CPI 59% to 73% (controls 23% to 32%) | 449, 848 | E12 fresh design | X, stated | "added in iteration 2 after the streaming run"; marked secondary. |
+| C33 | Gaussian LR (fresh) alarmed in 62% to 76% of control windows; robust at band 0 in 39% to 51% | 449, 848 | E12 | X, stated | Fresh design (iteration 2) and band-0 robust run (review round 2a, `990c289`) added after the first results. |
+| C34 | Panel discoveries pointed the right way (78% to 83% up, 85% to 97% down) | 453, 852 | E15 Q15d | S, verifiable | Q15d in the docstring at `2eaa2e3` (21:26), before the real results (`d8cf4ae`, 21:38). |
+| C35 | A hindsight per-asset threshold was confirmed at the same rate (12 cells) | 852 | E15 Q15d | S, verifiable | In the docstring at `2eaa2e3`. Equivalence claim without a margin. |
+| C36 | 5- and 15-minute detectors alone confirmed more often (90%, 95%; 95%, 96%) | 834 | E17 Q17f | S, verifiable | Real settings frozen in the script (`34c6155`) before the real run (`5da9ac2`); unequal alarm rates. |
+
+**Primary endpoint per data set** (`results/e20_primary_endpoints.csv`):
+
+| Data set | Primary endpoint |
+|---|---|
+| Five coins (E6) | none was pre-specified (Q6d and Q6e are research questions) |
+| Five coins (E13) | none was pre-specified (Q13d names the comparison, not a primary test) |
+| Five coins (E14, E15, E17) | none was pre-specified |
+| Nifty 50 monitor (E7) | none was pre-specified; a primary *configuration* (calibration 750, band 0.25) was stated in the commit that holds the results (`38856a3`) |
+| Nifty 50 events (E7) | none was pre-specified (five event types, no primary type) |
+| Nifty 50 and India VIX (E7) | none was pre-specified (eight cells) |
+| Nifty 50 (E13) | none was pre-specified |
+| FOMC and CPI (E12) | BTC, streaming robust monitor (band 0.25), up alarm within six hours, FOMC and CPI, exact stratified permutation test, Holm at 5%; stated as fixed before the first run in the commit that holds the results (`47a5982`), not verifiable from the commit order |
+
+### 2. Adjusted results
+
+**Method (pre-registration Part 2).** Holm within each family, no adjustment across families. Shares and differences of shares are resampled by a circular block bootstrap over calendar days (UTC) or Nifty sessions: blocks of 7 days or 5 sessions, B = 9,999, seed 20, **one set of day weights per replicate applied to every coin, method, direction and control draw of the period**, so the dependence across coins and between methods on the same day is kept. Percentile 95% intervals; $p$ is the inversion of the percentile interval, so the smallest attainable value is 2/10,000. Equivalence is **shown** when the 95% interval of a difference lies within plus or minus 5 points. For E7, the random-time control shares are not stored per draw and are treated as fixed numbers, which understates their uncertainty.
+
+**Checks (pre-registration 3.2).** All 76 checks in `results/e20_checks.csv` passed. E6's `summarise` and `forecast_hits`, called in E6's job order with E6's seed, reproduced `e06d_monitor_summary.csv`, `e06e_forecast_hits.csv` and `e06e_competitor.csv` for all ten coin-periods (counts exactly, shares to $10^{-12}$), including the random times, the matched-delay control draws and the ratio-rule thresholds and alarms. E17's matched one-minute monitor, rerun at its stored levels, gave the stored counts for all ten coin and target pairs. The E13, E7, E14 and E15 lists equal their summaries.
+
+**Overview.** "Nominal" counts bootstrap (or, for the existing tests, original) $p < 0.05$.
+
+| Family | Data and comparison | Tests | Nominal $p < 0.05$ | Holm $p < 0.05$ | Equivalence shown |
+|---|---|---|---|---|---|
+| F1 | E6, alarm minus matched-delay control | 4 | 4 | 4 | |
+| F2 | E6, alarm minus random times, EWMA and HAR | 8 | 8 | 8 | |
+| F3 | E6, e-detector minus ratio rule | 48 | 4 | 1 | 13 |
+| F4 | E6, robust (band 0) minus Gaussian LR | 4 | 3 | 3 (2 favour the robust monitor) | |
+| F5 | E6 cross-venue, circular-shift p-values | 8 | 8 | 8 | |
+| F6 | E13 crypto, first-run windows | 16 | 15 | 15 | 0 |
+| F7 | E13 crypto, longer windows | 32 | 20 | 11 | 0 |
+| F8a | E13 Nifty, first-run windows | 8 | 0 | 0 | 0 |
+| F8b | E13 Nifty, session-long windows | 8 | 3 | 2 | 0 |
+| F9a | E7 Nifty, alarm minus random times | 4 | 4 | 4 | |
+| F9b | E7 Nifty, robust minus Gaussian LR | 4 | 2 | 2 | |
+| F10a | E7 events, Fisher (as published) | 5 | 2 | 2 | |
+| F10b | E7 events, circular shift of the calendar | 5 | 2 | 2 | |
+| F10c | E7 events, monitored at the open | 5 | 2 | 2 | |
+| F11 | E7 India VIX, Fisher | 8 | 4 | 3 | |
+| F12a | E12 primary family | 2 | 1 | 1 | |
+| F12b | E12 replications (ETH, SOL) | 4 | 4 | 4 | |
+| F12c | E12 fresh calibration | 6 | 6 | 6 | |
+| F12d | E12 releases with the monitor awake | 6 | 5 | 5 | |
+| F13 | E14 Q14g event cells | 18 | 18 | 18 | |
+| F14 | E14 Q14d restarts minus plug-in | 4 | 1 | 1 (against the restart) | 0 |
+| F15 | E15 e-BH minus hindsight threshold | 12 | 1 | 0 | 12 |
+| F16 | E17 Q17g matched one-minute minus coarse | 12 | 2 | 2 (favour the one-minute monitor) | 1 |
+| F17 | Part 3, regression | 6 | 3 | 2 | |
+| F18 | Part 3, QLIKE | 3 | 1 | 1 (the adjustment is worse) | |
+
+**Sensitivity.** With blocks of 14 days and 10 sessions, one Holm decision of the 164 bootstrap tests changes: F7, BOCPD $w$ = 720 against the e-detector, January to June 2025, down alarms (Holm $p$ 0.092 with 7-day blocks, 0.028 with 14-day blocks).
+
+#### 2.1 Alarms against random times and controls (F1, F2, F9a): Table 7 with day-block intervals
+
+Pooled over the five coins, band 0.25. Share of alarms on the flagged side, with the day-block 95% interval and, in brackets, the Wilson interval of the paper; then the random-time share and the difference with its day-block interval. Every Holm $p$ is 0.0008 (F1) or 0.0016 (F2).
+
+| Rule, forecast | Period | Up alarms | Down alarms | Up minus random | Down minus random |
+|---|---|---|---|---|---|
+| e-detector, EWMA | Jul to Dec 2025 | 78.5% (72.0 to 84.5) [74.0 to 82.4], $n$ = 367; random 49.4% | 80.5% (74.6 to 86.3) [75.2 to 84.9], $n$ = 256; random 50.6% | +29.1 (23.9 to 34.2) | +29.8 (23.3 to 36.7) |
+| e-detector, HAR | Jul to Dec 2025 | 80.7% (74.7 to 86.4) [76.3 to 84.4]; random 51.3% | 78.1% (70.3 to 85.5) [72.7 to 82.8]; random 48.7% | +29.4 (23.5 to 35.3) | +29.4 (23.9 to 34.9) |
+| e-detector, EWMA | out of sample | 77.1% (73.5 to 80.5) [74.3 to 79.6], $n$ = 951; random 50.4% | 70.9% (66.7 to 75.1) [67.8 to 73.8], $n$ = 870; random 49.6% | +26.7 (23.3 to 30.1) | +21.3 (18.1 to 24.4) |
+| e-detector, HAR | out of sample | 75.9% (72.0 to 79.6) [73.0 to 78.6], $n$ = 909; random 48.3% | 73.6% (69.9 to 77.3) [70.5 to 76.5], $n$ = 834; random 51.7% | +27.6 (24.6 to 30.5) | +22.0 (19.1 to 24.8) |
+| e-detector, calibration baseline (Q6d) | Jul to Dec 2025 | 79.6% (74.2 to 84.8); matched-delay control 52.2% | 88.3% (83.0 to 93.0); control 49.8% | +27.4 (21.7 to 33.2) | +38.4 (33.7 to 43.5) |
+| e-detector, calibration baseline (Q6d) | out of sample | 77.9% (74.5 to 81.2); control 47.7% | 84.5% (81.4 to 87.4); control 52.3% | +30.2 (26.3 to 34.0) | +32.2 (29.3 to 35.1) |
+| Nifty 50, primary configuration | 2022 to Oct 2026 | 78.3% (71.9 to 84.2), $n$ = 161; random 47.0% (fixed) | 76.0% (69.2 to 82.4), $n$ = 150; random 53.0% | +31.2 (24.9 to 37.2) | +23.0 (16.2 to 29.4) |
+
+The HAR rows of the out-of-sample period have fewer alarms (909 and 834) because the HAR forecast of E6 is not defined for most alarms before mid-February 2024. In the paper's own words, the day-block intervals are what "alarms across coins are correlated, so pooled intervals are optimistic" asks for.
+
+#### 2.2 E-detector against the rate-matched ratio rules (F3)
+
+Band 0.25, the 16 cells behind "within 0 to 5 points, none significant" (line 419). Difference in points (e-detector minus rule), day-block 95% interval, bootstrap $p$, original $p$ (two-proportion test of E6). Every Holm $p$ in this table is 1.
+
+| Period | Forecast | Rule | Up: difference (interval), $p$, original $p$ | Down: difference (interval), $p$, original $p$ |
+|---|---|---|---|---|
+| Jul to Dec 2025 | EWMA | 60 min | +4.6 (-0.7 to 9.5), 0.085, 0.15 | +2.3 (-5.2 to 9.7), 0.52, 0.51 |
+| Jul to Dec 2025 | EWMA | 240 min | +4.3 (-0.9 to 9.5), 0.10, 0.17 | -1.8 (-8.6 to 5.1), 0.62, 0.60 |
+| Jul to Dec 2025 | HAR | 60 min | +4.0 (-0.9 to 9.1), 0.11, 0.18 | +1.2 (-4.8 to 7.0), 0.69, 0.75 |
+| Jul to Dec 2025 | HAR | 240 min | +2.9 (-2.3 to 8.3), 0.28, 0.33 | -2.6 (-9.3 to 4.0), 0.47, 0.47 |
+| out of sample | EWMA | 60 min | +0.1 (-2.7 to 2.8), 0.94, 0.96 | +3.5 (-0.2 to 7.2), 0.064, 0.11 |
+| out of sample | EWMA | 240 min | +1.4 (-1.5 to 4.3), 0.36, 0.48 | 0.0 (-3.2 to 3.2), 0.98, 0.99 |
+| out of sample | HAR | 60 min | 0.0 (-2.6 to 2.7), 0.98, 0.99 | +1.5 (-1.7 to 4.8), 0.38, 0.50 |
+| out of sample | HAR | 240 min | +1.0 (-2.2 to 4.2), 0.56, 0.63 | -1.6 (-4.4 to 1.2), 0.27, 0.46 |
+
+Of all 48 cells (bands 0, 0.25 and 0.5), 4 have a bootstrap $p < 0.05$, all at band 0.5 out of sample: EWMA, 60 minutes, up +3.6 (1.2 to 6.1), $p$ = 0.002, Holm 0.11 (original 0.061); EWMA, 60 minutes, down **+10.5 (5.5 to 15.6), $p$ = 0.0002, Holm 0.0096** (original $< 0.001$); EWMA, 240 minutes, up +4.1 (1.4 to 7.0), $p$ = 0.005, Holm 0.24 (original 0.032); HAR, 240 minutes, up +3.3 (0.2 to 6.4), $p$ = 0.037, Holm 1. The one survivor is the subgroup the paper highlights, which was singled out after the results (class X).
+
+**Robust against Gaussian LR (F4), band 0, EWMA.** Up alarms: +13.5 points (8.2 to 18.6) in July to December 2025 and +7.2 (4.0 to 10.3) out of sample, both Holm $p = 0.0008$. Down alarms: -3.3 (-8.7 to 2.2), Holm 0.24, and **-5.5 (-8.6 to -2.3) out of sample, Holm $p = 0.003$: the Gaussian monitor's decrease alarms were the more informative ones**, which the paper does not report.
+
+**Cross-venue (F5).** The eight circular-shift p-values are 0.001 or 0.002; Holm gives 0.008 for each.
+
+#### 2.3 Published competitors (F6 to F8)
+
+**First-run windows, five coins (F6).** 15 of 16 cells hold after Holm (Holm $p \le 0.021$). The exception is the one the paper names: truncated BOCPD, January to June 2025, down alarms, +2.7 points (-4.1 to 9.8), $p = 0.44$.
+
+**Longer windows, five coins (F7, added after the first run).** Differences e-detector minus competitor, EWMA forecast, in points, with Holm $p$:
+
+| Competitor | Jul to Dec 2025, up | Jul to Dec 2025, down | Jan to Jun 2025, up | Jan to Jun 2025, down |
+|---|---|---|---|---|
+| BOCPD on truncated returns, $w$ = 720 | +5.9 (0.2 to 11.5), Holm 0.53 | +2.6 (-4.7 to 10.4), 1 | +7.2 (1.5 to 13.1), 0.26 | +0.4 (-4.9 to 5.7), 1 |
+| BOCPD on truncated returns, $w$ = 1440 | +8.9 (4.1 to 13.9), 0.0064 | -1.2 (-9.2 to 7.0), 1 | +8.3 (2.4 to 14.8), 0.076 | -2.2 (-8.7 to 4.3), 1 |
+| BJV-type, $k$ = 1440 | +10.5 (4.2 to 17.1), 0.032 | +2.7 (-5.5 to 10.9), 1 | +12.7 (5.7 to 20.0), 0.021 | -3.9 (-11.4 to 4.0), 1 |
+| BJV-type, studentised, $k$ = 1440 | +12.2 (5.7 to 18.7), 0.012 | +2.6 (-5.7 to 11.1), 1 | +12.7 (5.2 to 20.3), 0.029 | -3.0 (-10.3 to 4.5), 1 |
+| BJV-type, $k$ = 480 | +8.6 (3.7 to 13.7), 0.012 | +6.5 (-1.3 to 14.8), 1 | +6.4 (0.7 to 12.2), 0.44 | +1.4 (-4.1 to 6.9), 1 |
+| BOCPD, $w$ = 720 | +8.0 (3.1 to 12.9), 0.017 | +13.9 (4.5 to 23.4), 0.044 | +10.1 (4.0 to 16.4), 0.025 | +10.3 (3.3 to 17.3), 0.092 |
+
+(The studentised BJV-type test with $k$ = 480 and plain BOCPD with $w$ = 1440 are in `e20_bootstrap.csv`.) The day-long competitors' down alarms are not significantly different from the e-detector's in any of the 8 cells, but no interval lies within plus or minus 5 points, so "as informative" is not shown. For up alarms the e-detector is ahead in 5 of these 8 day-long cells after Holm, and in 10 of all 16 longer-window up cells. The paper's two "best longer-window competitor" comparisons (truncated BOCPD $w$ = 720, July to December; BJV $k$ = 480, held-out) have bootstrap $p$ = 0.041 and 0.026 but Holm $p$ = 0.53 and 0.44.
+
+**Nifty 50, 2024 and 2025 (F8a, F8b).** With the first-run windows no difference is significant (smallest Holm $p$ 0.53); with $n$ = 79 up and 69 down alarms the intervals are 21 to 29 points wide, so equality is not shown either. With session-long windows, the BJV-type test ($k$ = 375) and its studentised version have less informative down alarms (+20.3 points, 7.7 to 33.1, Holm 0.021; +17.4, 5.4 to 29.6, Holm 0.035); their up alarms do not differ significantly after Holm (0.25 and 0.11).
+
+#### 2.4 Nifty 50: robust against Gaussian, India VIX and events (F9b, F10, F11)
+
+**Robust against Gaussian LR (F9b).** Up alarms: +11.3 points (3.7 to 18.7) in the development period, Holm 0.014; +16.9 (10.0 to 23.7) held-out, Holm 0.0008. Down alarms: +4.0 (-3.6 to 11.5) and -0.1 (-8.5 to 8.4), not significant.
+
+**India VIX (F11, Fisher as published, Holm over 8).** Same day: development up and down hold (Holm $p < 0.001$); held-out down holds (0.0037); **held-out up does not** (original 0.062, Holm 0.25). Next day: no cell is significant after Holm (the smallest, held-out down, 0.036 becomes 0.18).
+
+**Events (F10).** Fisher test as published (F10a), the circular-shift test of the calendar against the alarm series over all 2,361 shifts (F10b), and Fisher restricted to sessions monitored at the open (F10c):
+
+| Event type | Sessions with an alarm | Fisher $p$ (Holm) | Circular-shift $p$ (Holm) | Monitored at the open: Fisher $p$ (Holm) |
+|---|---|---|---|---|
+| Union Budget | 9 of 11 | 0.00012 (0.0006) | 0.00042 (0.0021) | 0.0021 (0.011) |
+| Monthly expiry | 42 of 110 | 0.0024 (0.0095) | 0.0038 (0.015) | 0.0023 (0.011) |
+| RBI policy | 13 of 41 | 0.36 (0.72) | 0.50 (1) | 0.68 (1) |
+| Election result | 2 of 2 | 0.062 (0.19) | 0.077 (0.23) | 0.17 (0.51) |
+| March 2020 window | 6 of 21 | 0.62 (0.72) | 0.75 (1) | 1 (1) |
+
+Ordinary sessions: 540 of 2,178 with an alarm. The circular-shift test keeps the clustering of alarms in time; Budget and expiry keep their excess under it.
+
+#### 2.5 FOMC and CPI (F12, F13)
+
+E12's primary family (F12a) is reported as published: FOMC on BTC, Holm $p = 0.00025$; CPI on BTC, $p = 0.11$. The replications (F12b) hold after Holm within their family (ETH FOMC 0.0005, ETH CPI 0.0032, SOL FOMC 0.0009, SOL CPI 0.00015), as do the fresh-calibration cells (F12c, Holm $p \le 0.0004$). Restricted to releases with the monitor awake (F12d, post hoc), 5 of 6 cells hold; BTC CPI does not ($p = 0.27$). All 18 cells of E14 Q14g (F13) hold after Holm within F13 (largest Holm $p$ 0.011; BTC CPI 0.011 with the band restart and 0.0027 with the rank restart). These are post hoc with respect to E12's primary test and do not change its result.
+
+#### 2.6 Restarts, panel and frequencies (F14 to F16)
+
+**Restarts (F14, five coins, July to December 2025, band 0.25).** Band restart (awake-A) minus the plug-in: up 78.5% against 79.6%, -1.1 points (-6.8 to 4.8); down 85.1% against 88.3%, -3.2 (-10.7 to 3.7); neither significant, equivalence not shown. Rank restart (awake-B): up 72.9% against 79.6%, **-6.7 (-10.8 to -2.7), Holm $p = 0.006$**; down 92.2% against 88.3%, +3.9 (-2.4 to 10.7), not significant.
+
+**Panel (F15).** All 12 cells of e-BH against the hindsight per-asset threshold are within plus or minus 5 points (largest absolute interval end 3.8 points); no difference is significant after Holm. Equivalence is shown in all 12.
+
+**Frequencies (F16, matched one-minute monitor minus the coarse detector).** Against the 5-minute detector all six differences are small and not significant (-4.4 to 7.9 points at the interval ends); equivalence is shown only for confirmed up alarms (+0.4, -3.7 to 4.6). Against the 15-minute detector, the one-minute monitor's down alarms were ahead against the EWMA forecast (+16.5, 7.1 to 27.4, Holm 0.0044) and the HAR forecast (+24.3, 14.2 to 36.4, Holm 0.0024); the other four cells are not significant, with intervals up to 21 points wide. No cell favours the coarse detector.
+
+### 3. Information beyond a forecast (referee items 4 and M6)
+
+**Design (pre-registration Part 3).** Five coins, hourly grid. Outcome: log realised variance of the next 1440 minutes (primary) or 360 minutes, from squared one-minute log returns; bipower variation as the jump-robust alternative. Forecasts from past data only, each a daily refitted expanding-window regression of the log outcome on its regressors plus hour-of-day and day-of-week dummies (at least 720 training points): EWMA (half-life one day, E6's), HAR (Corsi 2009; rolling 1-, 5- and 22-day realised variance anchored at the grid time) and HAR-I (HAR plus the log realised variance of the last hour). Alarm indicators $U$ and $D$: an up (down) alarm of the rule in the hour ending at the grid time. Evaluation regression, pooled over coins with coin intercepts:
+
+$$\log RV_H(t) = a_{\text{coin}} + b \log F(t) + c_{\uparrow} U(t) + c_{\downarrow} D(t) + e(t),$$
+
+with Driscoll and Kraay (1998) standard errors (scores summed within each UTC day over all coins, Bartlett weights, bandwidth 5 days; Newey and West 1987), day-clustered standard errors as a secondary check. Loss: QLIKE, $L(y, F) = y/F - \log(y/F) - 1$ (Patton 2011), comparing $F$ with $F \kappa_{\uparrow}^{U} \kappa_{\downarrow}^{D}$, where $\kappa$ is the mean of $y/F$ at the development-period alarms (the QLIKE-optimal constant), evaluated on the other period with a Diebold and Mariano (1995) type test (Driscoll and Kraay standard error). Rules: the E6 e-detector and the two ratio rules matched to it, band 0.25 (primary) and 0.5.
+
+**Samples and alarms.** July to December 2025: grid times 1 July 00:00 to 30 December 23:00 UTC, 183 days, $n$ = 21,960. Held-out: 23 February 2024 to 29 June 2025, 493 days, $n$ = 59,160. The held-out sample starts on 23 February, not 21 January, because the HAR regressors need 22 days of history and the first fit needs 720 points; this follows from the pre-registered rule of one common sample for all forecasts. Every alarm of the five coins landed on a grid point of its own period, except one e-detector down alarm of BTC in each band (23:25 UTC at band 0.25 and 23:53 UTC at band 0.5, on 31 December 2025), whose grid point lies past the end of the data and which has no outcome window. No two alarms of one rule, coin and direction fell in the same hour (`e20_forecast_alarm_counts.csv`). Bitstamp BTC/USD, a sixth series of E6 in July to December 2025, is not part of the five coins and is not used.
+
+**Forecast choice** (`e20_forecast_choice.csv`, mean QLIKE of next-day realised variance, July to December 2025): EWMA 0.565, HAR 0.562, **HAR-I 0.537**, so HAR-I is the strongest forecast. It is also the best on the held-out period (0.234 against 0.248 and 0.250) and for every horizon and measure.
+
+**Primary family F17** (held-out, next-day realised variance, HAR-I, band 0.25, Driscoll and Kraay standard errors; $b$ = 0.952, standard error 0.024):
+
+| Rule | Up alarms (grid points) | $c_{\uparrow}$ (SE), $p$, Holm | Down alarms (grid points) | $c_{\downarrow}$ (SE), $p$, Holm |
+|---|---|---|---|---|
+| e-detector | 892 | +0.038 (0.027), 0.16, 0.32 | 816 | **-0.064 (0.025), 0.0092, 0.046** |
+| ratio rule, 60 min | 890 | +0.026 (0.024), 0.28, 0.32 | 815 | -0.040 (0.022), 0.067, 0.20 |
+| ratio rule, 240 min | 885 | +0.063 (0.026), 0.014, 0.056 | 817 | **-0.087 (0.022), 0.0001, 0.0007** |
+
+Two of six tests hold. After an e-detector down alarm, next-day realised variance was on average about 6% below the HAR-I forecast ($e^{-0.064} = 0.94$), after a 240-minute ratio-rule down alarm about 8% below ($e^{-0.087} = 0.92$). The e-detector's down coefficient is fragile: with day-clustered standard errors its Holm $p$ is 0.060 (ratio rule 240: 0.0020). In the joint model with both rules, held-out, the e-detector's down coefficient stays significant beside either ratio rule (-0.061, $p$ = 0.009 with the 60-minute rule; -0.056, $p$ = 0.017 with the 240-minute rule), and so does the 240-minute rule's (-0.081, $p = 0.0001$).
+
+**Secondary blocks** (`e20_forecast_regressions.csv`; Holm within each block of six coefficients):
+
+* *Against EWMA and HAR* (two forecasts, two periods, two horizons, two measures, two bands: 32 blocks): every coefficient has the sign of its alarm and every Holm $p \le 0.002$; $c_{\uparrow}$ from +0.16 to +0.60, $c_{\downarrow}$ from -0.15 to -0.49. This is the regression version of Table 7, and it holds.
+* *Against HAR-I* (16 cells per rule): the e-detector's up coefficient is significant in **0 of 16** cells (it is negative in all 8 July to December cells); its down coefficient in 14 of 16. The 240-minute rule: up 6 of 16 (all held-out), down 16 of 16. The 60-minute rule: up 0 of 16, down 7 of 16 (all July to December). On July to December 2025, next-day realised variance, all three rules' down coefficients are -0.12 to -0.14 (Holm $p = 0.03$ each) and no up coefficient is significant.
+
+**Primary family F18** (QLIKE; HAR-I scaled at alarms with constants fitted on July to December 2025, evaluated on the held-out period; mean HAR-I QLIKE 0.2336):
+
+| Rule | $\kappa_{\uparrow}$, $\kappa_{\downarrow}$ (fitted) | Held-out mean $y/F$ at up, down alarms | Change in mean QLIKE (SE) | $p$, Holm | Relative change |
+|---|---|---|---|---|---|
+| e-detector | 1.544, 0.846 | 1.152, 1.017 | +0.00068 (0.00041) | 0.10, 0.11 | +0.29% |
+| ratio rule, 60 min | 1.545, 0.862 | 1.123, 1.060 | +0.00088 (0.00033) | 0.0082, 0.025 | +0.38% |
+| ratio rule, 240 min | 1.716, 0.911 | 1.166, 0.995 | +0.00085 (0.00045) | 0.057, 0.11 | +0.36% |
+
+A positive change means the scaled forecast is worse. The factors do not transfer: at the e-detector's up alarms the realised variance was 54% above the HAR-I forecast on average in July to December 2025 but 15% above it in the held-out period, and at down alarms 15% below it against 2% above it. Over all 72 loss comparisons (both directions of fitting, three forecasts, two horizons, two bands, three rules), none shows a significant gain; 8, all with HAR-I fitted on July to December 2025, show a significant loss. With constants fitted on the held-out period and evaluated on July to December 2025, every change is negative (a gain) but none is significant ($p \ge 0.29$).
+
+**Reading.** The alarms do say something that a daily EWMA or HAR forecast does not: volatility has just moved. A forecast that already sees the last hour's realised variance captures most of it. What remains is a modest signal in the down alarms, carried at least as well by a 240-minute ratio rule, and it is too unstable across periods to improve a forecast's loss out of sample.
+
+### 4. Claim by claim: adjusted status and recommended wording
+
+"Holds" means Holm $p < 0.05$ in its family with the interval on the claimed side; "holds only unadjusted" means nominal $p < 0.05$ but Holm $p \ge 0.05$; "exploratory" claims keep the status their numbers give but carry no confirmatory weight. The wording is a recommendation; the authors decide.
+
+| ID | Line | Adjusted status | Recommended wording |
+|---|---|---|---|
+| C1 | 9, 404 | Partly holds: hit rates against EWMA and HAR hold (F2); against HAR with the last hour only the down alarms add information (F17), and no out-of-sample loss gain (F18) | Abstract: "On five cryptocurrencies, alarms were followed by next-day volatility on the flagged side of EWMA and HAR forecasts far more often than random times, but against a HAR forecast that includes the last hour's realised variance only the decrease alarms added information, no more than a 240-minute ratio rule's, and scaling the forecast at alarms did not lower its out-of-sample QLIKE loss." Line 404 heading: "Alarms beat daily forecasts, but not a forecast that sees the last hour, and a tuned ratio rule does as well." |
+| C2 | 9 | Holds for Union Budget and for FOMC on BTC; CPI on BTC (same primary family) does not | "...on the Nifty 50 they followed Union Budget sessions, and on BTC FOMC statements (the one pre-specified primary test), far more often than control times; the CPI test of the same family was not significant on BTC." |
+| C3 | 9, 419 | No significant difference at band 0.25; equivalence within 5 points shown out of sample only | "A ratio rule tuned with hindsight was not significantly less precise; out of sample the differences were within plus or minus 5 points (95% day-block intervals)." |
+| C4 | 9, 441 | Exploratory; down alarms not significantly different, equivalence not shown; up alarms e-detector ahead in 5 of 8 day-long cells | "...and published change-point methods given day-long windows had decrease alarms that were not significantly less informative (in comparisons added after the first run), while their increase alarms were less informative in most comparisons." |
+| C5 | 379, 457, 788 | Does not hold for the rank restart's increase alarms (-6.7 points, Holm $p = 0.006$); band restart: no significant difference, equivalence not shown | "...the band restart's alarms were confirmed about as often as the standard protocol's (differences -1.1 and -3.2 points, not significant; 95% intervals -6.8 to 4.8 and -10.7 to 3.7), the rank restart's increase alarms less often (72.9% against 79.6%, Holm $p$ = 0.006)." |
+| C6 | 379, 449, 792 | Exploratory; holds after Holm within its family (0.011, 0.0027) | Keep the numbers, add: "(an analysis designed after the primary CPI test had failed; it does not replace that test)". |
+| C7 | 381, 834 | Exploratory; no cell favours the coarse detectors; 2 of 12 favour the one-minute monitor; equivalence shown in 1 of 12 | Keep; add "with intervals up to 21 points wide, so equal precision is not shown except for confirmed increase alarms against the 5-minute detector". Replace "The p-values treat alarms as independent and are optimistic" by the day-block results: 5-minute: up +0.4 points (-3.7 to 4.6), down +1.8 (-1.9 to 5.9); 15-minute, down against EWMA +16.5 (7.1 to 27.4), Holm $p$ = 0.0044. |
+| C8 | 402 | Holds (Holm $p$ = 0.0008) | Add the pooled day-block result: "pooled, 79.6% and 88.3% against 52.2% and 49.8% (differences 27 and 38 points, 95% day-block intervals 22 to 33 and 34 to 44)". |
+| C9 | 402 | Descriptive, not tested; pooled shares fell by 1.6 and 3.8 points | Keep. |
+| C10 | 402 | Holds (Holm $p$ = 0.008 for each of 8) | Keep. |
+| C11 | 419 | Holds (Holm $p \le 0.0016$); HAR rows exploratory | Keep the numbers; replace the Wilson intervals of Table 7 by the day-block intervals of Section 2.1 above, and the caption's "pooled intervals are optimistic" by "intervals from a block bootstrap over calendar days, resampled jointly across coins". |
+| C12 | 419 | Holds as "not significant" (all 16 Holm $p$ = 1); equivalence shown out of sample only | "...within 0 to 5 points at band 0.25 and none of these differences was significant; out of sample the 95% day-block intervals lie within plus or minus 5 points in 7 of 8 cells, but in July to December 2025 they reach 9.7 points." |
+| C13 | 419 | Exploratory; down cell holds after Holm (0.0096); up cells only unadjusted (0.11, 0.24) | "Only at band 0.5, out of sample, against the EWMA forecast and the 60-minute rule, were the e-detector's decrease alarms more informative (10.5 points, Holm-adjusted $p$ = 0.01 over 48 comparisons; a subgroup noticed after the results); the 4-point differences for increases are not significant after adjustment." |
+| C14 | 419 | Holds for up alarms; down alarms favour the Gaussian monitor out of sample | "The increase alarms of the Gaussian likelihood-ratio monitor were 7 to 14 points less informative than those of the robust monitor (band 0), while its decrease alarms were as informative or, out of sample, 5.5 points more informative." |
+| C15 | 441 | Holds (15 of 16, Holm $p \le 0.021$) | Replace "two-proportion tests, $p \le 0.02$; ... week-clustered ... $p \le 0.010$" by "day-block bootstrap with Holm over the 16 comparisons, adjusted $p \le 0.021$". |
+| C16 | 441 | Exploratory (held-out replication with frozen settings); holds | Keep; say "a held-out half-year added after the first run, with every setting frozen". |
+| C17 | 441 | Exploratory; not significantly different, equivalence not shown | "...the competitors' down alarms were not significantly less informative (differences -3.9 to +2.7 points, 95% intervals up to 11 points wide)". |
+| C18 | 441 | Exploratory; holds only unadjusted (Holm 0.53, 0.44) | "...the best longer-window competitor, picked after seeing the results, was about 6 points lower, a difference that is not significant after adjustment for the 32 longer-window comparisons." |
+| C19 | 441 | Not tested by E20 | Keep, labelled as an outcome added after the first run. |
+| C20 | 441 | First-run windows: no significant difference, equivalence not shown; session-long BJV worse for down alarms only | "...no difference was significant (with 69 to 79 alarms per direction the intervals are more than 20 points wide); with session-long windows the BJV-type tests' decrease alarms were less informative (17 to 20 points, Holm $p \le 0.035$)." |
+| C21 | 445, 842 | Holds (Holm $p \le 0.0008$; control fixed) | Keep. |
+| C22 | 445, 842 | Holds for up alarms (Holm 0.0008) | Keep; add "its decrease alarms were as informative". |
+| C23 | 445, 842 | Same-day agreement holds in development and for held-out decreases, not for held-out increases; no lead | "India VIX agreed with the alarms on the same day in the development years (and for decrease alarms in the held-out years) and did not lead them". |
+| C24 | 445, 842 | Holds (Fisher Holm 0.0006; shift test Holm 0.0021) | Add "(Holm-adjusted over five event types: $p = 0.0006$; a circular-shift test that keeps the clustering of alarms gives $p = 0.0004$)". |
+| C25 | 842 | Exploratory; Holm 0.011 | Keep, labelled as a restriction chosen after the first results. |
+| C26 | 445, 842 | No difference detected, not an equivalence | "Reserve Bank of India policy days showed no significant excess (32% against 25%, $p = 0.36$)". |
+| C27 | 842 | Holds (Holm 0.0095; shift Holm 0.015) | Keep. |
+| C28 | 445, 842 | Descriptive | Keep. |
+| C29 | 449, 846 to 848 | FOMC holds (Holm 0.00025); CPI does not (0.11) | Keep, and say that the plan was committed with the results: "the primary test, stated in the analysis script committed with the first results as fixed before the run". |
+| C30 | 449, 848 | Holds (Holm 0.0032, 0.00015) | "the CPI test was significant on ETH and SOL (secondary replications)" rather than "replicated", since the primary BTC CPI test was not significant. |
+| C31 | 449, 848 | Exploratory; FOMC holds on all three coins | Keep; add "a post hoc restriction". |
+| C32 | 449, 848 | Exploratory; holds | Keep (already labelled secondary). |
+| C33 | 449, 848 | Descriptive, not tested | Keep. |
+| C34 | 453, 852 | Not tested by E20 | Keep; add "(alarms of the same day are dependent; not adjusted)". |
+| C35 | 852 | Holds; equivalence shown in all 12 cells | "...had them confirmed at the same rate (all 12 differences within plus or minus 4 points, 95% day-block intervals)". |
+| C36 | 834 | Descriptive at unequal alarm rates | Keep. |
+
+### Limitations of E20
+
+* The families and the 5-point equivalence margin were chosen by E20 after the original results had been read; Holm controls the family-wise error only within each family, and a reader who pools families should adjust further.
+* The block bootstrap assumes that dependence fades within one or two weeks; 14-day blocks changed one decision out of 164. Calendar days are the unit, so dependence within a day is kept entirely and dependence across more than a block is not.
+* E7's random-time control shares are treated as fixed, which makes the Nifty 50 intervals of F9a slightly too narrow.
+* The forecast comparison uses realised variance from raw one-minute returns, not E6's robust volatility, and three simple forecasts; a stronger forecast (for example with jump or leverage terms) could absorb more of the down alarms' signal. HAR-I was chosen on the development period, as pre-registered.
+* Four claims (C19, C33, C34, C36) had no registered family and remain unadjusted.
+
+### References added by E20
+
+Holm (1979), *Scandinavian Journal of Statistics* 6(2), 65 to 70; Politis and Romano (1992), the circular block bootstrap, in LePage and Billard (eds.), *Exploring the Limits of Bootstrap*, Wiley (chapter title and pages not verified); Driscoll and Kraay (1998), *Review of Economics and Statistics* 80(4), 549 to 560; Newey and West (1987), *Econometrica* 55(3), 703 to 708; Patton (2011), *Journal of Econometrics* 160(1), 246 to 256; Barndorff-Nielsen and Shephard (2004), *Journal of Financial Econometrics* 2(1), 1 to 37; Diebold and Mariano (1995), *Journal of Business and Economic Statistics* 13(3), 253 to 263; Corsi (2009), *Journal of Financial Econometrics* 7(2), 174 to 196. Checked by web search on 3 November 2026 from index and library listings (publisher pages could not be opened), as recorded in the pre-registration.
 
 ---
 
