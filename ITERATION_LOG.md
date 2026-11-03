@@ -574,6 +574,28 @@ NEXT ITERATION: The paper's abstract and Section 7, then the final audit.
 
 ---
 
+ITERATION NUMBER: 27 (the release test on fresh data, E23)
+
+OBJECTIVE: Turn the one pre-specified real-data test into a confirmatory one. E12 and E22 used the releases of 2024 and 2025, and E22 was designed after E12's answer was known.
+
+PROBLEM IDENTIFIED: A rerun on known data cannot confirm anything; only releases nobody in the project had looked at can.
+
+HYPOTHESIS: If the contrast is real, E22's guaranteed monitor (P1) shows it on the FOMC statements and CPI releases of January to October 2026.
+
+CHANGES IMPLEMENTED: A freshness check (no committed analysis used crypto returns after 2025-12-31); `data/events/us_macro_events_2026.csv` with every date checked by web search (the CPI release of February 2026 moved from the 11th to the 13th); a power calculation on E22's rates that chose one stratified test over BTC's FOMC and CPI releases together (power 0.82 against 0.69 for FOMC alone); `docs/preregistration_e23.md` committed alone before any 2026 return was loaded; `experiments/e23_fresh_releases.py` (E22's and E12's code with only the period and the events changed, behind two reproduction gates), `tests/test_e23.py`.
+
+EXPERIMENTS PERFORMED: P1 (primary), the plug-in, the rank monitor and P1 without restart on BTC, ETH and SOL, 1 January to 24 October 2026 (the data end; the FOMC statement of 28 October is outside), 6 FOMC statements and 10 CPI releases; Holm within registered families; blind segments; per-day alarm shares.
+
+RESULTS: The primary test fails: 2 of 16 releases on BTC with an up alarm within 6 hours against 5.9% of matched controls, p = 0.25 (Fisher 0.29). No P1 secondary family passes (pooled ETH p = 0.067, SOL p = 0.039, Holm 0.079 for both). The rank monitor flagged 4 of 6 FOMC statements on each coin (Holm 0.016, 0.033, 0.055); the plug-in passes one cell (ETH FOMC, Holm 0.040); no CPI cell passes under any monitor. On BTC, P1 could not raise an increase alarm for 28% of its monitored time (10 to 15 August and 17 August to 3 October 2026, 47 days), covering three releases. P1 alarmed in 37.8% to 48.0% of its monitored days against a 5% bound under the tolerance. Found while planning: E12's stratified test can exceed its level slightly when releases share controls (5.8% for seven FOMC statements).
+
+IMPROVEMENTS: The real-data claims now carry an honest confirmatory test: the FOMC contrast of 2024 and 2025 is exploratory, not confirmed.
+
+REMAINING ISSUES: The blind mode of the confidence-sequence baseline is a real cost on fresh data; a guard with a proof is needed. Six FOMC statements a year give little power for any single-year confirmation.
+
+NEXT ITERATION: A guard against blind confidence-sequence segments, with its proof, tested on synthetic data and, as an exploratory check only, on the 2024 to 2026 releases.
+
+---
+
 Further work streams (E13, E14, E16, E17, the alternative prototypes, logs ALT1 to ALT6) keep their own iteration notes in `docs/iterations/`. Their main results are summarised in `docs/experiment_report.md` and `alternatives/ALTERNATIVES.md`.
 
 ---
