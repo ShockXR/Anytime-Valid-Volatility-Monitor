@@ -627,10 +627,11 @@ times the Kolmogorov distance between the window and \(F\), applies the
 central limit theorem to it and feeds it into Corollary 12; the stream
 of (b) holds the conditional mean fixed and then bets boldly on the two
 values \(0\) and \(\hat B\). The boundary \(m \asymp \sqrt n\) does not
-depend on \(A\): a one-day horizon of 390 minutes is short compared with
-\(\sqrt n\) only for windows of more than about 150,000 returns. At one
-day after a 390-step Gaussian window, the largest false alarm
-probability over \(\mathcal{C}(W)\) lies between 33.8\% and 42.4\%
+depend on \(A\): a one-day horizon of 390 minutes falls below
+\(\sqrt n\) only for windows of more than 152,100 returns (390 trading
+days of minute data), and is short compared with it only for much longer
+ones. At one day after a 390-step Gaussian window, the largest false
+alarm probability over \(\mathcal{C}(W)\) lies between 33.8\% and 42.4\%
 (nominal 5\%), while i.i.d. returns gave at most 5.14\% in simulation.
 For i.i.d. monitored returns a heuristic suggests the scale
 \(\log A/\sqrt n\) instead of \(m/\sqrt n\); we have not proved it. The
