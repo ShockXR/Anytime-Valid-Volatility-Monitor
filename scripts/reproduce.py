@@ -80,7 +80,7 @@ EXPERIMENTS = [
     ("E16 adversarial null search, outside the class", ["experiments/e16_adversarial_null.py", "b"], False, "full"),
     ("E16 figures", ["experiments/e16_adversarial_null.py", "figures"], False, "full"),
     ("E17 multi-frequency, synthetic", ["experiments/e17_multifrequency.py", "baselines", "levels", "null", "change"], False, "full"),
-    ("E17 multi-frequency, real data and figures", ["experiments/e17_multifrequency.py", "real", "figures"], True, "full"),
+    ("E17 multi-frequency, real data and figures", ["experiments/e17_multifrequency.py", "real", "ratematch", "figures"], True, "full"),
 ]
 
 RESULT_DIRS = ["results"] + [str(p.relative_to(ROOT)) for p in sorted((ROOT / "alternatives").glob("*/results"))]

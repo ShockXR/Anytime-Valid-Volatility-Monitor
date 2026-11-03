@@ -3,7 +3,7 @@
 This log records what was tried, what went wrong and what changed. It follows the ten-step iteration framework of the project brief, in its required format (objective, problem, hypothesis, change, experiments, results, improvements, remaining issues, next step). Each framework iteration below consolidates several concrete rounds of work. Failed attempts are part of the record.
 
 * **Round 1** (2 November 2026, daytime): first prototype, experiments E1 to E5. Its original 16-row log is kept unchanged in the appendix at the end.
-* **Round 2** (night of 2 to 3 November 2026): real data for all five coins of the paper and Nifty 50, an independent review, the confidence-sequence baseline, forecast-relative monitoring, new theory and alternative prototypes (experiments E6 to E15).
+* **Round 2** (night of 2 to 3 November 2026): real data for all five coins of the paper and Nifty 50, an independent review, the confidence-sequence baseline, forecast-relative monitoring, new theory and alternative prototypes (experiments E6 to E17).
 
 Detailed notes per work stream, with every sub-iteration and failure, are in `docs/iterations/`: `MAIN.md` (integration and data), `E6.md` (five-coin reproduction), `E7.md` (Nifty 50 and India VIX), `E8.md` (confidence-sequence baseline), `ALT1.md` to `ALT5.md` (alternative prototypes), `EV1.md` (crypto event study), and the theory and benchmark tracks as they finish. The independent review is `docs/review/independent_review_round1.md`.
 
@@ -354,7 +354,51 @@ NEXT ITERATION: Benchmarks against published methods (E13), running truncation (
 
 ---
 
-Further work streams (E13, E14, the alternative prototypes, logs ALT1 to ALT6) keep their own iteration notes in `docs/iterations/`. Their main results are summarised in `docs/experiment_report.md` and `alternatives/ALTERNATIVES.md`.
+ITERATION NUMBER: 17 (adversarial search for null streams, E16)
+
+OBJECTIVE: Find how close a stream that satisfies every condition of Theorem B can push the full default detector to its bound, and where exactly the bound breaks when a condition fails.
+
+PROBLEM IDENTIFIED: E9 found the bound about four times conservative for four natural laws (1.1% to 1.4% per day against 5%). Nobody had searched for the worst law for the full two-sided grid, or allowed the law to react to the detector's own state, which the theorem permits. "Four times conservative" could have been an artefact of friendly test laws.
+
+HYPOTHESIS: Both statistics are affine in the next observation, so a two-point law with mean 1 is the adversary's best choice at each step; "bold play" (the widest legal spread, landing exactly on 2A when one draw can reach it) should be close to optimal. Outside the null class, each failure should line up with the condition that was broken.
+
+CHANGES IMPLEMENTED: `experiments/e16_adversarial_null.py` (a vectorised engine with a per-step callback, bold play, an 8-parameter state-dependent policy family, hidden-Markov shape switching, GARCH, plug-in and price-tick designs) and `tests/test_e16_adversarial.py` (every searched law keeps the conditional mean at 1, each return law uses its own true τ and m0, and the engine matches `VolatilityMonitor` alarm for alarm).
+
+EXPERIMENTS PERFORMED: Grid search, then Nelder-Mead on common random numbers, over nine families; the best law of each family re-run on seeds the search never saw (200,000 paths at one day, 60,000 at five days). Outside the class: 64 GARCH cells, the plug-in baseline, and returns rounded to price ticks.
+
+RESULTS: Failed first: the in-sample search maximum was biased upwards (a small probability estimated on a few thousand paths, maximised over many candidates), so every reported rate now comes from fresh seeds. Inside the class the worst stream found is bold play at 2.62% per day (95% interval 2.50% to 2.75%) against 5%, and 18.1% over five days against 25%; the Gaussian reference is 0.97% and 12.4%. About half of the remaining slack is expected wealth stranded on paths that never alarm. Outside the class: GARCH is above the bound from a drift of 3.9% in the conditional mean (43 of 64 cells, ordered by that drift); the plug-in baseline reaches 41% to 42% over five days, and 32.5% in one day under a shape change; price ticks fail only from 4 sd.
+
+IMPROVEMENTS: "About four times conservative" now reads "about four times for natural laws, about two times against the worst stream found" in the README, limitations and the delay theory note.
+
+REMAINING ISSUES: No proof that bold play is optimal for the two-sided grid. An independent review (round 5) is checking E16.
+
+NEXT ITERATION: A bound for false alarms as a function of drift in the conditional mean, the condition GARCH breaks (TH4).
+
+---
+
+ITERATION NUMBER: 18 (one monitor for several sampling frequencies, E17)
+
+OBJECTIVE: Combine e-detectors run on 1, 5 and 15 minute returns into one monitor with one proved false alarm bound, and find out whether it beats each frequency.
+
+PROBLEM IDENTIFIED: A coarse detector changes only at the end of its block, so between block ends it is not a fair bet. The usual proof does not cover the plain average checked every minute.
+
+HYPOTHESIS: Counting each coarse detector only at the wealth it is sure to keep (a "certified" average) restores a proof. The combination should never be much worse than the best single frequency and should catch changes that one frequency misses.
+
+CHANGES IMPLEMENTED: `src/avmonitor/multifreq.py` (`MultiFrequencyMonitor`, `proved_bound`, `level_for_budget`), `docs/theory_multifreq.md` (Theorems 1 to 3), `experiments/e17_multifrequency.py`, `tests/test_multifreq.py`.
+
+EXPERIMENTS PERFORMED: Levels and handicaps; false alarms under four laws and with the plug-in baseline; persistent changes; short bursts and a jump in lag-one autocorrelation; price noise (γ = 1, then γ = 2, added after seeing γ = 1); the five coins with settings committed before the first real run; after review round 4, a rate-matched comparison on the coins.
+
+RESULTS: A union bound proves only three times the budget for the plain average; the certified average has P(false alarm within m) ≤ Σ w_k ⌈m/k⌉ / A when each frequency's null holds with the true baselines. With independent simulated returns it never beats the best single frequency on persistent changes, staying within 0% to 5% (equal weights) or 11% to 18% (balanced weights) of it, and it catches 95% to 97% of paths after an autocorrelation jump from 0 to 0.3 (84% to 89% for Student t3), against 3.8% for the one-minute detector. On the coins it behaves like the one-minute monitor. Failed or corrected: review round 4 found a calibration bug with missing minutes (no reported number changed; every result file was byte-identical after the fix) and overstated wording; an unplanned comparison with E6 suggested the 5-minute detector was more precise, but at matched alarm counts it is not (up alarms confirmed 90.0% against 90.5%, p = 0.88); the first rate-matched run capped the levels too low and never reached the target counts, and was rerun.
+
+IMPROVEMENTS: Every statement now carries its conditions (true baselines, independent returns); calibration is safe with missing minutes; `MultiFrequencyMonitor` takes separate increase and decrease levels.
+
+REMAINING ISSUES: No proof with the plug-in baselines used on real data. The gain under price noise holds only at γ = 2, a level chosen after seeing γ = 1.
+
+NEXT ITERATION: Landmark-event case study (E18) and the final audit (10).
+
+---
+
+Further work streams (E13, E14, E16, E17, the alternative prototypes, logs ALT1 to ALT6) keep their own iteration notes in `docs/iterations/`. Their main results are summarised in `docs/experiment_report.md` and `alternatives/ALTERNATIVES.md`.
 
 ---
 
