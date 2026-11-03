@@ -19,8 +19,11 @@ Part 2 [REAL]. E6's monitoring and validation (Q6d, Q6e; E6 code imported, not c
 confidence-sequence baseline, next to E6's plug-in results, and the monitoring time it costs.
 Part 3 [REAL]. E10's forecast-relative monitor on the five coins: cost and validated shares.
 Part 4 [SYNTHETIC]. The Gaussian row of Table S2 (E11f, split clip c_down) with the confidence-sequence baseline.
+Post hoc parts (added after seeing results, marked as such in the report): ``blind`` (segments in which the cs
+increase side cannot alarm because tau^2 <= m_up), ``p1std`` (bootstrap of day-standardised calm days) and
+``p2boot`` (the primary bootstrap of Part 2 recomputed from the saved events, with Bonferroni columns).
 
-Usage: nice -n 10 python experiments/e19_real_null.py [p1] [p2] [p3] [p4] [figs]
+Usage: nice -n 10 python experiments/e19_real_null.py [pools] [p1] [p2] [p3] [p4] [blind] [p1std] [p2boot] [figs]
 Environment: E19_SCALE (default 1) multiplies the numbers of streams (smoke runs only); E19_OUT redirects
 outputs (default results/).
 """
@@ -716,6 +719,69 @@ def summarise_p1(results, drifts) -> tuple[pd.DataFrame, pd.DataFrame]:
     return df, pd.DataFrame(dr)
 
 
+# ----------------------------------------------------------------------------
+# Post hoc (added after seeing Part 1): day-standardised pools
+# ----------------------------------------------------------------------------
+# The calm days of a pool differ in level (their robust volatility varies by a factor of about 1.5 to 2.1 between
+# the 10% and 90% quantiles), so a bootstrap block from one day next to a block from another is a change of level.
+# Dividing each calm day's returns by that day's robust volatility removes the between-day level differences and
+# keeps the intraday dependence, which separates the two sources of alarms on the bootstrap streams.
+
+STD_TYPES = ("perm", "sb30", "sb390", "sb1440")
+STD_ROWS = 500
+
+
+def build_std_pool(name: str):
+    if name == "Nifty 50":
+        keys, u, in_period = load_nifty_u()
+        mf = MIN_FINITE["nifty"]
+    else:
+        keys, u, in_period = load_crypto(name)
+        mf = MIN_FINITE["crypto"]
+    days, mask = calm_flags(keys, u, in_period, mf)
+    k, x = keys[mask], u[mask]
+    fin = np.isfinite(x)
+    k, x = k[fin], x[fin]
+    calm = days[days.calm]
+    v = pd.Series(calm.robust_vol.to_numpy(), index=calm.day.to_numpy()).reindex(k).to_numpy()
+    pool = x / v
+    scale = float(np.median(np.abs(pool)) * MAD_NORMAL_SCALE)
+    tau2 = (C * scale) ** 2
+    X = np.minimum(pool**2, tau2)
+    m0 = float(X.mean())
+    _, inv = np.unique(np.abs(pool), return_inverse=True)
+    info = dict(dataset=name, pool="day-standardised", pool_returns=int(pool.size), zero_share=float(np.mean(pool == 0)),
+                scale=scale, tau2=tau2, m0=m0, B=tau2 / m0, clipped_share=float(np.mean(pool**2 > tau2)),
+                sd_X_over_m0=float(X.std() / m0))
+    return pool, (inv + 1).astype(np.int32), info
+
+
+def part_std(names=tuple(DATASETS), workers: int = 2):
+    infos, jobs = [], []
+    for d, name in enumerate(names):
+        pool, ranks, info = build_std_pool(name)
+        sname = f"{name} std"
+        np.savez(pool_path(sname), pool=pool, ranks=ranks, tau2=info["tau2"], m0=info["m0"])
+        infos.append(info)
+        DATASETS[sname] = DATASETS[name]  # same day length, calibration and A; the workers are forked after this
+        for kind in STD_TYPES:
+            jobs.append((sname, 100 + d, kind, STREAM_TYPES.index(kind), 0, STD_ROWS))
+    pd.DataFrame(infos).to_csv(OUT / "e19_pools_std.csv", index=False)
+    with Pool(workers) as pool:
+        res = pool.map(p1_job, jobs, chunksize=1)
+    strip = lambda s: s[:-4] if s.endswith(" std") else s
+    results = [dict(r, dataset=strip(r["dataset"])) for out, _ in res for r in out]
+    drifts = [(strip(nm), kind, b, x) for _, (nm, kind, b, x) in res]
+    df, drift = summarise_p1(results, drifts)
+    df.insert(1, "pool", "day-standardised")
+    df.to_csv(OUT / "e19_null_std.csv", index=False)
+    with pd.option_context("display.width", 250, "display.max_rows", 500):
+        print(df[["dataset", "stream", "monitor", "band", "streams", "one_day", "five_days", "per_monitored_day",
+                  "streams_ended_early"]].round(4).to_string(index=False))
+        print(drift.to_string(index=False))
+    return df
+
+
 def p1_pooled() -> pd.DataFrame:
     """The pooled five-coin rows of e19_null_streams.csv, in their own file (as pre-registered)."""
     df = pd.read_csv(OUT / "e19_null_streams.csv")
@@ -1275,8 +1341,8 @@ def fig_null(df: pd.DataFrame):
                             mec="white", mew=0.8, elinewidth=1, capsize=0, label=name)
                 bnd = g[f"{col}_bound"].to_numpy()
                 ax.hlines(bnd, xs - 0.08, xs + 0.08, color=col_, lw=1.6)
-            ax.set_yscale("symlog", linthresh=0.01 if col != "per_monitored_day" else 0.01)
-            ax.set_ylim(0, 1.5 if col != "per_monitored_day" else 8)
+            ax.set_yscale("symlog", linthresh=1e-3, linscale=0.4)  # the cs rates are near 0
+            ax.set_ylim(0, 1.5 if col != "per_monitored_day" else 10)
             ax.axvspan(-0.5, 1.5, color="#f3f2ee", zorder=0)
             ax.set_xlim(-0.5, len(STREAM_TYPES) - 0.5)
             ax.set_xticks(x)
@@ -1286,12 +1352,12 @@ def fig_null(df: pd.DataFrame):
                 ax.set_ylabel("rate (symmetric log scale)", fontsize=8)
             ax.tick_params(labelsize=8)
     h, l = axes[0, 0].get_legend_handles_labels()
-    fig.legend(h, l, loc="upper center", ncol=4, fontsize=8, frameon=False, bbox_to_anchor=(0.5, 0.965))
+    fig.legend(h, l, loc="lower center", ncol=4, fontsize=8, frameon=False, bbox_to_anchor=(0.5, 0.0))
     fig.suptitle("Null streams with the real marginal law, band 0 [REAL marginal, constructed streams]. Points: rate with "
-                 "95% interval; short bars: the bound of each monitor (nominal only for the plug-in).\nShaded: the "
-                 "null holds (permuted pool, i.i.d. draws from it). Unshaded: stationary bootstrap of the calm days, "
-                 "real clustering kept within blocks.", fontsize=9, x=0.01, ha="left")
-    fig.tight_layout(rect=(0, 0, 1, 0.9))
+                 "95% interval; short bars: each monitor's bound (nominal only for the plug-in).\nShaded: the null "
+                 "holds (permuted pool, i.i.d. draws from it). Unshaded: stationary bootstrap of the calm days in "
+                 "calendar order (mean block 30, 390, 1440 returns).", fontsize=9, x=0.01, ha="left")
+    fig.tight_layout(rect=(0, 0.04, 1, 0.93))
     fig.savefig(FIG / "e19_null_rates.png", dpi=130)
     plt.close(fig)
 
@@ -1366,7 +1432,7 @@ def figures():
 
 
 def main(argv):
-    parts = argv or ["p1", "p2", "p3", "p4", "blind", "figs"]
+    parts = argv or ["p1", "p2", "p3", "p4", "blind", "p1std", "figs"]
     OUT.mkdir(parents=True, exist_ok=True)
     FIG.mkdir(parents=True, exist_ok=True)
     t0 = time.time()
@@ -1386,6 +1452,8 @@ def main(argv):
         part3()
     if "blind" in parts:
         part_blind()
+    if "p1std" in parts:
+        part_std()
     if "figs" in parts:
         figures()
     print(f"total {time.time() - t0:.0f}s")
