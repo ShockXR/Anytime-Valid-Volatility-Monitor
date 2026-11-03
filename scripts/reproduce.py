@@ -5,6 +5,7 @@ Usage:
     python scripts/reproduce.py --tier full     # every experiment (several hours on one machine)
     python scripts/reproduce.py --steps data,tests
     python scripts/reproduce.py --steps manifest   # rewrite results/MANIFEST.csv from the files on disk
+    python scripts/reproduce.py --tier full --steps run,compare --from E15   # resume a full run at E15
 
 Steps (run in this order; pick a subset with --steps):
 
@@ -186,12 +187,16 @@ def step_tests() -> bool:
     return res.returncode == 0
 
 
-def step_run(tier: str, have_data: bool) -> bool:
+def step_run(tier: str, have_data: bool, start: str | None = None, only: str | None = None) -> bool:
     import csv
 
     rows, ok = [], True
+    started = start is None
     for label, cmd, needs_data, t in EXPERIMENTS:
         if tier == "quick" and t != "quick":
+            continue
+        started = started or label.startswith(start)
+        if not started or (only is not None and only not in label):
             continue
         if needs_data and not have_data:
             print(f"run: skip {label} (needs data)")
@@ -206,7 +211,7 @@ def step_run(tier: str, have_data: bool) -> bool:
         dt = time.time() - t0
         rows.append(dict(experiment=label, command=" ".join(cmd), seconds=round(dt), status=res.returncode))
         ok &= res.returncode == 0
-    if tier == "full" and rows:
+    if tier == "full" and rows and start is None and only is None:
         with open(ROOT / "results" / "MANIFEST_RUNTIMES.csv", "w", newline="") as fh:
             w = csv.DictWriter(fh, fieldnames=list(rows[0]))
             w.writeheader()
@@ -296,6 +301,9 @@ def main(argv=None) -> int:
     ap.add_argument("--tier", choices=["quick", "full"], default="quick")
     ap.add_argument("--steps", default="data,tests,run,compare")
     ap.add_argument("--download", action="store_true", help="fetch missing data files")
+    ap.add_argument("--from", dest="start", default=None,
+                    help="run step: start at the first experiment whose label begins with this text (to resume)")
+    ap.add_argument("--only", default=None, help="run step: run only experiments whose label contains this text")
     ap.add_argument("--rtol", type=float, default=1e-9, help="relative tolerance for numeric comparison")
     a = ap.parse_args(argv)
     steps = [s.strip() for s in a.steps.split(",") if s.strip()]
@@ -308,7 +316,7 @@ def main(argv=None) -> int:
         elif s == "tests":
             status[s] = step_tests()
         elif s == "run":
-            status[s] = step_run(a.tier, have_data)
+            status[s] = step_run(a.tier, have_data, a.start, a.only)
         elif s == "compare":
             status[s] = step_compare(a.rtol)
         elif s == "report":
