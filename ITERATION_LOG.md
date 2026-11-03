@@ -596,6 +596,28 @@ NEXT ITERATION: A guard against blind confidence-sequence segments, with its pro
 
 ---
 
+ITERATION NUMBER: 28 (a proved guard against blind segments, and a forward test, E24)
+
+OBJECTIVE: Remove the blind segments of the confidence-sequence baseline (E19, and 28% of BTC's monitored time in E23) without losing its proved bounds, and give the release question a test on data nobody has seen.
+
+PROBLEM IDENTIFIED: When the first quarter of a calibration window is much quieter than the rest, τ² falls below the band-inflated upper bound and the increase side cannot alarm for the whole segment. E19's proposed fix (discard the window and calibrate again) selects windows by their bounds, so the per-window coverage no longer holds as such.
+
+HYPOTHESIS: Splitting the error budget over the windows tried restores every bound; retrying near-blind windows, not only blind ones, is needed for power.
+
+CHANGES IMPLEMENTED: `docs/theory_blind_guard.md` (blind and near-blind conditions decided at the end of calibration; Theorem 1, P(kept window's bounds fail) ≤ Σ δ_k ≤ δ; Theorem 2, Theorem 6.4, Corollary 6.6 and the per-day Corollary 1 unchanged relative to the kept window; Proposition 3, the naive guard inflates the failure probability about K-fold; time-out and rank fallback); `src/avmonitor/guard.py`; `tests/test_guard.py`; `experiments/e24_blind_guard.py`; `docs/preregistration_e24_future.md` with its event file.
+
+EXPERIMENTS PERFORMED: Closed forms (fewest steps to an increase alarm when near-blind); the selection effect (400,000 replications); nine synthetic designs with 800 paths and five monitors; post hoc reruns of E22's and E23's designs and E19's blind diagnostic with the guard; the power calculation that chose the forward test.
+
+RESULTS: [PROVED] the guard keeps every bound with the budget split; the naive guard does not (7.6 × 10⁻⁴ against 2.5 × 10⁻⁴ for three windows on P1's window). [SYNTHETIC] recommended guard (K = 3, budgets δ/2, δ/4, δ/4, η = 0.25, rank fallback): no null alarm in 800 paths per design; a later doubling detected within a day in 86.5% to 100% of paths against 0% to 0.25% unguarded. [REAL, post hoc] the guard acted only on BTC (8 windows, all starting on a weekend) and left no blind minute; BTC 2026 releases 4 of 16 (p = 0.056) against P1's 2 of 16. Forward test: rank monitor, BTC FOMC and CPI pooled, 25 October 2026 to 1 June 2027, power 0.82 at the pooled 2024 to 2026 rates. Failed or weak: the guard does not rescue E23; the null designs cannot rank the monitors (no alarms); the rank fallback never triggered; one synthetic design was chosen after seeing real data; the 2027 dates rest on search results.
+
+IMPROVEMENTS: The confidence-sequence monitor no longer goes blind, with a proof; the release question has a pre-registered test with a fixed date.
+
+REMAINING ISSUES: Run the forward test after 1 June 2027; independent review of E24 (round 10).
+
+NEXT ITERATION: Final audit.
+
+---
+
 Further work streams (E13, E14, E16, E17, the alternative prototypes, logs ALT1 to ALT6) keep their own iteration notes in `docs/iterations/`. Their main results are summarised in `docs/experiment_report.md` and `alternatives/ALTERNATIVES.md`.
 
 ---

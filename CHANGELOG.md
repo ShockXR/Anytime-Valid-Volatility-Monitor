@@ -10,7 +10,7 @@ overlapped in time, so some 0.3.0 work (the first paper drafts, E17) has commits
 
 ## [0.3.0] - Unreleased
 
-Round 3: theory TH4 to TH6, experiments E16 to E23, the paper, and the preparation of a release.
+Round 3: theory TH4 to TH6, experiments E16 to E24, the paper, and the preparation of a release.
 
 ### Added
 
@@ -51,6 +51,11 @@ Round 3: theory TH4 to TH6, experiments E16 to E23, the paper, and the preparati
 - E23: the same test on the fresh FOMC and CPI releases of January to October 2026, pre-registered
   before any 2026 crypto return was loaded (`docs/preregistration_e23.md`), with the event dates in
   `data/events/us_macro_events_2026.csv`. The primary test fails.
+- E24: `avmonitor.guard`, confidence-sequence monitors (plain and restarted every day) with a proved guard
+  against blind segments: a near-blind calibration window is discarded and calibration repeated with the
+  error budget split over the windows tried, with a fallback to the awake rank monitor; theory in
+  `docs/theory_blind_guard.md`; a forward pre-registration (`docs/preregistration_e24_future.md`) for
+  releases up to 1 June 2027.
 - `docs/demo/replay.html` and `scripts/build_replay.py`: a minute-by-minute replay of two landmark days
   of E18, rebuilt from the data and checked against E18's saved alarm lists.
 - TH4: `avmonitor.robustness`, false alarm bounds when the null holds only approximately (mean drift,

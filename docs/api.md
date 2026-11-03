@@ -17,6 +17,9 @@ Each entry gives the signature and the first paragraph of the docstring. The doc
 | `Event` | class | `avmonitor.monitor` |
 | `PeriodicVolatilityMonitor` | class | `avmonitor.periodic` |
 | `restarted_sr_bound` | function | `avmonitor.periodic` |
+| `GuardedVolatilityMonitor` | class | `avmonitor.guard` |
+| `GuardedPeriodicVolatilityMonitor` | class | `avmonitor.guard` |
+| `spending_schedule` | function | `avmonitor.guard` |
 | `MultiFrequencyMonitor` | class | `avmonitor.multifreq` |
 | `MFEvent` | class | `avmonitor.multifreq` |
 | `level_for_budget` | function | `avmonitor.multifreq` |
@@ -78,6 +81,7 @@ Research modules (used by the experiments and the theory notes):
 - [`avmonitor.benchmarks_robust`](#avmonitorbenchmarks_robust)
 - [`avmonitor.competitors`](#avmonitorcompetitors)
 - [`avmonitor.design`](#avmonitordesign)
+- [`avmonitor.guard`](#avmonitorguard)
 - [`avmonitor.limits`](#avmonitorlimits)
 - [`avmonitor.robustness`](#avmonitorrobustness)
 - [`avmonitor.running`](#avmonitorrunning)
@@ -758,6 +762,14 @@ calibrate(
 
 Estimate the null regime from pre-change returns.
 
+### `check_bets`
+
+```python
+check_bets(up_grid, down_fractions) -> None
+```
+
+Raise unless every increase bet and every decrease fraction lies in [0, 1), so that every factor is positive.
+
 ### class `DetectorResult`
 
 ```python
@@ -1388,6 +1400,7 @@ load_bitstamp_csv(
     path: str | Path,
     start: str | None = None,
     end: str | None = None,
+    filled: str = 'missing',
 ) -> pd.DataFrame
 ```
 
@@ -2299,6 +2312,64 @@ optimise_grid(
 ```
 
 Choose ``K`` bets (and weights) minimising ``design_ratio`` over the given post-change laws.
+
+## avmonitor.guard
+
+A retry guard against blind segments of the confidence-sequence baseline (E24).
+
+### `spending_schedule`
+
+```python
+spending_schedule(delta: float, tries: int, kind: str = 'halving') -> tuple[float, ...]
+```
+
+Error budgets delta_1, ..., delta_K for the K windows a segment may try; they sum to ``delta``.
+
+### `near_blind_delay_floor`
+
+```python
+near_blind_delay_floor(rho: float, A: float, up_grid=None, cap: int = 10000000) -> float
+```
+
+Proposition 2(b): the fewest monitored steps after a (re)start before the increase side can alarm, over all data.
+
+### class `GuardedVolatilityMonitor`
+
+```python
+GuardedVolatilityMonitor(
+    *args,
+    guard_tries: int = 3,
+    guard_deltas=None,
+    guard_spending: str = 'halving',
+    guard_eta: float = 0.0,
+    guard_fallback: str = 'keep',
+    rank_seed=None,
+    **kw,
+)
+```
+
+Subclass of `avmonitor.guard._GuardMixin`, `avmonitor.monitor.VolatilityMonitor`.
+
+``VolatilityMonitor(baseline="cs")`` with the retry guard against blind segments.
+
+### class `GuardedPeriodicVolatilityMonitor`
+
+```python
+GuardedPeriodicVolatilityMonitor(
+    *args,
+    guard_tries: int = 3,
+    guard_deltas=None,
+    guard_spending: str = 'halving',
+    guard_eta: float = 0.0,
+    guard_fallback: str = 'keep',
+    rank_seed=None,
+    **kw,
+)
+```
+
+Subclass of `avmonitor.guard._GuardMixin`, `avmonitor.periodic.PeriodicVolatilityMonitor`.
+
+P1 with the retry guard: ``PeriodicVolatilityMonitor(baseline="cs", period=m)`` plus the guard.
 
 ## avmonitor.limits
 
