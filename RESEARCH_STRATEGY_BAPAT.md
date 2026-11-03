@@ -120,7 +120,7 @@ Five candidate directions were scored from 1 (weak) to 10 (strong) on the seven 
 
 ## 11. Development roadmap
 
-**Done in rounds 1 to 3.** Everything in sections 3 to 6, about 480 automated tests, experiments E1 to E21, theory work streams TH4 to TH6 (robustness to drift, limits for every valid procedure, per-day guarantees), alternatives ALT1 to ALT6, eight rounds of independent review and a referee report on the paper with a response, a one-command reproduction script (`scripts/reproduce.py`), a short paper draft with a supplement (`paper/`), a release-ready package (version 0.3.0, not released) and a replay page of two landmark days.
+**Done in rounds 1 to 3.** Everything in sections 3 to 6, about 490 automated tests, experiments E1 to E22, theory work streams TH4 to TH6 (robustness to drift, limits for every valid procedure, per-day guarantees), alternatives ALT1 to ALT6, eight rounds of independent review and a referee report on the paper with a response, a one-command reproduction script (`scripts/reproduce.py`), a short paper draft with a supplement (`paper/`), a release-ready package (version 0.3.0, not released) and a replay page of two landmark days.
 
 **Next, after a first meeting with Prof. Bapat (about 2 to 3 weeks).**
 1. Confirm the code conventions (weight normalisation, MAD scaling, simulation σ, the σ_J = 0.10 design, the RMSE definition, the DOGE data) and rerun E1 and E6 with his settings.

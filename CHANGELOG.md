@@ -10,7 +10,7 @@ overlapped in time, so some 0.3.0 work (the first paper drafts, E17) has commits
 
 ## [0.3.0] - Unreleased
 
-Round 3: theory TH4 to TH6, experiments E16 to E21, the paper, and the preparation of a release.
+Round 3: theory TH4 to TH6, experiments E16 to E22, the paper, and the preparation of a release.
 
 ### Added
 
@@ -44,6 +44,10 @@ Round 3: theory TH4 to TH6, experiments E16 to E21, the paper, and the preparati
   Shiryaev-Roberts rules on the truncated statistic with simulated or per-path bootstrap thresholds, a
   Student t BOCPD with an exact run-length recursion, and CUSUM monitoring with a training sample; on
   synthetic paths, E13's paths and the five coins at matched alarm counts.
+- E22: E12's pre-registered FOMC and CPI test rerun with monitors that carry a proved per-day bound
+  (`PeriodicVolatilityMonitor(baseline="cs")` restarted every UTC day, the same without restart, the
+  awake rank monitor), after a gate that reproduces E12 exactly; pre-registered in
+  `docs/preregistration_e22.md`.
 - `docs/demo/replay.html` and `scripts/build_replay.py`: a minute-by-minute replay of two landmark days
   of E18, rebuilt from the data and checked against E18's saved alarm lists.
 - TH4: `avmonitor.robustness`, false alarm bounds when the null holds only approximately (mean drift,

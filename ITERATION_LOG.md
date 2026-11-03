@@ -552,6 +552,28 @@ NEXT ITERATION: The paper's Section 7.1, then the second referee pass.
 
 ---
 
+ITERATION NUMBER: 26 (the pre-registered FOMC test with a monitor that carries a proved bound, E22)
+
+OBJECTIVE: Answer finding J1 of the referee's second report: the one pre-specified primary real-data test (E12, FOMC and CPI on BTC) used the plug-in baseline, which has no finite-sample guarantee, while the abstract used it to show what the guarantee buys.
+
+PROBLEM IDENTIFIED: No real-data test had been run with a monitor whose per-day false alarm probability is proved.
+
+HYPOTHESIS: If the FOMC contrast comes from the releases and not from the plug-in's estimation error, it survives the confidence-sequence baseline restarted at every UTC day boundary (Corollary 1 of `docs/theory_per_period.md`). Possible failure: confidence-sequence segments that are blind to increases (E19).
+
+CHANGES IMPLEMENTED: `docs/preregistration_e22.md` (committed alone, before any real-data run), `experiments/e22_guaranteed_events.py` (E12's own functions with only the monitor changed, and a gate that stops unless the plug-in arm reproduces E12 exactly), `tests/test_e22.py`; a short derivation that Corollary 6.6's long-run count carries over to the restarted monitor, because a restart only lowers the statistic.
+
+EXPERIMENTS PERFORMED: Arms P1 (primary: cs baseline, A = 36,000, delta = 0.01, restart at 00:00 UTC), S1 (no restart), S2 (E14's awake rank monitor) and P0 (E12's plug-in) on BTC, ETH and SOL, January 2024 to December 2025; Holm within five registered families; per-day alarm shares against the bounds; releases watched with E19's blind-segment criterion.
+
+RESULTS: P0 reproduced E12 exactly (840 test cells, 2,736 window cells, 12 summary cells) and S2 reproduced E14 Q14g. Primary test passes: P1, BTC, FOMC 8 of 16 against 10.9% of matched controls, p = 0.00017, Holm 0.00033 (plug-in 9 of 16 against 13.9%, Holm 0.00025). CPI on BTC under P1 5 of 22 against 5.9%, Holm 0.0097, but 3 of 22, p = 0.12 under S1 and Holm 0.075 on ETH and SOL. P1 was watching at 80 of 114 coin and release pairs, S1 77, S2 114, the plug-in 55; one BTC FOMC statement fell in a blind cs segment. P1 alarmed in 48.1% to 53.5% of monitored days against a 5% bound under the tolerance (0.92 to 1.15 alarms per monitored day against a long-run 0.0404). Failed or weak: the bound is never in force on these data; P1 changes baseline, A and restart together and only the restart is isolated; the data are not new.
+
+IMPROVEMENTS: The paper's one pre-specified primary real-data test now holds, pre-registered and reproduced, for a monitor that carries a proved per-day bound.
+
+REMAINING ISSUES: Real one-minute days violate the ±25% tolerance about half the time, so no real-data test exercises the bound; a fresh, untouched event set (for example 2026 releases) would make the test confirmatory rather than a rerun.
+
+NEXT ITERATION: The paper's abstract and Section 7, then the final audit.
+
+---
+
 Further work streams (E13, E14, E16, E17, the alternative prototypes, logs ALT1 to ALT6) keep their own iteration notes in `docs/iterations/`. Their main results are summarised in `docs/experiment_report.md` and `alternatives/ALTERNATIVES.md`.
 
 ---
