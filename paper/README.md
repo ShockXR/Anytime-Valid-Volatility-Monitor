@@ -42,7 +42,7 @@ By section: Introduction 946, Section 2 609, Section 3 1,900, Section 4 1,359, S
 
 ## Provenance of numbers
 
-Experiment labels (E1 to E23, ALT1 to ALT5, TH4 to TH6, and their sub-labels such as Q4a) no longer appear in the text of the paper. Each paragraph, table caption or figure caption that reports results ends with a hidden HTML comment such as `<!-- provenance: E4 Q4a -->` naming the sections of `docs/experiment_report.md` behind it. Pandoc drops these comments, so they do not appear in the LaTeX or a PDF, but `scripts/trace_numbers.py` reads them to set the scope of each number. Supplement S9 maps every table and figure to its script and result file. The companion note keeps the labels in the text, since it is a technical note on the repository's experiments.
+Experiment labels (E1 to E24, ALT1 to ALT6, TH4 to TH6, and their sub-labels such as Q4a) no longer appear in the text of the paper. Each paragraph, table caption or figure caption that reports results ends with a hidden HTML comment such as `<!-- provenance: E4 Q4a -->` naming the sections of `docs/experiment_report.md` behind it. Pandoc drops these comments, so they do not appear in the LaTeX or a PDF, but `scripts/trace_numbers.py` reads them to set the scope of each number. Supplement S9 maps every table and figure to its script and result file. The companion note keeps the labels in the text, since it is a technical note on the repository's experiments.
 
 Both files were checked with
 
