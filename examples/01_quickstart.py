@@ -29,7 +29,8 @@ def main() -> None:
     rng = np.random.default_rng(1)
     r = np.concatenate([rng.standard_normal(CHANGE), 2.0 * rng.standard_normal(1000)])
     print(f"[SYNTHETIC] {r.size} Gaussian returns, sd 1 before step {CHANGE} and 2 from it on")
-    print(f"alarm level A = {A:.0f}: P(false alarm within the first 390 monitored steps) <= 390 / A = {390 / A:.0%}")
+    print(f"alarm level A = {A:.0f}: with the true baseline, P(false alarm within the first 390 monitored steps) "
+          f"<= 390 / A = {390 / A:.0%}; this run estimates the baseline (plug-in), so its level is approximate")
 
     # 1. Streaming: feed returns one at a time (run() loops over update()).
     mon = VolatilityMonitor(threshold=A, cal_len=CAL_LEN)

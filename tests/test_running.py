@@ -12,6 +12,8 @@ from scipy import stats
 from avmonitor import running as R
 from avmonitor.detectors import betting_edetector
 
+_trapz = getattr(np, "trapezoid", None) or np.trapz  # numpy >= 2.0 renamed trapz
+
 
 # ----------------------------------------------------------------------------
 # Route A: the bands
@@ -171,7 +173,7 @@ def test_conformal_pvalues_are_uniform_and_independent(law):
 def test_betting_functions_have_mean_one():
     u = np.concatenate([np.geomspace(1e-9, 1e-2, 200001), np.linspace(1e-2, 1, 400001)[1:]])
     for f in R.bet_family("lr")[0] + R.bet_family("lr")[1]:
-        val = np.trapezoid(f(u), u) + 1e-9 * f(1e-9)
+        val = _trapz(f(u), u) + 1e-9 * f(1e-9)
         assert val == pytest.approx(1.0, abs=2e-4)
         assert np.all(f(u) > 0)
     for f in R.bet_family("ind")[0] + R.bet_family("ind")[1]:
