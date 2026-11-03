@@ -32,13 +32,13 @@ Words are counted as whitespace-separated tokens after removing HTML comments an
 | Part | Words |
 |---|---|
 | Abstract | 200 |
-| Main text, Section 1 to Reproducibility | 11,683 |
+| Main text, Section 1 to Reproducibility | 11,697 |
 | Introduction | 1,012 |
 | References | about 1,290 |
 | Supplement | about 14,900 |
 | Companion note `extensions.md` | about 6,300 |
 
-By section: Introduction 1,012, Section 2 765, Section 3 1,746, Section 4 1,365, Section 5 2,012, Section 6 2,326, Section 7 1,803, Section 8 539, Reproducibility 115 (these include the section headings). The TH5 results added about 1,130 words to the main text (Theorem 10 and Corollary 11 in Section 3.3, Theorem 13 in Section 4.1, the collapse floors and Theorem 21 in Section 5.1, and short changes to the contributions and the Discussion); their proofs and most of their numbers are in Supplement S1.6, S2 and S3. The main text is now about 1,700 words above 10,000, and the open slots below will add to it. We suggest one pass that moves material to the supplement once the remaining slots are filled, rather than cutting piecemeal; candidates are the plug-in numbers of Section 4.1 after Corollary 12, the discussion after Theorem 13, the paragraph of Section 5.1 that compares the collapse floors, and parts of Section 6.
+By section: Introduction 1,012, Section 2 765, Section 3 1,746, Section 4 1,379, Section 5 2,012, Section 6 2,326, Section 7 1,803, Section 8 539, Reproducibility 115 (these include the section headings). The TH5 results added about 1,140 words to the main text (Theorem 10 and Corollary 11 in Section 3.3, Theorem 13 in Section 4.1, the collapse floors and Theorem 21 in Section 5.1, and short changes to the contributions and the Discussion); their proofs and most of their numbers are in Supplement S1.6, S2 and S3. The main text is now about 1,700 words above 10,000, and the open slots below will add to it. We suggest one pass that moves material to the supplement once the remaining slots are filled, rather than cutting piecemeal; candidates are the plug-in numbers of Section 4.1 after Corollary 12, the discussion after Theorem 13, the paragraph of Section 5.1 that compares the collapse floors, and parts of Section 6.
 
 ## Provenance of numbers
 
