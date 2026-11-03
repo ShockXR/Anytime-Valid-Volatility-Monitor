@@ -530,6 +530,28 @@ NEXT ITERATION: E19 (real-data null streams), then the paper's Section 6.2.
 
 ---
 
+ITERATION NUMBER: 25 (the guarantee on real data, E19)
+
+OBJECTIVE: Answer the referee's point M1 (and m32): the real-data evidence never exercised the proved guarantee, because the main runs used the plug-in baseline and real days are rarely null.
+
+PROBLEM IDENTIFIED: Real alarm rates are not false alarm rates, and the confidence-sequence baseline, the one estimated baseline with a proof, had never been the primary configuration on real data.
+
+HYPOTHESIS: On streams that keep the real marginal law but are exchangeable, the proved monitors stay below their bounds and the plug-in does not over several days; as the primary configuration the confidence-sequence baseline costs alarms but not validation.
+
+CHANGES IMPLEMENTED: `docs/preregistration_e19.md` (committed before any real-data part ran), `experiments/e19_real_null.py`, `tests/test_e19_real_null.py`; a short proof that permuted streams stay exchangeable given the past at stopping times, and a deterministic condition under which a cs segment cannot raise an increase alarm.
+
+EXPERIMENTS PERFORMED: Part 1, 20,000 permuted calm-day streams per pool (five coins, the pool, Nifty), i.i.d. and block-bootstrap streams, three endpoints, two bands; Part 2, the cs baseline on five coins (Jul to Dec 2025); Part 3, forecast-relative monitoring; Part 4, Table S2's Gaussian row with cs. Post hoc: blind segments, day-standardised bootstrap, Bonferroni columns.
+
+RESULTS: Primary endpoint (five coins, band 0, first day): known 2.26%, cs 0.01%, rank 3.38% against 5%; plug-in 5.50%, and 41% over five days against 25%. The proved monitors stayed below every bound in 252 cells. Block-bootstrapped calm days gave 86% to 100% alarms within a day for every monitor. cs on five coins: 0.51 to 0.53 alarms per day against 0.66 to 0.70, up alarms validated 78.2% against 79.6% (difference -1.3 points, -5.8 to 3.2), down alarms 96.3% against 88.3% (+8.0, 2.7 to 13.7), share of minutes monitored 0.46 to 0.49 against 0.30 to 0.33 at band 0.25 (fewer recalibrations), matched up alarms 4 to 10 minutes later; 5 of 7031 cs segments blind (BTC, up to 136 days). GARCH-relative monitoring: 39 alarms at 0.89 of the nominal bound, all validated; EWMA-relative alarms 17 to 89 times the bound. Failed or dropped: a first Part 1 run too slow (killed after 18 of 144 jobs, nothing written); no drift-adjusted bound for permuted streams; Parts 2 and 3 not run on Nifty; the blind-segment guard not implemented.
+
+IMPROVEMENTS: The proved guarantee is now exercised on data with the real marginal law, and the confidence-sequence baseline has been run as the primary real-data configuration.
+
+REMAINING ISSUES: Minute-level real data violate the null even on calm days; a guard against blind cs segments with its own proof; Nifty for Parts 2 and 3.
+
+NEXT ITERATION: The paper's Section 7.1, then the second referee pass.
+
+---
+
 Further work streams (E13, E14, E16, E17, the alternative prototypes, logs ALT1 to ALT6) keep their own iteration notes in `docs/iterations/`. Their main results are summarised in `docs/experiment_report.md` and `alternatives/ALTERNATIVES.md`.
 
 ---

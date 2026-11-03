@@ -100,6 +100,7 @@ EXPERIMENTS = [
     ("E21 real data, h1", ["experiments/e21_benchmarks.py", "real", "h1"], True, "full"),
     ("E21 real data, pooled", ["experiments/e21_benchmarks.py", "real-pooled"], True, "full"),
     ("E21 figures", ["experiments/e21_benchmarks.py", "figures"], True, "full"),
+    ("E19 the guarantee on real data (pre-registered parts, then post hoc parts)", ["experiments/e19_real_null.py", "pools", "p1", "p2", "p3", "p4", "blind", "p1std", "p2boot", "figs"], True, "full"),
     ("E20 re-analysis of the real-data inference", ["experiments/e20_inference.py", "checks", "bootstrap", "holm", "events", "forecast", "classify"], True, "full"),
     ("Replay page of two landmark days (rebuilds docs/demo/replay.html and checks it against E18)", ["scripts/build_replay.py"], True, "full"),
     ("TH4 robustness to drift in the conditional mean", ["experiments/th4_robustness.py", "sup", "constant", "switching", "garch", "plugin", "ticks", "counterexamples", "figures"], False, "full"),
