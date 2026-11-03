@@ -2961,6 +2961,8 @@ Both monitors were watching at T in all 72 rows. Columns: minutes from T to the 
 
 Script `experiments/e20_inference.py` (parts `checks`, `bootstrap`, `holm`, `events`, `forecast`, `classify`), tests `tests/test_e20_inference.py`. Outputs: `results/e20_checks.csv`, `e20_items_e6.csv.gz`, `e20_items_e17.csv.gz`, `e20_bootstrap.csv`, `e20_holm_existing.csv`, `e20_nifty_event_shift.csv`, `e20_forecast_choice.csv`, `e20_forecast_regressions.csv`, `e20_forecast_qlike.csv`, `e20_forecast_alarm_counts.csv`, `e20_classification.csv`, `e20_primary_endpoints.csv`. All results **[REAL]**. Pre-registration: [`docs/preregistration_e20.md`](../preregistration_e20.md), committed on its own as `bbc8f87` at 01:52 UTC on 3 November 2026, before any Holm adjustment, bootstrap, regression, loss comparison or shift test of this study was run; the result files `results/e20_*` were all written after it. It answers referee items 4, 5, 9, 15, 17 and 18, section 4.1 and major comment M6 of `docs/review/referee_report_paper.md`.
 
+**Names.** "Variance-ratio scan" is E13's two-window variance-ratio scan test, inspired by Bibinger, Jirak and Vetter (2017) but not their published procedure (we could not obtain the paper); the CSV files label it "BJV rolling".
+
 **What this is, and what it is not.** Every alarm list, hit rate and p-value re-examined here had been computed and read before (E6, E7, E12, E13, E14, E15, E17). E20 is therefore a **re-analysis whose methods were fixed before their own results, not a confirmatory study**: the families, the adjustment, the resampling scheme, the regression and loss specifications and the rules that classify each claim were committed first, but the questions were chosen by people who had seen the data. E20 changes no monitor setting and does not edit the paper; the last table proposes wording, which the authors may apply. Line numbers refer to `paper/short_paper.md` at commit `8f71a2e`.
 
 ### Summary
@@ -3001,7 +3003,7 @@ Classes (pre-registration Part 1): **P** pre-specified primary; **S** pre-specif
 | C17 | Day-long windows: competitors' down alarms as informative ($p \ge 0.28$) | 441 | E13, longer windows | X, verifiable | As C4. |
 | C18 | Best longer-window competitor about 6 points lower for up alarms ($p$ = 0.065 and 0.054) | 441 | E13, longer windows | X, verifiable | Comparator picked after the results (referee item 18). |
 | C19 | On the next four hours, short-window competitors did as well or better | 441 | E13, four-hour outcome | X, verifiable | Outcome added in review round 3 (`fca74a5`). |
-| C20 | Nifty 50: all five methods 69% to 83%, no significant difference; session-long BJV worse | 441 | E13 Nifty | S (first-run); X (session-long), verifiable | As C15 and C4. |
+| C20 | Nifty 50: all five methods 69% to 83%, no significant difference; session-long variance-ratio scan worse | 441 | E13 Nifty | S (first-run); X (session-long), verifiable | As C15 and C4. |
 | C21 | Nifty held-out: 78% of up alarms (47% at random times) and 76% of down alarms (53%) confirmed | 445, 842 | E7 Q7b | S, stated | "Pre-registered primary configuration" in the E7 docstring, committed with the results (`38856a3`): a configuration, not an endpoint. |
 | C22 | Against 61% for the Gaussian LR monitor's up alarms | 445, 842 | E7 Q7b | S, stated | Benchmark in the E7 docstring (`38856a3`). |
 | C23 | India VIX agreed on the same day but did not lead | 445, 842 | E7 Q7c | S, verifiable | Q7c in the docstring at `0627d14`, before the VIX results (`83ce131`), after the alarms were known (`38856a3`). |
@@ -3117,14 +3119,14 @@ Of all 48 cells (bands 0, 0.25 and 0.5), 4 have a bootstrap $p < 0.05$, all at b
 |---|---|---|---|---|
 | BOCPD on truncated returns, $w$ = 720 | +5.9 (0.2 to 11.5), Holm 0.53 | +2.6 (-4.7 to 10.4), 1 | +7.2 (1.5 to 13.1), 0.26 | +0.4 (-4.9 to 5.7), 1 |
 | BOCPD on truncated returns, $w$ = 1440 | +8.9 (4.1 to 13.9), 0.0064 | -1.2 (-9.2 to 7.0), 1 | +8.3 (2.4 to 14.8), 0.076 | -2.2 (-8.7 to 4.3), 1 |
-| BJV-type, $k$ = 1440 | +10.5 (4.2 to 17.1), 0.032 | +2.7 (-5.5 to 10.9), 1 | +12.7 (5.7 to 20.0), 0.021 | -3.9 (-11.4 to 4.0), 1 |
-| BJV-type, studentised, $k$ = 1440 | +12.2 (5.7 to 18.7), 0.012 | +2.6 (-5.7 to 11.1), 1 | +12.7 (5.2 to 20.3), 0.029 | -3.0 (-10.3 to 4.5), 1 |
-| BJV-type, $k$ = 480 | +8.6 (3.7 to 13.7), 0.012 | +6.5 (-1.3 to 14.8), 1 | +6.4 (0.7 to 12.2), 0.44 | +1.4 (-4.1 to 6.9), 1 |
+| variance-ratio scan, $k$ = 1440 | +10.5 (4.2 to 17.1), 0.032 | +2.7 (-5.5 to 10.9), 1 | +12.7 (5.7 to 20.0), 0.021 | -3.9 (-11.4 to 4.0), 1 |
+| variance-ratio scan, studentised, $k$ = 1440 | +12.2 (5.7 to 18.7), 0.012 | +2.6 (-5.7 to 11.1), 1 | +12.7 (5.2 to 20.3), 0.029 | -3.0 (-10.3 to 4.5), 1 |
+| variance-ratio scan, $k$ = 480 | +8.6 (3.7 to 13.7), 0.012 | +6.5 (-1.3 to 14.8), 1 | +6.4 (0.7 to 12.2), 0.44 | +1.4 (-4.1 to 6.9), 1 |
 | BOCPD, $w$ = 720 | +8.0 (3.1 to 12.9), 0.017 | +13.9 (4.5 to 23.4), 0.044 | +10.1 (4.0 to 16.4), 0.025 | +10.3 (3.3 to 17.3), 0.092 |
 
-(The studentised BJV-type test with $k$ = 480 and plain BOCPD with $w$ = 1440 are in `e20_bootstrap.csv`.) The day-long competitors' down alarms are not significantly different from the e-detector's in any of the 8 cells, but no interval lies within plus or minus 5 points, so "as informative" is not shown. For up alarms the e-detector is ahead in 5 of these 8 day-long cells after Holm, and in 10 of all 16 longer-window up cells. The paper's two "best longer-window competitor" comparisons (truncated BOCPD $w$ = 720, July to December; BJV $k$ = 480, held-out) have bootstrap $p$ = 0.041 and 0.026 but Holm $p$ = 0.53 and 0.44.
+(The studentised variance-ratio scan with $k$ = 480 and plain BOCPD with $w$ = 1440 are in `e20_bootstrap.csv`.) The day-long competitors' down alarms are not significantly different from the e-detector's in any of the 8 cells, but no interval lies within plus or minus 5 points, so "as informative" is not shown. For up alarms the e-detector is ahead in 5 of these 8 day-long cells after Holm, and in 10 of all 16 longer-window up cells. The paper's two "best longer-window competitor" comparisons (truncated BOCPD $w$ = 720, July to December; variance-ratio scan $k$ = 480, held-out) have bootstrap $p$ = 0.041 and 0.026 but Holm $p$ = 0.53 and 0.44.
 
-**Nifty 50, 2024 and 2025 (F8a, F8b).** With the first-run windows no difference is significant (smallest Holm $p$ 0.53); with $n$ = 79 up and 69 down alarms the intervals are 21 to 29 points wide, so equality is not shown either. With session-long windows, the BJV-type test ($k$ = 375) and its studentised version have less informative down alarms (+20.3 points, 7.7 to 33.1, Holm 0.021; +17.4, 5.4 to 29.6, Holm 0.035); their up alarms do not differ significantly after Holm (0.25 and 0.11).
+**Nifty 50, 2024 and 2025 (F8a, F8b).** With the first-run windows no difference is significant (smallest Holm $p$ 0.53); with $n$ = 79 up and 69 down alarms the intervals are 21 to 29 points wide, so equality is not shown either. With session-long windows, the variance-ratio scan ($k$ = 375) and its studentised version have less informative down alarms (+20.3 points, 7.7 to 33.1, Holm 0.021; +17.4, 5.4 to 29.6, Holm 0.035); their up alarms do not differ significantly after Holm (0.25 and 0.11).
 
 #### 2.4 Nifty 50: robust against Gaussian, India VIX and events (F9b, F10, F11)
 
@@ -3217,10 +3219,10 @@ A positive change means the scaled forecast is worse. The factors do not transfe
 | C14 | 419 | Holds for up alarms; down alarms favour the Gaussian monitor out of sample | "The increase alarms of the Gaussian likelihood-ratio monitor were 7 to 14 points less informative than those of the robust monitor (band 0), while its decrease alarms were as informative or, out of sample, 5.5 points more informative." |
 | C15 | 441 | Holds (15 of 16, Holm $p \le 0.021$) | Replace "two-proportion tests, $p \le 0.02$; ... week-clustered ... $p \le 0.010$" by "day-block bootstrap with Holm over the 16 comparisons, adjusted $p \le 0.021$". |
 | C16 | 441 | Exploratory (held-out replication with frozen settings); holds | Keep; say "a held-out half-year added after the first run, with every setting frozen". |
-| C17 | 441 | Exploratory; not significantly different, equivalence not shown | "...the competitors' down alarms were not significantly less informative (differences -3.9 to +2.7 points, 95% intervals up to 11 points wide)". |
+| C17 | 441 | Exploratory; not significantly different, equivalence not shown | "...the competitors' down alarms were not significantly less informative (differences -3.9 to +2.7 points, with 95% intervals too wide to show equivalence, up to about 16 points wide)". |
 | C18 | 441 | Exploratory; holds only unadjusted (Holm 0.53, 0.44) | "...the best longer-window competitor, picked after seeing the results, was about 6 points lower, a difference that is not significant after adjustment for the 32 longer-window comparisons." |
 | C19 | 441 | Not tested by E20 | Keep, labelled as an outcome added after the first run. |
-| C20 | 441 | First-run windows: no significant difference, equivalence not shown; session-long BJV worse for down alarms only | "...no difference was significant (with 69 to 79 alarms per direction the intervals are more than 20 points wide); with session-long windows the BJV-type tests' decrease alarms were less informative (17 to 20 points, Holm $p \le 0.035$)." |
+| C20 | 441 | First-run windows: no significant difference, equivalence not shown; session-long variance-ratio scan worse for down alarms only | "...no difference was significant (with 69 to 79 alarms per direction the intervals are more than 20 points wide); with session-long windows the variance-ratio scans' decrease alarms were less informative (17 to 20 points, Holm $p \le 0.035$)." |
 | C21 | 445, 842 | Holds (Holm $p \le 0.0008$; control fixed) | Keep. |
 | C22 | 445, 842 | Holds for up alarms (Holm 0.0008) | Keep; add "its decrease alarms were as informative". |
 | C23 | 445, 842 | Same-day agreement holds in development and for held-out decreases, not for held-out increases; no lead | "India VIX agreed with the alarms on the same day in the development years (and for decrease alarms in the held-out years) and did not lead them". |
@@ -3249,6 +3251,33 @@ A positive change means the scaled forecast is worse. The factors do not transfe
 ### References added by E20
 
 Holm (1979), *Scandinavian Journal of Statistics* 6(2), 65 to 70; Politis and Romano (1992), the circular block bootstrap, in LePage and Billard (eds.), *Exploring the Limits of Bootstrap*, Wiley (chapter title and pages not verified); Driscoll and Kraay (1998), *Review of Economics and Statistics* 80(4), 549 to 560; Newey and West (1987), *Econometrica* 55(3), 703 to 708; Patton (2011), *Journal of Econometrics* 160(1), 246 to 256; Barndorff-Nielsen and Shephard (2004), *Journal of Financial Econometrics* 2(1), 1 to 37; Diebold and Mariano (1995), *Journal of Business and Economic Statistics* 13(3), 253 to 263; Corsi (2009), *Journal of Financial Econometrics* 7(2), 174 to 196. Checked by web search on 3 November 2026 from index and library listings (publisher pages could not be opened), as recorded in the pre-registration.
+
+---
+
+## E21. Benchmarks that are not calibrated on Gaussian data only
+
+Script `experiments/e21_benchmarks.py`; methods `src/avmonitor/benchmarks_robust.py`; outputs `results/e21_*.csv` and `results/figures/e21_*.png`; tests `tests/test_benchmarks_robust.py`; iteration notes `docs/iterations/E21.md`. Q21a to Q21c are **[SYNTHETIC]**, Q21d is **[REAL]**, and the literature statements are marked **[PUBLISHED]** with what could and could not be checked. Every setting, seed, target and number of paths was fixed before the reported runs (iteration 1 of the notes); the changes made after the first runs are listed in "Post hoc decisions" at the end.
+
+**Question.** The referee (M5) observed that the competitors of E4 and E13 were calibrated on Gaussian data, that BOCPD had a Gaussian observation model, that the "BJV-type" test was reconstructed without the paper (renamed "VR scan" in E13), and that no classical detector on the e-detector's own statistic and no econometric monitoring procedure was tried, so that the benchmarks favour the proposed method. Three questions follow. (i) At the same false alarm rate on clean data, what does Ville's distribution-free threshold cost in delay against a threshold calibrated for the true law? (ii) When the law is not Gaussian, does a threshold calibrated by simulation or by a bootstrap of the calibration window keep its rate? (iii) How do a robust BOCPD and a CUSUM monitoring procedure with a training sample compare, on simulated and on real data?
+
+TBD_SUMMARY
+
+### The competitors
+
+All rules see the same returns: a calibration window (2000 steps in the simulations, 1440 minutes on real data) and then the monitored stream.
+
+* **Classical rules on the e-detector's statistic.** X_t = min(r_t², τ²) with τ = 3 times the scaled MAD of the calibration window and m0 the mean of X over that window, as for the e-detector; Y_t = X_t / m0. *Page's two-sided CUSUM on Y*: G_t = max(0, G_{t-1} + Y_t - 1 - k) for increases and max(0, G_{t-1} + 1 - Y_t - k) for decreases, with the reference value of the Gaussian likelihood ratio for a change of the variance by a factor θ (k = θ log θ / (θ - 1) - 1 for θ > 1 and k = 1 - θ log θ / (θ - 1) for θ < 1; on untruncated Gaussian returns this is exactly the likelihood-ratio CUSUM): "small" for sd × 1.25 and × 0.8 (k = 0.240 and 0.207) and "medium" for × 1.5 and × 0.67 (k = 0.460 and 0.348). *SR betting*: the e-detector's own Shiryaev-Roberts betting statistics (the same six increase and five decrease bets), with a calibrated threshold in place of the level 2A that Ville's inequality gives. Each side of a two-sided rule gets half of the target rate.
+* **Two calibrations.** (a) *Gaussian simulation*: 20,000 clean Gaussian paths, one 390-step day after a 2000-step calibration window; the targets are the e-detector's own first-day rate on the same paths (1.305%, "matched") and 5% (the e-detector's bound for one day, A = 7800). (b) *Bootstrap of the calibration window*, per path: 1000 replicates, each a resampled calibration window (giving m0*) and a resampled 390-step stream of X values, Y* = X* / m0*; each side's threshold is the 1 - α/2 quantile of the replicate maxima. τ is kept (X is already truncated at τ²). This is the calibration a practitioner could run without assuming a law; it assumes i.i.d. returns.
+* **BOCPD-t.** Bayesian online change-point detection (Adams and MacKay 2007) with a Student t observation model with ν = 3 fixed (the heaviest Student law with a finite variance) and an unknown variance on a grid (65 values from 0.04 to 25 times the unit variance in the simulations, log step 0.1; 71 values from e^-6 to e^4.5 times a predictable centre on real data, log step 0.15). The prior is E13's inverse gamma prior (α0 = 2, mean equal to the calibration mean square, or on real data the robust variance of the previous day) discretised on the grid; hazard 1 / A; runs of at least w steps are lumped into one class, which is exact for a constant hazard; alarm on the posterior log-odds of a run shorter than w (w = 250 as in E13); direction from the posterior mean variance of the short runs against the lumped class. The filter is the exact run-length recursion for this discrete model (tests: it equals the conjugate Gaussian filter of E13 when the t is replaced by a Gaussian, and the lumped recursion equals the unlumped one). It is calibrated as E13 calibrates BOCPD: threshold matched to the e-detector's rate on E13's own 4000 Gaussian calibration paths (1.55%), and the rule "posterior probability of a short run at least 0.5".
+* **HKZ-type monitoring with a training sample.** The calibration window is the training sample of size m. Detector Q(m, k) = sum of Z over the first k monitored steps minus k times the training mean of Z, with Z = r² (the setting of the published procedure) or Z = X (our robust variant), standardised by sqrt(m) times a Bartlett long-run standard deviation of the training Z (bandwidth floor(m^(1/3)) = 12). Alarm when |Q(m, k)| / (σ sqrt(m)) ≥ c (1 + k/m) (k / (m + k))^γ, with γ = 0.25 (primary), 0 and 0.45; the sign gives the direction. A second boundary, sqrt(x (x - 1) (c² + log(x / (x - 1)))) with x = (m + k) / m, is that of OLS-CUSUM monitoring in the R package strucchange ("CSW-type"). Critical values: asymptotic, for open-ended monitoring at 5% (simulated quantile of sup_{0<t<1} |W(t)| / t^γ, 20,000 paths; for the strucchange boundary c solving 2 (1 - Φ(c) + c φ(c)) = 0.05), and calibrated on Gaussian data like the rules above (one critical value for |D|).
+* **Reference.** The robust two-sided e-detector with a plug-in baseline, each side alarming at 2A, A = 7800 (1440-minute days and A = 28,800 on real data), computed with per-path decrease bets exactly as `VolatilityMonitor` does (unit test). On E13's paths E13's own version (decrease bets common to a batch) is also run, and reproduces E13's numbers exactly (checked in the script).
+
+**[PUBLISHED] What could be checked.** Web searches on 3 November 2026; arxiv.org, the NeurIPS proceedings site and publisher full texts could not be opened from this machine, and no attempt was made to get around the block.
+* Knoblauch, Jewson and Damoulas (2018), "Doubly robust Bayesian inference for non-stationary streaming data with β-divergences", NeurIPS 31: robust BOCPD by general Bayesian inference with β-divergences, robust both for the parameters and for the change-point posterior (proceedings and institutional listings). The equations could not be read, so a β-divergence version could not be built and checked; BOCPD-t is the Student t version that the referee allowed instead, and it is *not* their method.
+* Horváth, Kokoszka and Zhang (2006), "Monitoring constancy of variance in conditionally heteroskedastic time series", Econometric Theory 22(3), 373 to 402 (Cambridge Core and RePEc listings): sequential monitoring of the unconditional variance with a training sample, with theory through a strong invariance principle for the squared observations. Their detector and boundary could not be read; we therefore call our rule "HKZ-type". The boundary g(m, k) = c sqrt(m) (1 + k/m) (k / (m + k))^γ, 0 ≤ γ < 1/2, and its limit sup_{0<t<1} |W(t)| / t^γ were verified, through search excerpts, for monitoring in linear models (Horváth, Hušková, Kokoszka and Steinebach 2004, Journal of Statistical Planning and Inference 126(1), 225 to 251; restated in later papers by the same group).
+* Chu, Stinchcombe and White (1996), "Monitoring structural change", Econometrica 64(5), 1045 to 1065 (Econometric Society and RePEc listings). Their boundary could not be read in the paper; the "CSW-type" boundary is the one implemented in strucchange (version 1.6-0, `R/monitoring.R`, read from the CRAN mirror on GitHub), which cites later work, so it is a sensitivity check and not a reproduction.
+
+TBD_RESULTS
 
 ---
 
@@ -3344,6 +3373,89 @@ The guarantee of Theorem B degrades smoothly, not abruptly. A drift of the condi
 * The worst case over streams with a given constant drift, at horizons shorter than the deterministic alarm step, is not known. The adaptive stream is a lower bound on it.
 * All statements are for band 0. With the monitor's null band b, Theorem 1 holds with the drifts reduced to `((δ↑ - b) / (1 + b))⁺` and `((δ↓ - b) / (1 - b))⁺` (remark after Theorem 1 in the theory note).
 * Everything is synthetic and for the default grid with A = 7800 (one design row uses A = 28,800).
+
+---
+
+## TH5. Limits for every valid procedure, and the plug-in baseline when n, m and A grow together
+
+Theory `docs/theory_limits.md` (statements, proofs and the full tables); code `src/avmonitor/limits.py`; script `experiments/th5_limits.py`; outputs `results/th5_*.csv` and `results/figures/th5_floors.png`, `results/figures/th5_plugin_regime.png`; tests `tests/test_limits.py`; iteration notes `docs/iterations/TH5.md`. The theorems are proved in the theory note; all numerical results are **[SYNTHETIC]**, with seeds fixed in the script.
+
+**Question.** Sections 2, 3 and M3 of the referee report. (1) The decrease speed limit of `docs/theory_delay.md` (58 steps on a complete collapse for any Shiryaev-Roberts e-detector with linear bets at c = 3, A = 7800) is a statement about e-detectors. How fast can *any* procedure with the guarantee of Theorem B detect a change, and how far are the e-detectors from that? (2) When does the plug-in baseline keep the nominal false alarm level if the calibration length n, the horizon m and the alarm level A grow together, and what margin restores it? (3) Why is the growth-optimal decrease bet so close to its upper limit `λ_max = 1 / (B - 1)`?
+
+**Set-up.** Monitored statistic `Y = min(r², τ²) / m₀ ∈ [0, B]`, nonparametric null classes (conditional mean of Y at least 1, at most 1, or equal to 1; laws need not be independent or identical), validity `P(T ≤ n) ≤ n / A` for every n (Theorem B). Default detector: six increase bets, five decrease bets, each side at 2A, A = 7800, c = 3. Post-change laws for delays: Gaussian, Student t3 and the jump law of E4, sd ratios 0.5, 0.67, 0.8, 1.25, 1.5 and 2, change at the first step, true baseline. Plug-in: Gaussian and Student t3 returns, n = 390 to 92,160, m = 98 to 7800.
+
+**Summary.**
+* **A speed limit for every valid procedure (Theorem 2, proved).** On a path y, a rule valid at levels `n / A` can stop at step n only if `W_n(y) = Π_{s ≤ n} 1 / π(y_s) ≥ A / n`, where `π(y)` is the largest probability a null law can put on the value y: `(B - 1) / (B - y)` for `y < 1` (decreases), `1 / y` for `y > 1` (increases). The proof places an independent two-point null law at each step, under which the path has probability exactly `1 / W_n(y)`. The floor is exact path by path, holds for rules that see the raw returns, and a randomised rule can beat it only with probability at most `(n / A) W_n(y)`.
+* **Complete collapse: 45 steps for every procedure.** With all returns zero at c = 3 (B = 9.045), no valid procedure alarms before step 45 at A = 7800 (50 at 2A), against 57.7 for every Shiryaev-Roberts e-detector with linear bets and 73 for the default grid (79 at 2A). The 13 steps between 45 and 58 are the factor `n / B` in the level that one path allows and an e-detector, which must spread `E M_n ≤ n` over all paths, cannot use. At c = 2 the numbers are 23, 28.7 and 36. Without truncation no valid procedure alarms before step A on any path, the sequential form of `docs/math.md` 5.3.
+* **The e-detectors are within a factor of about 2 of the best possible delay (Theorem 5, proved; numbers Monte Carlo).** Combining the pathwise floor with a Neyman-Pearson bound at the least favourable null law gives a lower bound on the mean delay of every valid deterministic procedure. Over the 18 laws, the default grid takes 1.69 to 2.16 times the bound and the growth-optimal single bet 1.34 to 1.76 times. No alarm of either, on 180,000 paths at two levels, came before the pathwise floor.
+* **The plug-in keeps its level exactly when m is small compared with √n (Theorem 8, Corollary 10, proved).** The drift of the plug-in baseline is at most `B̂ D_n`, with `D_n` the Kolmogorov distance between the window and the return law. So `P(T ≤ m) ≤ (m / A)(1 + C (m + 1) / √n (1 + o(1)))` when `m / √n → 0`, with `C = 0.037` for Gaussian returns and `C = 2.52` for every law. Conversely, a stream in the null class that holds the drift and then bets boldly makes `P(T ≤ m) / (m / A) → ∞` when `m / √n → ∞`. The boundary is `m ≍ √n`, whatever A. At one day after a 390-step window, the worst stream's false alarm probability is proved to lie between 32% and 42% (nominal 5%); simulated: 36.5%.
+* **The margin for the plug-in is the normal quantile (Proposition 11, proved).** Baselines `m̂ ± z se` keep `P(T ≤ m) ≤ m / A + 2 Φ̄(z) + o(1)` uniformly in m and A, and the worst stream attains `2 Φ̄(z)` when `m / (√n log A) → ∞`; so `z = Φ⁻¹(1 - δ / 2)`. The confidence-sequence baseline (Theorem D) guarantees the same without asymptotics at an effective z of 3.8 to 5.7.
+* **The decrease optimum is at the boundary only for light tails (Proposition 12, proved).** The growth of the bet `λ_max (1 - ε)` is `G_c + q_B log ε` up to small terms, with `q_B` the probability that a return reaches the truncation level, and `ε* = q_B / h(ε*)`. For Gaussian halving `q_B = 2 × 10⁻⁹` and `ε* = 2.4 × 10⁻⁸`, the referee's value. For Student t3 `q_B` is 0.6% to 2.4% and `λ* / λ_max` is 0.93 to 0.55; a bet at `λ_max (1 - 10⁻⁶)` has negative growth there and is up to 53% slower.
+
+### Q-TH5a. Floors on the most extreme paths
+
+Gaussian truncation, `results/th5_collapse.csv`. At A = 7800 (at 2A in brackets).
+
+| c | B | complete collapse: every valid procedure | SR e-detector, linear bets | default grid | complete explosion: every valid procedure | SR e-detector | default grid |
+|---|---|---|---|---|---|---|---|
+| 2 | 4.345 | 23 (25) | 28.7 (31.3) | 36 (39) | 6 (6) | 6 (7) | 11 (12) |
+| 2.5 | 6.393 | 33 (36) | 41.8 (45.9) | 52 (57) | 5 (5) | 5 (6) | 8 (9) |
+| 3 | 9.045 | 45 (50) | 57.7 (63.6) | 73 (79) | 4 (4) | 5 (5) | 7 (7) |
+| 4 | 16.00 | 73 (82) | 95.9 (106.7) | 122 (134) | 3 (4) | 4 (4) | 5 (6) |
+
+A rule that promises only `P(T ≤ 390) ≤ 0.05` (one day) could alarm on the collapse after 26 steps at c = 3: controlling every n at once costs 19 steps on this path.
+
+### Q-TH5b. Delay floor for every valid procedure against the e-detectors
+
+10,000 paths of 4000 steps per law, A = 7800, mean delays in steps (`results/th5_floors.csv`). "Bound" is the lower bound for deterministic valid rules (Theorem 5: the larger of the pathwise floor and the Neyman-Pearson bound restricted to the floor).
+
+| Law | sd ratio | pathwise floor | bound | default grid | best single bet | grid / bound | best bet / bound |
+|---|---|---|---|---|---|---|---|
+| Gaussian | 0.5 | 55.2 | 55.2 | 93.2 | 74.2 | 1.69 | 1.34 |
+| Gaussian | 0.8 | 70.1 | 90.4 | 194.9 | 156.5 | 2.16 | 1.73 |
+| Gaussian | 1.25 | 16.8 | 65.4 | 120.7 | 108.3 | 1.85 | 1.66 |
+| Gaussian | 2 | 9.1 | 12.2 | 23.0 | 18.4 | 1.88 | 1.51 |
+| Student t3 | 0.5 | 39.7 | 44.9 | 81.5 | 69.3 | 1.82 | 1.55 |
+| Student t3 | 0.8 | 47.8 | 147.0 | 281.3 | 259.3 | 1.91 | 1.76 |
+| Student t3 | 1.25 | 18.7 | 117.3 | 218.4 | 196.5 | 1.86 | 1.67 |
+| jumps | 0.5 | 54.1 | 56.9 | 99.0 | 82.6 | 1.74 | 1.45 |
+| jumps | 2 | 9.2 | 12.5 | 23.5 | 18.9 | 1.89 | 1.51 |
+
+All 18 laws are in the theory note (section 3.3). Over all of them: grid / bound 1.69 to 2.16 at A and 1.65 to 2.09 at 2A; best bet / bound 1.34 to 1.76 and 1.33 to 1.72. Randomised rules gain at most 15% on the bound. As A grows the gap closes slowly: the best bet over the bound is 1.38 to 1.93 at `A = 10³` and 1.22 to 1.40 at `A = 10⁸` (`results/th5_asymptotic.csv`, six laws). The pathwise floor alone grows like `log A / γ_Q` with `γ_Q ≥ KL_inf`, with equality only when the post-change law has no mass beyond 1 (Proposition 6), so for increases and fat tails the Neyman-Pearson part of the bound does the work.
+
+### Q-TH5c. The plug-in baseline: bounds and simulation
+
+PLUGIN_SECTION
+
+### Q-TH5d. The decrease bet at its boundary
+
+`results/th5_boundary.csv`, 4000 paths of 6000 steps, single bet at threshold A = 7800.
+
+| Law | sd ratio | `q_B` | `ε*` | `λ* / λ_max` | delay at `ε*` | at ε = 10⁻⁶ | growth at ε = 10⁻⁶ (`KL_inf`) |
+|---|---|---|---|---|---|---|---|
+| Gaussian | 0.5 | 2.0 × 10⁻⁹ | 2.4 × 10⁻⁸ | 1 - 2.4 × 10⁻⁸ | 74.1 | 74.1 | 0.0881 (0.0881) |
+| Gaussian | 0.8 | 1.8 × 10⁻⁴ | 8.3 × 10⁻³ | 0.9917 | 156.4 | 155.8 | 0.0332 (0.0346) |
+| Student t3 | 0.5 | 6.5 × 10⁻³ | 0.069 | 0.931 | 69.7 | 71.3 | 0.0249 (0.0913) |
+| Student t3 | 0.67 | 1.5 × 10⁻² | 0.223 | 0.777 | 122.8 | 139.9 | -0.1260 (0.0450) |
+| Student t3 | 0.8 | 2.4 × 10⁻² | 0.455 | 0.545 | 258.8 | 396.7 | -0.2817 (0.0172) |
+| jumps | 0.8 | 3.7 × 10⁻³ | 0.123 | 0.877 | 183.5 | 184.7 | -0.0127 (0.0273) |
+
+Where the growth is negative the delay stays finite: the Shiryaev-Roberts statistic restarts after each return at the truncation level and alarms on a long enough run without one (Proposition 12e gives an ε-free bound, which is loose).
+
+### Reading
+
+The guarantee of Theorem B has a price that no procedure can avoid, and the e-detectors pay about twice the minimum. On the hardest path for the decrease side, a complete collapse, every procedure with the guarantee needs 45 steps at c = 3, the best e-detectors 58 and the default grid 73. Across realistic post-change laws the default grid is 1.7 to 2.2 times slower than the best any valid procedure could do on average, and the best single bet 1.3 to 1.8 times. So the slowness of decrease detection is mostly the problem, through the truncation level B, and partly the detector.
+
+For the plug-in baseline the relevant comparison is the horizon against the square root of the calibration length. The bound of Theorem B is then inflated by a factor `1 + C m / √n` for every stream with the right conditional mean, and this is sharp: for `m ≫ √n` some such stream breaks the nominal level by an unbounded factor. With minute data, a one-day horizon is short compared with √n only for calibration windows of more than about 150,000 returns (390 trading days). A margin of `z = Φ⁻¹(1 - δ / 2)` standard errors restores `m / A + δ` asymptotically, and the confidence-sequence baseline restores it exactly at a wider margin.
+
+### Caveats
+
+* The floors are for the change at the first step (no pre-change data), which is the worst case in Lorden's sense; they do not bound the conditional delay after a pre-change history (E4's delays, which used one, are smaller than E11's).
+* The Neyman-Pearson parts of the delay bound are Monte Carlo estimates (importance weights from 10,000 paths per law), not certified values. The pathwise floor is exact on each path.
+* The bounds concern rules valid over the full nonparametric null. A procedure valid only over a smaller model (for example a fixed return shape) is not covered.
+* The plug-in lower bound uses an adversarial stream that knows the drift of the window. For i.i.d. monitored returns the boundary is not proved; a heuristic suggests the scale `log A / √n` (theory note, section 4.6), and the simulation of Q-TH5c shows a much smaller excess than the worst case.
+* The distribution-free constant (2.52) is 68 times the Gaussian one (0.037); its bound is informative only for `m` well below `√n / 20`.
+* Everything is synthetic and for the default grid with c = 3 and A = 7800, except where a table varies c or A.
 
 ---
 
