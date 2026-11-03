@@ -236,7 +236,8 @@ bounds. Our contributions are the following.
   of Bapat (2026), the Nifty 50 index with India VIX, and FOMC and CPI
   releases, with random-time, forecast and rate-matched controls. First
   results on a running truncation level and on restarts without a blind
-  period, and on a panel of assets with false discovery control.
+  period, on combining detectors at 1, 5 and 15 minutes, and on a panel
+  of assets with false discovery control.
 \end{itemize}
 
 We also report, briefly and as questions, what an independent
@@ -1565,28 +1566,30 @@ null holds again for the pre-averaged statistic, so Theorems A and B
 apply exactly for every block length (ALT1). Supplement S3 gives the
 details of all three cases.
 
-\hypertarget{extensions-a-running-truncation-level-and-many-assets}{%
-\subsection{5.5 Extensions: a running truncation level and many
-assets}\label{extensions-a-running-truncation-level-and-many-assets}}
+\hypertarget{extensions-a-running-truncation-level-many-assets-and-several-sampling-frequencies}{%
+\subsection{5.5 Extensions: a running truncation level, many assets and
+several sampling
+frequencies}\label{extensions-a-running-truncation-level-many-assets-and-several-sampling-frequencies}}
 
-Two extensions are studied in E14 and E15; Supplement S4 reports them in
-full. First, E14 makes the truncation level a running, data-driven
-\(\tau_t\) with a proof, either through a band for the truncated mean
-that holds for all truncation levels at once (bound \(\delta + m/A\)) or
-through rank-based (conformal) bets that need no baseline (bound \(m/A\)
-under exchangeable returns). In simulation the rank detector was valid
-at its nominal level and two to three times faster than the plug-in for
-large decreases, while the plug-in with 390 calibration steps alarmed on
-40.6\% to 42.9\% of null paths within five days, where a known baseline
-would guarantee at most 25\% (E14, Q14a and Q14b) {[}SYNTHETIC{]}; at a
-fixed calibration length no bound of the form \(C\,m/A\) holds for it
-(Section 3.4). Second, E15 monitors many assets at once with the e-BH
-procedure (Wang and Ramdas 2022) applied to mixture e-processes, which
-controls the false discovery rate within a block under any dependence
-between assets; in simulation it kept the probability of any false alarm
-on quiet blocks below 1\% with up to 50 assets, where the uncorrected
-rule reached 37.2\%, and found 5.0 percentage points more changes than
-Bonferroni on average (E15) {[}SYNTHETIC{]}.
+Three extensions are studied in E14, E15 and E17; Supplement S4 reports
+them in full. First, E14 makes the truncation level a running,
+data-driven \(\tau_t\) with a proof, either through a band for the
+truncated mean that holds for all truncation levels at once (bound
+\(\delta + m/A\)) or through rank-based (conformal) bets that need no
+baseline (bound \(m/A\) under exchangeable returns). In simulation the
+rank detector was valid at its nominal level and two to three times
+faster than the plug-in for large decreases, while the plug-in with 390
+calibration steps alarmed on 40.6\% to 42.9\% of null paths within five
+days, where a known baseline would guarantee at most 25\% (E14, Q14a and
+Q14b) {[}SYNTHETIC{]}; at a fixed calibration length no bound of the
+form \(C\,m/A\) holds for it (Section 3.4). Second, E15 monitors many
+assets at once with the e-BH procedure (Wang and Ramdas 2022) applied to
+mixture e-processes, which controls the false discovery rate within a
+block under any dependence between assets; in simulation it kept the
+probability of any false alarm on quiet blocks below 1\% with up to 50
+assets, where the uncorrected rule reached 37.2\%, and found 5.0
+percentage points more changes than Bonferroni on average (E15)
+{[}SYNTHETIC{]}.
 
 E14 also tests restarts that bet from the first return after an alarm,
 so that the monitor is never blind. Without a change both versions kept
@@ -1614,6 +1617,34 @@ restarted monitors were watching at all 114 releases, against 55 for the
 standard monitor, and the BTC CPI test, not significant there, gave
 \(p = 0.003\) and \(0.0003\) (E14, Q14g) {[}REAL{]}. Every monitor of
 E14 costs well under a millisecond per return (Q14e).
+
+Third, E17 runs the detector at 1, 5 and 15 minutes at once, each on
+non-overlapping blocks with its own truncation level and baseline, and
+combines the three with weights \(w_k\) that sum to 1, because some
+changes are easier to see in coarser returns. An average of e-values is
+an e-value (Vovk and Wang 2021), but the usual proof does not cover the
+plain average checked every minute, because a coarse detector is not a
+fair bet on the one-minute clock. A union bound proves only three times
+the budget for it with weights proportional to \(k\). A certified
+average, which credits each coarse detector between its block ends with
+the smallest value it can take at the next one, has
+\(\mathbb{P}(\text{false alarm within } m \text{ minutes}) \le \sum_k w_k \lceil m/k \rceil / A\)
+when each frequency's null holds with the true baselines, for example
+for i.i.d. returns with any tails; there is no proof with plug-in
+baselines. At a proved 5\% per day and with i.i.d. simulated returns, no
+average beat the best single frequency, but on persistent changes the
+equal-weight average was 0\% to 5\% slower than the one-minute detector
+and the average with weights proportional to \(k\) 11\% to 18\% slower.
+After the lag-one autocorrelation of returns jumped from 0 to 0.3, which
+the one-minute detector caught on 3.8\% of Gaussian paths, the averages
+of all three frequencies caught 95.5\% to 97.3\% (83.9\% to 89.0\% for
+Student \(t_3\)). Under price noise the only proved average, of 5- and
+15-minute blocks that share no noisy price, helped only for persistent
+increases at the strongest noise level, which was added after the first
+results (E17) {[}SYNTHETIC{]}. On the five coins the averages behaved
+like the one-minute monitor, and at matched alarm counts, in a
+comparison added after review, the 5- and 15-minute detectors alone were
+no more precise than it (E17, Supplement S4.3) {[}REAL{]}.
 
 \hypertarget{comparison-with-published-change-point-methods}{%
 \subsection{5.6 Comparison with published change-point
@@ -2373,6 +2404,10 @@ Vovk, V., Nouretdinov, I. and Gammerman, A. (2003). Testing
 exchangeability on-line. \emph{Proceedings of the International
 Conference on Machine Learning (ICML 2003)}, 768-775.
 
+Vovk, V. and Wang, R. (2021). E-values: calibration, combination and
+applications. \emph{Annals of Statistics} 49(3), 1736-1754.
+doi:10.1214/20-AOS2020
+
 Wang, R. and Ramdas, A. (2022). False discovery rate control with
 e-values. \emph{Journal of the Royal Statistical Society Series B}
 84(3), 822-852. doi:10.1111/rssb.12489
@@ -2843,6 +2878,14 @@ or 1440 steps); restarts with no calibration & \(A = 7800\) (\(m/A\)) or
 1000 per change; streams 40 paths of 30 days & at monitored step 500;
 after a restart at 30, 120 or 360 steps; streams about one change per
 day \\
+E17 & Gaussian, Student \(t_3\), jumps (0.005, sd 8); price noise
+\(u_t \sim N(0, \gamma^2)\) on log prices, \(\gamma\) = 0.5, 1, 2 & true
+(2 million simulated blocks) or plug-in (1440 minutes, all block phases)
+& proved 5\% per 1440-minute day: \(A\) = 28,800, 5760, 1920 for 1, 5,
+15 minutes alone, 2880 to 12,160 for combinations & 10,000 null days,
+2000 per change & at monitored minute 247: sd ratio 1.25, 1.5, 2, 0.8,
+0.67, 0.5; bursts ×2 or ×3 for 15 or 60 minutes; lag-one autocorrelation
+from 0 to 0.3; \(\gamma = 2\) added after the \(\gamma = 1\) results \\
 ALT1 (noise) & one-second returns, 23,400 per day, i.i.d. Gaussian price
 noise & per experiment & \(A\) = steps per day / 0.05 & 200 days per
 cell & none (validity) \\
@@ -2889,6 +2932,11 @@ every method; competitor thresholds rate-matched per series \\
 E14 & Binance five coins, July to December 2025; Nifty 50, 2024 and
 2025; the E12 event design & as E6 and E7, bands 0 and 0.25; running and
 restarted monitors as in the synthetic runs \\
+E17 & Binance five coins, 1 July to 31 December 2025 & as E6 with band
+0.25 and recalibration after every alarm; detectors at 1, 5 and 15
+minutes, three certified averages and the balanced maximum; settings
+committed before the first real run; rate-matched comparison (Q17g)
+added after an independent review \\
 \end{longtable}
 
 \hypertarget{appendix-d.-correspondence-with-the-accompanying-repository}{%
@@ -2929,12 +2977,16 @@ Section 5.5, Supplement S4.1 & \texttt{docs/theory\_running\_tau.md},
 Section 5.6, Table 8 & \texttt{docs/report\_parts/E13.md} \\
 Supplement S4.2 & \texttt{docs/theory\_panel.md},
 \texttt{docs/report\_parts/E15.md} \\
+Section 5.5, Supplement S4.3 & \texttt{docs/theory\_multifreq.md}
+(Propositions 2 and 3, Theorems 1 and 3, Corollary 4),
+\texttt{docs/report\_parts/E17.md} \\
 Section 7 & \texttt{docs/estimator\_issues.md}, Issues 1, 2, 3 and 5 \\
 Code & \texttt{src/avmonitor/detectors.py} (bets and e-detectors),
 \texttt{monitor.py} (streaming monitor), \texttt{confseq.py} (confidence
 sequence), \texttt{forecast.py}, \texttt{design.py}, \texttt{running.py}
 (running truncation and restarts), \texttt{competitors.py} (BOCPD and
-the BJV-type test), \texttt{panel.py} (panel monitor) \\
+the BJV-type test), \texttt{panel.py} (panel monitor),
+\texttt{multifreq.py} (detectors at several frequencies) \\
 Experiments & \texttt{experiments/e04\_detection.py},
 \texttt{e04e\_review\_checks.py}, \texttt{e08\_cs\_baseline.py},
 \texttt{e09\_stress\_guarantee.py}, \texttt{e10\_forecast\_relative.py},
@@ -2943,8 +2995,9 @@ Experiments & \texttt{experiments/e04\_detection.py},
 \texttt{e06b\_five\_coins\_monitor.py}, \texttt{e07\_nifty.py},
 \texttt{e07c\_india\_vix.py}, \texttt{e07d\_events.py},
 \texttt{e12\_crypto\_events.py}, \texttt{e13\_benchmarks.py},
-\texttt{e14\_running\_tau.py}, \texttt{e15\_panel.py}; results in
-\texttt{results/}, report in \texttt{docs/experiment\_report.md} \\
+\texttt{e14\_running\_tau.py}, \texttt{e15\_panel.py},
+\texttt{e17\_multifrequency.py}; results in \texttt{results/}, report in
+\texttt{docs/experiment\_report.md} \\
 Figure 1 & \texttt{paper/make\_paper\_figures.py} \\
 \end{longtable}
 
@@ -3233,11 +3286,12 @@ variance was detected within one day on 34\% to 43\% of paths and within
 five days on 93\% to 94\%, with median delays of 1523 to 1791 steps;
 without a break the same monitors alarmed within one day on 4\% to 6\%
 and within five days on 38\% to 44\% of paths, the latter far above the
-25\% that Theorem B gives with the true baseline (E10, Q10b and Q10b2).
-A fourfold increase of the long-run variance was detected within a day
-on 89\% to 90\% of paths (median 612 to 712 steps). For the oracle,
-whose standardised returns are exactly i.i.d., the excess over five days
-is the plug-in effect of Section 3.4, not a property of the forecast.
+25\% that Theorem B guarantees with a known baseline (E10, Q10b and
+Q10b2). A fourfold increase of the long-run variance was detected within
+a day on 89\% to 90\% of paths (median 612 to 712 steps). For the
+oracle, whose standardised returns are exactly i.i.d., the excess over
+five days is the plug-in effect of Section 3.4, not a property of the
+forecast.
 
 \textbf{Price-level microstructure noise.} With i.i.d. noise on log
 prices, \(\mathbb{E}[r_t^2 \mid \mathcal{F}_{t-1}]\) depends on the last
@@ -3259,8 +3313,9 @@ from a noise ratio of about 2 (ALT1) {[}SYNTHETIC{]}. One-minute crypto
 returns were not tested for noise of this kind; the effect is largest at
 the highest frequencies.
 
-\hypertarget{s4.-extensions-e14-e15}{%
-\subsection{S4. Extensions (E14, E15)}\label{s4.-extensions-e14-e15}}
+\hypertarget{s4.-extensions-e14-e15-e17}{%
+\subsection{S4. Extensions (E14, E15,
+E17)}\label{s4.-extensions-e14-e15-e17}}
 
 \hypertarget{s4.1-a-running-truncation-level-and-restarts-with-a-proof-e14}{%
 \subsubsection{S4.1 A running truncation level and restarts with a proof
@@ -3459,6 +3514,173 @@ baseline the power for a 25\% increase fell from about 93\% to 36\% to
 per daily block is not a guarantee for a horizon of ten blocks, over
 which daily e-BH had a 23.5\% chance of at least one false discovery
 against 4.25\% for daily Bonferroni (E15).
+
+\hypertarget{s4.3-several-sampling-frequencies-e17}{%
+\subsubsection{S4.3 Several sampling frequencies
+(E17)}\label{s4.3-several-sampling-frequencies-e17}}
+
+\textbf{Set-up.} Frequency \(k \in \lbrace 1, 5, 15 \rbrace\) (minutes)
+sums the one-minute returns of non-overlapping \(k\)-minute blocks or,
+in the \emph{gap} version, the last \(k - 1\) returns of each block, so
+that consecutive blocks share no price. Each block return \(R_b^{(k)}\)
+gives \(X_b^{(k)} = \min((R_b^{(k)})^2, \tau_k^2)\), with \(\tau_k\)
+three scaled MADs of \(k\)-minute returns, and frequency \(k\) runs its
+own increase and decrease detectors over blocks with the default grids;
+between block ends its statistic \(M^{(k)}\) keeps its last value. The
+weights \(w_k \ge 0\) sum to 1. Each frequency needs its own null,
+\(\mathbb{E}[X_b^{(k)} \mid \mathcal{F}_s] \le m_k^{\uparrow}\) for
+every block (and \(\ge m_k^{\downarrow}\) on the decrease side), where
+\(s\) is the minute before the block starts and \(\mathcal{F}_s\) holds
+all one-minute information up to \(s\). The one-minute null does not
+imply it in general: if every return of a block takes a fair random sign
+drawn for that block, \(r_t = S_b \lvert e_t \rvert\) with \(e_t\)
+i.i.d. standard normal, the one-minute null holds exactly but a 5-minute
+block has mean square 17.7 instead of 5. It does hold with the true
+baselines for i.i.d. returns with any tails or jumps, and for gap blocks
+under i.i.d. price noise on an efficient price with independent
+increments. The statements below are proved in the accompanying theory
+note on multi-frequency monitoring; we keep its numbering.
+
+\textbf{Why the usual proof fails (Proposition 2 of the note).} A
+\(k\)-minute detector is an e-detector on its own clock, not on the
+one-minute clock: with \(k = 2\), i.i.d. Gaussian returns, no truncation
+and one increase bet \(\lambda\), a stopping time on the one-minute
+clock gives \(\mathbb{E}[M_\tau] = 1 + p + 0.484\lambda\), while the
+expected number of completed blocks is only \(1 + p\), with
+\(p = \mathbb{P}(\lvert Z \rvert > 1) = 0.317\). This breaks the proof
+of Theorems A and B for the plain average checked every minute; it does
+not show that the average exceeds the bound.
+
+\textbf{Certified average (Theorem 1 and Corollary 4 of the note).}
+Between block ends, bet \(j\) of frequency \(k\) is credited with
+\(C_t = \min(M_s, \ell_j (M_s + 1))\), where \(M_s\) is its value at the
+last block end and \(\ell_j\) its smallest possible factor
+(\(1 - \lambda_j\) for an increase bet, \(1 - \varphi_j\) for a decrease
+bet); at block ends \(C_t = M_t\). Each side averages \(C_t\) over its
+grid and over frequencies with weights \(w_k\), and the monitor alarms
+when either side reaches \(2A\). If every frequency with positive weight
+satisfies both nulls with the baselines that the monitor uses, then for
+every \(m \ge 1\) \[
+\mathbb{P}(\text{alarm within } m \text{ minutes}) \le \frac{1}{A}\sum_k w_k \lceil m/k \rceil,
+\] and the mean time to the first alarm is at least
+\((A - \kappa)/\rho\) minutes, with \(\rho = \sum_k w_k/k\) and
+\(\kappa = \sum_k w_k (1 - 1/k)\). With recalibration after every alarm,
+the expected number of alarms within \(m\) monitored minutes is at most
+\((m\rho + \kappa)/(A - \kappa)\). \emph{Sketch.}
+\(\mathbb{E}[M_{e(t)} \mid \mathcal{F}_t]\), with \(e(t)\) the end of
+the current block, is at least \(C_t\) and grows in mean by at most 1
+per block started, so Ville's inequality applies.
+
+\textbf{Plain average and weighted maximum (Theorem 3 of the note).}
+With frozen values checked every minute and
+\(N_k = \lfloor m/k \rfloor\), a union bound gives
+\(\sum_k w_k N_k / A\) for the rule \(\max_k w_k M^{(k)} \ge 2A\) and
+\((\sum_k \sqrt{w_k N_k})^2/A\) for the plain average, three times the
+certified bound when \(w_k \propto k\) (``balanced'' weights). Neither
+has a restart result.
+
+\textbf{The price of not knowing the frequency (Proposition 3 of the
+note).} If only frequency \(j\) sees a change, the certified average
+alarms when \(M^{(j)}\) reaches
+\(h_j = \sum_k w_k \lceil m/k \rceil / (w_j \lceil m/j \rceil)\) times
+the threshold that \(j\) would need alone at the same budget. For any
+weights \(\max_j h_j \ge 3\), the cost of a Bonferroni split, with
+equality for balanced weights; equal weights give 1.27, 6.33 and 19. For
+5\% per 1440-minute day, \(A\) is 28,800, 5760 and 1920 for one
+frequency alone, 12,160 for equal and 4114 for balanced weights (E17,
+Q17a).
+
+\emph{Table S3. Gaussian returns, true baseline, levels for a proved 5\%
+per 1440-minute day (15\% for the plain average); 10,000 null days, 2000
+paths per change (E17, Q17a to Q17d) {[}SYNTHETIC{]}. Persistent
+changes: median delay in minutes (share detected if below 99.5\%). Burst
+(standard deviation tripled for 15 minutes) and autocorrelation jump
+(lag-one autocorrelation from 0 to 0.3, one-minute variance unchanged):
+share detected (median delay).}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.1429}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.1429}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.1429}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.1429}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.1429}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.1429}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.1429}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Monitor
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\(A\)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+False alarms per day
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+sd ×1.25
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+sd ×0.5
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Burst ×3, 15 min
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Autocorrelation jump
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+1 min & 28,800 & 1.96\% & 134 & 93 & 73.2\% (12) & 3.8\% (707) \\
+5 min & 5760 & 0.71\% & 508 (98\%) & 403 & 0.8\% (18) & 99.2\% (448) \\
+15 min & 1920 & 0.39\% & 893 (57\%) & 1103 & 0.0\% & 81.6\% (758) \\
+Average, equal weights & 12,160 & 1.50\% & 138 & 96 & 70.3\% (12) &
+95.5\% (593) \\
+Average, balanced & 4114 & 0.77\% & 153 & 107 & 62.7\% (13) & 97.3\%
+(525.5) \\
+Average, \(w_k \propto \sqrt{k}\) & 6909 & 1.08\% & 143 & 100 & 68.2\%
+(12) & 96.6\% (550.5) \\
+Plain average every minute, balanced & 4114 & 0.78\% & 153 & 107 &
+62.7\% (13) & 97.3\% (523) \\
+Weighted maximum, balanced & 4114 & 0.72\% & 153 & 107 & 62.6\% (13) &
+97.0\% (533) \\
+Average of 5 and 15 min, balanced & 2880 & 0.50\% & 563 (98\%) & 448 &
+0.4\% (18) & 98.5\% (493) \\
+\end{longtable}
+
+\textbf{Results {[}SYNTHETIC{]}.} With the true baselines and i.i.d.
+Gaussian, Student \(t_3\) or jump returns, every monitor alarmed on
+0.32\% to 2.62\% of days, and the plain every-minute average stayed
+within 0.07 points of the certified one: the factor 3 is a gap in the
+proof, not in behaviour. With plug-in baselines the one-minute detector
+alarmed on 5.47\% of Gaussian days, significantly above 5\%, and the
+balanced average on 3.66\% to 4.54\% (Q17b). Under price noise
+(\(r_t = e_t + u_t - u_{t-1}\), \(u_t \sim N(0, \gamma^2)\) in units of
+the one-minute efficient standard deviation, as in ALT1) with true
+baselines, the one-minute detector alarmed on 6.88\% and 12.06\% of days
+at \(\gamma = 1\) and 2, the balanced average on 3.09\% and 6.50\%, and
+the proved gap average of 5 and 15 minutes on 0.54\% and 0.52\%. At
+\(\gamma = 2\) it detected persistent increases of 25\% and 50\% more
+often than either proved single gap detector (28.1\% against 21.4\% and
+25.3\%; 93.3\% against 85.5\% and 82.8\%) but halvings less often than
+the 5-minute gap detector (47.2\% against 56.5\%); at the planned
+\(\gamma = 1\) it did not help for increases (78.7\% against 79.2\% at
+sd ×1.25), and at neither level for decreases or a tripling lasting 60
+minutes. The level \(\gamma = 2\) was added after the \(\gamma = 1\)
+results had been seen (Q17e).
+
+\textbf{Results {[}REAL{]}.} On the five coins (July to December 2025,
+deseasonalised as in E6, band 0.25, plug-in baselines, recalibration
+after every alarm), the one-minute detector made up 98.4\% to 99.7\% of
+the combined statistic at alarms on average. The averages alarmed 0.65
+to 0.68 times per day (one-minute monitor 0.68), and their up and down
+alarms were followed by next-day volatility on the flagged side of the
+baseline 78\% to 80\% and 84\% to 88\% of the time, against 80\% and
+88\%. The 5- and 15-minute detectors alone alarmed 0.43 and 0.26 times
+per day and were confirmed more often (up 90\% and 95\%, down 95\% and
+96\%) (Q17f). In a comparison added after an independent review, the
+one-minute monitor with its two levels set per coin to give about as
+many up and down alarms as the 5-minute detector had its up alarms
+confirmed 90.5\% of the time against 90.0\% (\(p = 0.88\)) and its down
+alarms 96.4\% against 94.6\% (\(p = 0.43\)); matched to the 15-minute
+detector, its down alarms were followed by volatility below an EWMA
+forecast 88.9\% of the time against 72.4\% (\(p = 0.0014\)). The
+p-values treat alarms as independent and are optimistic (Q17g).
 
 \hypertarget{s5.-real-data-details}{%
 \subsection{S5. Real-data details}\label{s5.-real-data-details}}
