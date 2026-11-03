@@ -19,11 +19,11 @@ All figures now live in `paper/figures/`, with no experiment labels in their tit
 
 ## Structure
 
-Main text: Abstract (no citations); 1 Introduction (three contributions and a related-work paragraph); 2 Model, statistic and nulls; 3 Validity (3.1 e-detectors and the guarantees, including their reading over many days; 3.2 a small drift of the conditional mean; 3.3 why a decrease detector needs a bounded statistic); 4 Estimated baseline (4.1 plug-in; 4.2 confidence sequence); 5 Detection delay; 6 Simulations; 7 Application (7.1 data and what real data can test; 7.2 five cryptocurrencies; 7.3 FOMC statements as the pre-specified validation; 7.4 other data and lessons); 8 Discussion; Reproducibility; References.
+Main text: Abstract (no citations); 1 Introduction (three contributions and a related-work paragraph); 2 Model, statistic and nulls; 3 Validity (3.1 e-detectors and the guarantees, including their reading over many days; 3.2 a small drift of the conditional mean; 3.3 why a decrease detector needs a bounded statistic); 4 Estimated baseline (4.1 plug-in; 4.2 confidence sequence); 5 Detection delay; 6 Simulations; 7 Application (7.1 data, which results are confirmatory, and what real data can test; 7.2 five cryptocurrencies, with intervals from a block bootstrap over days, Holm adjustment and forecast regressions; 7.3 scheduled announcements and landmark shocks: the FOMC and CPI test, the one pre-specified primary test, and four case studies; 7.4 other data and lessons); 8 Discussion; Reproducibility; References.
 
-Supplement: S1 proofs and details for Sections 2 and 3 (Corollary 6; Theorem 7 with its design numbers, Table S1 and the sharpness result; drift that varies; Corollary 9; the short proofs of Lemma 1, Theorem 3 and Propositions 5 and 8); S2 proofs for Section 4; S3 proofs for Section 5; S4 second-order delay at practical levels (Table S2, Figure S1); S5 truncation constant, slack of the bound and bet design (Table S3); S6 clustering, forecasts, the GARCH bound and price noise (Proposition S8, Figure S2, Table S4); S7 real-data details (Nifty 50, FOMC and CPI, competitors with Table S5); S8 settings of every experiment (Tables S6 and S7); S9 where each table and figure comes from (script and result file).
+Supplement: S1 proofs and details for Sections 2 and 3 (Corollary 6; Theorem 7 with its design numbers, Table S1 and the sharpness result; drift that varies; Corollary 9; the short proofs of Lemma 1, Theorem 3 and Propositions 5 and 8); S2 proofs for Section 4; S3 proofs for Section 5; S4 second-order delay at practical levels (Table S2, Figure S1); S5 truncation constant, slack of the bound, bet design and further comparisons (Table S3; offline scan and cost; width of the confidence-sequence baseline); S6 clustering, forecasts, the GARCH bound and price noise (Proposition S8, Figure S2, Table S4); S7 real-data details (S7.1 Nifty 50 and India VIX; S7.2 FOMC and CPI; S7.3 competitors with Table S5; S7.4 the re-analysis of the real-data inference with Table S6; S7.5 the landmark shocks); S8 settings of every experiment (Tables S7 and S8); S9 where each table and figure comes from (script and result file).
 
-Numbering: one counter for all results of the main text (Lemma 1 to Theorem 19); results stated only in the supplement are Lemma S1 to Proposition S8. Map from the previous draft (commit 8f71a2e): Theorem A to Theorem 3, Theorem B to Theorem 4, Proposition 1 to Proposition 5, Corollary C to Corollary 6, Proposition 2 to Proposition 8, Corollary 3 to Corollary 9, Theorem D to Theorem 11, Corollaries E and F to 12 and 13, Lemmas 4 and 5 to Lemmas 14 and 15, Corollaries 6 and 7 to 16 and 17, Theorems 8 and 9 to 18 and 19, Proposition 10 to Proposition S8, Lemma A.1 to Lemma S6, Theorem D.1 to Lemma S7. New: Theorem 7 (drift of the conditional mean, from the TH4 note `docs/theory_robustness.md`) and Corollary 10 (plug-in baseline through Theorem 7). Proposition A.6 and Lemma A.7 of the running-truncation note are not used in the paper; they are cited only in the companion note. Section 7 of the previous draft (the reproduction of the quarticity estimator) and Appendix D were removed.
+Numbering: one counter for all results of the main text (Lemma 1 to Theorem 19); results stated only in the supplement are Lemma S1 to Proposition S8. Tables are 1 to 6 in the main text and S1 to S8 in the supplement; Table S6 (forecast regressions) is new in this version, so the settings tables are now S7 and S8. Map from the previous draft (commit 8f71a2e): Theorem A to Theorem 3, Theorem B to Theorem 4, Proposition 1 to Proposition 5, Corollary C to Corollary 6, Proposition 2 to Proposition 8, Corollary 3 to Corollary 9, Theorem D to Theorem 11, Corollaries E and F to 12 and 13, Lemmas 4 and 5 to Lemmas 14 and 15, Corollaries 6 and 7 to 16 and 17, Theorems 8 and 9 to 18 and 19, Proposition 10 to Proposition S8, Lemma A.1 to Lemma S6, Theorem D.1 to Lemma S7. New: Theorem 7 (drift of the conditional mean, from the TH4 note `docs/theory_robustness.md`) and Corollary 10 (plug-in baseline through Theorem 7). Proposition A.6 and Lemma A.7 of the running-truncation note are not used in the paper; they are cited only in the companion note. Section 7 of the previous draft (the reproduction of the quarticity estimator) and Appendix D were removed.
 
 ## Length
 
@@ -32,13 +32,13 @@ Words are counted as whitespace-separated tokens after removing HTML comments an
 | Part | Words |
 |---|---|
 | Abstract | 196 |
-| Main text, Section 1 to Reproducibility | 10,250 (9,409 without tables) |
-| Introduction | 949 |
-| References | about 1,170 |
-| Supplement | about 10,700 |
-| Companion note `extensions.md` | about 5,700 |
+| Main text, Section 1 to Reproducibility | 10,553 (9,710 without tables) |
+| Introduction | 964 |
+| References | about 1,240 |
+| Supplement | about 12,500 |
+| Companion note `extensions.md` | about 6,300 |
 
-By section: Introduction 952, Section 2 765, Section 3 1,385, Section 4 1,033, Section 5 1,692, Section 6 2,474, Section 7 1,379, Section 8 455, Reproducibility 115 (these include the section headings). The open slots below will add to the main text; a figure of about 10,000 leaves little room, so filling them should move other material to the supplement.
+By section: Introduction 964, Section 2 765, Section 3 1,385, Section 4 1,033, Section 5 1,672, Section 6 2,326, Section 7 1,803, Section 8 493, Reproducibility 115 (these include the section headings). Integrating the re-analysis of the real-data inference and the landmark case studies added about 430 words to Section 7 net of the details moved to Supplement S7; to compensate, the adversarial search, the offline scan, the cost per step and the width of the confidence-sequence baseline were shortened in Section 6 and moved to Supplement S5. The main text is still about 550 words above 10,000, and the open slots below will add to it, so filling them should move other material to the supplement.
 
 ## Provenance of numbers
 
@@ -65,15 +65,13 @@ HTML comments of the form `<!-- SLOT: ... -->` mark where pending results go. Ea
 | TH6, per-period guarantees | Section 3.1, after Theorem 4 | a construction with a proved bound per period and its cost |
 | TH6, Theorem 11 | Section 4.2, after Theorem 11 | the algorithm-free tolerance hypothesis; the statement already uses it, TH6 may sharpen it |
 | E19 | Section 7.1 | real-data null streams; the confidence-sequence baseline as the primary configuration |
-| E20 | Section 7.2, after Table 6 | Holm within families, day-block bootstrap intervals, forecast regressions or QLIKE, a realised-variance outcome |
 | E21 | Section 6.2 | robust CUSUM and Shiryaev-Roberts rules on the clipped statistic, a robust BOCPD, an econometric variance monitor |
-| E18 | Section 7.3 | landmark market events |
 
-TH4 is filled: Theorem 7 in Section 3.2, Corollary 10 in Section 4.1, proofs and the pathwise results in Supplement S1.2 and S1.3.
+Filled: TH4 (Theorem 7 in Section 3.2, Corollary 10 in Section 4.1, proofs and the pathwise results in Supplement S1.2 and S1.3); E20 (Sections 7.1 to 7.4, Table 6, Supplement S7.1 to S7.4 with Table S6, and the restart, panel and frequency paragraphs of the companion note); E18 (Section 7.3, Supplement S7.5, and its exploratory run of the restarted monitors in the companion note, Section 1).
 
 ## References
 
-Every entry of the reference lists was checked against a publisher, journal, arXiv or index listing, either by the referee (`docs/review/referee_report_paper.md`, Sections 2.2 and 2.3) or by our own web search on 3 November 2026. New in this version: Berkes et al. (2004), Chu, Stinchcombe and White (1996), Choe and Ramdas (2024), Clerico (2025), Dandapanthula and Ramdas (2025), Dette and Gösmann (2020), Fearnhead and Rigaill (2019), Horváth, Kokoszka and Zhang (2006), Huber (1965), Knoblauch, Jewson and Damoulas (2018), Mei (2008), Mineiro (2022), Shekhar and Ramdas (2024), Tartakovsky, Nikiforov and Basseville (2014), Unnikrishnan, Veeravalli and Meyn (2009), Vovk et al. (2021), Wang and Ramdas (2023) and Wang, Wang and Ziegel (2026). Horváth, Trapani and Wang is now cited as the *Journal of Time Series Analysis* article of 2025.
+Every entry of the reference lists was checked against a publisher, journal, arXiv or index listing, either by the referee (`docs/review/referee_report_paper.md`, Sections 2.2 and 2.3) or by our own web search on 3 November 2026. New in this version: Berkes et al. (2004), Chu, Stinchcombe and White (1996), Choe and Ramdas (2024), Clerico (2025), Dandapanthula and Ramdas (2025), Dette and Gösmann (2020), Fearnhead and Rigaill (2019), Horváth, Kokoszka and Zhang (2006), Huber (1965), Knoblauch, Jewson and Damoulas (2018), Mei (2008), Mineiro (2022), Shekhar and Ramdas (2024), Tartakovsky, Nikiforov and Basseville (2014), Unnikrishnan, Veeravalli and Meyn (2009), Vovk et al. (2021), Wang and Ramdas (2023) and Wang, Wang and Ziegel (2026). Horváth, Trapani and Wang is now cited as the *Journal of Time Series Analysis* article of 2025. Added with the re-analysis of the real-data inference: Holm (1979), Driscoll and Kraay (1998), Patton (2011) and Diebold and Mariano (1995), checked by our own web search on 3 November 2026 against index and library listings.
 
 Not fully verified, to check before submission:
 
@@ -91,6 +89,11 @@ Not fully verified, to check before submission:
 * Waudby-Smith and Ramdas (2024): the paper is confirmed; the theorem number of the predictable plug-in empirical Bernstein bound could not be checked, so the paper cites it without a theorem number.
 * Ram and Ramdas (2026): exists (arXiv:2602.05272); its text could not be opened, so the statement that Theorem 19 is an instance of it rests on the abstract.
 * Bapat (2026): details as checked against the PDF in an earlier round; volume and DOI not confirmed online.
+* Bibinger, Jirak and Vetter (2017): the reference is confirmed, but we could not obtain the paper. The two-window variance-ratio scan of Sections 6.2 and 7.2 is therefore called "inspired by" their work and is not presented as their procedure (it was called a BJV-type test in earlier drafts and in the experiment reports).
+* Holm (1979): volume, issue and pages confirmed by several listings; the JSTOR stable identifier (10.2307/4615733, from a software package's documentation) was not added as a DOI.
+* Driscoll and Kraay (1998): DOI 10.1162/003465398557825 from two secondary listings, not from the publisher.
+* Diebold and Mariano (1995): volume, issue and pages confirmed; no DOI was confirmed, so none is given.
+* Politis and Romano (1992), the circular block bootstrap, in *Exploring the Limits of Bootstrap* (Wiley): not cited, because neither the chapter title nor the pages could be confirmed; the paper describes the resampling scheme without a citation.
 
 ## Regenerating
 
