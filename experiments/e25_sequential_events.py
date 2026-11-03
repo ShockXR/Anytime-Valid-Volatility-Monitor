@@ -897,10 +897,11 @@ def part_posthoc(procs: int):
 # ----------------------------------------------------------------------------
 
 
-def fresh_plan(events: pd.DataFrame, data_end, stream_start=STREAM_START) -> tuple[pd.DataFrame, pd.DataFrame]:
+def fresh_plan(events: pd.DataFrame, data_end, stream_start=None) -> tuple[pd.DataFrame, pd.DataFrame]:
     """The strata of the fresh test at a look with data to ``data_end`` (exclusive): the releases of the event file
     (released or rescheduled, at or after the stream start), every release day of the file for rule 2, and the
     completion of rule 4 against the event file's statuses. Uses no market data."""
+    stream_start = STREAM_START if stream_start is None else stream_start
     relrows = events[events.status.isin(RELEASED)]
     utc = [et_anchor(d, h) for d, h in zip(relrows.date, relrows.release_time_et)]
     rel = relrows[np.array([t >= _utc(stream_start) for t in utc], dtype=bool)]
@@ -909,9 +910,10 @@ def fresh_plan(events: pd.DataFrame, data_end, stream_start=STREAM_START) -> tup
     return cands, comp
 
 
-def status_refusals(events: pd.DataFrame, cutoff, now=None, stream_start=STREAM_START) -> list[str]:
+def status_refusals(events: pd.DataFrame, cutoff, now=None, stream_start=None) -> list[str]:
     """Reasons the status part must not compute anything (empty when it may). Checked before any market data are
     downloaded or read, and again with the data's actual end."""
+    stream_start = STREAM_START if stream_start is None else stream_start
     now = _utc(pd.Timestamp.now(tz="UTC") if now is None else now)
     cut = _utc(cutoff)
     why = []
