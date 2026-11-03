@@ -1,0 +1,2 @@
+CPI row of 10 November missing: refusals none; stratum 1 in the test with n = 4 (controls 2026-11-04 19:00;2026-11-11 19:00;2026-11-18 19:00;2026-11-25 19:00), Z = 1, K = 1, M_1 = 1.9094
+CPI row of 10 November present: refusals none; stratum 1 in the test with n = 3 (controls 2026-11-04 19:00;2026-11-18 19:00;2026-11-25 19:00), Z = 1, K = 0, M_1 = 2.5408

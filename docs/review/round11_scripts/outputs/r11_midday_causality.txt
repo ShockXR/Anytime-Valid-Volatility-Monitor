@@ -1,0 +1,2 @@
+cut 2026-07-01 13:37 UTC: cut run 144 alarms, committed full run 144 alarms before the cut; index and direction identical: True; run took 10 s
+cut 2026-09-16 18:30 UTC: cut run 213 alarms, committed full run 213 alarms before the cut; index and direction identical: True; run took 14 s

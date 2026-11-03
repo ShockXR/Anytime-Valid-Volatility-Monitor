@@ -1,0 +1,52 @@
+run at 2026-11-03 11:08 UTC
+HEAD 333b147c777a7f8d308d238abd75aab2e64b04e9
+pre-registration commit 30804bb
+git diff --stat 30804bb -- experiments/e12_crypto_events.py experiments/e14_running_tau.py experiments/e22_guaranteed_events.py experiments/e23_fresh_releases.py experiments/e24_blind_guard.py src/avmonitor data/events/us_macro_events_e24_future.csv:
+(no change)
+git log --oneline 30804bb..HEAD -- experiments/e25_sequential_events.py:
+42207d0 E25 Amendment 1: rule 3 drops candidates whose window overlaps any release or earlier kept control; balance reported; amended rules are the default, original-rule results kept for comparison
+80ee004 E25: report part, iteration notes, dry run of the status part on known data
+eda19d8 E25: causality and pipeline gates (33 checks, 0 mismatches), power, post hoc illustration
+d0c2d8f E25: e-value, strata (rules 1 to 4), gates 1 and 5, tests
+
+arm coin     cell                     role  threshold  strata_in_test last_stratum_date  releases_with_outcome  release_rate  control_windows  control_rate      M  max_M  crossed first_crossing_stratum first_crossing_date  rejects_H0  prod_psi2  prod_psi4  prod_psi8  prod_psi16
+ S2  BTC fomc+cpi             E25a primary       20.0              15        2026-09-16                      6        0.4000               66        0.1061 3.8260 3.8260    False                   None                           False     4.3831     6.8182     3.4565      0.6461
+ S2  BTC     fomc exploratory, no decision       20.0               6        2026-09-16                      4        0.6667               18        0.1111 7.6531 7.6531    False                   None                           False     3.3333     7.2727    10.2073      9.7990
+ S2  BTC      cpi exploratory, no decision       20.0               9        2026-09-11                      2        0.2222               48        0.1042 0.6642 0.6642    False                   None                           False     1.3149     0.9375     0.3386      0.0659
+ S2  ETH fomc+cpi           E25b secondary       40.0              15        2026-09-16                      7        0.4667               66        0.1364 8.3531 8.3531    False                   None                           False     6.6790    14.6875     9.8046      2.2414
+ S2  ETH     fomc exploratory, no decision       40.0               6        2026-09-16                      4        0.6667               18        0.1667 5.0481 5.0481    False                   None                           False     2.8571     5.2893     6.4467      5.5995
+ S2  ETH      cpi exploratory, no decision       40.0               9        2026-09-11                      3        0.3333               48        0.1250 1.7589 1.9094    False                   None                           False     2.3377     2.7769     1.5209      0.4003
+ S2  SOL fomc+cpi           E25b secondary       40.0              15        2026-09-16                      7        0.4667               66        0.1364 5.0054 5.0054    False                   None                           False     5.3267     9.0909     4.7268      0.8771
+ S2  SOL     fomc exploratory, no decision       40.0               6        2026-09-16                      4        0.6667               18        0.2222 3.8216 3.8216    False                   None                           False     2.5000     4.1558     4.7111      3.9196
+ S2  SOL      cpi exploratory, no decision       40.0               9        2026-09-11                      3        0.3333               48        0.1042 1.3863 1.3863    False                   None                           False     2.1307     2.1875     1.0033      0.2238
+ stratum       date event_type               release_utc         data_needed_until  complete                                  not_complete_because
+look 2026-10-25 | BTC: status strata 1..15 (15), M 3.825972, role E25a primary, threshold 20.0; independent: 15 strata, M 3.825972; MATCH
+look 2026-10-25 | ETH: status strata 1..15 (15), M 8.353143, role E25b secondary, threshold 40.0; independent: 15 strata, M 8.353143; MATCH
+look 2026-10-25 | SOL: status strata 1..15 (15), M 5.005391, role E25b secondary, threshold 40.0; independent: 15 strata, M 5.005391; MATCH
+look 2026-10-25: pending strata [16, 17] (2026-10-14; 2026-10-28); outcome columns in the pending file: []; files written: ['e25_status_2026-10-25_candidates.csv', 'e25_status_2026-10-25_data_checks.csv', 'e25_status_2026-10-25_data_files.csv', 'e25_status_2026-10-25_data_gaps.csv', 'e25_status_2026-10-25_path.csv', 'e25_status_2026-10-25_pending.csv', 'e25_status_2026-10-25_provenance.txt', 'e25_status_2026-10-25_strata.csv', 'e25_status_2026-10-25_summary.csv']
+run at 2026-11-03 11:09 UTC
+HEAD 333b147c777a7f8d308d238abd75aab2e64b04e9
+pre-registration commit 30804bb
+git diff --stat 30804bb -- experiments/e12_crypto_events.py experiments/e14_running_tau.py experiments/e22_guaranteed_events.py experiments/e23_fresh_releases.py experiments/e24_blind_guard.py src/avmonitor data/events/us_macro_events_e24_future.csv:
+(no change)
+git log --oneline 30804bb..HEAD -- experiments/e25_sequential_events.py:
+42207d0 E25 Amendment 1: rule 3 drops candidates whose window overlaps any release or earlier kept control; balance reported; amended rules are the default, original-rule results kept for comparison
+80ee004 E25: report part, iteration notes, dry run of the status part on known data
+eda19d8 E25: causality and pipeline gates (33 checks, 0 mismatches), power, post hoc illustration
+d0c2d8f E25: e-value, strata (rules 1 to 4), gates 1 and 5, tests
+
+arm coin     cell                     role  threshold  strata_in_test last_stratum_date  releases_with_outcome  release_rate  control_windows  control_rate      M  max_M  crossed first_crossing_stratum first_crossing_date  rejects_H0  prod_psi2  prod_psi4  prod_psi8  prod_psi16
+ S2  BTC fomc+cpi             E25a primary       20.0              14        2026-09-11                      5        0.3571               63        0.1111 1.7756 1.7756    False                   None                           False     2.7394     2.9830     1.1882      0.1918
+ S2  BTC     fomc exploratory, no decision       20.0               5        2026-07-29                      3        0.6000               15        0.1333 2.9208 2.9208    False                   None                           False     2.0833     3.1818     3.5088      2.9091
+ S2  BTC      cpi exploratory, no decision       20.0               9        2026-09-11                      2        0.2222               48        0.1042 0.6642 0.6642    False                   None                           False     1.3149     0.9375     0.3386      0.0659
+ S2  ETH fomc+cpi           E25b secondary       40.0              14        2026-09-11                      6        0.4286               63        0.1429 3.6590 3.6590    False                   None                           False     4.1744     6.4258     3.3703      0.6654
+ S2  ETH     fomc exploratory, no decision       40.0               5        2026-07-29                      3        0.6000               15        0.2000 1.9945 1.9945    False                   None                           False     1.7857     2.3140     2.2161      1.6623
+ S2  ETH      cpi exploratory, no decision       40.0               9        2026-09-11                      3        0.3333               48        0.1250 1.7589 1.9094    False                   None                           False     2.3377     2.7769     1.5209      0.4003
+ S2  SOL fomc+cpi           E25b secondary       40.0              14        2026-09-11                      6        0.4286               63        0.1429 2.2979 2.2979    False                   None                           False     3.3292     3.9773     1.6248      0.2604
+ S2  SOL     fomc exploratory, no decision       40.0               5        2026-07-29                      3        0.6000               15        0.2667 1.5409 1.5409    False                   None                           False     1.5625     1.8182     1.6194      1.1636
+ S2  SOL      cpi exploratory, no decision       40.0               9        2026-09-11                      3        0.3333               48        0.1042 1.3863 1.3863    False                   None                           False     2.1307     2.1875     1.0033      0.2238
+ stratum       date event_type               release_utc         data_needed_until  complete                                  not_complete_because
+look 2026-10-10 | BTC: status strata 1..14 (14), M 1.775595, role E25a primary, threshold 20.0; independent: 14 strata, M 1.775595; MATCH
+look 2026-10-10 | ETH: status strata 1..14 (14), M 3.658985, role E25b secondary, threshold 40.0; independent: 14 strata, M 3.658985; MATCH
+look 2026-10-10 | SOL: status strata 1..14 (14), M 2.297927, role E25b secondary, threshold 40.0; independent: 14 strata, M 2.297927; MATCH
+look 2026-10-10: pending strata [15, 16, 17] (2026-09-16; 2026-10-14; 2026-10-28); outcome columns in the pending file: []; files written: ['e25_status_2026-10-10_candidates.csv', 'e25_status_2026-10-10_data_checks.csv', 'e25_status_2026-10-10_data_files.csv', 'e25_status_2026-10-10_data_gaps.csv', 'e25_status_2026-10-10_path.csv', 'e25_status_2026-10-10_pending.csv', 'e25_status_2026-10-10_provenance.txt', 'e25_status_2026-10-10_strata.csv', 'e25_status_2026-10-10_summary.csv']
