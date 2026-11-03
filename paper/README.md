@@ -53,4 +53,4 @@ For a journal template, copy the body of `short_paper.tex` (between `\begin{docu
 
 ## Length
 
-The main text (abstract to Section 8) has about 15,300 words including inline mathematics, plus tables and displayed equations, longer than a 10 to 14 page short paper. Results that the main text only summarises are already in the supplement. The next candidates for moving out of the main text are the construction of the confidence sequence in Section 3.4 (to Appendix A), the information rate and Table 2 in Section 4.5, and Sections 6.2 to 6.4.
+The main text (abstract to Section 8) has about 15,900 words including inline mathematics, plus tables and displayed equations, longer than a 10 to 14 page short paper. Results that the main text only summarises are already in the supplement. The next candidates for moving out of the main text are the construction of the confidence sequence in Section 3.4 (to Appendix A), the information rate and Table 2 in Section 4.5, and Sections 6.2 to 6.4.
