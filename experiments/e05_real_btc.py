@@ -18,6 +18,15 @@ Research questions
        a warm-up that is not monitored (review m16), and every alarm is counted
        in the up and down columns (review m11). The round 1 function is kept
        unchanged (it uses start="pooled") so that its results stay reproducible.
+
+Review round 9 (m5). The committed results were computed when the Bitstamp
+loader turned the provider's filled (zero-volume) minutes into zero returns:
+0.30% of the minutes of July to December 2025. The loader now makes the
+returns on both sides of a filled minute missing (docs/math.md 5.6). This
+script asks for the old behaviour explicitly (BITSTAMP_FILLED = "zero"), so
+that it still reproduces the committed results; pass
+``--bitstamp-filled missing`` to apply the fix. The effect on every committed
+cell is in results/r9_bitstamp_impact.csv.
 """
 
 import sys
@@ -36,6 +45,13 @@ from avmonitor.monitor import GaussianLRMonitor, VolatilityMonitor  # noqa: E402
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "results"
 RAW = ROOT / "data/raw/crypto/btcusd_bitstamp_1min_latest.csv"
+# "zero": filled minutes give zero returns, as in the committed results; "missing": the loader's default (review
+# round 9, m5). Set from the command line with --bitstamp-filled.
+BITSTAMP_FILLED = "zero"
+
+
+def load(start: str, end: str) -> pd.DataFrame:
+    return load_bitstamp_csv(RAW, start, end, filled=BITSTAMP_FILLED)
 
 
 def q5a(r: np.ndarray):
@@ -217,9 +233,9 @@ def figure(df, u):
 
 def main(parts=("a", "b", "c", "c_r2")):
     if parts == ("c_r2",):
-        q5c_r2(load_bitstamp_csv(RAW, "2025-06-01", "2026-01-01"))
+        q5c_r2(load("2025-06-01", "2026-01-01"))
         return
-    df = load_bitstamp_csv(RAW, "2025-07-01", "2026-01-01")
+    df = load("2025-07-01", "2026-01-01")
     r = df.logret.dropna().to_numpy()
     print(f"REAL DATA: {len(df)} minutes, zero-return share {np.mean(r == 0):.3f}")
     q5a(r)
@@ -227,8 +243,13 @@ def main(parts=("a", "b", "c", "c_r2")):
     u, _ = q5c(df)
     figure(df, u)
     if "c_r2" in parts:
-        q5c_r2(load_bitstamp_csv(RAW, "2025-06-01", "2026-01-01"))
+        q5c_r2(load("2025-06-01", "2026-01-01"))
 
 
 if __name__ == "__main__":
-    main(tuple(sys.argv[1:]) or ("a", "b", "c", "c_r2"))
+    args = sys.argv[1:]
+    if "--bitstamp-filled" in args:
+        i = args.index("--bitstamp-filled")
+        BITSTAMP_FILLED = args[i + 1]
+        del args[i : i + 2]
+    main(tuple(args) or ("a", "b", "c", "c_r2"))

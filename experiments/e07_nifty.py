@@ -28,6 +28,16 @@ Usage
   python experiments/e07_nifty.py q7a
   python experiments/e07_nifty.py q7b-dev     # development period only (2017 to 2021)
   python experiments/e07_nifty.py q7b         # full run, dev and held-out reported separately
+  python experiments/e07_nifty.py q7a --bitstamp-filled missing   # BTC rows of Q7a with the loader's default
+
+The Bitstamp BTC/USD rows of Q7a (review round 9, m5). The committed rows were computed
+(i) with the Bitstamp loader of before review round 9, which turned the provider's filled
+(zero-volume) minutes into zero returns, and (ii) with the pooled start of the intraday
+profile (``intraday_scale(..., start="pooled")``), which was the default until the
+profile was made strictly predictable later the same day (commit 0e7d160). Q7a asks for
+both explicitly (BITSTAMP_FILLED = "zero"), so that the script reproduces the committed
+results; ``--bitstamp-filled missing`` makes the returns on both sides of a filled minute
+missing. The effect on every committed cell is in results/r9_bitstamp_impact.csv.
 """
 
 from __future__ import annotations
@@ -58,6 +68,9 @@ CAL_LENS = (375, 750)
 BANDS = (0.0, 0.25, 0.5)
 PRIMARY = (750, 0.25)  # pre-registered primary configuration
 DEV_END = pd.Timestamp("2022-01-01", tz=TZ)
+# "zero": filled Bitstamp minutes give zero returns, as in the committed Q7a results; "missing": the loader's
+# default (review round 9, m5). Set from the command line with --bitstamp-filled.
+BITSTAMP_FILLED = "zero"
 FROZEN_RUN = 5  # a 50-stock index that does not move for 5+ minutes is halted or frozen
 MAX_FLAGGED_SHARE = 0.25  # drop sessions where more than this share of returns is flagged
 LOOKBACK = 20  # sessions in the intraday profile
@@ -223,10 +236,12 @@ def q7a():
     u = deseasonalise(df).to_numpy()
     rows.append(describe(u, "Nifty 50 deseasonalised, full sample [REAL]"))
     # Bitstamp BTC/USD, same period as E5 and Table 5 of the paper, for a like-for-like comparison
-    btc = load_bitstamp_csv(ROOT / "data/raw/crypto/btcusd_bitstamp_1min_latest.csv", "2025-07-01", "2026-01-01")
+    btc = load_bitstamp_csv(ROOT / "data/raw/crypto/btcusd_bitstamp_1min_latest.csv", "2025-07-01", "2026-01-01",
+                            filled=BITSTAMP_FILLED)
     rb = btc["logret"].to_numpy()
     rows.append(describe(rb, "BTC/USD Bitstamp, Jul to Dec 2025 [REAL]"))
-    sb = intraday_scale(btc["logret"].fillna(0.0), lookback_days=20)  # circular profile is right for 24h crypto
+    # circular profile is right for 24h crypto; pooled start as in the committed results (see the docstring)
+    sb = intraday_scale(btc["logret"].fillna(0.0), lookback_days=20, start="pooled")
     ub = (btc["logret"] / sb).to_numpy(copy=True)
     ub[~np.isfinite(ub)] = np.nan
     rows.append(describe(ub, "BTC/USD deseasonalised [REAL]"))
@@ -417,7 +432,12 @@ def q7b(full: bool):
 
 
 if __name__ == "__main__":
-    cmd = sys.argv[1] if len(sys.argv) > 1 else "all"
+    args = sys.argv[1:]
+    if "--bitstamp-filled" in args:
+        i = args.index("--bitstamp-filled")
+        BITSTAMP_FILLED = args[i + 1]
+        del args[i : i + 2]
+    cmd = args[0] if args else "all"
     if cmd in ("q7a", "all"):
         q7a()
     if cmd == "q7b-dev":

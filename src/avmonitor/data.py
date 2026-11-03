@@ -40,13 +40,25 @@ BITSTAMP_URL = (
 )
 
 
-def load_bitstamp_csv(path: str | Path, start: str | None = None, end: str | None = None) -> pd.DataFrame:
+def load_bitstamp_csv(path: str | Path, start: str | None = None, end: str | None = None,
+                      filled: str = "missing") -> pd.DataFrame:
     """Read the Bitstamp file and return a frame indexed by UTC minute.
 
     ``start`` is inclusive and ``end`` exclusive (any string pandas parses).
     Adds ``logret`` (close-to-close log return, NaN for the first row) and
     ``zero_volume`` (True for filled or tradeless minutes).
+
+    ``filled`` sets the returns around a filled minute. ``"missing"`` (default)
+    makes the returns on both sides of it NaN. ``"zero"`` is the behaviour
+    before review round 9 (m5): the filled minute repeats the previous close,
+    so its return is 0 and the next return carries the whole move since the
+    last trade. ``"zero"`` breaks the rule of ``docs/math.md`` 5.6 never to
+    zero-fill a missing return; it exists only so that the committed results
+    of E5, E6b, E7a, E8e and E19, which were computed with it, can be
+    reproduced exactly.
     """
+    if filled not in ("missing", "zero"):
+        raise ValueError("filled must be 'missing' or 'zero'")
     df = pd.read_csv(path)
     df["time"] = pd.to_datetime(df["timestamp"], unit="s", utc=True)
     df = df.set_index("time").sort_index()
@@ -58,7 +70,8 @@ def load_bitstamp_csv(path: str | Path, start: str | None = None, end: str | Non
     df["zero_volume"] = df["volume"] <= 0
     # A filled (tradeless) minute repeats the previous close: no price was observed, so the returns on both
     # sides of it are missing, not zero (docs/math.md 5.6, item 5), as for the gaps of load_binance.
-    df["logret"] = np.log(df["close"].where(~df["zero_volume"])).diff()
+    close = df["close"] if filled == "zero" else df["close"].where(~df["zero_volume"])
+    df["logret"] = np.log(close).diff()
     return df
 
 

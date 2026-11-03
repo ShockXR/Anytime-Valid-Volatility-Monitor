@@ -44,6 +44,15 @@ Outputs: results/e06d_monitor_summary.csv, e06d_events.csv,
 e06d_cross_venue.csv, e06d_cross_coin.csv, e06e_forecast_hits.csv,
 e06e_competitor.csv, e06e_pooled.csv, e06d_pooled.csv, results/figures/e06_alarm_timelines.png,
 results/figures/e06_hit_rates.png. Seeds: 6 (random times), 66 (shifts).
+
+Review round 9 (m5). The committed Bitstamp rows were computed when the
+Bitstamp loader turned the provider's filled (zero-volume) minutes into zero
+returns. The loader now makes the returns on both sides of a filled minute
+missing (docs/math.md 5.6). ``prepare`` asks for the old behaviour explicitly
+(BITSTAMP_FILLED = "zero"), so that this script and E19, which uses
+``prepare``, still reproduce the committed results; pass
+``--bitstamp-filled missing`` to apply the fix. Binance rows are unaffected.
+The effect on every committed cell is in results/r9_bitstamp_impact.csv.
 """
 
 from __future__ import annotations
@@ -63,6 +72,9 @@ from avmonitor.robust import MAD_NORMAL_SCALE
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "results"
 BITSTAMP = ROOT / "data/raw/crypto/btcusd_bitstamp_1min_latest.csv"
+# "zero": filled Bitstamp minutes give zero returns, as in the committed results; "missing": the loader's default
+# (review round 9, m5). Set from the command line with --bitstamp-filled.
+BITSTAMP_FILLED = "zero"
 COINS = {"BTC": "BTCUSDT", "ETH": "ETHUSDT", "XRP": "XRPUSDT", "SOL": "SOLUSDT", "DOGE": "DOGEUSDT"}
 # label -> (monitor start, end, history start used for the intraday profile and the forecasts)
 PERIODS = {
@@ -90,7 +102,7 @@ MATCH_MINUTES = 60
 def prepare(source: str, period: str):
     start, end, hist = PERIODS[period]
     if source == "Bitstamp BTC":
-        df = load_bitstamp_csv(BITSTAMP, hist, end)
+        df = load_bitstamp_csv(BITSTAMP, hist, end, filled=BITSTAMP_FILLED)
     else:
         df = load_binance(COINS[source], hist, end, download=False)
     s = intraday_scale(df.logret, lookback_days=20)  # NaN returns are skipped by the rolling medians
@@ -664,4 +676,6 @@ def main():
 
 
 if __name__ == "__main__":
+    if "--bitstamp-filled" in sys.argv:
+        BITSTAMP_FILLED = sys.argv[sys.argv.index("--bitstamp-filled") + 1]
     sys.exit(main())

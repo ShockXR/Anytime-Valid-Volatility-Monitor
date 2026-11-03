@@ -26,6 +26,10 @@ increase side cannot alarm because tau^2 <= m_up), ``p1std`` (bootstrap of day-s
 Usage: nice -n 10 python experiments/e19_real_null.py [pools] [p1] [p2] [p3] [p4] [blind] [p1std] [p2boot] [figs]
 Environment: E19_SCALE (default 1) multiplies the numbers of streams (smoke runs only); E19_OUT redirects
 outputs (default results/).
+Option ``--bitstamp-filled missing`` (review round 9, m5): read the Bitstamp BTC/USD series of Parts 2 and
+``blind`` with the loader's default, which makes the returns around a filled (zero-volume) minute missing. The
+default, "zero", is the old behaviour (filled minutes give zero returns) with which the committed results were
+computed; it is set in E6's ``prepare`` (``e06b_five_coins_monitor.BITSTAMP_FILLED``). Binance series are unaffected.
 """
 
 from __future__ import annotations
@@ -1460,4 +1464,11 @@ def main(argv):
 
 
 if __name__ == "__main__":
-    main(sys.argv[1:])
+    args = sys.argv[1:]
+    if "--bitstamp-filled" in args:
+        import e06b_five_coins_monitor as E6
+
+        i = args.index("--bitstamp-filled")
+        E6.BITSTAMP_FILLED = args[i + 1]
+        del args[i : i + 2]
+    main(args)

@@ -42,6 +42,17 @@ Research questions
 
 All settings were fixed before the runs; nothing was tuned on the reported data.
 Seeds are fixed below. Run time: a few minutes on one core.
+
+Reproducing Q8e (review round 9, m5). The committed Q8e results were computed
+(i) with the Bitstamp loader of before review round 9, which turned the
+provider's filled (zero-volume) minutes into zero returns, and (ii) with the
+intraday profile's pooled start (``intraday_scale(..., start="pooled")``),
+which was the default until the profile was made strictly predictable later
+the same day (commit 0e7d160) and is what E5c round 1 uses. Q8e asks for both
+explicitly, so that the script reproduces the committed results. Pass
+``--bitstamp-filled missing`` to read the file with the loader's default
+(returns on both sides of a filled minute missing); the effect on every
+committed cell is in results/r9_bitstamp_impact.csv.
 """
 
 from __future__ import annotations
@@ -345,16 +356,22 @@ def q8d(null_df=None):
 # ----------------------------------------------------------------------------
 
 
+# "zero": filled Bitstamp minutes give zero returns, as in the committed Q8e results; "missing": the loader's
+# default (review round 9, m5). Set from the command line with --bitstamp-filled.
+BITSTAMP_FILLED = "zero"
+
+
 def q8e():
     from avmonitor.data import intraday_scale, load_bitstamp_csv
 
     raw = ROOT / "data/raw/crypto/btcusd_bitstamp_1min_latest.csv"
-    df = load_bitstamp_csv(raw, "2025-07-01", "2026-01-01")
+    df = load_bitstamp_csv(raw, "2025-07-01", "2026-01-01", filled=BITSTAMP_FILLED)
     r = df.logret
     # Missing returns stay missing (NaN): the profile medians and the monitor skip them. E5c filled them
-    # with 0, which counts a missing minute as a zero return (independent review, M6); on this file only
-    # the first return is missing, so the two choices give the same results here.
-    s = intraday_scale(r, lookback_days=20)
+    # with 0, which counts a missing minute as a zero return (independent review, M6). With filled="zero" only
+    # the first return is missing, so the two choices give the same results; with filled="missing" 1,485 are.
+    # start="pooled" is E5c's profile (round 1) and the one the committed results were computed with.
+    s = intraday_scale(r, lookback_days=20, start="pooled")
     u = (r / s).to_numpy(copy=True)
     u[~np.isfinite(u)] = np.nan
     stream = u
@@ -611,4 +628,9 @@ def main(parts="abcde"):
 
 
 if __name__ == "__main__":
-    main(sys.argv[1] if len(sys.argv) > 1 else "abcdefg")
+    args = sys.argv[1:]
+    if "--bitstamp-filled" in args:
+        i = args.index("--bitstamp-filled")
+        BITSTAMP_FILLED = args[i + 1]
+        del args[i : i + 2]
+    main(args[0] if args else "abcdefg")
