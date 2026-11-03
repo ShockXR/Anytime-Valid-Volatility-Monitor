@@ -314,3 +314,57 @@ def test_null_bound_rank_fallback():
     bound = 0.05 + m / A
     assert falls > P / 2
     assert hits / P <= bound + 3 * math.sqrt(bound * (1 - bound) / P)
+
+
+# ----------------------------------------------------------------------------
+# The forward pre-registration's guards (experiments/e24_blind_guard.py; no market data)
+# ----------------------------------------------------------------------------
+
+
+def _e24():
+    import sys
+    from pathlib import Path
+
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "experiments"))
+    import e24_blind_guard as E24
+
+    return E24
+
+
+def test_future_part_refuses_early_and_with_unverified_releases():
+    E24 = _e24()
+    assert E24.future_refusals(None)  # no end date fixed
+    import pandas as pd
+
+    why = E24.future_refusals("2027-07-01")
+    if pd.Timestamp.now(tz="UTC") < pd.Timestamp("2027-07-01", tz="UTC"):
+        assert any("before the end date" in w for w in why)
+    assert any("status 'scheduled'" in w for w in why)  # every 2027 row of the event file is still scheduled
+    assert any("before the end date 2027-07-01" in w for w in E24.future_refusals("2027-07-01", data_end="2027-06-30 23:59"))
+
+
+def test_event_file_and_planning_calendar():
+    import pandas as pd
+
+    E24 = _e24()
+    ev = pd.read_csv(E24.FUTURE_EVENTS, dtype=str, keep_default_na=False)
+    assert list(ev.columns) == ["date", "event_type", "release_time_et", "release_time_utc", "status", "original_date",
+                                "description", "source_url", "verification", "access_date"]
+    assert ev.date.is_monotonic_increasing
+    assert set(ev.status) <= {"released", "rescheduled", "cancelled", "no_statement", "scheduled"}
+    et = pd.to_datetime(ev.date + " " + ev.release_time_et).dt.tz_localize("America/New_York").dt.tz_convert("UTC")
+    assert (et.dt.strftime("%Y-%m-%d %H:%M") == ev.release_time_utc).all()  # UTC column agrees with the time zone rules
+    assert ((ev.event_type == "fomc") <= (ev.release_time_et == "14:00")).all()
+    assert ((ev.event_type == "cpi") <= (ev.release_time_et == "08:30")).all()
+    assert ev.verification.str.len().min() > 50 and (ev.access_date == "2026-11-03").all()
+    # every month from November 2026 to December 2027 has exactly one CPI row
+    m = pd.to_datetime(ev.loc[ev.event_type == "cpi", "date"]).dt.to_period("M")
+    assert list(m) == list(pd.period_range("2026-11", "2027-12", freq="M"))
+    # the plan: the no-statement meeting dropped, no placeholder before 2028, every 6-hour window inside the period
+    pe = E24.planning_events("2027-12-01")
+    assert (pe.kind == "event file").all() and "2027-01-27" not in set(pe.date.dt.strftime("%Y-%m-%d"))
+    assert pe.release_utc.min() >= pd.Timestamp(E24.FUTURE_MONITOR_START, tz="UTC")
+    assert (pe.release_utc + pd.Timedelta(hours=6) <= pd.Timestamp("2027-12-01", tz="UTC")).all()
+    pe28 = E24.planning_events("2029-01-01")
+    ph = pe28[pe28.kind != "event file"]
+    assert (ph.date.dt.year == 2028).all() and (ph.event_type == "fomc").sum() == 6 and (ph.event_type == "cpi").sum() == 12
