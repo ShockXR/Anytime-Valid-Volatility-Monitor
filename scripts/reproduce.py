@@ -81,7 +81,7 @@ EXPERIMENTS = [
     ("E16 figures", ["experiments/e16_adversarial_null.py", "figures"], False, "full"),
     ("E17 multi-frequency, synthetic", ["experiments/e17_multifrequency.py", "baselines", "levels", "null", "change"], False, "full"),
     ("E17 multi-frequency, real data and figures", ["experiments/e17_multifrequency.py", "real", "ratematch", "figures"], True, "full"),
-    ("E18 landmark events, pre-registered case studies", ["experiments/e18_landmark_events.py", "run", "figure", "context"], True, "full"),
+    ("E18 landmark events, pre-registered case studies", ["experiments/e18_landmark_events.py", "run", "figure", "context", "awake"], True, "full"),
     ("E20 re-analysis of the real-data inference", ["experiments/e20_inference.py", "checks", "bootstrap", "holm", "events", "forecast", "classify"], True, "full"),
     ("TH4 robustness to drift in the conditional mean", ["experiments/th4_robustness.py", "sup", "constant", "switching", "garch", "plugin", "ticks", "counterexamples", "figures"], False, "full"),
 ]

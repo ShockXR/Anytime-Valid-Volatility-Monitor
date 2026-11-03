@@ -438,7 +438,7 @@ IMPROVEMENTS: A concrete, pre-registered demonstration of the cost of the blind 
 
 REMAINING ISSUES: Four events are case studies, not evidence. Rate matching uses data from after the events, which favours the competitors.
 
-NEXT ITERATION: E14's monitors without a blind period on the same events (exploratory, added after this result).
+NEXT ITERATION: E14's monitors without a blind period on the same events, exploratory and decided after this result: at the e-detector's null band and a similar alarm rate (0.59 to 0.94 against 0.66 to 0.71 per crypto day) they flagged 15 and 17 of the 18 cases within 24 hours, fast on 5 August 2024 and 10 October 2025 and slow on 7 April 2025, against 3 for the e-detector; their alarm lists match E14's exactly.
 
 ---
 
