@@ -1,0 +1,53 @@
+check,column,compared,mismatches,max_abs_diff
+P0 vs e12_tests.csv,(row keys),60,0,
+P0 vs e12_tests.csv,events,60,0,0.0
+P0 vs e12_tests.csv,events_with,60,0,0.0
+P0 vs e12_tests.csv,rate_event,60,0,0.0
+P0 vs e12_tests.csv,rate_event_lo,60,0,0.0
+P0 vs e12_tests.csv,rate_event_hi,60,0,0.0
+P0 vs e12_tests.csv,control_windows,60,0,0.0
+P0 vs e12_tests.csv,weekday_time_groups,60,0,0.0
+P0 vs e12_tests.csv,rate_control_matched,60,0,0.0
+P0 vs e12_tests.csv,expected_from_matched_controls,60,0,0.0
+P0 vs e12_tests.csv,rate_ratio_matched,60,0,0.0
+P0 vs e12_tests.csv,expected_under_null,60,0,0.0
+P0 vs e12_tests.csv,p_stratified_permutation,60,0,0.0
+P0 vs e12_tests.csv,p_stratified_permutation_fewer,60,0,0.0
+P0 vs e12_tests.csv,p_stratified_fisher,60,0,0.0
+P0 Holm (primary family) vs e12_tests.csv,(row keys),2,0,
+P0 Holm (primary family) vs e12_tests.csv,p_holm_primary,2,0,0.0
+P0 vs e12_event_windows.csv,(row keys),114,0,
+P0 vs e12_event_windows.csv,monitoring_at_start,114,0,0.0
+P0 vs e12_event_windows.csv,monitored_share_post,114,0,0.0
+P0 vs e12_event_windows.csv,any_post,114,0,0.0
+P0 vs e12_event_windows.csv,up_post,114,0,0.0
+P0 vs e12_event_windows.csv,up_post_1h,114,0,0.0
+P0 vs e12_event_windows.csv,n_up_post,114,0,0.0
+P0 vs e12_event_windows.csv,down_post,114,0,0.0
+P0 vs e12_event_windows.csv,first_up_delay_min,114,0,0.0
+P0 vs e12_event_windows.csv,first_up_max_abs_recent_over_scale,114,0,0.0
+P0 vs e12_event_windows.csv,first_up_post_over_baseline,114,0,0.0
+P0 vs e12_event_windows.csv,up_pre,114,0,0.0
+P0 vs e12_event_windows.csv,last_up_lead_min,114,0,0.0
+P0 vs e12_event_windows.csv,down_follow,114,0,0.0
+P0 vs e12_event_windows.csv,first_down_follow_min,114,0,0.0
+P0 vs e12_event_windows.csv,down_after_up,114,0,0.0
+P0 vs e12_event_windows.csv,abs_ret_first_hour_over_pre,114,0,0.0
+P0 vs e12_event_windows.csv,abs_ret_post_over_pre,114,0,0.0
+P0 vs e12_event_windows.csv,n_controls,114,0,0.0
+P0 vs e12_event_windows.csv,control_up_post_rate,114,0,0.0
+P0 vs e12_event_windows.csv,control_up_post_1h_rate,114,0,0.0
+P0 vs e12_event_windows.csv,control_up_pre_rate,114,0,0.0
+P0 vs e12_event_windows.csv,control_down_follow_rate,114,0,0.0
+P0 vs e12_event_windows.csv,control_down_after_up_given_up_rate,114,0,0.0
+P0 vs e12_event_windows.csv,control_monitoring_at_start_rate,114,0,0.0
+P0 vs e12_monitor_summary.csv,(row keys),3,0,
+P0 vs e12_monitor_summary.csv,alarms,3,0,0.0
+P0 vs e12_monitor_summary.csv,up,3,0,0.0
+P0 vs e12_monitor_summary.csv,down,3,0,0.0
+P0 vs e12_monitor_summary.csv,monitored_share,3,0,0.0
+S2 vs e14g_e12_tests.csv (awake-B),(row keys),6,0,
+S2 vs e14g_e12_tests.csv (awake-B),releases,6,0,0.0
+S2 vs e14g_e12_tests.csv (awake-B),awake_at_release,6,0,0.0
+S2 vs e14g_e12_tests.csv (awake-B),up_within_6h,6,0,0.0
+S2 vs e14g_e12_tests.csv (awake-B),stratified_p,6,0,0.0
