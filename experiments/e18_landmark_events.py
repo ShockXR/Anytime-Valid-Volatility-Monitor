@@ -25,8 +25,10 @@ samples. Nifty: E13's stream (2024 to 2025, E7's session profile).
 
 Methods. e-detector with the frozen E6 / E7 settings (A = 28,800 or 7,500, c = 3, calibration 1440 or 750, band 0.25),
 streaming from the stream start. E13's competitors with the first-run windows and the round-3 windows: BOCPD and BOCPD
-on truncated returns (w = 250, 720, 1440 on crypto; 250, 375 on Nifty) and the truncated Gaussian-normalised BJV-type
-rolling test (k = 120, 480, 1440; 120, 375). Each competitor's up and down thresholds are matched to the e-detector's
+on truncated returns (w = 250, 720, 1440 on crypto; 250, 375 on Nifty) and the truncated Gaussian-normalised
+two-window variance-ratio scan (k = 120, 480, 1440; 120, 375), inspired by Bibinger, Jirak and Vetter (2017); the paper
+could not be obtained, so this is not their test (earlier called the "BJV-type" test; the code and the CSV files keep
+E13's internal label "BJV rolling"). Each competitor's up and down thresholds are matched to the e-detector's
 up and down alarm counts on the same stream, counting only alarms outside the exclusion windows [T - 8 d, T + 2 d).
 
 Outcomes per event, asset and method (primary): state at T (monitoring / calibrating, watching / paused), delay from T
@@ -40,10 +42,13 @@ Usage
   python experiments/e18_landmark_events.py figure   # results/figures/e18_events.png from the saved CSV files
   python experiments/e18_landmark_events.py context  # results/e18_context.csv: descriptive return sizes around the
                                                      # e-detector's alarms on the crypto events (NOT pre-registered)
+  python experiments/e18_landmark_events.py awake    # results/e18_awake.csv: E14's monitors with no blind period on the
+                                                     # same events (exploratory, NOT pre-registered, post hoc)
   Optional: E18_CACHE=<folder> keeps the BOCPD arrays and finished series between attempts (not result files).
 
 Outputs: results/e18_events.csv, e18_outcomes.csv, e18_alarms.csv, e18_thresholds.csv, e18_rates.csv,
-results/figures/e18_events.png; results/e18_context.csv (descriptive, not pre-registered).
+results/figures/e18_events.png; results/e18_context.csv (descriptive, not pre-registered); results/e18_awake.csv
+(exploratory, not pre-registered).
 """
 
 from __future__ import annotations
@@ -587,7 +592,7 @@ def run():
 # ----------------------------------------------------------------------------
 
 FAMILY = {"e-detector": ("e-detector", "#2a78d6"), "BOCPD,": ("BOCPD", "#eb6834"),
-          "BOCPD on": ("BOCPD on truncated returns", "#1baf7a"), "BJV": ("BJV-type rolling test", "#6250d6")}
+          "BOCPD on": ("BOCPD on truncated returns", "#1baf7a"), "BJV": ("two-window variance-ratio scan", "#6250d6")}
 
 
 def _family(m):
@@ -605,7 +610,7 @@ def _short(m):
         return f"BOCPD trunc. {w}"
     if m.startswith("BOCPD"):
         return f"BOCPD {w}"
-    return f"BJV {w}"
+    return f"scan {w}"
 
 
 def raw_returns(market, asset, T):
@@ -740,7 +745,126 @@ def context():
     print("wrote", OUT / "e18_context.csv")
 
 
+# ----------------------------------------------------------------------------
+# Exploratory, NOT pre-registered: E14's monitors with no blind period on the same events
+# ----------------------------------------------------------------------------
+# Decided after seeing that the e-detector was recalibrating at every crypto event. Settings exactly as committed in
+# E14 (experiments/e14_running_tau.py, make_monitor and real_job): awake-A = route A with a learning band and no
+# blind period (AwakeRunningTauMonitor, A = day / (0.05 - 0.01), delta = 0.01, c = 3); awake-B = the rank (conformal)
+# detector restarted at once after each alarm (ConformalMonitor, A = 28,800 or 7,500, 120 returns of warm-up at the
+# stream start only, family "lr", seed 14000). Both with E14's two null bands, 0.25 (E12's frozen setting, the one the
+# e-detector uses here) and 0. Same streams, events and reference times as the primary design.
+
+E14_SEED = 14_000
+DELTA_AWAKE = 0.01
+AWAKE_MONITORS = [(m, b) for m in ("awake-A", "awake-B") for b in (0.25, 0.0)]
+
+
+def make_awake(method, band, cfg):
+    from avmonitor import running as RT
+
+    if method == "awake-A":
+        return RT.AwakeRunningTauMonitor(threshold=cfg["day"] / (0.05 - DELTA_AWAKE), c=3.0, delta=DELTA_AWAKE,
+                                         null_band=band)
+    return RT.ConformalMonitor(threshold=cfg["A"], cal_len=RT.AWAKE_PRE, family="lr", band=band, seed=E14_SEED,
+                               restart_len=0)
+
+
+def awake_job(job):
+    market, stream, asset, tt, um = job
+    cfg = MARKETS[market]
+    evs = [e for e in EVENTS if e["stream"] == stream and tt[0] <= e["T"] and e["T"] + H24 <= tt[-1]]
+    keep = np.ones(um.size, bool)
+    for e in evs:
+        keep &= ~((tt >= e["T"] - EXCL_BEFORE) & (tt < e["T"] + EXCL_AFTER))
+    rows, lists = [], {}
+    for method, band in AWAKE_MONITORS:
+        t0 = time.time()
+        mon = make_awake(method, band, cfg)
+        watching = np.zeros(um.size, bool)
+        for t in range(um.size):
+            watching[t] = mon.calibrated
+            mon.update(um[t])
+        alarms = [(e.index, e.direction) for e in mon.events]
+        lists[(method, band)] = alarms
+        starts = np.array([s["start"] for s in mon.segments], int)
+        n_out = sum(1 for t, _ in alarms if keep[t])
+        rate = n_out / max(int(keep.sum()), 1)
+        for e in evs:
+            rec = window_outcomes(alarms, tt, e, "e-detector", None, watching, starts, rate)
+            T = e["T"]
+            pos = np.array([a[0] for a in alarms], int)
+            before = pos[pos < int(tt.searchsorted(T))]
+            steps7 = int(np.sum((tt >= T - D7) & (tt < T)))
+            n7 = rec["n_up_7d_before"] + rec["n_down_7d_before"]
+            rows.append(dict(
+                event=e["event"], date=e["date"], market=market, stream=stream, asset=asset, monitor=method,
+                null_band=band, A=cfg["day"] / (0.05 - DELTA_AWAKE) if method == "awake-A" else cfg["A"],
+                watching_at_T=rec["state_at_T"] == "monitoring",
+                last_alarm_before_T=str(tt[before[-1]]) if before.size else "",
+                last_alarm_direction=dict(alarms)[int(before[-1])] if before.size else "",
+                last_alarm_lead_min=float((T - tt[before[-1]]) / pd.Timedelta(minutes=1)) if before.size else np.nan,
+                n_up_7d_before=rec["n_up_7d_before"], n_down_7d_before=rec["n_down_7d_before"],
+                alarms_per_day_7d_before=n7 / (steps7 / cfg["day"]),
+                first_up_after_T=rec["first_up_after_T"], delay_min=rec["delay_min"],
+                delay_from_latest_min=rec["delay_from_latest_min"],
+                n_up_24h_after=rec["n_up_24h_after"], n_down_24h_after=rec["n_down_24h_after"],
+                first_alarm_after_T=rec["first_alarm_after_T"],
+                stream_alarms_per_day=len(alarms) / (um.size / cfg["day"]),
+                stream_alarms_per_day_outside_windows=rate * cfg["day"], watching_share=float(watching.mean())))
+        print(f"awake {stream} {asset} {method} band {band}: {len(alarms)} alarms, {time.time() - t0:.0f} s", flush=True)
+    return rows, (stream, asset, lists)
+
+
+def e14_awake_check(lists):
+    """Compare with E14's saved real-data alarm lists (H2 2025 coins and Nifty 2024 to 2025, same steps)."""
+    f = OUT / "e14d_real_alarms.csv"
+    if not f.exists():
+        return {}
+    ref = pd.read_csv(f)
+    out = {}
+    for stream, asset, by_mon in lists:
+        src = COINS.get(asset, asset)
+        if stream not in ("H2 2025", "Nifty 2024-2025"):
+            continue
+        for (method, band), alarms in by_mon.items():
+            r = ref[(ref.source == src) & (ref.method == method) & (ref.band == band)]
+            same = [(int(i), d) for i, d in zip(r["index"], r["direction"])] == [(int(i), d) for i, d in alarms]
+            out[(stream, asset, method, band)] = same
+            print(f"E14 check {stream} {asset} {method} band {band}: {'identical' if same else 'DIFFERENT'} "
+                  f"({len(alarms)} alarms here, {len(r)} in E14)", flush=True)
+    return out
+
+
+def awake():
+    """Exploratory, NOT pre-registered: results/e18_awake.csv (see the block comment above)."""
+    t0 = time.time()
+    jobs = []
+    for market, streams in (("nifty", nifty_stream()), ("crypto", crypto_streams())):
+        for st in streams:
+            for a, (idx, u, i0) in streams[st].items():
+                jobs.append((market, st, a, idx[i0:], u[i0:]))
+    with Pool(2) as pool:
+        res = pool.map(awake_job, jobs, chunksize=1)
+    rows = [r for rr, _ in res for r in rr]
+    check = e14_awake_check([lst for _, lst in res])
+    out = pd.DataFrame(rows)
+    out["e14_alarm_list_check"] = [
+        ("identical" if check[k] else "different") if k in check else "no E14 run"
+        for k in zip(out.stream, out.asset, out.monitor, out.null_band)]
+    o = pd.read_csv(OUT / "e18_outcomes.csv")
+    ed = o[(o.design == "primary") & (o.method == "e-detector")].set_index(["event", "asset"])
+    key = list(zip(out.event, out.asset))
+    out["edetector_n_7d_before"] = [int(ed.loc[k, "n_up_7d_before"] + ed.loc[k, "n_down_7d_before"]) for k in key]
+    out["edetector_first_up_after_T"] = [ed.loc[k, "first_up_after_T"] for k in key]
+    out.to_csv(OUT / "e18_awake.csv", index=False)
+    cols = ["event", "asset", "monitor", "null_band", "watching_at_T", "last_alarm_before_T", "last_alarm_direction",
+            "delay_min", "n_up_7d_before", "n_down_7d_before", "alarms_per_day_7d_before", "stream_alarms_per_day"]
+    print(out[cols].round(2).to_string(index=False))
+    print(f"wrote {OUT / 'e18_awake.csv'} after {time.time() - t0:.0f} s")
+
+
 if __name__ == "__main__":
     parts = sys.argv[1:] or ["run", "figure"]
     for p in parts:
-        {"run": run, "figure": figure, "context": context}[p]()
+        {"run": run, "figure": figure, "context": context, "awake": awake}[p]()
