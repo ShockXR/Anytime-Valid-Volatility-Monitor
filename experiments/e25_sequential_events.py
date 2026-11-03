@@ -608,7 +608,9 @@ def part_power():
         raise SystemExit("F24a's committed power values are not 0.822, 0.596, 0.369, 0.031")
     entry = tab["enters_test"]
     entry_ns = _ns(entry)
-    grid = pd.date_range("2026-12-01", PLANNING_END, freq="MS", tz="UTC")
+    # the crossing probability changes only when a stratum enters: evaluate it at every entry time and month start
+    grid = pd.DatetimeIndex(sorted(set(pd.date_range("2026-11-01", PLANNING_END, freq="MS", tz="UTC"))
+                                   | set(entry[entry <= pd.Timestamp(PLANNING_END, tz="UTC")])))
     never = np.iinfo(np.int64).max
     rows, curve, growth = [], [], []
     for sname in SCENARIOS:
@@ -637,7 +639,7 @@ def part_power():
                 row["F24a_power_at_2027-06-01"] = float(f24.loc[sname, "power"])
             rows.append(row)
             for g in grid:
-                curve.append(dict(scenario=sname, procedure=kind, date=str(g.date()),
+                curve.append(dict(scenario=sname, procedure=kind, date=f"{g:%Y-%m-%d %H:%M}",
                                   P_cross_by_date=float((cdate <= g.value).mean()),
                                   strata_entered=int((entry_ns <= g.value).sum())))
         sub = tab[entry_ns <= pd.Timestamp(PLANNING_END, tz="UTC").value]
@@ -1068,7 +1070,7 @@ def fig_power(plt):
     for i, s in enumerate(SCENARIOS):
         for proc, ls, lw in (("E25 (p estimated from the stratum)", "-", 2.0), ("oracle (true control rate)", "--", 1.1)):
             h = c[(c.scenario == s) & (c.procedure == proc)]
-            ax.plot(pd.to_datetime(h.date), h.P_cross_by_date, color=SERIES[i], ls=ls, lw=lw,
+            ax.plot(pd.to_datetime(h.date), h.P_cross_by_date, color=SERIES[i], ls=ls, lw=lw, drawstyle="steps-post",
                     label=f"{s}" if proc.startswith("E25") else None)
         f = pw[(pw.scenario == s) & pw.procedure.str.startswith("E25")]["F24a_power_at_2027-06-01"].iloc[0]
         ax.scatter([pd.Timestamp(F24A_POWER_AT)], [f], s=46, facecolor=SURFACE, edgecolor=SERIES[i], lw=1.8, zorder=4,
@@ -1077,14 +1079,14 @@ def fig_power(plt):
     ax.axhline(ALPHA, color=MUTED, ls=(0, (1, 3)), lw=0.9)
     ax.annotate("F24a's fixed-sample power on 1 June 2027 (open markers)", xy=(pd.Timestamp(F24A_POWER_AT), 0.97),
                 xytext=(4, 0), textcoords="offset points", fontsize=7.5, color=MUTED, va="top")
-    ax.annotate("0.05", xy=(pd.Timestamp("2026-12-01"), ALPHA), xytext=(0, 3), textcoords="offset points", fontsize=7.5,
+    ax.annotate("0.05", xy=(pd.Timestamp("2026-11-01"), ALPHA), xytext=(0, 3), textcoords="offset points", fontsize=7.5,
                 color=MUTED)
     ax.plot([], [], color=MUTED, ls="--", lw=1.1, label="oracle that knows the control rate (descriptive)")
     ax.set_ylim(0, 1)
     ax.grid(color=GRID_C, lw=0.6)
     ax.set_ylabel("P(M has reached 20 by the date)")
     ax.set_xlabel("date (strata enter when complete: release + 4 weeks + 6 hours)")
-    ax.legend(frameon=False, fontsize=8, loc="center right")
+    ax.legend(frameon=False, fontsize=8, loc="lower right", bbox_to_anchor=(1.0, 0.06))
     ax.set_title("E25: chance that the e-process has crossed 20, by date [SYNTHETIC; planning inputs REAL S2 BTC rates]",
                  loc="left", fontsize=9.5, color=INK)
     fig.tight_layout()
@@ -1094,6 +1096,8 @@ def fig_power(plt):
 
 
 def fig_posthoc(plt):
+    import matplotlib.dates as mdates
+
     st = pd.read_csv(OUT / "e25_posthoc_strata.csv")
     st = st[st.in_test.astype(bool)]
     periods = list(dict.fromkeys(st.period))
@@ -1115,6 +1119,8 @@ def fig_posthoc(plt):
         ax.grid(color=GRID_C, lw=0.6)
         ax.set_title(per, loc="left", fontsize=9, color=INK)
         ax.set_xlabel("release date (strata in the test, in order)")
+        ax.xaxis.set_major_locator(mdates.MonthLocator(bymonth=(1, 4, 7, 10)))
+        ax.xaxis.set_major_formatter(mdates.DateFormatter("%b %Y"))
     axes[0].set_ylabel("M after each complete stratum (log scale)")
     axes[0].annotate("20 (E25a)", xy=(0.0, THRESHOLD), xycoords=("axes fraction", "data"), xytext=(2, 3),
                      textcoords="offset points", fontsize=7.5, color=INK)
