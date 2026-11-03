@@ -85,7 +85,7 @@ python -m avmonitor run --source binance --symbol ETHUSDT --download \
     --start 2025-03-01 --end 2025-03-31 --plot eth.png       # real data, alarms printed and plotted
 ```
 
-`notebooks/demo.ipynb` is an executed walk-through (rebuild it with `python scripts/build_demo_notebook.py`).
+`notebooks/demo.ipynb` is an executed walk-through (rebuild it with `python scripts/build_demo_notebook.py`). [`docs/demo/replay.html`](docs/demo/replay.html) is a self-contained page that replays two landmark days of E18 minute by minute (Nifty 50 on 4 June 2024, when the monitor flagged the shock 11 minutes after the open, and BTC on 10 October 2025, when it was recalibrating and blind): the statistic, both e-processes against the threshold, the blind periods, and the alarms of every competitor, checked against E18's saved alarm lists when the page is built (`python scripts/build_replay.py`, about 20 minutes, or seconds with `--cache`). [REAL]
 
 Minimal use from Python:
 
@@ -183,6 +183,7 @@ The full list, with what each one affects, is in [`docs/limitations.md`](docs/li
 │   ├── literature_review.md    verified references and the gap
 │   ├── limitations.md          what the results do not show
 │   ├── experiment_report.md    all results (generated from report_parts/)
+│   ├── demo/replay.html        minute-by-minute replay of two landmark days (E18)
 │   ├── report_parts/           one file per experiment
 │   ├── iterations/             per-workstream iteration notes
 │   └── review/                 independent reviews and responses

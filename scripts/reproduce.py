@@ -83,6 +83,7 @@ EXPERIMENTS = [
     ("E17 multi-frequency, real data and figures", ["experiments/e17_multifrequency.py", "real", "ratematch", "figures"], True, "full"),
     ("E18 landmark events, pre-registered case studies", ["experiments/e18_landmark_events.py", "run", "figure", "context", "awake"], True, "full"),
     ("E20 re-analysis of the real-data inference", ["experiments/e20_inference.py", "checks", "bootstrap", "holm", "events", "forecast", "classify"], True, "full"),
+    ("Replay page of two landmark days (rebuilds docs/demo/replay.html and checks it against E18)", ["scripts/build_replay.py"], True, "full"),
     ("TH4 robustness to drift in the conditional mean", ["experiments/th4_robustness.py", "sup", "constant", "switching", "garch", "plugin", "ticks", "counterexamples", "figures"], False, "full"),
     ("TH6 false alarms after the first day, per-day guarantees", ["experiments/th6_per_period.py", "laws", "hazard390", "hazard1440", "family", "adversary", "delay", "renewal", "tolerance", "figures"], False, "full"),
     ("TH5 limits for every valid procedure and the plug-in regime", ["experiments/th5_limits.py", "collapse", "floors", "asymptotic", "boundary", "plugin_bound", "plugin_sim", "holdbold", "figures"], False, "full"),
