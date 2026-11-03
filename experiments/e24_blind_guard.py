@@ -22,7 +22,11 @@ Parts (keep them separate; each writes its own results/e24_*.csv):
   power      [SYNTHETIC; planning inputs are REAL rates of 2024 to 2026] the forward pre-registration's power
              calculation; results/e24_future_power.csv.
   future     the forward confirmatory test of docs/preregistration_e24_future.md; refuses to run before the data
-             reach the fixed end date and before every release in the period is verified.
+             reach the fixed end date, before every release in the period is verified, when a scheduled FOMC row
+             is missing, and when the pipeline no longer reproduces E23's committed rows (the gate is rerun first);
+             records the git HEAD and the changes to the shared pipeline since the pre-registration.
+  future_gate  [REAL, known data] the future pipeline on E23's period must reproduce E23's committed P1 and S2
+             test rows; results/e24_future_gate.csv.
   figs       results/figures/e24_*.png from the CSVs.
 
 Usage: nice -n 10 python experiments/e24_blind_guard.py <part> [--procs=2] [--paths=1000]
@@ -717,6 +721,15 @@ def part_e19blind(procs: int):
 # Forward pre-registration (docs/preregistration_e24_future.md): power and the future test
 # ----------------------------------------------------------------------------
 FUTURE_EVENTS = ROOT / "data/events/us_macro_events_e24_future.csv"
+# Amendment after the round 10 review (m8; it only adds refusals and changes nothing in the test): the scheduled
+# FOMC meetings (second meeting day, Federal Reserve schedule as recorded in the event file on 3 November 2026).
+# A row may change status but is never deleted, so each of these dates must stay in the file, as `date` or, when
+# the release was moved, as `original_date`.
+FUTURE_FOMC_SCHEDULED = ("2026-10-28", "2026-12-09", "2027-01-27", "2027-03-17", "2027-04-28", "2027-06-09",
+                         "2027-07-28", "2027-09-15", "2027-10-27", "2027-12-08")
+FUTURE_PIPELINE_FILES = ("experiments/e12_crypto_events.py", "experiments/e22_guaranteed_events.py",
+                         "experiments/e23_fresh_releases.py", "src/avmonitor")
+FUTURE_PREREG_COMMIT = "22f1988"
 FUTURE_MONITOR_START = "2026-10-25"  # E23's stream ended at 2026-10-25 00:00 UTC (exclusive): the first unseen minute
 FUTURE_LOAD_START = "2026-10-05"  # 20 days of intraday-profile warm-up (known data), as E12 and E23
 # Fixed by the power part's decision rule (first run 08:39 UTC, 3 November 2026; results/e24_future_candidates.csv)
@@ -948,15 +961,46 @@ def future_refusals(end: str | None, data_end: str | None = None) -> list[str]:
     for m in months:
         if m > pd.Period(FUTURE_MONITOR_START, "M") and m not in cpi_months:
             why.append(f"no CPI row for {m} (add the release, or a cancelled row, with its verification)")
+    # amendment (round 10 review, m8): a deleted FOMC row, and a release marked verified before it happened
+    fomc = ev[ev.event_type == "fomc"]
+    seen = set(fomc.date) | set(fomc.original_date)
+    for d0 in FUTURE_FOMC_SCHEDULED:
+        if pd.Timestamp(d0) < pd.Timestamp(end) and d0 not in seen:
+            why.append(f"no FOMC row for the scheduled meeting of {d0} (update its status; rows are never deleted)")
+    rel = ev[inside & (ev.status == "released")]
+    for _, r in rel[rel.access_date < rel.date].iterrows():
+        why.append(f"{r.date} {r.event_type}: 'released' with an access date before the release; "
+                   "record the verification")
     if data_end is not None and pd.Timestamp(data_end) < pd.Timestamp(end):
         why.append(f"the data end at {data_end} UTC, before the end date {end}")
     return why
 
 
+def future_provenance() -> str:
+    """The git HEAD, and the changes to the shared pipeline since the pre-registration's commit (amendment m8)."""
+    import subprocess
+
+    def git(*args):
+        try:
+            res = subprocess.run(["git", *args], cwd=ROOT, capture_output=True, text=True, check=True)
+            return res.stdout.strip()
+        except (OSError, subprocess.CalledProcessError) as err:
+            return f"git failed: {err}"
+
+    lines = [f"run at {pd.Timestamp.now(tz='UTC'):%Y-%m-%d %H:%M} UTC", f"HEAD {git('rev-parse', 'HEAD')}",
+             f"git diff --stat {FUTURE_PREREG_COMMIT} -- {' '.join(FUTURE_PIPELINE_FILES)}:",
+             git("diff", "--stat", FUTURE_PREREG_COMMIT, "--", *FUTURE_PIPELINE_FILES) or "(no change)"]
+    return "\n".join(lines) + "\n"
+
+
 def part_future(procs: int):
     """The confirmatory test of docs/preregistration_e24_future.md. Refuses to run before the end date, before every
     release in the period is verified, and when the data end before the end date. Nothing here may be changed after
-    the pre-registration's commit except FUTURE_END's value as set by the power part in that commit."""
+    the pre-registration's commit except FUTURE_END's value as set by the power part in that commit, and the disclosed
+    amendment after the round 10 review (m8), which only adds refusals: a scheduled FOMC row that is missing, a release
+    marked 'released' with an access date before it, and a pipeline that no longer reproduces E23's committed rows
+    (the gate is rerun here before any download); the git HEAD and the changes to the shared pipeline since the
+    pre-registration's commit are written to results/e24_future_provenance.txt."""
     import urllib.error
 
     import e12_crypto_events as E12
@@ -966,6 +1010,12 @@ def part_future(procs: int):
     why = future_refusals(FUTURE_END)
     if why:
         raise SystemExit("future part refused:\n  " + "\n  ".join(why))
+    prov = future_provenance()
+    (OUT / "e24_future_provenance.txt").write_text(prov)
+    print(prov, flush=True)
+    gate = part_future_gate(procs, name="e24_future_gate_at_run.csv")
+    if int(gate.mismatches.sum()):
+        raise SystemExit("future part refused: the pipeline no longer reproduces E23's committed rows")
     months = pd.period_range(pd.Period(FUTURE_MONITOR_START, "M"), pd.Period(pd.Timestamp(FUTURE_END) - pd.Timedelta(minutes=1), "M"))
     paths = {}
     for coin, sym in E12.COINS.items():
@@ -1030,10 +1080,10 @@ def future_pipeline(period: dict, procs: int, prefix: str | None) -> pd.DataFram
     return tests
 
 
-def part_future_gate(procs: int):
+def part_future_gate(procs: int, name: str = "e24_future_gate.csv") -> pd.DataFrame:
     """Gate of the pre-registration, section 8 [REAL, known data]: the future pipeline, run on E23's period and
     events (no download), must reproduce E23's committed P1 and S2 test rows exactly (every outcome and sample,
-    the 14 columns of E23's gate). Writes results/e24_future_gate.csv."""
+    the 14 columns of E23's gate). Writes results/<name> and returns the comparison (one row per test row)."""
     period = _e23_period()
     tests = future_pipeline(period, procs, None)
     ref = pd.read_csv(OUT / "e23_tests.csv")
@@ -1058,10 +1108,11 @@ def part_future_gate(procs: int):
             rows.append(dict(arm=arm, coin=x.coin, event_type=x.event_type, outcome=x.outcome, sample=x["sample"],
                              compared=len(cols), mismatches=len(bad), columns_differing=";".join(bad)))
     g = pd.DataFrame(rows)
-    g.to_csv(OUT / "e24_future_gate.csv", index=False)
+    g.to_csv(OUT / name, index=False)
     print(f"future gate: {len(g)} rows of E23's P1 and S2 tests compared, {int(g.mismatches.sum())} mismatches")
     if g.mismatches.sum():
         print(g[g.mismatches > 0].to_string(index=False))
+    return g
 
 
 def future_families():

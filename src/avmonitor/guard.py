@@ -9,7 +9,7 @@ The blind condition
 With ``baseline="cs"`` the truncation level tau is fixed from the first quarter of the calibration window and the
 upper bound U from the rest; the increase side bets against ``m_up = (1 + b) U``. If ``tau^2 <= m_up``, every
 increase factor ``1 + lam (X / m_up - 1)`` with ``X = min(r^2, tau^2)`` is at most 1, so the increase side cannot
-alarm for the life of the segment (with the daily restart of P1, never; without it, not before 2A monitored steps).
+alarm for the life of the segment (with the daily restart of P1, never; without it, not within 2A - 1 monitored steps).
 Both tau and U are known when calibration ends, so the condition is decided at a stopping time. The guard uses the
 "near-blind" form ``tau^2 <= (1 + eta) m_up`` with ``eta >= 0`` fixed in advance (``eta = 0`` is E19's criterion).
 
@@ -29,18 +29,25 @@ Guarantee (``docs/theory_blind_guard.md``, Theorems 1 to 3), with ``delta`` the 
   (Proposition 3), so each window tried must have its own share of delta.
 * Hence ``docs/math.md`` Theorem 6.4 and Corollary 6.6, and Corollary 1 of ``docs/theory_per_period.md`` (with the
   daily restart), hold unchanged, with T the end of the kept window and the tolerance (H-up), (H-down) relative to
-  the kept window's confidence-sequence part: P(an alarm within the first m monitored steps of a segment) <=
-  delta + m / A; with ``period=m``, P(an alarm in a given period of a segment) <= delta + m / A (marginal); expected
-  alarms in the first M monitored steps <= (delta + M / A) / (1 - delta). Calibration steps, including discarded
-  windows, are not monitored steps.
+  the kept window's confidence-sequence part (sufficient, and independent of the selection: the tolerance relative
+  to each of the K windows, docs/theory_blind_guard.md (H*)): P(an alarm within the first m monitored steps of a
+  segment) <= delta + m / A; with ``period=m``, P(an alarm in a given period of a segment) <=
+  delta + (m + carry) / A (marginal); expected alarms in the first M monitored steps <= (delta + M / A) / (1 - delta).
+  Calibration steps, including discarded windows, are not monitored steps.
 * Rank fallback: the same bounds hold if, in a segment that falls back, the returns after the fallback time are
   exchangeable given everything up to it (Theorem 3; this replaces the tolerance for that segment only).
 
-A sufficient condition that does not depend on which window is kept: a constant conditional law of the returns
-from the end of the first window's tau part on (``docs/math.md``, Corollary 6.5), for example i.i.d. returns with
-any law, possibly after a step in volatility inside the first window's tau part.
+Which window is kept depends on delta_k, the bets and eta, so the null "tolerance relative to the kept window"
+depends on the guard's tuning. A sufficient condition that does not depend on which window is kept is the
+tolerance relative to each of the K windows ((H*) of the theory note), which implies both the guarded and the
+unguarded hypotheses; it holds under a constant conditional law of the returns from the end of the first window's
+tau part on (``docs/math.md``, Corollary 6.5), for example i.i.d. returns with any law, possibly after a step in
+volatility inside the first window's tau part.
 
-With ``guard_tries=1`` the guarded monitor is the unguarded one, step for step.
+With ``guard_tries=1`` and ``guard_fallback="keep"`` the guarded monitor is the unguarded one, step for step.
+
+The constructors' defaults (``guard_eta=0``, ``guard_fallback="keep"``) are E19's criterion (E24's arm G0), not the
+recommended guard, which is ``guard_eta=0.25, guard_fallback="rank"`` (``docs/theory_blind_guard.md`` 6.1).
 """
 
 from __future__ import annotations
@@ -221,12 +228,15 @@ class _GuardMixin:
 
 
 class GuardedVolatilityMonitor(_GuardMixin, VolatilityMonitor):
-    """``VolatilityMonitor(baseline="cs")`` with the retry guard against blind segments.
+    """``VolatilityMonitor(baseline="cs")`` with the retry guard against blind segments. The defaults
+    (guard_eta=0, guard_fallback="keep") are E19's criterion (E24's arm G0); the recommended guard is
+    guard_eta=0.25, guard_fallback="rank" (docs/theory_blind_guard.md 6.1).
 
     Extra keyword arguments (all fixed in advance):
 
     guard_tries : int, default 3
-        K, the most calibration windows a segment may try. 1 reproduces the unguarded monitor exactly.
+        K, the most calibration windows a segment may try. 1 with ``guard_fallback="keep"`` reproduces the unguarded
+        monitor exactly.
     guard_deltas : tuple of K floats or None
         Error budget of each window (U and L each get half). Default ``spending_schedule(delta, K, guard_spending)``.
         Must sum to at most ``delta``.
@@ -238,10 +248,13 @@ class GuardedVolatilityMonitor(_GuardMixin, VolatilityMonitor):
     rank_seed : seed of the rank fallback's tie-breaking draws.
 
     Guarantee (``docs/theory_blind_guard.md``): if the tolerance (H-up), (H-down) of ``docs/math.md`` Theorem 6.4
-    holds for the first m monitored steps relative to the kept window (and, with the rank fallback, the returns after
-    a fallback are exchangeable given the past), P(an alarm within the first m monitored steps of a segment) <=
-    delta + m / A; over the first M monitored steps the expected number of alarms is at most
-    (delta + M / A) / (1 - delta) when the hypothesis holds in every segment.
+    holds for the first m monitored steps relative to the kept window (sufficient, and independent of the selection:
+    the tolerance relative to each of the K windows, docs/theory_blind_guard.md (H*)) (and, with the rank fallback,
+    the returns after a fallback are exchangeable given the past), P(an alarm within the first m monitored steps of
+    a segment) <= delta + m / A; over the first M monitored steps the expected number of alarms is at most
+    (delta + M / A) / (1 - delta) when the tolerance holds in every segment up to its alarm (h = infinity).
+
+    ``delta`` holds the current window's budget delta_k during and after a run; the total budget is ``delta_total``.
 
     Records: ``segments`` (kept windows and rank segments, with ``guard``, ``try_index``, ``delta_window`` and
     ``guard_cal_steps``), ``discarded`` (one dict per discarded window), ``guard_stats``.
@@ -257,7 +270,9 @@ class GuardedVolatilityMonitor(_GuardMixin, VolatilityMonitor):
 
 
 class GuardedPeriodicVolatilityMonitor(_GuardMixin, PeriodicVolatilityMonitor):
-    """P1 with the retry guard: ``PeriodicVolatilityMonitor(baseline="cs", period=m)`` plus the guard.
+    """P1 with the retry guard: ``PeriodicVolatilityMonitor(baseline="cs", period=m)`` plus the guard. The defaults
+    (guard_eta=0, guard_fallback="keep") are E19's criterion (E24's arm G0); the recommended guard is
+    guard_eta=0.25, guard_fallback="rank" (docs/theory_blind_guard.md 6.1).
 
     The guard arguments are those of ``GuardedVolatilityMonitor``; ``period``, ``offset`` and ``carry`` are those of
     ``PeriodicVolatilityMonitor`` (``statistic`` must be "sr"). In rank-fallback segments the rank statistics restart
@@ -265,10 +280,15 @@ class GuardedPeriodicVolatilityMonitor(_GuardMixin, PeriodicVolatilityMonitor):
 
     Guarantee (Corollary 1 of ``docs/theory_per_period.md`` with Theorem 1 of ``docs/theory_blind_guard.md``): for
     every period (b, b'] of a segment with b' - b <= m, if the tolerance (H-up), (H-down) holds relative to the kept
-    window from its end to b', P(the segment raises an alarm in (b, b']) <= delta + (m + carry) / A, marginally (not
-    given the past). In a rank-fallback segment the bound is (m + carry) / A, given the p-values before b, if the
-    returns after the fallback are exchangeable given the past. The bound is per segment and period; for a fixed
-    calendar day see Remark 6 of the theory note.
+    window from its end to b' (sufficient, and independent of the selection: the tolerance relative to each of the K
+    windows, docs/theory_blind_guard.md (H*)), P(the segment raises an alarm in (b, b']) <= delta + (m + carry) / A,
+    marginally (not given the past). In a rank-fallback segment the bound is m / A (its statistics restart at 0
+    whatever the carry), given the p-values before b, if the returns after the fallback are exchangeable given the
+    past. The bound is per segment and period; for a fixed calendar day see Remark 6 of the theory note; the long-run
+    share of alarmed periods is at most (m + carry) / (A (1 - delta)) under the tolerance in every segment (its
+    Corollary 2).
+
+    ``delta`` holds the current window's budget delta_k during and after a run; the total budget is ``delta_total``.
     """
 
     def __init__(self, *args, guard_tries: int = 3, guard_deltas=None, guard_spending: str = "halving",

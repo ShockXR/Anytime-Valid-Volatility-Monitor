@@ -2350,7 +2350,7 @@ GuardedVolatilityMonitor(
 
 Subclass of `avmonitor.guard._GuardMixin`, `avmonitor.monitor.VolatilityMonitor`.
 
-``VolatilityMonitor(baseline="cs")`` with the retry guard against blind segments.
+``VolatilityMonitor(baseline="cs")`` with the retry guard against blind segments. The defaults (guard_eta=0, guard_fallback="keep") are E19's criterion (E24's arm G0); the recommended guard is guard_eta=0.25, guard_fallback="rank" (docs/theory_blind_guard.md 6.1).
 
 ### class `GuardedPeriodicVolatilityMonitor`
 
@@ -2369,7 +2369,7 @@ GuardedPeriodicVolatilityMonitor(
 
 Subclass of `avmonitor.guard._GuardMixin`, `avmonitor.periodic.PeriodicVolatilityMonitor`.
 
-P1 with the retry guard: ``PeriodicVolatilityMonitor(baseline="cs", period=m)`` plus the guard.
+P1 with the retry guard: ``PeriodicVolatilityMonitor(baseline="cs", period=m)`` plus the guard. The defaults (guard_eta=0, guard_fallback="keep") are E19's criterion (E24's arm G0); the recommended guard is guard_eta=0.25, guard_fallback="rank" (docs/theory_blind_guard.md 6.1).
 
 ## avmonitor.limits
 

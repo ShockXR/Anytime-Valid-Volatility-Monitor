@@ -1,6 +1,7 @@
 """Tests of the retry guard against blind segments (avmonitor.guard; docs/theory_blind_guard.md). [SYNTHETIC]"""
 
 import math
+from pathlib import Path
 
 import numpy as np
 import pytest
@@ -285,7 +286,7 @@ def test_null_bounds_first_m_and_per_period(law):
         e = [ev for ev in g.events if ev.monitored_since == s]
         a = e[0].index if e else None
         first_m += a is not None and a - s < m
-        b0 = s + (-s) % m  # first boundary at or after s; periods (b0 - m, b0], (b0, b0 + m], ...
+        b0 = (s // m + 1) * m  # first boundary strictly after s (restarts happen at t > start)
         bounds = [s] + [b0 + i * m for i in range(n_per)]
         for i in range(n_per):
             lo, hi = bounds[i], bounds[i + 1]
@@ -331,16 +332,72 @@ def _e24():
     return E24
 
 
-def test_future_part_refuses_early_and_with_unverified_releases():
-    E24 = _e24()
-    assert E24.future_refusals(None)  # no end date fixed
+def _future_events_copy(tmp_path, monkeypatch, edit):
+    """A copy of the event file, edited by ``edit``, in place of the committed one (the live file must not be
+    touched by the tests, and it will be updated before the test runs)."""
     import pandas as pd
 
+    E24 = _e24()
+    committed = Path(E24.__file__).resolve().parents[1] / "data/events/us_macro_events_e24_future.csv"
+    ev = edit(pd.read_csv(committed, dtype=str, keep_default_na=False))
+    p = tmp_path / f"events_{edit.__name__}.csv"
+    ev.to_csv(p, index=False)
+    monkeypatch.setattr(E24, "FUTURE_EVENTS", p)
+    return E24
+
+
+def test_future_part_refuses_early_and_with_unverified_releases(tmp_path, monkeypatch):
+    import pandas as pd
+
+    def unverified(ev):
+        ev.loc[ev.date >= "2026-11-01", "status"] = "scheduled"
+        return ev
+
+    E24 = _future_events_copy(tmp_path, monkeypatch, unverified)
+    assert E24.future_refusals(None)  # no end date fixed
     why = E24.future_refusals("2027-07-01")
     if pd.Timestamp.now(tz="UTC") < pd.Timestamp("2027-07-01", tz="UTC"):
         assert any("before the end date" in w for w in why)
-    assert any("status 'scheduled'" in w for w in why)  # every 2027 row of the event file is still scheduled
+    assert any("status 'scheduled'" in w for w in why)
     assert any("before the end date 2027-07-01" in w for w in E24.future_refusals("2027-07-01", data_end="2027-06-30 23:59"))
+
+
+def test_future_part_refuses_a_deleted_fomc_row_and_an_early_verification(tmp_path, monkeypatch):
+    """Amendment after the round 10 review (m8): rows are never deleted, and 'released' needs a verification dated
+    on or after the release."""
+
+    def updated(ev):  # every row in the period updated lawfully, verified on 1 July 2027
+        inside = ev.date < "2027-06-01"
+        ev.loc[inside, "status"] = "released"
+        ev.loc[inside, "access_date"] = "2027-07-01"
+        return ev
+
+    E24 = _future_events_copy(tmp_path, monkeypatch, updated)
+    assert not [w for w in E24.future_refusals("2027-06-01") if "before the end date" not in w]
+
+    def deleted(ev):
+        ev = updated(ev)
+        return ev[~((ev.event_type == "fomc") & (ev.date == "2027-03-17"))]
+
+    E24 = _future_events_copy(tmp_path, monkeypatch, deleted)
+    assert any("scheduled meeting of 2027-03-17" in w for w in E24.future_refusals("2027-06-01"))
+
+    def moved(ev):  # a moved meeting keeps its scheduled date as original_date: no refusal
+        ev = updated(ev)
+        i = ev.index[(ev.event_type == "fomc") & (ev.date == "2027-03-17")][0]
+        ev.loc[i, ["date", "original_date", "status"]] = ["2027-03-18", "2027-03-17", "rescheduled"]
+        return ev
+
+    E24 = _future_events_copy(tmp_path, monkeypatch, moved)
+    assert not any("scheduled meeting" in w for w in E24.future_refusals("2027-06-01"))
+
+    def early(ev):
+        ev = updated(ev)
+        ev.loc[ev.date == "2027-05-12", "access_date"] = "2027-05-01"
+        return ev
+
+    E24 = _future_events_copy(tmp_path, monkeypatch, early)
+    assert any("2027-05-12 cpi: 'released' with an access date before" in w for w in E24.future_refusals("2027-06-01"))
 
 
 def test_event_file_and_planning_calendar():
@@ -356,7 +413,7 @@ def test_event_file_and_planning_calendar():
     assert (et.dt.strftime("%Y-%m-%d %H:%M") == ev.release_time_utc).all()  # UTC column agrees with the time zone rules
     assert ((ev.event_type == "fomc") <= (ev.release_time_et == "14:00")).all()
     assert ((ev.event_type == "cpi") <= (ev.release_time_et == "08:30")).all()
-    assert ev.verification.str.len().min() > 50 and (ev.access_date == "2026-11-03").all()
+    assert ev.verification.str.len().min() > 50 and (ev.access_date >= "2026-11-03").all()
     # every month from November 2026 to December 2027 has exactly one CPI row
     m = pd.to_datetime(ev.loc[ev.event_type == "cpi", "date"]).dt.to_period("M")
     assert list(m) == list(pd.period_range("2026-11", "2027-12", freq="M"))
