@@ -38,6 +38,7 @@ To rerun: `pip install -r requirements.txt && pip install -e .`, then `python sc
 | E21 | Do the benchmarks favour the e-detector (referee M5)? Classical CUSUM and Shiryaev-Roberts rules on the same statistic with simulated or bootstrap thresholds, Student t BOCPD, CUSUM monitoring with a training sample | Partly. At equal Gaussian false alarm rate Ville's threshold costs little delay (same speed for increases; a calibrated CUSUM is 15% to 40% faster for decreases). Gaussian thresholds fail under fat tails (CUSUM 5.0% to 8.2% against 1.3%); a bootstrap repairs them. A Student t BOCPD fixes BOCPD's false alarms but finds 56% of 25% increases (e-detector 98%). On real data, at matched alarm counts, classical rules on the same statistic match the e-detector, while Student t BOCPD and the training-sample CUSUM rules do worse in most comparisons (unadjusted). |
 | E22 | Does E12's pre-registered FOMC result hold with a monitor that carries a proved per-day false alarm bound (referee round 2, J1)? | Yes [REAL], pre-registered: the confidence-sequence baseline restarted every UTC day (5% per day of a segment under the ±25% tolerance) flags 8 of 16 BTC FOMC statements within 6 hours against 10.9% of matched controls, Holm p = 0.00033 (plug-in: 9 of 16, Holm 0.00025); it watches more releases than the plug-in (80 of 114 against 55). The tolerance fails on real days: the monitor alarms on about half of its monitored days, so E22 does not test the bound. |
 | E23 | Does E22's FOMC and CPI contrast hold on fresh releases (January to October 2026), which no analysis had seen? | **No** [REAL], pre-registered: with the guaranteed monitor of E22 on BTC, 2 of 16 releases had an up alarm within 6 hours against 5.9% of matched controls, p = 0.25 (planned power 0.82). The monitor could not raise an increase alarm for 28% of its monitored time on BTC (one segment of 47 days). Secondary: the never-blind rank monitor flagged 4 of 6 FOMC statements on each coin (Holm 0.016 to 0.055); no CPI contrast under any monitor. |
+| E24 | Can a guard remove the blind segments of the confidence-sequence baseline without losing its proved bounds, and what test on unseen releases would settle the release question? | Yes, if the error budget is split over the calibration windows tried (proved; naive retries multiply the kept window's failure probability by about the number of windows). Recommended guard: up to 3 windows, budgets δ/2, δ/4, δ/4, retry when τ² ≤ 1.25 m↑, rank-monitor fallback. [SYNTHETIC] It detects a later doubling within a day in 86.5% to 100% of paths where the unguarded monitor detects 0% to 0.25%, with no null alarm in 800 paths. [REAL, post hoc] On BTC it removed all blind time but did not rescue E23 (4 of 16, p = 0.056). A forward test is pre-registered: rank monitor, BTC FOMC and CPI pooled, data to 1 June 2027, power 0.82 at planning rates. |
 | TH5 | How fast can any valid procedure detect a change, and when does the plug-in baseline keep its level? | Proved: a deterministic rule valid at levels n / A, even one that sees raw returns, can stop on a path only where a product of per-step likelihood bounds reaches A / n (a randomised rule only with probability at most n W_n / A). On a complete collapse no valid deterministic rule alarms before 45 steps (randomised: mean at least 43.4; Shiryaev-Roberts e-detectors 58, the default grid 73), and over 18 post-change laws the default grid's mean delay is at most 1.7 to 2.2 times that of the best valid deterministic rule. The plug-in baseline keeps m / A, up to a factor 1 + O(m / √n), when m is small compared with √n, and some stream with the right conditional mean breaks it by an unbounded factor when m is large compared with √n and log A; a margin z = Φ⁻¹(1 - δ / 2) restores m / A + δ. The growth-optimal decrease bet is at its upper limit only for light tails. |
 | TH6 | Does Theorem B give 5% per day, and what gives a bound for every day? | No: it bounds the first day after each (re)start and, through Corollary C, the long-run count (0.05 false alarms per day); a constant null law makes the default detector alarm with certainty on day 40. Measured on later days: 4.7% on average over days 11 to 20 for i.i.d. returns, 5.25% for bold play, 28% on a day after nine calm days. With a known baseline, restarting the statistics at every day boundary gives a proved m / A for every day given the past (with the confidence-sequence baseline, δ + m / A per day of a segment, not given the past, while Theorem D's tolerance holds) (mean delay 1.06 to 1.44 times longer at 390-step days, 1.02 to 1.14 at 1440); the e-CUSUM gives 5.146% for any window of a day, but only for exchangeable nulls. Theorem D restated with a tolerance hypothesis that does not depend on the bets, plus a version with no assumption. |
 | ALT1 | Quarticity stream; pre-averaging for noise | Price noise breaks the raw-return guarantee; non-overlapping pre-averaged blocks restore it. |
@@ -4039,6 +4040,118 @@ Not part of any family; no decision attached (`status` column of `e23_tests.csv`
 | `SOLUSDT_1m_2026-08.csv` | 44,640 | `00e8e5385cdde56ed16a5187bc43879e3c83f5bcbc7f2dbb4670d141d7e65561` |
 | `SOLUSDT_1m_2026-09.csv` | 43,200 | `db9bab833ca6dbac3a262f73525537330731869ba51a39c3125b2683477dae0d` |
 | `SOLUSDT_1m_2026-10.csv` | 34,560 | `7ae972fc04bbcf02354a4101df16bc942e1088d48bb234c10ee18e2a9d749cc3` |
+
+---
+
+## E24. A proved guard against blind segments of the confidence-sequence baseline, and a forward pre-registration
+
+Theory `docs/theory_blind_guard.md`; code `src/avmonitor/guard.py`; script `experiments/e24_blind_guard.py` (parts `theory`, `selection`, `synthetic`, `real`, `e19blind`, `power`, `future`, `figs`); outputs `results/e24_*.csv` and `results/figures/e24_*.png`; tests `tests/test_guard.py` [SYNTHETIC]; forward pre-registration `docs/preregistration_e24_future.md` with `data/events/us_macro_events_e24_future.csv`; iteration notes `docs/iterations/E24.md`. Labels: [PROVED], [NUMERICAL], [SYNTHETIC], [REAL]; every real-data result here is **post hoc and exploratory**, because the data were seen by E19, E22 and E23 before the guard was designed.
+
+**Question.** In E23 the primary monitor P1 could not raise an increase alarm for 28% of its monitored time on BTC, and 3 of the 16 releases of 2026 fell in such blind segments. E19 had proposed a guard (discard a blind calibration window and calibrate again) and left it unproved, because the kept windows are selected by their bounds. Can the guard be proved, what does it cost, does it help, and what test on releases nobody has seen would settle the release question?
+
+**Summary.**
+* **The guard is proved, and the naive version is not.** [PROVED] A blind segment (τ² ≤ m↑) is decided when calibration ends, so a guard can act on it. Discarding blind windows and calibrating again breaks the per-window coverage of the kept window's bounds (Proposition 3: under a law inside the tolerance, a window is kept exactly when its upper bound fails), but spending the error budget over the windows tried, δ_1 + ... + δ_K ≤ δ, gives P(the kept window's bounds fail) ≤ δ (Theorem 1), and with it Theorem 6.4, Corollary 6.6 and the per-day Corollary 1 unchanged, with the tolerance taken relative to the kept window (Theorem 2). A fallback to the rank monitor after K blind windows keeps δ + m/A under a mixed hypothesis (Theorem 3). [NUMERICAL] For P1's window the construction triples the failure probability with three windows and no spending (7.6 × 10⁻⁴ against 2.5 × 10⁻⁴; `e24_selection.csv`).
+* **Blind is not the only failure: near-blind windows are just as deaf.** [PROVED, SYNTHETIC] With ρ = τ²/m↑ ≤ 1.0105 P1's increase side cannot alarm within a day whatever the data; with a step in volatility of 4 or 6 after the τ part (ρ ≈ 1.2 and 1.03) the unguarded P1 and the guard with E19's criterion (η = 0) detected a later doubling within a day in at most 16% of paths, the guard with η = 0.25 in 86.5% and 100% (`e24_synthetic.csv`).
+* **Recommended guard: K = 3, budgets δ/2, δ/4, δ/4, η = 0.25, rank fallback** (fixed from the synthetic results before any real-data rerun; `docs/theory_blind_guard.md` 6.1). [SYNTHETIC] No alarm in the first day or any of the first four days of a null segment in 800 paths of any constant-law design, for any monitor (upper limit 0.0037; bound 0.05); detection within a day 86.5% to 100% where the unguarded P1 had 0% to 0.25%; cost: one extra calibration day only where the first window is near-blind.
+* **On real data the guard removes every blind segment at a small cost.** [REAL, post hoc] It acted only on BTC (3 windows in 711 days of 2024 to 2025, 5 in 297 days of 2026; no fallback needed); no monitored minute of the guarded P1 was blind, against 28% for P1 on BTC in 2026. All 8 discarded windows began on a weekend: the τ part was a quiet weekend stretch, in three 2026 windows with a median absolute return of exactly one price tick, and the sequence part was 5 to 1010 times more volatile. In E19's diagnostic (no daily restart) the guard turned BTC's 83% blind time (band 0.5, one segment of 136 days) into 0%, with one discarded window; the unguarded rows reproduce E19's exactly (`e24_e19_blind.csv`).
+* **The guard does not rescue E23's primary test, and nothing here is confirmatory.** [REAL, post hoc, exploratory] On BTC in 2026 the guarded P1 had 4 of 16 releases with an up alarm within 6 hours against a matched control rate of 8.9% (raw p = 0.056; FOMC 3 of 6), P1 2 of 16 (p = 0.25), the rank monitor S2 6 of 16 (p = 0.007). These data were seen and the guard was designed after E23 failed.
+* **A forward test is pre-registered** (`docs/preregistration_e24_future.md`, commit `22f1988`, 08:46 UTC, 3 November 2026, before any return after 24 October 2026 was loaded). By a rule fixed before the power calculation ran, the primary test is **S2, BTC FOMC statements and CPI releases pooled, 25 October 2026 to 1 June 2027 (11 planned releases), power 0.82 at the pooled 2024 to 2026 rates** [SYNTHETIC; planning inputs REAL]; 0.60 at the 2026 rates, 0.37 at half the pooled excess. The script refuses to run before 1 June 2027, on data that end earlier, or while any release is unverified.
+
+
+### Theory [PROVED] (`docs/theory_blind_guard.md`)
+
+| Statement | Content |
+|---|---|
+| Lemma 1, Proposition 1 | A segment is blind when τ² ≤ m↑ = (1 + b) Ū_T: every increase factor is at most 1, so the increase side cannot alarm within 2A monitored steps of a (re)start, and with P1's daily restart never. The event is in F_T (T, the end of calibration, is a stopping time), so the guard can act on it. |
+| Proposition 2 | Near-blind, ρ = τ²/m↑ ≤ 1 + η: the exact floor d_min(ρ) on the steps to an increase alarm after a (re)start, over all data, attained by X ≡ τ², and a bound log(1 + λ_max η) on the expected log growth per step under any law. For P1 no increase alarm is possible within a day when ρ ≤ 1.0105; d_min = 1503 steps at ρ = 1.01, 371 at 1.05, 91 at 1.25 [NUMERICAL, `e24_near_blind.csv`, figure `e24_near_blind.png`]. |
+| Theorem 1 | Retry guard with error spending: windows k = 1, ..., K with budgets δ_k, Σδ_k ≤ δ; discard a near-blind window and calibrate again; then P(the kept window's bounds fail given the past) ≤ Σ_k δ_k P(window k is tried) ≤ δ, for any discard rule decided at the end of each window. |
+| Proposition 3 | The selection is real: under a law inside the tolerance relative to every window, a window is kept exactly when its upper bound fails; with the same δ for every window the failure probability of the kept window is 1 - Π_k(1 - p_k), about K times one window's. E19's worry is right for the naive guard; spending is what repairs it. |
+| Theorem 2 | Theorem 6.4 and Corollary 6.6 of `docs/math.md` and Corollary 1 of `docs/theory_per_period.md` hold unchanged with δ the total budget, T the end of the kept window and the tolerance relative to the kept window's sequence part. The guarded and unguarded monitors test different nulls; a selection-free sufficient condition is a constant conditional law from the end of the first τ part (covers a step in volatility inside it). |
+| Proposition 4 | Time-out after D periods: per-segment bounds unchanged; long-run bound grows by δ/D alarms per period. |
+| Theorem 3 | Fallback to E14's awake rank monitor after K near-blind windows: P(alarm within m monitored steps of a segment) ≤ Σδ_k + m/A, where the cs branch needs the tolerance relative to the kept window and the rank branch needs exchangeability of the returns after the fallback given the past; the per-period and long-run bounds carry over (the latter by a per-segment optional-stopping argument). |
+| Remark 6 | Not specific to the guard: Corollary 1 bounds a period of a segment; for a fixed calendar day the bound is δ E[segments started by then] + m/A, and an adaptive null can exceed δ + m/A on that day [upper bound PROVED, lower bound SKETCH]. |
+
+### Synthetic experiments [SYNTHETIC] (`e24_synthetic.csv`, `e24_synthetic_paths.csv.gz`, figure `e24_synthetic.png`)
+
+Eleven-day streams of one-minute returns; the standard deviation doubles at a uniform minute of day 9; 800 paths per design; five monitors on the same paths: U, P1 unguarded (`PeriodicVolatilityMonitor(baseline="cs", delta=0.01, A = 36,000, period=1440)`, band 0.25); G, guarded, K = 3, η = 0, keep; GR, as G with the rank fallback; GE, K = 3, η = 0.25, rank fallback (the recommendation); R, E22's rank monitor S2 (A = 28,800). Null endpoints use each monitor's first segment that starts after the pre-change law has settled (after the first 360 minutes for the steps and `frozen`, after the first day for `drift8_gauss`). GR gave the same numbers as G everywhere (no fallback was needed).
+
+| Design | Median ρ of the first window (U) | U's blind share | Detected within a day: U / G / GE / R | Median delay (min): G / GE / R | Extra calibration, GE (min per path) |
+|---|---|---|---|---|---|
+| step2_gauss: sd 1 for 360 min, then 2 | 2.09 | 0 | 100 / 100 / 100 / 100% | 144 / 144 / 25 | 0 |
+| step4_gauss | 1.20 | 0 | 0.25 / 0.1 / 86.5 / 100% | 1048 / 49 / 27 | 1244 |
+| step6_gauss | 1.03 | 13% | 0 / 16.2 / 100 / 100% | 48 / 50 / 26 | 1440 |
+| step8_gauss | 0.96 | 99% | 0 / 99.2 / 100 / 100% | 50 / 50 / 27 | 1440 |
+| step8_t3 (Student t3) | 0.96 | 97.5% | 0 / 97.9 / 100 / 99.8% | 115 / 115 / 127 | 1440 |
+| frozen: ticks, 60% frozen minutes in the first 360, then 10% | 0.88 | 100% | 0 / 100 / 100 / 100% | 64 / 64 / 30 | 1440 |
+| drift8_gauss: sd rises 1 to 8 over the first day | 1.61 | 0 | 100 / 100 / 100 / 100% | 48 / 48 / 25 | 0 |
+| calm_btc_days: E19's calm BTC days, shuffled whole | 4.72 | 0 | 67 / 66 / 66 / 88% | 220 / 221 / 90 | 0 |
+| calm_btc_perm: the same returns, permuted | 4.17 | 0 | 100 / 100 / 100 / 100% | 111 / 111 / 93 | 0 |
+
+* **Null rates.** In the seven designs whose law is constant after the first τ part (the five steps, `frozen`, `calm_btc_perm`) no monitor raised an alarm in the first day, or in any of the first four days, of its first null segment: 0 of 800 paths (one-sided 95% upper limit 0.0037) against the bound δ + m/A = 0.05 (R: 0 of 710 to 800 paths with a null segment; in `frozen` only 4, because its first segment starts before the frozen share falls). Expected alarms per path before the change are bounded by 0.27 to 0.31 (cs) and 0.37 to 0.42 (R); observed 0. The bounds hold with a wide margin, as in E19 and E22; the designs cannot rank the monitors by false alarms.
+* **Where the hypotheses fail.** In `drift8_gauss` the first window is not near-blind (ρ ≈ 1.6) and is kept; every cs monitor alarms on the first monitored day of every path, which the theorem allows because its tolerance fails relative to that window. In `calm_btc_days` the level changes at day boundaries and every monitor alarms early (first-day share 0.78 U, 0.76 guarded, 0.62 R; 4.4 to 8.1 alarms per path): alarm rates, not false alarm rates.
+* **What the guard buys.** Blindness disappears (blind share 0 for every guarded monitor in every design), and with η = 0.25 so does near-blindness. The rank monitor detects about twice as fast (25 to 30 minutes against 50 to 64) and is never blind; the guarded P1 keeps the tolerance-based per-day bound.
+
+### Proposition 3 in numbers [NUMERICAL] (`e24_selection.csv`)
+
+Under the construction of Proposition 3 (b = 0.25, η = 0, so a window is kept exactly when U_T < 0.8):
+
+| Configuration | One window | 3 windows, δ each | 3 windows, halving (Theorem 1) |
+|---|---|---|---|
+| P1's window (n_cs = 1080, δ = 0.01; 400,000 replications per level) | 2.5 × 10⁻⁴ | 7.6 × 10⁻⁴ | 1.9 × 10⁻⁴ |
+| illustration (n_cs = 150, δ = 0.3 per window; 200,000) | 0.0139 | 0.041 | 0.0063 |
+| the same through `GuardedVolatilityMonitor` (4000 paths) | | 0.043 (s.e. 0.0032; formula 0.0426) | |
+
+The selection multiplies the failure probability by the number of windows tried, as the proof says it can; spending keeps it below δ.
+
+### Real data, post hoc and exploratory [REAL]
+
+E22's design (BTC, ETH, SOL, 21 January 2024 to 31 December 2025, 38 releases per coin) and E23's design (1 January to 24 October 2026, 16 releases per coin) rerun through `E22.job` with two guarded arms: G1, the recommended guard (as GE), and G0 (K = 3, η = 0, keep; the guard closest to E19's proposal). P1 and S2 rows are E22's and E23's committed ones. **These data were seen before the guard was designed; no result in this section is confirmatory, and the p-values are raw.**
+
+| Period | Monitor | BTC pooled: releases with an up alarm within 6 h | matched control rate | p | FOMC | CPI | BTC releases watched |
+|---|---|---|---|---|---|---|---|
+| 2024 to 2025 | P1 | 13 / 38 | 8.0% | 6.5 × 10⁻⁶ | 8 / 16 | 5 / 22 | 26 |
+| | G1 | 13 / 38 | 8.0% | 6.2 × 10⁻⁶ | 9 / 16 | 4 / 22 | 28 |
+| | S2 | 23 / 38 | 15.4% | 5.7 × 10⁻¹⁰ | 13 / 16 | 10 / 22 | 38 |
+| 2026 | P1 | 2 / 16 | 5.9% | 0.25 | 1 / 6 | 1 / 10 | 11 |
+| | G1 | 4 / 16 | 8.9% | 0.056 | 3 / 6 | 1 / 10 | 12 |
+| | S2 | 6 / 16 | 10.9% | 0.0070 | 4 / 6 | 2 / 10 | 16 |
+
+(`e24_real_contrast.csv`, figure `e24_real_release_rates.png`.) G0 gave the same release counts as G1 in every cell. On ETH and SOL in 2026, G1's pooled counts were 5 of 16 (p = 0.023 and 0.032), against P1's 4 and 5 of 16. Six BTC releases differ between G1 and P1: G1 alarmed after the FOMC statements of 29 January 2025 and 16 September 2026, which fell in P1's blind segments, and after those of 30 July 2025 and 17 June 2026, at which P1 was recalibrating; P1 alarmed after the FOMC statement of 31 July 2024 and the CPI release of 18 December 2025, where G1 did not, because a discarded window shifts every later segment.
+
+* **Blindness and its mechanism** (`e24_real_summary.csv`, `e24_real_guard_windows.csv`). The guard discarded 3 BTC windows in 2024 to 2025 and 5 in 2026 (4320 and 7200 extra calibration minutes; about one day per three months), none on ETH or SOL (smallest ρ 1.59 and 1.76); no segment fell back to the rank monitor; no monitored minute of G1 or G0 was blind. All 8 discarded windows started on a Saturday or Sunday. In three (24 January, 9 and 16 August 2026) the τ part's robust scale is 1.48 price ticks, that is, the median absolute one-minute return is exactly one tick (0.01 USDT), and the sequence part's scale is 390 to 1010 times larger; in the other five the τ part is a quiet weekend stretch (9% to 27% exact zeros) followed by a more active one (ratio 5 to 26; the window of 26 January 2025 runs into 27 January 2025).
+* **Per-day alarm rates** of G1: 46% to 53% of monitored periods, 0.84 to 1.11 alarms per monitored day against the long-run bound 0.0404, as for P1: the tolerance fails on most real days.
+* **E19's blind diagnostic with the guard** (`e24_e19_blind.csv`; E19's Part 2 configurations, cs baseline without the daily restart, bands 0, 0.25 and 0.5, five Binance coins in two periods and Bitstamp BTC). The unguarded rows reproduce `e19_blind.csv` exactly (33 rows, 8 columns, 0 mismatches). Every blind segment in it was removed by the guard, with one or two discarded windows and no fallback: BTC July to December 2025 at band 0.5, 82.6% of monitored time blind (one segment of 136 days, 18 alarms) became 0% (65 alarms); at band 0.25, 6.0% became 0%; BTC 2024 to June 2025 at band 0.25, 1.4% to 0%; Bitstamp BTC at band 0.5, 2.4% to 0%. ETH, XRP, SOL and DOGE were never blind.
+
+### The forward pre-registration (`docs/preregistration_e24_future.md`; figure `e24_future_power.png`)
+
+Releases after E23's data end (25 October 2026 00:00 UTC) have not been seen by anyone in the project. The event file `data/events/us_macro_events_e24_future.csv` holds the released FOMC statement of 28 October 2026 and the scheduled CPI releases and FOMC statements to December 2027, each tied by web search to the official schedule (the official hosts cannot be fetched from this machine), with an update rule; one 2027 meeting is expected to have no statement (announced 28 October 2026, meeting not named). Candidates: G1 or S2, BTC FOMC alone or pooled with CPI. Rule (committed before the power part first ran): the earliest monthly end date with power ≥ 0.8 at the candidate's pooled 2024 to 2026 BTC rates, size under the null at most 0.055.
+
+| Candidate | First end date with power ≥ 0.8 | Releases (FOMC + CPI) | Power | Null size |
+|---|---|---|---|---|
+| G1, FOMC alone | 1 December 2027 | 8 + 13 | 0.831 | 0.046 |
+| G1, pooled | 1 November 2027 | 8 + 12 | 0.815 | 0.040 |
+| S2, FOMC alone | 1 July 2027 | 5 + 8 | 0.828 | 0.041 |
+| **S2, pooled (chosen)** | **1 June 2027** | **4 + 7** | **0.822** | **0.031** |
+
+(`e24_future_candidates.csv`; 20,000 replications; s.e. 0.003.) At the chosen end date the primary test has power 0.60 if the 2026 rates are the truth and 0.37 at half the pooled excess (`e24_future_power.csv`); 0.8 at the 2026 rates would need data to 1 October 2027 (`e24_future_power_sensitivity.csv`, descriptive). Secondary families: S2 pooled on ETH and SOL (F24b), G1 pooled on three coins (F24c), S2 per type on three coins (F24d). A gate showed that the future pipeline reproduces E23's committed P1 and S2 rows exactly on E23's period (192 rows, 14 columns; `e24_future_gate.csv`). The test runs after 1 June 2027 with `python experiments/e24_blind_guard.py future --procs=2`.
+
+### Reading
+
+The retry guard with error spending is a proved fix for blind segments of the confidence-sequence baseline: it keeps every bound of the unguarded monitor, under a hypothesis stated relative to the window it keeps, and on real BTC data it removes all blind time at the cost of about one calibration day per quarter. The selection that E19 worried about is real (Proposition 3) and is paid for by splitting δ, not argued away. The guard does not, on the data already seen, restore the 2024 to 2025 release rates in 2026, and the rank monitor remains the stronger release detector; whether either result holds on new releases is now a pre-registered question with a fixed date.
+
+### Caveats and what failed
+
+* All real-data comparisons here are post hoc on seen data; the guard was designed after E23's failure, partly from E23's BTC windows.
+* The synthetic null checks cannot separate the monitors (no alarm at all); the bounds are far from tight in these designs.
+* The near-blind margin η = 0.25 and K = 3 were fixed before the synthetic run, after a 3-path smoke run; other values were not explored.
+* The first version of the per-period summary counted an empty first period (segments starting on a day boundary); fixed in the summary before any number was reported (iteration 2).
+* Iteration 1's scratch look at P1's blind BTC windows attributed them all to tick-level τ parts; the committed account on the guarded monitor's windows (8 windows, two mechanisms) is in `e24_real_guard_windows.csv`, and the synthetic design `frozen` was chosen after that first look.
+* The forward test's power rests on planning rates that include 2024 and 2025, when release rates were higher than in 2026; its power at the 2026 rates is 0.60. The official schedule pages could not be fetched; the 2027 dates rest on search results that index them.
+* Remark 6's lower bound (an adaptive null exceeding δ + m/A on a fixed calendar day) is a sketch, not simulated.
+
+### Data files [REAL]
+
+Binance spot one-minute bars, BTCUSDT, ETHUSDT, SOLUSDT, exactly as read by E22 (2024 to 2025) and E23 (2026, to 24 October 23:59 UTC); E19's calm-day pool (BTC, July to December 2025) for two synthetic designs; E6's sources and periods (five Binance coins and Bitstamp BTC, through E6's `prepare`) for the E19 diagnostic. No file after 24 October 2026 was read.
 
 ---
 
