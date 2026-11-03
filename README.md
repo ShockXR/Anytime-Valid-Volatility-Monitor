@@ -106,7 +106,7 @@ for e in mon.run(r):
 
 ## Reproduce the experiments
 
-Each experiment is one script in `experiments/` that writes CSV files to `results/` and figures to `results/figures/`. Synthetic experiments need no data; real-data experiments need `python scripts/download_data.py` first. Seeds are fixed.
+Each experiment is one script in `experiments/` that writes CSV files to `results/` and figures to `results/figures/`. Synthetic experiments need no data; real-data experiments need `python scripts/download_data.py` first. Seeds are fixed. `python scripts/reproduce.py` checks the data hashes, runs the tests and reruns the experiments against `results/MANIFEST.csv` (`--tier full` for every experiment, `--from E18` to resume). On a fresh clone the quick tier reproduced every file, and the full tier reproduced every file of E1 to E17 (identical, within a relative tolerance of 1e-9, or equal except run-time columns); E18 onward has not yet been rerun on a fresh clone.
 
 | Experiment | Question | Script | Label |
 | --- | --- | --- | --- |

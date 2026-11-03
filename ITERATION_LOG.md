@@ -220,6 +220,28 @@ NEXT ITERATION: Final audit.
 
 ---
 
+ITERATION NUMBER: 30 (final audit: full reproduction on a clean copy, and the live Nifty session)
+
+OBJECTIVE: Check that one command regenerates the committed results on a fresh copy of the repository, and run the pre-registered live Nifty session of 3 November 2026.
+
+PROBLEM IDENTIFIED: The quick tier had reproduced every file; the full tier had never been run end to end on a clean copy.
+
+HYPOTHESIS: Every committed result file is produced by an entry of `scripts/reproduce.py`.
+
+CHANGES IMPLEMENTED: `scripts/reproduce.py` gains `--from`, `--to` and `--only`, the E13 parts added in review round 3, E14's parts run one calibration length or law at a time, and a documented list of run-time columns that compare ignores; `experiments/e07_nifty.py` asks the package for the deseasonalisation behaviour its committed check used; `tests/test_reproduce.py`. The live run's result is appended to `docs/preregistration_nifty_2026-11-03.md`.
+
+EXPERIMENTS PERFORMED: Full tier on a clean copy, E1 to E14; E15 to E17 on a second clean copy; the live run once, with the frozen settings.
+
+RESULTS: [REAL and SYNTHETIC] E1 to E14: 432 of 444 files identical; 12 differed and E14's figure step crashed, because seven E13 parts were missing from the script, E14's split files were written under one name, some files hold run times, and E7's deseasonalisation check was made before a later change to the package function. After the fixes no committed number changed, and the corrected entries rerun on the clean copy gave 439 files identical, 2 equal within a relative tolerance of 1e-9, 3 equal except their run-time columns, 0 different. E15 to E17: every file identical. [REAL] Live run: no alarm; the monitor was recalibrating for the whole session after a down alarm at 11:42 IST on 2 November (750 returns needed, 573 available by the close). This was foreseeable from the dry run and was missed. Failed or weak: the full tier from E18 onward was not rerun on a clean copy before the deadline.
+
+IMPROVEMENTS: The full tier now regenerates every file of E1 to E17 on a clean copy, and a run can be resumed or narrowed.
+
+REMAINING ISSUES: Rerun the full tier from E18 on a clean copy (`python scripts/reproduce.py --tier full --steps run,compare --from E18`). Run the forward tests at their dates (E24 after 1 June 2027, E25 from 26 November 2026).
+
+NEXT ITERATION: None in this round.
+
+---
+
 ITERATION NUMBER: 10 (final research audit, documentation and presentation readiness)
 
 OBJECTIVE: Check that a researcher can reproduce every table from a clean clone, and that the pitch, README and report agree with the results.
@@ -637,6 +659,28 @@ IMPROVEMENTS: The release question can be watched release by release and continu
 REMAINING ISSUES: Run `python experiments/e25_sequential_events.py status` from 26 November 2026; keep the event file updated under F24a's rule. Review round 11 found no critical problem; its major finding (a missing event row could change a stratum already reported) was fixed by refusals and a ledger of reported strata (Amendment 2, refusals only).
 
 NEXT ITERATION: Final audit.
+
+---
+
+ITERATION NUMBER: 30 (final audit: full reproduction on a clean copy, and the live Nifty session)
+
+OBJECTIVE: Check that one command regenerates the committed results on a fresh copy of the repository, and run the pre-registered live Nifty session of 3 November 2026.
+
+PROBLEM IDENTIFIED: The quick tier had reproduced every file; the full tier had never been run end to end on a clean copy.
+
+HYPOTHESIS: Every committed result file is produced by an entry of `scripts/reproduce.py`.
+
+CHANGES IMPLEMENTED: `scripts/reproduce.py` gains `--from`, `--to` and `--only`, the E13 parts added in review round 3, E14's parts run one calibration length or law at a time, and a documented list of run-time columns that compare ignores; `experiments/e07_nifty.py` asks the package for the deseasonalisation behaviour its committed check used; `tests/test_reproduce.py`. The live run's result is appended to `docs/preregistration_nifty_2026-11-03.md`.
+
+EXPERIMENTS PERFORMED: Full tier on a clean copy, E1 to E14; E15 to E17 on a second clean copy; the live run once, with the frozen settings.
+
+RESULTS: [REAL and SYNTHETIC] E1 to E14: 432 of 444 files identical; 12 differed and E14's figure step crashed, because seven E13 parts were missing from the script, E14's split files were written under one name, some files hold run times, and E7's deseasonalisation check was made before a later change to the package function. After the fixes no committed number changed, and the corrected entries rerun on the clean copy gave 439 files identical, 2 equal within a relative tolerance of 1e-9, 3 equal except their run-time columns, 0 different. E15 to E17: every file identical. [REAL] Live run: no alarm; the monitor was recalibrating for the whole session after a down alarm at 11:42 IST on 2 November (750 returns needed, 573 available by the close). This was foreseeable from the dry run and was missed. Failed or weak: the full tier from E18 onward was not rerun on a clean copy before the deadline.
+
+IMPROVEMENTS: The full tier now regenerates every file of E1 to E17 on a clean copy, and a run can be resumed or narrowed.
+
+REMAINING ISSUES: Rerun the full tier from E18 on a clean copy (`python scripts/reproduce.py --tier full --steps run,compare --from E18`). Run the forward tests at their dates (E24 after 1 June 2027, E25 from 26 November 2026).
+
+NEXT ITERATION: None in this round.
 
 ---
 
