@@ -13,7 +13,7 @@ ROOT = Path(__file__).resolve().parents[1]
 PARTS = ROOT / "docs" / "report_parts"
 OUT = ROOT / "docs" / "experiment_report.md"
 
-ORDER = ["_header", "E01_E05", "E6", "E7", "E8", "E9", "E10", "E11", "E12", "E13", "E14", "E15", "E16", "E17",
+ORDER = ["_header", "E01_E05", "E6", "E7", "E8", "E9", "E10", "E11", "E12", "E13", "E14", "E15", "E16", "E17", "TH4",
          "_alternatives", "ALT1", "ALT2", "ALT3", "ALT4", "ALT5", "ALT6", "_footer"]
 
 
