@@ -508,6 +508,28 @@ NEXT ITERATION: E19 and E21, then the paper's per-day sentences and TH6 slots.
 
 ---
 
+ITERATION NUMBER: 24 (benchmarks not calibrated on Gaussian data only, E21)
+
+OBJECTIVE: Answer the referee's point M5: the competitors were calibrated on Gaussian data, BOCPD had a Gaussian likelihood, the "BJV-type" test was a reconstruction, and no classical detector on the e-detector's own statistic or econometric monitoring procedure was tried.
+
+PROBLEM IDENTIFIED: The benchmarks could favour the e-detector by construction: a competitor calibrated for the wrong law looks bad for that reason alone, and a comparison with methods on a different statistic cannot separate the statistic from the threshold.
+
+HYPOTHESIS: At a matched false alarm rate, classical CUSUM and Shiryaev-Roberts rules on the same truncated statistic are about as fast as the e-detector; their Gaussian thresholds fail under fat tails; and on real data they are about as precise, so the e-detector's advantage is the calibration-free guarantee rather than speed or precision.
+
+CHANGES IMPLEMENTED: `src/avmonitor/benchmarks_robust.py` (simulated and per-path bootstrap thresholds, Student t BOCPD with an exact run-length recursion on a variance grid, CUSUM monitoring with a training sample of the Horvath-Huskova-Kokoszka-Steinebach type, a strucchange-type boundary), `experiments/e21_benchmarks.py`, `tests/test_benchmarks_robust.py`; in E13 the test is renamed "two-window variance-ratio scan" and its real-data tables show scored counts.
+
+EXPERIMENTS PERFORMED: Calibration to the e-detector's first-day rate on Gaussian data (1.3%) and to 5%; nulls under six laws; delays in the E4 design; BOCPD-t on E13's paths; real data on the five coins in two half-years at matched alarm counts.
+
+RESULTS: At 1.3% on Gaussian data the calibrated SR betting rule detects increases in 106, 41 and 20 steps against the e-detector's 100, 39 and 19, decreases in 144 against 162; a CUSUM on X is as fast for increases and 15% to 40% faster for decreases. Gaussian-calibrated CUSUMs reach 5.0% to 8.2% under Student t (target 1.3%); per-path bootstrap thresholds stay at 1.4% to 2.2%. BOCPD-t has 0.7% false alarms under jumps and 3.3% under t5 (E13's BOCPD 73.2% and 53.2%) but finds 56% of 25% increases and 77% of 20% decreases (e-detector 98%). On real data SR betting and both CUSUMs are never significantly less precise than the e-detector in 24 comparisons (differences -5.0 to +3.0 points); the training-sample CUSUM rules are below it in 13 of 16 (6 significant) and BOCPD-t in 20 of 24 (14 significant), with unadjusted p-values. Failed or dropped: the exact published monitoring procedures and a beta-divergence BOCPD (papers not readable from our environment); count matching by bisection alone missed by up to 29 alarms, so a grid search was added after a timing run; a low Gaussian rate of BOCPD-t on E13's paths (0.5%) is not fully explained.
+
+IMPROVEMENTS: The benchmark no longer favours the e-detector by calibration, and the documents now say that its advantage over BOCPD and the scan comes from the truncated statistic and the design, while Ville's threshold adds a guarantee that needs no calibration.
+
+REMAINING ISSUES: Exact published procedures; a block bootstrap for dependent returns; adjustment of E21's real-data p-values.
+
+NEXT ITERATION: E19 (real-data null streams), then the paper's Section 6.2.
+
+---
+
 Further work streams (E13, E14, E16, E17, the alternative prototypes, logs ALT1 to ALT6) keep their own iteration notes in `docs/iterations/`. Their main results are summarised in `docs/experiment_report.md` and `alternatives/ALTERNATIVES.md`.
 
 ---
