@@ -36,14 +36,15 @@ Parts (each writes its own CSV files; run at most 2 processes on a shared machin
   hazard390   Q6a and the calm-9 stream for 390-step days (th6_hazard_390.csv)
   hazard1440  the same for 1440-step days (th6_hazard_1440.csv)
   family      the referee's family, Q6b (th6_calm_family.csv)
-  adversary   bold play over 20 days and the park-and-strike counterexample (th6_adversary.csv,
-              th6_park_strike.csv, th6_park_scaled.csv)
+  adversary   bold play over 20 days (th6_adversary.csv)
+  parkstrike  the park-and-strike counterexample (th6_park_strike.csv, th6_park_scaled.csv)
   delay       Q6d (th6_delay.csv, th6_delay_by_position.csv)
   renewal     Q6d, Proposition 2: the renewal bound on the restarted detector's delay (th6_delay_renewal.csv;
               needs th6_delay.csv; added after the delay results were seen)
   tolerance   Q6e (th6_tolerance.csv)
   figures     results/figures/th6_hazard.png, th6_delay.png
-  python experiments/th6_per_period.py laws hazard390 hazard1440 family adversary delay renewal tolerance figures
+  python experiments/th6_per_period.py laws hazard390 hazard1440 family adversary parkstrike delay renewal \
+      tolerance figures
   TH6_SCALE=0.05 TH6_OUT=/tmp/th6 python experiments/th6_per_period.py ...   # smoke run
 
 Seeds (SEED = 26060): hazard SEED + 1..10 (stream index, plus 5 for 1440-step days); family SEED + 21..100;
@@ -295,7 +296,7 @@ def park_strike(day, A, P, rng, n_days=DAYS, B=None):
                             init={"CUSUM": (su, sd)})
         p = float(np.mean(res["CUSUM"]["first"] >= 0))
         cond = Pm.conditional_window_bound(su, sd, day, A).mean()
-        rows.append(dict(day_len=day, A=A, B=B, day=d, paths=P, parked_before_day=float(np.mean((parked_at >= 0) & (parked_at < (d - 1) * day))),
+        rows.append(dict(day_len=day, A=A, B=B, day=d, paths=P, parked_before_day=float(np.mean((parked_at >= 0) & (parked_at <= (d - 1) * day))),
                          p_alarm_day_d=p, se=math.sqrt(p * (1 - p) / P), mean_conditional_bound=cond,
                          bound_cusum_window_iid=Pm.window_bound_two_sided(day, A), one_over_B=1 / B))
     return rows
@@ -319,6 +320,12 @@ def part_adversary():
     df = pd.DataFrame(rows)
     print(df[df.day.isin([1, 2, 5, 10, 20])].pivot_table(index=["day_len", "day"], columns="detector",
                                                          values=["hazard", "mean_count", "cum_rate"]).round(4))
+
+
+def part_parkstrike():
+    """Proposition 3 at full scale and scaled down (split from part_adversary after review round 8, which
+    corrected the descriptive share parked: a path whose state allows a landing at the first step of day d
+    was parked before day d; the alarm probabilities use separate seeds and do not change)."""
     prow = []
     for day, A in SETTINGS.items():
         t0 = time.time()
@@ -623,7 +630,8 @@ def figures():
 
 
 PARTS = {"laws": part_laws, "hazard390": lambda: part_hazard(390), "hazard1440": lambda: part_hazard(1440),
-         "family": part_family, "adversary": part_adversary, "delay": part_delay, "renewal": part_renewal,
+         "family": part_family, "adversary": part_adversary, "parkstrike": part_parkstrike,
+         "delay": part_delay, "renewal": part_renewal,
          "tolerance": part_tolerance, "figures": figures}
 
 if __name__ == "__main__":

@@ -8,7 +8,8 @@
 * Theorem 2 (single bet, i.i.d. null, a late window) by Monte Carlo;
 * Proposition 3 (park and strike): no alarm before the strike, every draw has mean 1, the late-window rate is
   above the i.i.d. bound and below the conditional bound of Lemma 2;
-* PeriodicVolatilityMonitor: identical to VolatilityMonitor by default, and restarts at period boundaries.
+* PeriodicVolatilityMonitor: identical to VolatilityMonitor by default, and restarts at period boundaries;
+  with baseline="known" it is exactly the engine's detector, and Theorem 1 holds for it on the calm stream.
 """
 
 import math
@@ -199,6 +200,55 @@ def test_periodic_monitor_restarts_and_cusum():
     assert checked > 100
     with pytest.raises(ValueError):
         Pm.PeriodicVolatilityMonitor(period=0)
+
+
+@pytest.mark.parametrize("period", [50, None])
+def test_periodic_monitor_known_baseline_matches_engine(period):
+    # baseline="known": the streaming monitor is exactly the engine's detector (true baseline, restart at
+    # every period boundary and at once after every alarm), so Theorem 1 applies to it as stated
+    rng = np.random.default_rng(11)
+    A = 40.0
+    r = np.concatenate([rng.standard_normal(1500), 1.5 * rng.standard_normal(1500)])
+    mon = Pm.PeriodicVolatilityMonitor(threshold=A, baseline="known", tau=3.0, m0=M0, period=period)
+    ev = [e.index for e in mon.run(r)]
+    eng = Pm.Engine([Pm.Spec("k", "SR", A, period=period)], 1, B)
+    y = np.minimum(r**2, 9.0) / M0
+    hits = []
+    for t in range(r.size):
+        eng.boundary(t)
+        if eng.step(y[t:t + 1])["k"][0]:
+            hits.append(t)
+    assert ev == hits and len(ev) > 5
+    assert mon.segments[0]["start"] == 0 and mon.baseline == "known"  # no calibration window, no blind period
+    assert all(seg["start"] == e + 1 for seg, e in zip(mon.segments[1:], ev))
+
+
+def test_periodic_monitor_known_baseline_theorem1_on_calm_stream():
+    # the referee's stream (Y = 1 for 15 periods, then Gaussian) through the streaming monitor: the plain
+    # detector exceeds m / A in period 16, the restarted one does not (Theorem 1)
+    rng = np.random.default_rng(12)
+    P, m, A = 500, 10, 100.0
+    hit_plain, hit_restart = np.zeros(P, bool), np.zeros(P, bool)
+    for i in range(P):
+        r = np.concatenate([np.full(15 * m, math.sqrt(M0)), rng.standard_normal(m)])
+        a = Pm.PeriodicVolatilityMonitor(threshold=A, baseline="known", tau=3.0, m0=M0).run(r)
+        b = Pm.PeriodicVolatilityMonitor(threshold=A, baseline="known", tau=3.0, m0=M0, period=m).run(r)
+        assert all(e.index >= 15 * m for e in a) and all(e.index >= 15 * m for e in b)  # none while calm
+        hit_plain[i], hit_restart[i] = len(a) > 0, len(b) > 0
+    se = math.sqrt(0.1 * 0.9 / P)
+    assert hit_restart.mean() <= m / A + 3 * se
+    assert hit_plain.mean() > m / A + 5 * se
+
+
+def test_periodic_monitor_known_baseline_errors():
+    with pytest.raises(ValueError):
+        Pm.PeriodicVolatilityMonitor(baseline="known", tau=3.0)  # m0 missing
+    with pytest.raises(ValueError):
+        Pm.PeriodicVolatilityMonitor(baseline="known", tau=1.0, m0=2.0)  # m0 above tau^2
+    with pytest.raises(ValueError):
+        Pm.PeriodicVolatilityMonitor(tau=3.0, m0=M0)  # tau and m0 need baseline="known"
+    with pytest.raises(ValueError):
+        Pm.PeriodicVolatilityMonitor(baseline="other")
 
 
 def test_day_table():

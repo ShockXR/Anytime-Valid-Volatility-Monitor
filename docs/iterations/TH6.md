@@ -1,6 +1,6 @@
 # TH6 iteration notes: false alarms after the first day (referee M2) and the hypothesis of Theorem D (referee M4)
 
-Owner: TH6. Files: `src/avmonitor/periodic.py`, `tests/test_periodic.py`, `experiments/th6_per_period.py`, `results/th6_*.csv`, `results/figures/th6_*.png`, `docs/theory_per_period.md`, `docs/math.md` (remark after Theorem B, the bullet after it, and section 6.3; see iteration 6 for two small consistency edits in 6.5), `docs/report_parts/TH6.md`, this file.
+Owner: TH6. Files: `src/avmonitor/periodic.py`, `tests/test_periodic.py`, `experiments/th6_per_period.py`, `results/th6_*.csv`, `results/figures/th6_*.png`, `docs/theory_per_period.md`, `docs/math.md` (remark after Theorem B, the bullet after it, and section 6.3; see iterations 6 and 8 for small consistency edits in 6.5 and 6.7), `docs/report_parts/TH6.md`, this file.
 
 ---
 
@@ -146,5 +146,36 @@ Owner: TH6. Files: `src/avmonitor/periodic.py`, `tests/test_periodic.py`, `exper
 **RESULTS.** Verified by web search: bibliographic data of all four papers and of Harris (1960); Lai's criterion `sup_k P_∞(k ≤ T < k + m)` through a secondary source; Mei's result on mixture pre-change models and the alternative criteria named in his keywords; the local probability of false alarm of Pergamenchtchikov and Tartakovsky from their abstract; the construction and the run-length guarantee of Shekhar and Ramdas from their abstract. Not verified: the exact conditions on Lai's window, Mei's exact definitions, whether the local probability of Pergamenchtchikov and Tartakovsky conditions on no earlier alarm, and the full text of Shekhar and Ramdas.
 
 **REMAINING ISSUES.** A reading of the full texts when they can be opened.
+
+**NEXT ITERATION.** The independent review of round 8 (iteration 8).
+
+---
+
+## Iteration 8. Independent review, round 8
+
+**OBJECTIVE.** Apply `docs/review/independent_review_round8_th6.md` (no Critical, 2 Major, 12 Minor) and the consistency items raised for the paper.
+
+**PROBLEM IDENTIFIED.** (M1) The proved per-day bound was credited to `PeriodicVolatilityMonitor`, which had only the plug-in and confidence-sequence baselines, and Theorem 1 assumes a known one; the extension to the confidence-sequence baseline was asserted, not proved, and stated as if it held given the past. (M2) The summary said Theorem 2 holds "whatever happened before"; its bounds are unconditional, and given the state at the start of a window the next-step alarm chance can be about `P(Y > 1)`, 32% for Gaussian returns. Minor: the sharpness of `d m / A` was overstated (m1); a remedy in 6.5 works against the restated hypothesis (m2); 6.7 listed parts 1 to 3 of Theorem 6.4 (m3); a wrong range of daily hazards, mixing the 390 and 1440 tables (m4); part 4 needs the missingness assumption of 6.7 and `T < ∞` (m5); Proposition 2 left three conditions unstated (m6); the GARCH bands are per path while parts 1 to 3 need the tolerance almost surely (m7); wording and small numbers (m8 to m12, including an off-by-one in the descriptive parked share). From the paper: 2.75% is a hazard, not a probability (the largest probability is 2.66%); the README-29 row of the appendix had misread the awake-B figure of E14, which is 0.035 false alarms per day as a long-run rate; paper theorem numbers drop out of these files.
+
+**HYPOTHESIS.** A known-baseline mode of the class, built on the existing calibration hook, reproduces the simulation engine step by step, so Theorem 1 covers it as stated. For the confidence-sequence baseline the proof of Theorem 6.4, Steps 1 to 3, applies on each period of a segment conditionally on `F_b`, which gives `1{Gᶜ} + 1{G} (m + κ) / A` and, after taking expectations, `δ + (m + κ) / A`, marginally only.
+
+**CHANGES IMPLEMENTED.**
+* `src/avmonitor/periodic.py`: `PeriodicVolatilityMonitor(baseline="known", tau=..., m0=..., tau_down=None, m0_down=None)`. It validates `tau > 0` and `0 < m0 ≤ tau²` on both sides, refuses `margin_z` and `target_rel_width`, sets the null values directly in `_reset` (so it never calibrates and restarts at once after an alarm), and refuses `tau` or `m0` without `baseline="known"`. The class and module docstrings now say which baseline carries which bound, and that Theorem 2's bound is unconditional.
+* `tests/test_periodic.py`: three tests. The known mode equals the engine event by event (period 50 and no period, with a change in the stream); on a calm-then-Gaussian stream it raises no alarm while calm and its per-day rate is within three standard errors of `m / A`, while the plain detector's is more than five above; the errors above are raised.
+* `docs/theory_per_period.md`: Corollary 1 (confidence-sequence baseline) with its proof and three differences from Theorem 1 (marginal only; tolerance to the end of the period; per segment); Theorem 1 and Theorem 2 state "known baseline"; Theorem 2 says its bounds are unconditional and that given `F_s` only Lemma 2 holds; the conditions of Proposition 2 (m6); the non-aligned window bound `(2m + κ) / A`; m1, m8, m9, m10, m12.
+* `docs/math.md`: remark after Theorem B (m1, m4, m11, the two constructions with their baselines); "What the tolerance excludes" (m7); part 4 (m5); "Choosing A and δ" (the per-day statement for the confidence-sequence baseline); 6.5 (m2); 6.7 (m3).
+* `docs/report_parts/TH6.md`: the same corrections, the 2.66% probability against the 2.75% hazard, the day-16 crossing for 1440-step days, and the README-29 appendix row.
+* `experiments/th6_per_period.py`: `parked_before_day` uses `<=`; the park-and-strike runs are now their own part, `parkstrike`, so they can be rerun without bold play.
+
+**EXPERIMENTS PERFORMED.** `python experiments/th6_per_period.py parkstrike` (same seeds) to apply the `<=` fix; the full test suite. Numbers read off existing CSVs for m1 (`th6_calm_family.csv`), m4 (`th6_hazard_390.csv`), m12 (`th6_adversary.csv`, `th6_park_strike.csv`).
+
+**RESULTS** [SYNTHETIC].
+* The known mode matches the engine exactly in both tests. **Failure recorded:** the first sizing of the calm-stream test (19 calm periods) made the plain detector alarm with certainty at step 2A, and nine calm periods with 800 paths left it too close to `m / A` to separate; 15 calm periods are used.
+* Rerun of park and strike: every alarm probability is identical; the parked shares moved by at most 0.007 points (2 paths in 30,000) at full scale and 0.07 points in the scaled run, so no rounded figure changed (12.1% on day 20 at 390, 57% by period 120 in the scaled run).
+* Changed numbers in the text: Gaussian SR hazard on days 10 to 20 at 390 steps from "4.4% to 4.9%" to "4.70% on average over days 11 to 20, single days 4.34% to 5.18%"; the sharpness of `d m / A`: at most 35.7% against 50% (d = 10) and 73.2% against 100% (d = 20) over both settings and both laws of the last day; pooled bold-play hazard over days 11 to 20 5.23% with standard error about 0.06 points (was "about 0.05"); park and strike passes the i.i.d. bound on day 16 at 1440 (5.30%, 2.0 standard errors); Mei paragraph 4.7% (was 4.6%); a window that straddles one boundary `(2m + κ) / A` (was `2 (m + κ) / A`).
+
+**IMPROVEMENTS.** Every per-day claim now names its baseline: known (given the past, Theorem 1, implemented and tested), confidence sequence (marginal, Corollary 1), plug-in (none).
+
+**REMAINING ISSUES.** Corollary 1 is marginal: no bound is proved for a period given the observed past with an estimated baseline. It also inherits the tolerance of Theorem 6.4, which the GARCH cells of the `tolerance` part never satisfy for b < 1. The known mode needs `m0` and `tau` from outside the stream, which in practice is rarely available.
 
 **NEXT ITERATION.** None planned. Open questions are listed in section 7 of the theory note.

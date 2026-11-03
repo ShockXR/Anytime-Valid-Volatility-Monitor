@@ -9,13 +9,18 @@ expected number of false alarms per monitored step by 1 / A when the monitor res
 This module gives two constructions with a guarantee for every period, and the tools to check them:
 
 * **Restarted Shiryaev-Roberts** (``period`` in ``Spec`` or ``PeriodicVolatilityMonitor``): both
-  statistics restart at 0 at every period boundary. Then P(false alarm in a period | past) <= m / A for
-  every period of m steps, under every null law of Theorem B (``restarted_sr_bound``). Keeping at most
-  ``carry`` of each side's average across a boundary gives (m + carry) / A instead.
+  statistics restart at 0 at every period boundary. With a known baseline (the engine below, or
+  ``PeriodicVolatilityMonitor(baseline="known", tau=..., m0=...)``), P(false alarm in a period | past)
+  <= m / A for every period of m steps, under every null law of Theorem B (``restarted_sr_bound``).
+  Keeping at most ``carry`` of each side's average across a boundary gives (m + carry) / A instead. With
+  the confidence-sequence baseline only the marginal bound delta + m / A holds for each period of a
+  segment, and only while the tolerance of Theorem 6.4 holds; with the plug-in baseline nothing per
+  period is proved.
 * **CUSUM-type e-detector** (e-CUSUM; ``kind="CUSUM"``): C_t = f_t max(C_{t-1}, 1), the maximum over start
   times of the product of bets. Under an i.i.d. (or exchangeable) null with fixed bets, time reversal
   gives P(C_s >= x) <= 1 / x at every s, so a single bet has P(alarm in any window of m steps) <= m / A
-  (``window_bound_single``), and the default average over bets has
+  (``window_bound_single``; an unconditional bound, not one given the past), and the default average
+  over bets has
   (m + log A + H(w)) / A, H the entropy of the bet weights (``window_bound_mixture``,
   ``window_bound_two_sided``). Under a martingale-difference null the reversal fails and no such bound
   holds (``park_strike_policy`` builds the counterexample). ``conditional_window_bound`` is the part
@@ -342,27 +347,57 @@ def day_table(first: np.ndarray, counts: np.ndarray) -> dict:
 
 
 class PeriodicVolatilityMonitor(VolatilityMonitor):
-    """``VolatilityMonitor`` with two options for a guarantee in every period (``docs/theory_per_period.md``).
+    """``VolatilityMonitor`` with options for a guarantee in every period (``docs/theory_per_period.md``).
 
     period : int or None
         Restart both statistics at 0 at every step t of the stream with (t - offset) % period == 0 (for
-        example the first minute of each trading day). With a known baseline, P(false alarm in a period) is
-        then at most period / A for every period, whatever happened before (Theorem 1); a confidence-sequence
-        baseline adds delta once per segment (docs/math.md, Theorem 6.4). ``carry > 0`` keeps at most
-        ``carry`` of each side's average across a boundary instead (bound (period + carry) / A).
-    statistic : "sr" (default) or "cusum"
-        "cusum" replaces the Shiryaev-Roberts recursion by C_t = f_t max(C_{t-1}, 1). With a known baseline and
-        an i.i.d. or exchangeable null, any window of m steps then has a false alarm probability at most
-        ``window_bound_two_sided(m, A)`` (Theorem 2). Under a martingale-difference null it has no such bound
-        (Proposition 3).
+        example the first minute of each trading day). ``carry > 0`` keeps at most ``carry`` of each side's
+        average across a boundary instead (bound (period + carry) / A below). What this buys depends on
+        the baseline:
 
-    With ``period=None`` and ``statistic="sr"`` the output is identical to ``VolatilityMonitor``.
-    Calibration, baselines and the two-sided rule are inherited unchanged.
+        * ``baseline="known"`` (with ``tau`` and ``m0``): P(false alarm in a period | everything before it)
+          <= period / A for every period, under the null of Theorem B for that tau and m0 (Theorem 1). The
+          monitor then never calibrates: it starts at the first return and restarts at once after an alarm.
+        * ``baseline="cs"``: P(false alarm in a given period of a segment) <= delta + period / A, marginally
+          (not given the past), if the tolerance of Theorem 6.4 holds up to the end of that period
+          (Corollary 1 of the theory note).
+        * ``baseline="plugin"`` (the default): no per-period bound is proved.
+    statistic : "sr" (default) or "cusum"
+        "cusum" replaces the Shiryaev-Roberts recursion by C_t = f_t max(C_{t-1}, 1). With a known baseline,
+        fixed bets and an i.i.d. or exchangeable null, the probability of a false alarm in any window of m
+        steps is at most ``window_bound_two_sided(m, A)`` (Theorem 2; unconditional, not given the past).
+        Under a martingale-difference null it has no such bound (Proposition 3).
+    baseline : "plugin" (default), "cs" or "known"
+        "known" needs ``tau`` (the truncation level) and ``m0`` (the null mean of min(r^2, tau^2)), and
+        optionally ``tau_down`` and ``m0_down`` for the decrease side (default: the same values).
+
+    With ``period=None``, ``statistic="sr"`` and a plug-in or confidence-sequence baseline the output is
+    identical to ``VolatilityMonitor``. Calibration and the two-sided rule are inherited unchanged.
     """
 
     def __init__(self, *args, period: int | None = None, offset: int = 0, carry: float = 0.0,
-                 statistic: str = "sr", **kw):
-        super().__init__(*args, **kw)
+                 statistic: str = "sr", baseline: str = "plugin", tau: float | None = None,
+                 m0: float | None = None, tau_down: float | None = None, m0_down: float | None = None, **kw):
+        self._known = None
+        if baseline == "known":
+            if tau is None or m0 is None:
+                raise ValueError("baseline='known' needs tau and m0")
+            if kw.get("margin_z") or kw.get("target_rel_width") is not None:
+                raise ValueError("margin_z and target_rel_width do not apply to a known baseline")
+            td = float(tau) if tau_down is None else float(tau_down)
+            md = float(m0) if m0_down is None else float(m0_down)
+            for name, (tt, mm) in (("increase", (float(tau), float(m0))), ("decrease", (td, md))):
+                if not (math.isfinite(tt) and tt > 0 and math.isfinite(mm) and 0 < mm <= tt * tt):
+                    raise ValueError(f"{name} side: need tau > 0 and 0 < m0 <= tau^2")
+            known = (float(tau), float(m0), td, md)
+            super().__init__(*args, baseline="plugin", **kw)
+            self.baseline = "known"
+            self._known = known
+            self._reset()
+        else:
+            if any(v is not None for v in (tau, m0, tau_down, m0_down)):
+                raise ValueError("tau, m0, tau_down and m0_down need baseline='known'")
+            super().__init__(*args, baseline=baseline, **kw)
         if period is not None and int(period) < 1:
             raise ValueError("period must be a positive integer")
         if statistic not in ("sr", "cusum"):
@@ -374,6 +409,16 @@ class PeriodicVolatilityMonitor(VolatilityMonitor):
         self.carry = float(carry)
         self.statistic = statistic
         self.period_resets = 0
+
+    def _reset(self):
+        super()._reset()
+        if getattr(self, "_known", None) is not None:  # known baseline: monitor from the next return on
+            tau, m0, td, md = self._known
+            self.scale = tau / self.c
+            self.tau2 = tau * tau
+            self.tau2_dn = td * td
+            self._n_finite = 0
+            self._finish(m0, m0 * (1 + self.band), md * (1 - self.band), None, None, md)
 
     def _boundary(self):
         if self.period is None or (self.t - self.offset) % self.period != 0 or self.t <= self.start:
