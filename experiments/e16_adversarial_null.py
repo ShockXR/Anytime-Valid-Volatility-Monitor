@@ -25,12 +25,22 @@ Part a: inside the null class (true baseline, conditional mean exactly m0)
       makes the spread depend on both statistics and on the time left (random search, then
       Nelder-Mead, CRN), and a "hold, then bold" family. Fresh-seed evaluation at one and five days,
       the whole horizon curve, and a scan over B.
-  a3  Why the rest of the slack cannot be removed: the optional-stopping decomposition of
+  a3  Where the rest of the slack sits: the optional-stopping decomposition of
       docs/theory_delay.md 8.1 under the worst adversary (stopping, wealth stranded on paths that
       never alarm, by bet, and overshoot); and a check of the bold policy on single bets against
-      the exact dynamic programme of E11 (results/e11d_worst_case_dp.csv).
+      E11's dynamic programme (results/e11d_worst_case_dp.csv; its values are lower bounds on the
+      worst case).
   a4  B below the searched range (B = 1.2 to 2): bold play and the i.i.d. law {0, B}. Under the theorem
       tau is any level fixed in advance, so B can be any number above 1.
+  a5  B above the searched range (B = 100, 150 and 1,000): bold play. When more than half of the
+      returns are zero, the monitor's fallback for tau (median of the nonzero |r|) allows B above
+      39.6; the price ticks of b3 reach B = 149.
+  a6  What can be proved, next to what was found: (i) the floor bound. On a path without an alarm
+      by step m, N_m = (M_up + M_down) / 2 is at least c_m, its value when every draw goes against
+      every bet (Y = 0 for the increase bets, Y = B for the decrease bets), so optional stopping
+      gives P(false alarm within m) <= (m - c_m) / (A - c_m) for every null law. (ii) E11's dynamic
+      programme for the single bet 0.05 on finer wealth grids (its values are lower bounds that
+      rise as the grid is refined).
 
 Part b: outside the class (do not read these as failures of the theorem)
   b1  GARCH(1,1) returns, unit unconditional variance, tau and m0 at their unconditional values:
@@ -43,8 +53,12 @@ Part b: outside the class (do not read these as failures of the theorem)
       full oracle (true tau and m0). Plus an adversary inside the null class that only changes the
       shape of the law after calibration (constant |r| after calibration, same conditional mean).
   b3  Price-level ticks: observed price = tick x round(efficient price / tick), so returns are
-      dependent (bid-ask-bounce-like). Tick sizes 0.05 to 6 sd, true unconditional tau and m0;
-      the in-class twin rounds each return independently. Conditional mean drift measured as
+      dependent (bid-ask-bounce-like). Tick sizes 0.05 to 6 sd, true unconditional tau and m0.
+      In-class control: i.i.d. draws from the marginal law of the price-rounded returns (pooled
+      from the long paths that give tau and m0), with the same tau and m0, so only the dependence
+      is removed. The older "twin" rounds each return independently to the same tick: it is
+      inside the class too, but it is a different law (far more zero returns, a much larger B),
+      so it checks the tick grid, not the values. Conditional mean drift measured as
       E[X_t | previous return] / m0.
 
 Usage (each part writes its own CSV files; run with at most 2 processes on a shared machine):
@@ -52,16 +66,22 @@ Usage (each part writes its own CSV files; run with at most 2 processes on a sha
   python experiments/e16_adversarial_null.py a2
   python experiments/e16_adversarial_null.py a3
   python experiments/e16_adversarial_null.py a4
+  python experiments/e16_adversarial_null.py a5
+  python experiments/e16_adversarial_null.py a6
   python experiments/e16_adversarial_null.py b1
   python experiments/e16_adversarial_null.py b2
   python experiments/e16_adversarial_null.py b3
   python experiments/e16_adversarial_null.py figures
-  python experiments/e16_adversarial_null.py a        # a1 a2 a3 a4
+  python experiments/e16_adversarial_null.py a        # a1 a2 a3 a4 a5 a6
   python experiments/e16_adversarial_null.py b        # b1 b2 b3
 
 Seeds (SEED = 16000): search (common random numbers) SEED + 101..135; fresh evaluation SEED + 900..988 (part a)
-and SEED + 991..1016 (part b2); part b1 SEED + 201..264; b2 search SEED + 300..436; b3 SEED + 400..410. No
-reported rate uses the seeds its search used (a few fresh seeds are shared by different families).
+and SEED + 991..1016 (part b2); part a5 SEED + 600..602; part b1 SEED + 201..264; b2 search SEED + 300..436;
+b3 SEED + 400..410 (price-rounded paths and the twin) and SEED + 500..510 (the control with the same marginal
+law); a6 draws nothing. No reported rate uses the seeds its search used. Overlaps: b3 reuses the seeds of the
+b2 search with a 1440-step calibration (SEED + 400..410, laws 0 to 10); the two parts are unrelated, so this
+only makes them dependent. SEED + 911 serves a1 (ticks, five days) and a2 (shape switching, one day), and
+SEED + 921 and 925 serve all three adaptive families of a2, which makes those comparisons paired.
 """
 
 from __future__ import annotations
@@ -203,7 +223,9 @@ def engine(y_fn, P, n, B, thr=THR, up=UPG, dnf=DNF, record=False, decompose=Fals
 
     ``y_fn(t, idx, Su, Sd, lamd)`` returns the draws Y_t for the paths still running (``idx``); it
     may use the detector's state (an adaptive adversary). Returns a dict with alarm, side and,
-    with ``record``, the Y paths; with ``decompose``, what the optional-stopping identity needs.
+    with ``record``, the Y paths; with ``decompose``, what the optional-stopping identity needs
+    (N = (M_up + M_down) / 2 at the alarm, the survivors' end states) and ``m_alarm``, the
+    statistic of the side that alarmed.
     """
     lamd = dnf / (B - 1.0)
     idx = np.arange(P)
@@ -213,6 +235,7 @@ def engine(y_fn, P, n, B, thr=THR, up=UPG, dnf=DNF, record=False, decompose=Fals
     side = np.zeros(P, np.int8)
     Yrec = np.full((P, n), np.nan) if record else None
     n_at_alarm = np.full(P, np.nan) if decompose else None
+    m_alarm = np.full(P, np.nan) if decompose else None
     for t in range(n):
         y = y_fn(t, idx, Su, Sd, lamd)
         if record:
@@ -230,13 +253,14 @@ def engine(y_fn, P, n, B, thr=THR, up=UPG, dnf=DNF, record=False, decompose=Fals
             side[idx[hd]] = -1
             if decompose:
                 n_at_alarm[idx[hit]] = 0.5 * (Mu[hit] + Md[hit])
+                m_alarm[idx[hit]] = np.where(hu, Mu, Md)[hit]
             keep = ~hit
             idx, Su, Sd = idx[keep], Su[keep], Sd[keep]
             if idx.size == 0:
                 break
     out = dict(alarm=alarm, side=side, Y=Yrec)
     if decompose:
-        out.update(n_at_alarm=n_at_alarm, survivors=idx, Su_end=Su, Sd_end=Sd)
+        out.update(n_at_alarm=n_at_alarm, m_alarm=m_alarm, survivors=idx, Su_end=Su, Sd_end=Sd)
     return out
 
 
@@ -610,6 +634,7 @@ def part_a2():
         rng = np.random.default_rng(SEED + 910 + hz // DAY)
         al = []
         ch = min(_chunk(hz, 4e6), Pf)
+        # full chunks only: 10 x 10,256 = 102,560 paths at one day and 20 x 2,051 = 41,020 at five days
         for s in range(0, Pf, ch):
             U, V, Z = rng.random((ch, hz)), rng.random((ch, hz)), rng.standard_normal((ch, hz))
             al.append(engine(array_y_fn(markov_shape_Y(U, V, Z, best[1], best[2], B)), ch, hz, B)["alarm"])
@@ -791,7 +816,8 @@ def part_a3():
 
 def part_a4():
     """B below the searched range. Under the theorem tau is any level fixed in advance, so B = tau^2 / m0 can be
-    any number above 1; when tau is 3 x the scaled MAD of the law itself, B lies in [1.90, 39.6] (report, Q16b).
+    any number above 1; when tau is 3 x the scaled MAD of the law itself, B lies in [1.90, 39.6] (report, set-up;
+    when the median absolute return is positive; part a5 covers larger B).
     Bold play and the i.i.d. law {0, B} at B = 1.2, 1.5, 1.9 and 2, fresh seeds."""
     rows = []
     for i, Bv in enumerate((1.2, 1.5, 1.9, 2.0)):
@@ -803,6 +829,65 @@ def part_a4():
         log("low B", Bv, [round(r["rate"], 4) for r in rows[-4:]])
     df = pd.DataFrame(rows)
     df.to_csv(OUT / "e16a_low_B.csv", index=False)
+    print(df.round(4).to_string())
+
+
+def part_a5():
+    """B above the searched range. With more than half of the returns at zero the monitor's fallback (median of
+    the nonzero |r|) gives B above 39.6: 47.6 to 149 for the price ticks of 2 to 6 sd in part b3. Bold play at
+    B = 100, 150 and 1,000, 60,000 fresh paths of five days each."""
+    rows = []
+    for i, Bv in enumerate((100.0, 150.0, 1000.0)):
+        a = fresh_bold(BOLD, Bv, _n(60000), WEEK, SEED + 600 + i)
+        for hz in HORIZONS:
+            rows.append(dict(B=Bv, law="adaptive: bold play", **rate_row(a, hz)))
+        log("high B", Bv, [round(r["rate"], 4) for r in rows[-2:]])
+    df = pd.DataFrame(rows)
+    df.to_csv(OUT / "e16a_high_B.csv", index=False)
+    print(df.round(4).to_string())
+
+
+def floor_constant(m, up=UPG, dnf=DNF):
+    """Smallest value of N_m = (M_up + M_down) / 2 after m steps over every path of draws in [0, B].
+
+    Each bet's statistic S_t = f_t (S_{t-1} + 1) is nondecreasing in its factor f_t and in S_{t-1}, so it
+    is smallest when every draw goes against that bet: Y = 0 for an increase bet (f = 1 - lam) and Y = B
+    for a decrease bet (f = 1 - phi (B - 1) = 1 - frac, whatever B). Then S_m = (1 - g)(1 - (1 - g)^m) / g
+    with g = lam or frac. The bound holds bet by bet on every path, so also for the averages."""
+    su = (1 - up) * (1 - (1 - up) ** m) / up
+    sd = (1 - dnf) * (1 - (1 - dnf) ** m) / dnf
+    return 0.5 * (su.mean() + sd.mean())
+
+
+def part_a6():
+    """What can be proved, next to what was found (no random draws).
+
+    (i) Floor bound: under an exact null N_t - t is a martingale, so E[N at sigma ^ m] = E[sigma ^ m] <= m. At
+    an alarm N >= A; on a path without an alarm by step m, N_m >= c_m (floor_constant). Hence
+    A P + c_m (1 - P) <= m, that is P(false alarm within m) <= (m - c_m) / (A - c_m), for every null law.
+    (ii) E11's dynamic programme (design.worst_case_false_alarm, the call of experiments/e11_delay_theory.py)
+    for the single increase bet 0.05 at level A on finer log grids of wealth states. Its values are the
+    false alarm probabilities of an actual adversary restricted to the grid, so they are lower bounds on
+    the worst case; a coarse grid rounds the step M -> M + 1 (a draw at Y = 1) back down to M once M is
+    large, which is how a small bet builds its wealth."""
+    from avmonitor import design
+
+    rows = [dict(kind="floor bound (proved)", horizon=m, bound=m / A, c_m=floor_constant(m),
+                 value=(m - floor_constant(m)) / (A - floor_constant(m)))
+            for m in (98, 195, 390, 780, 1950, 3900)]
+    for ns, H in ((700, 3900), (1400, 1950), (2800, 3900), (5600, 390)):
+        t0 = time.time()
+        lo, _ = design.worst_case_false_alarm(0.05, B_GAUSS, A, H, "up", n_states=ns, n_left=30, n_right=90,
+                                              compute_upper=False)
+        for m in (98, 390, 1950, 3900):
+            if m <= H:
+                rows.append(dict(kind="dynamic programme, single bet up 0.05 at A (lower bound)", n_states=ns,
+                                 horizon=m, bound=m / A, value=float(lo[m - 1])))
+        log("dp", ns, H, [round(r["value"] / r["bound"], 4) for r in rows if r.get("n_states") == ns],
+            f"{time.time() - t0:.0f} s")
+    df = pd.DataFrame(rows)
+    df["value_over_bound"] = df.value / df.bound
+    df.to_csv(OUT / "e16a_floor_and_dp.csv", index=False)
     print(df.round(4).to_string())
 
 
@@ -1037,6 +1122,13 @@ def price_tick_returns(P, n, h, rng):
     return h * np.diff(eff, axis=1)
 
 
+def marginal_iid_draws(k, h, shape, rng):
+    """I.i.d. returns from the empirical marginal law of the price-rounded returns h k (k: whole ticks, pooled
+    over all paths and steps). The dependence between steps is removed, the values and their frequencies kept."""
+    vals, cnt = np.unique(np.asarray(k).ravel(), return_counts=True)
+    return h * rng.choice(vals, size=shape, p=cnt / cnt.sum()).astype(float)
+
+
 def part_b3():
     rows = []
     for i, h in enumerate((0.05, 0.1, 0.25, 0.5, 0.75, 1.0, 1.5, 2.0, 3.0, 4.0, 6.0)):
@@ -1057,19 +1149,35 @@ def part_b3():
         acx = float(np.corrcoef(X[:, :-1].ravel(), X[:, 1:].ravel())[0, 1])
         r = price_tick_returns(_n(10000), WEEK, h, rng)
         a_price, _ = first_alarm(np.minimum(r * r, tau**2), m0, m0, tau**2)
-        # in-class twin: each return rounded independently (exact tau and m0 of that law)
+        del r
+        # twin, inside the class but a different law: each return rounded independently (its own exact tau and m0)
         j, p, tau_i, m0_i = tick_law(h, kmax=int(np.ceil(12 / h)) + 1)
         z = h * np.round(rng.standard_normal((_n(10000), WEEK)) / h)
         a_iid, _ = first_alarm(np.minimum(z * z, tau_i**2), m0_i, m0_i, tau_i**2)
+        del z
+        # control inside the class with the same marginal law: i.i.d. draws from the pooled price-rounded returns of
+        # the long paths, with the same tau and m0 (m0 is exactly the mean of min(r^2, tau^2) under this law)
+        ctrl = marginal_iid_draws(k, h, (_n(10000), WEEK), np.random.default_rng(SEED + 500 + i))
+        xc = np.minimum(ctrl * ctrl, tau**2)
+        ctrl_zero, ctrl_mean = float(np.mean(ctrl == 0)), float(xc.mean() / m0)
+        del ctrl
+        a_ctrl, _ = first_alarm(xc, m0, m0, tau**2)
+        del xc
         for hz in HORIZONS:
-            rp, ri = rate_row(a_price, hz), rate_row(a_iid, hz)
-            rows.append(dict(tick=h, tau=tau, m0=m0, zero_share=float(np.mean(k == 0)), lag1_corr_returns=ac,
-                             lag1_corr_X=acx, **cond, horizon=hz, bound=hz / A,
+            rp, ri, rc = rate_row(a_price, hz), rate_row(a_iid, hz), rate_row(a_ctrl, hz)
+            rows.append(dict(tick=h, tau=tau, m0=m0, B=tau**2 / m0, zero_share=float(np.mean(k == 0)),
+                             lag1_corr_returns=ac, lag1_corr_X=acx, **cond, horizon=hz, bound=hz / A,
                              price_rounding_rate=rp["rate"], price_ci_low=rp["ci_low"], price_ci_high=rp["ci_high"],
                              price_rate_over_bound=rp["rate_over_bound"], price_above_bound=rp["above_bound"],
+                             marginal_iid_rate=rc["rate"], marginal_iid_ci_low=rc["ci_low"],
+                             marginal_iid_ci_high=rc["ci_high"], marginal_iid_rate_over_bound=rc["rate_over_bound"],
+                             marginal_iid_above_bound=rc["above_bound"], marginal_iid_zero_share=ctrl_zero,
+                             marginal_iid_mean_X_over_m0=ctrl_mean,
                              iid_rounding_rate=ri["rate"], iid_ci_low=ri["ci_low"], iid_ci_high=ri["ci_high"],
-                             iid_above_bound=ri["above_bound"], paths=rp["paths"]))
-        log("price ticks", h, cond, [(rw["price_rounding_rate"], rw["iid_rounding_rate"]) for rw in rows[-2:]])
+                             iid_above_bound=ri["above_bound"], twin_tau=tau_i, twin_m0=m0_i, twin_B=tau_i**2 / m0_i,
+                             twin_zero_share=float(p[j == 0].sum()), paths=rp["paths"]))
+        log("price ticks", h, cond, [(rw["price_rounding_rate"], rw["marginal_iid_rate"], rw["iid_rounding_rate"])
+                                     for rw in rows[-2:]])
     df = pd.DataFrame(rows)
     df.to_csv(OUT / "e16b_price_ticks.csv", index=False)
     print(df.round(4).to_string())
@@ -1212,8 +1320,8 @@ def figures():
         s_ = tk[tk.horizon == hz].sort_values("tick")
         ax.plot(s_.tick, np.maximum(s_.price_rounding_rate / (hz / A), floor), color=SERIES[2], ls=ls, lw=2, marker="s",
                 ms=4, label=f"price rounded to the tick, {hz} steps")
-        ax.plot(s_.tick, np.maximum(s_.iid_rounding_rate / (hz / A), floor), color=SERIES[3], ls=ls, lw=2, marker="o",
-                ms=4, label=f"each return rounded (inside), {hz} steps")
+        ax.plot(s_.tick, np.maximum(s_.marginal_iid_rate / (hz / A), floor), color=SERIES[3], ls=ls, lw=2, marker="o",
+                ms=4, label=f"same values drawn i.i.d. (inside), {hz} steps")
     ax.axhline(1.0, color=INK, lw=1)
     ax.set_xscale("log")
     ax.set_yscale("log")
@@ -1236,9 +1344,10 @@ def figures():
 
 if __name__ == "__main__":
     parts = sys.argv[1:] or ["a", "b"]
-    expand = {"a": ["a1", "a2", "a3", "a4"], "b": ["b1", "b2", "b3"]}
+    expand = {"a": ["a1", "a2", "a3", "a4", "a5", "a6"], "b": ["b1", "b2", "b3"]}
     todo = [p for x in parts for p in expand.get(x, [x])]
-    fns = dict(a1=part_a1, a2=part_a2, a3=part_a3, a4=part_a4, b1=part_b1, b2=part_b2, b3=part_b3, figures=figures)
+    fns = dict(a1=part_a1, a2=part_a2, a3=part_a3, a4=part_a4, a5=part_a5, a6=part_a6, b1=part_b1, b2=part_b2,
+               b3=part_b3, figures=figures)
     for p in todo:
         t0 = time.time()
         log("start", p)

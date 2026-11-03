@@ -66,16 +66,27 @@ def test_adaptive_policy_keeps_the_conditional_mean_at_every_step(E, theta_kind)
 
 
 def test_bold_play_lands_on_the_threshold(E):
-    """When one draw can take a side to 2A, bold play lands there: no alarm overshoots by more than one unit."""
+    """When one draw can take a side to 2A, bold play lands there: the statistic of the side that alarms is
+    in [thr, thr + 1] at every alarm, and exactly at the target thr (1 + LAND) at almost every alarm (the
+    rest are steps where the statistic is already within one unit of thr, so Y = 1 takes it over). The
+    i.i.d. law {0, B} on the same uniforms does not aim and overshoots."""
     rng = np.random.default_rng(2)
     B, n, P, thr = E.B_GAUSS, 600, 4000, 800.0
-    res = E.run_bold(E.BOLD, rng.random((P, n)), B, thr=thr, decompose=True)
+    U = rng.random((P, n))
+    res = E.run_bold(E.BOLD, U, B, thr=thr, decompose=True)
     hit = res["alarm"] >= 0
     assert hit.sum() > 50
-    # N = (M_up + M_down) / 2 at an alarm; the alarming side is in [thr, thr + 1), the other side >= 0
-    assert np.all(res["n_at_alarm"][hit] >= thr / 2)
-    side_val = 2 * res["n_at_alarm"][hit]  # M_alarm + M_other
-    assert np.median(side_val) < thr * 1.2
+    m = res["m_alarm"][hit]
+    assert np.all(m >= thr) and np.all(m <= thr + 1)
+    landed = np.abs(m / (thr * (1 + E.LAND)) - 1) < 1e-9
+    assert landed.mean() > 0.95
+    # N = (M_up + M_down) / 2 at an alarm: at least half of the alarming side
+    assert np.all(res["n_at_alarm"][hit] >= m / 2)
+    iid = E.engine(E.array_y_fn(E.two_point_draw(U, 0.0, B)), P, n, B, thr=thr, decompose=True)
+    hi = iid["alarm"] >= 0
+    assert hi.sum() > 50
+    assert np.mean(np.abs(iid["m_alarm"][hi] / (thr * (1 + E.LAND)) - 1) < 1e-9) < 0.01
+    assert np.median(iid["m_alarm"][hi]) > 1.02 * thr
 
 
 def test_iid_two_and_three_point_laws_have_mean_one(E):
@@ -277,3 +288,45 @@ def test_price_ticks_are_dependent_and_iid_ticks_are_not(E):
     assert c < -0.03  # bid-ask-bounce-like negative autocorrelation (about -0.07 at a tick of 1 sd)
     z = np.round(rng.standard_normal((400, 4000)))
     assert abs(np.corrcoef(z[:, :-1].ravel(), z[:, 1:].ravel())[0, 1]) < 0.01
+
+
+def test_marginal_control_keeps_the_values_and_removes_the_dependence(E):
+    """Part b3's control: i.i.d. draws from the pooled price-rounded returns have the same values, the same share
+    of zeros and the same truncated mean m0 as the price-rounded stream, and no lag-one correlation. The older twin
+    (each return rounded independently) has far more zeros at a large tick: a different law."""
+    rng = np.random.default_rng(13)
+    h = 4.0
+    r = E.price_tick_returns(300, 4000, h, rng)
+    k = np.round(r / h).astype(int)
+    vals, cnt = np.unique(np.abs(k).ravel(), return_counts=True)
+    tau = E.tick_tau(vals * h, cnt / cnt.sum())
+    m0 = float(np.minimum(r * r, tau**2).mean())
+    d = E.marginal_iid_draws(k, h, (400, 4000), np.random.default_rng(14))
+    assert set(np.round(d / h).astype(int).ravel()) <= set(k.ravel())
+    assert np.mean(d == 0) == pytest.approx(np.mean(k == 0), abs=0.005)
+    x = np.minimum(d * d, tau**2)
+    assert x.mean() == pytest.approx(m0, abs=4 * x.std() / np.sqrt(x.size))
+    assert np.corrcoef(r[:, :-1].ravel(), r[:, 1:].ravel())[0, 1] < -0.2
+    assert abs(np.corrcoef(d[:, :-1].ravel(), d[:, 1:].ravel())[0, 1]) < 0.01
+    j, p, _, _ = E.tick_law(h)
+    assert p[j == 0].sum() > np.mean(k == 0) + 0.1
+
+
+def test_floor_constant_is_the_smallest_value_of_the_two_sided_statistic(E):
+    """c_m of part a6: attained bet by bet (Y = 0 for the increase bets, Y = B for the decrease bets, whatever B),
+    and N_m = (M_up + M_down) / 2 is at least c_m on any path of draws in [0, B]."""
+    rng = np.random.default_rng(15)
+    m, big = 120, np.inf  # no alarms: every path survives to step m
+    for B in (2.0, E.B_GAUSS, 40.0):
+        zero = E.engine(E.array_y_fn(np.zeros((1, m))), 1, m, B, thr=big, decompose=True)
+        top = E.engine(E.array_y_fn(np.full((1, m), B)), 1, m, B, thr=big, decompose=True)
+        su = (1 - E.UPG) * (1 - (1 - E.UPG) ** m) / E.UPG
+        sd = (1 - E.DNF) * (1 - (1 - E.DNF) ** m) / E.DNF
+        assert np.allclose(zero["Su_end"][0], su, rtol=1e-12) and np.allclose(top["Sd_end"][0], sd, rtol=1e-12)
+        assert E.floor_constant(m) == pytest.approx(0.5 * (su.mean() + sd.mean()), rel=1e-14)
+        Y = np.where(rng.random((2000, m)) < 0.5, rng.random((2000, m)) * B, rng.choice([0.0, B], (2000, m)))
+        res = E.engine(E.array_y_fn(Y), 2000, m, B, thr=big, decompose=True)
+        N = 0.5 * (res["Su_end"].mean(axis=1) + res["Sd_end"].mean(axis=1))
+        assert N.min() >= E.floor_constant(m) * (1 - 1e-12)
+    c = E.floor_constant(390)
+    assert 8.3 < c < 8.4 and (390 - c) / (E.A - c) < 390 / E.A
