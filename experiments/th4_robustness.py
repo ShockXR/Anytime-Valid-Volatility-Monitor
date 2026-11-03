@@ -29,10 +29,13 @@ Parts
              (th4_plugin.csv, th4_plugin_deciles.csv, th4_plugin_caln.csv).
   ticks      E16's price-level ticks: Theorem 1 at the drift range E16 stored, which conditions on the previous
              return only, so the result is a heuristic, not a proved bound (th4_ticks.csv). No simulation.
+  counterexamples  Exact values for the examples of sections 3.3 and 3.4 of the theory note: the maximum over t
+             in Theorem 3, a drift that responds to the data, an alternating drift, Proposition 5 at one day,
+             and the sup form at the mean parts for the switching cells (th4_counterexamples.csv). No simulation.
   figures    results/figures/th4_sup_bound.png and th4_e16_comparison.png.
 
 Usage (each part writes its own CSV files; run with at most 2 processes on a shared machine):
-  python experiments/th4_robustness.py sup constant switching garch plugin ticks figures
+  python experiments/th4_robustness.py sup constant switching garch plugin ticks counterexamples figures
   TH4_SCALE=0.05 TH4_OUT=/tmp/th4 python experiments/th4_robustness.py ...   # smoke run
 
 Seeds (SEED = 18400): constant SEED + 1..70 (30 laws, then a search seed and a fresh seed for each of the 20
@@ -514,6 +517,83 @@ def part_ticks():
 
 
 # ----------------------------------------------------------------------------
+# Part counterexamples: the examples of sections 3.3 and 3.4 (review round 6), exact
+# ----------------------------------------------------------------------------
+
+
+def part_counterexamples():
+    """Exact values (no random draws) for the examples behind Theorem 3 and section 3.4.
+
+    1. A burst then a calm spell (deterministic drift): the D* term of Theorem 3 needs max_{t <= m} D*_t.
+    2. A drift that responds to the data: Theorem 3's formula with the realised drift is below the alarm
+       probability. Y_1 = B with probability 1 / B, else 0; after Y_1 = B the stream stays at B until the
+       alarm and then at 1; after Y_1 = 0 it stays at 1. Both path types are run exactly.
+    3. +6% and -6% on alternate steps with a random phase (exogenous): Theorem 3 against the sup form at the
+       mean parts (3%, 3%).
+    4. Proposition 5 with p = 0.1 at one day: the sup form at the mean absolute drift against the alarm
+       probability p.
+    5. The switching cells with stay 0.5 (drift independent across steps): the sup form at the mean parts
+       (eps / 2, eps / 2), to compare with Theorem 3 in th4_switching.csv.
+    """
+    lam, phi = R.default_bets(B_G)
+    rows = []
+
+    def add(example, quantity, value, horizon=np.nan):
+        rows.append(dict(example=example, quantity=quantity, horizon=horizon, value=float(value)))
+
+    # 1. burst, then calm
+    n = DAY
+    y = np.r_[np.full(7, B_G), np.full(n - 7, 0.95)][None, :]
+    d = y - 1
+    res = R.run_paths(y, d, B_G, A, horizons=(n,))
+    add("burst then calm", "alarm step", res["alarm"][0] + 1, n)
+    add("burst then calm", "D*_m (windows ending at m)", R.drift_cusum(d, lam, phi, [n], running=False)[n][0], n)
+    add("burst then calm", "D*_m m / A", R.drift_cusum(d, lam, phi, [n], running=False)[n][0] * n / A, n)
+    add("burst then calm", "max over t <= m of D*_t", R.drift_cusum(d, lam, phi, [n])[n][0], n)
+    # 2. responding drift
+    for m in (7, DAY):
+        y1 = np.r_[np.full(7, B_G), np.ones(m - 7)][None, :]
+        d1 = np.r_[0.0, np.full(6, B_G - 1), np.zeros(m - 7)][None, :]
+        y2 = np.r_[0.0, np.ones(m - 1)][None, :]
+        d2 = np.zeros((1, m))
+        a1 = R.run_paths(y1, d1, B_G, A, horizons=(m,))["alarm"][0]
+        a2 = R.run_paths(y2, d2, B_G, A, horizons=(m,))["alarm"][0]
+        b = [min(1.0, float(R.exogenous_bound(dd, m, A, B_G)[0]), float(R.drift_cusum(dd, lam, phi, [m])[m][0] * m / A))
+             for dd in (d1, d2)]
+        p1 = 1 / B_G
+        add("responding drift", "alarm step after Y_1 = B (0: none)", a1 + 1 if a1 >= 0 else 0, m)
+        add("responding drift", "alarm step after Y_1 = 0 (0: none)", a2 + 1 if a2 >= 0 else 0, m)
+        add("responding drift", "Theorem 3 per-path bound after Y_1 = B", b[0], m)
+        add("responding drift", "Theorem 3 per-path bound after Y_1 = 0", b[1], m)
+        add("responding drift", "expected Theorem 3 bound", p1 * b[0] + (1 - p1) * b[1], m)
+        add("responding drift", "P(T <= m) = 1 / B", p1 if 0 <= a1 < m else 0.0, m)
+    # 3. alternating drift with a random phase
+    m = DAY
+    alt = np.where(np.arange(m) % 2 == 0, 0.06, -0.06)
+    D = np.vstack([alt, -alt])
+    add("alternating +6% / -6%", "expected first term of Theorem 3 (uncapped)", R.exogenous_bound(D, m, A, B_G).mean(), m)
+    add("alternating +6% / -6%", "sup form at the mean parts (3%, 3%)", R.sup_bound(0.03, 0.03, m, A, B_G), m)
+    add("alternating +6% / -6%", "expected D* term of Theorem 3", (R.drift_cusum(D, lam, phi, [m])[m] * m / A).mean(), m)
+    # 4. Proposition 5 at one day, p = 0.1
+    s_star = R.deterministic_alarm_step(B_G, A, B_G)
+    p = 0.1
+    dbar = p * (B_G - 1) * s_star / DAY
+    add("Proposition 5, p = 0.1", "s*", s_star, DAY)
+    add("Proposition 5, p = 0.1", "mean absolute drift", dbar, DAY)
+    add("Proposition 5, p = 0.1", "sup form at the mean absolute drift (both sides)", R.sup_bound(dbar, dbar, DAY, A, B_G), DAY)
+    add("Proposition 5, p = 0.1", "P(T <= m)", p, DAY)
+    # 5. sup form at the mean parts for the switching cells with stay 0.5
+    for eps in (0.01, 0.02, 0.05, 0.1):
+        for m in HORIZONS:
+            add(f"switching eps = {eps:g}, stay 0.5", "sup form at the mean parts (eps / 2, eps / 2)",
+                min(1.0, float(R.sup_bound(eps / 2, eps / 2, m, A, B_G))), m)
+    df = pd.DataFrame(rows)
+    df.to_csv(OUT / "th4_counterexamples.csv", index=False)
+    print(df.to_string())
+    return df
+
+
+# ----------------------------------------------------------------------------
 # Figures
 # ----------------------------------------------------------------------------
 
@@ -645,9 +725,9 @@ def figures():
 
 if __name__ == "__main__":
     OUT.mkdir(parents=True, exist_ok=True)
-    parts = sys.argv[1:] or ["sup", "constant", "switching", "garch", "plugin", "ticks", "figures"]
+    parts = sys.argv[1:] or ["sup", "constant", "switching", "garch", "plugin", "ticks", "counterexamples", "figures"]
     fns = dict(sup=part_sup, constant=part_constant, switching=part_switching, garch=part_garch, plugin=part_plugin,
-               ticks=part_ticks, figures=figures)
+               ticks=part_ticks, counterexamples=part_counterexamples, figures=figures)
     for p in parts:
         t0 = time.time()
         log("start", p)

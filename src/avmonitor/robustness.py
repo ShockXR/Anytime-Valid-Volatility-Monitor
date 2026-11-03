@@ -211,11 +211,13 @@ def exogenous_bound(d, m, A=DEFAULT_A, B=None, up_grid=None, down_fractions=None
     return (up.mean(axis=1) + dn.mean(axis=1)) / (2 * A)
 
 
-def drift_cusum(d, lam, phi, horizons):
+def drift_cusum(d, lam, phi, horizons, running=True):
     """D*_t = largest product over a window ending at t, over every bet and side, of (1 + lam d_i) or (1 - phi d_i).
 
     Uses the signed drift d (so a calm spell, d < 0, shrinks the increase product). CUSUM recursion
-    C_t = rho_t max(C_{t-1}, 1). Returns {m: max_{t <= m} D*_t} (shape (P,)) for each horizon.
+    C_t = rho_t max(C_{t-1}, 1). Returns {m: max_{t <= m} D*_t} (shape (P,)) for each horizon, the quantity
+    that Theorems 2 and 3 need; with ``running=False`` it returns D*_m itself (windows ending at m only),
+    which is not enough for those theorems (section 3.3 of the theory note).
     """
     d = np.atleast_2d(np.asarray(d, float))
     P, n = d.shape
@@ -230,9 +232,10 @@ def drift_cusum(d, lam, phi, horizons):
         dt = d[:, t][:, None]
         cu = np.minimum((1 + lam * dt) * np.maximum(cu, 1.0), CLIP)
         cd = np.minimum((1 - phi * dt) * np.maximum(cd, 1.0), CLIP)
-        run = np.maximum(run, np.maximum(cu.max(axis=1), cd.max(axis=1)))
+        now = np.maximum(cu.max(axis=1), cd.max(axis=1))
+        run = np.maximum(run, now)
         if t + 1 in hs:
-            out[t + 1] = run.copy()
+            out[t + 1] = run.copy() if running else now.copy()
     return out
 
 

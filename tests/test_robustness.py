@@ -1,16 +1,22 @@
 """TH4 (src/avmonitor/robustness.py, docs/theory_robustness.md): bounds when the null holds only approximately.
 
 * the closed form S_m(x) and the elementary bounds on G_m(x) = S_m(x) / m;
-* Lemma 1 (expected Shiryaev-Roberts wealth under a drift) by Monte Carlo, also at a stopping time;
-* Theorem 1 on simulated streams with a known constant drift (the simulation check), including the
-  deterministic stream at which the bound is attained;
+* Lemma 1 (expected Shiryaev-Roberts wealth under a drift) exactly, by enumerating every path of a two-point
+  law, also at a stopping time;
+* Theorem 1 on simulated streams with a known constant drift (the simulation check), including an adaptive
+  stream whose rate lies strictly between m / A and the bound, and the deterministic stream at which the bound
+  is attained;
 * the one-pass engine run_paths agrees with the package's own detector, and Lemma 2 (N_t <= D*_t N~_t) holds
   path by path;
 * drift_sr_sums, drift_cusum and threshold_bound agree with brute force;
-* Theorems 2 and 3 and Proposition 4 hold on an exogenous switching stream; the counterexamples of section 3;
+* Theorems 2 and 3 and Propositions 2b and 4 hold on exogenous switching streams, with informative values;
+  Theorem 3 needs the maximum of D*_t over t; the counterexamples of section 3;
 * Corollary 1 for the plug-in: per window, the capped bound is at least the alarm indicator of the
   deterministic stream that keeps the same conditional mean (the shape adversary of E16 with q = 0).
 """
+
+import importlib.util
+from pathlib import Path
 
 import numpy as np
 import pytest
@@ -20,6 +26,14 @@ from avmonitor.detectors import DEFAULT_UP_GRID, betting_edetector, two_sided_al
 from avmonitor.robust import MAD_NORMAL_SCALE
 
 B = R.gaussian_B()
+ROOT = Path(__file__).resolve().parents[1]
+
+
+def _load(name, rel):
+    spec = importlib.util.spec_from_file_location(name, ROOT / rel)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
 
 
 def test_gaussian_B():
@@ -78,23 +92,35 @@ def test_design_drift_hits_target():
     assert R.design_drift(0.1, direction="down") > 3 * R.design_drift(0.1, direction="up")
 
 
-def test_lemma1_expected_wealth_and_stopping():
-    """E[R_t] = S_t(lam delta) when E[f_t | past] = 1 + lam delta exactly; E[R_{T ^ t}] <= S_t at a stopping time."""
-    rng = np.random.default_rng(1)
-    lam, delta, n, P = 0.35, 0.03, 40, 200000
-    Y = np.where(rng.random((P, n)) < (1 + delta) / B, B, 0.0)
-    Rt = np.zeros(P)
-    Rs = np.zeros(P)
-    stopped = np.zeros(P, bool)
+def test_lemma1_exact_by_enumeration():
+    """Lemma 1 exactly: Y in {1 + delta - 0.5, 1 + delta + 0.5} i.i.d., every one of the 2^n paths enumerated.
+
+    E[R_t] = S_t(lam delta) with equality (the conditional mean of each factor is exactly 1 + lam delta), and at
+    the stopping time T = first t with R_t >= c, E[R_{T ^ t}] <= S_t, with the sharper recursion of the proof,
+    a_t <= rho (a_{t-1} + P(T > t - 1)), checked at every t.
+    """
+    lam, delta, n, c = 0.35, 0.03, 12, 10.0
+    rho = 1 + lam * delta
+    bits = (np.arange(2**n)[:, None] >> np.arange(n)[None, :]) & 1
+    Y = 1 + delta + np.where(bits == 1, 0.5, -0.5)
+    w = np.full(2**n, 0.5**n)
+    Rt = np.zeros(2**n)
+    Rs = np.zeros(2**n)
+    stopped = np.zeros(2**n, bool)
+    a_prev, alive_prev = 0.0, 1.0
     for t in range(n):
         f = 1 + lam * (Y[:, t] - 1)
         Rt = f * (Rt + 1)
         Rs = np.where(stopped, Rs, f * (Rs + 1))
-        stopped |= Rs >= 30  # a stopping time
-    S = float(R.sr_growth_sum(lam * delta, n))
-    se = Rt.std() / np.sqrt(P)
-    assert abs(Rt.mean() - S) < 4 * se
-    assert Rs.mean() <= S + 4 * Rs.std() / np.sqrt(P)
+        a_t = float(w @ Rs)
+        S = float(R.sr_growth_sum(lam * delta, t + 1))
+        assert float(w @ Rt) == pytest.approx(S, rel=1e-12)
+        assert a_t <= rho * (a_prev + alive_prev) + 1e-12
+        assert a_t <= S + 1e-12
+        stopped |= Rs >= c
+        a_prev, alive_prev = a_t, float(w @ ~stopped)
+    assert stopped.any() and not stopped.all()
+    assert a_prev < float(R.sr_growth_sum(lam * delta, n)) - 0.1  # stopping matters here
 
 
 def _run_default(Y, mean, A):
@@ -125,6 +151,24 @@ def test_simulation_check_constant_drift(law, direction):
     assert bound < 1  # the check is not vacuous
     assert rate <= bound + 3 * np.sqrt(bound * (1 - bound) / P)
     assert rate > 0
+
+
+def test_theorem1_adaptive_stream_above_m_over_A():
+    """Hold Y at 1 + delta for 360 steps, then bold play (E16's engine), A = 7800, one day, delta = 3% upward.
+
+    Its rate (22.7% in th4_constant_drift.csv) lies strictly between m / A = 5% and the bound 35.9%, so this
+    check fails if the inflation factor of Theorem 1 is dropped.
+    """
+    E = _load("e16_adversarial_null", "experiments/e16_adversarial_null.py")
+    X = _load("th4_robustness", "experiments/th4_robustness.py")
+    A, m, d, P = 7800.0, 390, 0.03, 4000
+    U = np.random.default_rng(21).random((P, m))
+    alarm = E.engine(X.drift_bold_fn(1 + d, U, 360), P, m, B)["alarm"]
+    rate = np.mean((alarm >= 0) & (alarm < m))
+    bound = float(R.sup_bound(d, 0, m, A, B))
+    se = np.sqrt(rate * (1 - rate) / P)
+    assert bound == pytest.approx(0.359, abs=5e-4)
+    assert m / A + 4 * se < rate <= bound + 3 * se
 
 
 def test_deterministic_stream_attains_the_bound():
@@ -226,6 +270,56 @@ def test_pathwise_bounds_hold_on_switching_stream():
     assert rc <= m / A + 3 * np.sqrt(m / A / P)
 
 
+def test_propositions_2b_and_4_informative_on_small_switching_drift():
+    """A switching drift of +/- 0.5% (stay 0.5): Propositions 2b and 4 are below 1 and above the rate."""
+    rng = np.random.default_rng(13)
+    A, m, P = 500.0, 150, 6000
+    Y, d = _random_drift_stream(rng, P, m, eps=0.005, stay=0.5)
+    res = R.run_paths(Y, d, B, A, horizons=(m,))
+    rate = np.mean((res["alarm"] >= 0) & (res["alarm"] < m))
+    h = res["horizons"][m]
+    se = 3 * np.sqrt(rate * (1 - rate) / P) + 3 / P
+    md = R.mean_drift_bound(h["sum_up"], h["sum_dn"], m, A, B=B)
+    trs = R.truncated_sup_bound(h["max_up"], h["max_dn"], m, A, B)[0]
+    assert md < 1 and trs < 1
+    assert rate <= md + se and rate <= trs + se
+    assert rate > 0
+
+
+def test_theorem3_needs_the_maximum_over_t():
+    """Y = B for 7 steps, then 0.95: the alarm is at step 7, D*_390 m / A = 0.876 < 1, max_t D*_t = 80,628."""
+    A, n = 7800.0, 390
+    lam, phi = R.default_bets(B)
+    y = np.r_[np.full(7, B), np.full(n - 7, 0.95)][None, :]
+    d = y - 1
+    res = R.run_paths(y, d, B, A, horizons=(n,))
+    assert res["alarm"][0] + 1 == 7
+    now = R.drift_cusum(d, lam, phi, [n], running=False)[n][0]
+    run = R.drift_cusum(d, lam, phi, [n])[n][0]
+    assert now * n / A == pytest.approx(0.876, abs=1e-3)  # windows ending at m only: below P(T <= m) = 1
+    assert run == pytest.approx(80628.4, rel=1e-5)
+    assert res["horizons"][n]["dstar"][0] == pytest.approx(run)  # the engine uses the maximum over t
+    assert float(R.exogenous_bound(d, n, A, B)[0]) >= 1 and run * n / A >= 1
+
+
+def test_theorem3_formula_fails_for_a_drift_that_responds_to_the_data():
+    """Y_1 = B with probability 1 / B (then B until the alarm, then 1), else 0 (then 1): exact, two path types."""
+    A = 7800.0
+    lam, phi = R.default_bets(B)
+    for m, expect in ((390, 0.1023), (7, 0.0532)):
+        y1 = np.r_[np.full(7, B), np.ones(m - 7)][None, :]
+        d1 = np.r_[0.0, np.full(6, B - 1), np.zeros(m - 7)][None, :]
+        y2 = np.r_[0.0, np.ones(m - 1)][None, :]
+        d2 = np.zeros((1, m))
+        assert R.run_paths(y1, d1, B, A, horizons=(m,))["alarm"][0] + 1 == 7
+        assert R.run_paths(y2, d2, B, A, horizons=(m,))["alarm"][0] == -1
+        b = [min(1.0, float(R.exogenous_bound(dd, m, A, B)[0]), float(R.drift_cusum(dd, lam, phi, [m])[m][0]) * m / A)
+             for dd in (d1, d2)]
+        e_bound = b[0] / B + (1 - 1 / B) * b[1]
+        assert e_bound == pytest.approx(expect, abs=1e-4)
+        assert e_bound < 1 / B  # below P(T <= m) = 1 / B = 0.1106
+
+
 def test_two_step_counterexample():
     lam, c = 0.5, 2.0
     el, ed = R.two_step_counterexample(lam, c)
@@ -257,7 +351,12 @@ def test_jackpot_counterexample():
     mean_drift = np.mean(np.abs(d))
     assert mean_drift == pytest.approx(jack.mean() * (B - 1) * s / m)
     h = res["horizons"][m]
-    assert R.mean_drift_bound(h["sum_up"], h["sum_dn"], m, A, B=B) >= rate
+    md = R.mean_drift_bound(h["sum_up"], h["sum_dn"], m, A, B=B)
+    assert md >= rate
+    # the sup form at the mean absolute drift is below the alarm probability (section 3.4, Proposition 5)
+    dbar = 0.1 * (B - 1) * s / m
+    assert float(R.sup_bound(dbar, dbar, m, A, B)) == pytest.approx(0.0891, abs=1e-4)
+    assert float(R.sup_bound(dbar, dbar, m, A, B)) < 0.1
 
 
 def test_plugin_bound_dominates_deterministic_stream():
