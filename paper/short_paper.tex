@@ -1380,6 +1380,16 @@ windows tried, keeps the bounds of Section 4.2 (Supplement S7.6); on BTC
 it removed all blind time, but on these data, now seen, it raised the
 count only to 4 of 16 (\(p = 0.056\), post hoc). A forward test of the
 rank detector on the BTC releases up to 1 June 2027 is pre-registered.
+So is an anytime-valid version of it (Supplement S7.7): each release,
+with control windows within four weeks that no other release's windows
+overlap, contributes a likelihood-ratio e-value, and the running product
+over releases is a test martingale if each release window is
+exchangeable with its controls given the earlier releases, so it may be
+checked after every release and continued without an end date. At the
+planning rates it reaches 20 by 1 June 2027 with probability 0.43,
+against power 0.82 for the fixed-date test, and by 1 January 2028 with
+probability 0.82; on the releases of 2024 and 2025, already seen, it
+would have reached 20 in June 2024.
 
 \hypertarget{other-data-and-what-the-real-data-say-about-the-method}{%
 \subsection{7.4 Other data, and what the real data say about the
@@ -4851,6 +4861,49 @@ times the nominal rate and were confirmed less often (62\% to 82\%) than
 on the raw returns. The forecast-relative null changes the question: the
 monitor flags one or two departures from the forecast per coin per
 month.
+
+\hypertarget{s7.7-an-anytime-valid-release-test}{%
+\subsubsection{S7.7 An anytime-valid release
+test}\label{s7.7-an-anytime-valid-release-test}}
+
+\textbf{Design (pre-registered).} Releases are taken in time order, and
+release \(i\) gets a stratum: its six-hour window and up to eight
+control windows at the same Eastern weekday and clock time one to four
+weeks before and after it. A candidate is dropped if its day is less
+than 2 days from a release day, if it starts within 1800 minutes of the
+start of the stream or is not inside the data, if an earlier release
+already uses it, or if its window overlaps the window of any release or
+of a control kept for an earlier release (the last rule an amendment
+made before any data of the test were loaded). With \(Z_i\) the release
+window's outcome (an up alarm of the rank detector within six hours),
+\(n_i\) controls, \(S_i\) windows with the outcome and
+\(p_i = S_i/(n_i+1)\), the e-value for an odds ratio \(\psi\) is
+\(e_i(\psi) = \psi^{Z_i}/(1 - p_i + \psi p_i)\), and
+\(M_j = \tfrac14 \sum_{\psi \in \{2, 4, 8, 16\}} \prod_{i \le j} e_i(\psi)\);
+the test rejects the first time \(M_j \ge 20\).
+
+\textbf{Guarantee.} If, given the outcomes of strata \(1\) to \(i - 1\),
+the \(n_i + 1\) outcomes of stratum \(i\) are exchangeable, then
+\(\mathbb{P}(Z_i = 1 \mid \mathcal{G}_{i-1}, S_i) = p_i\), so
+\(\mathbb{E}[e_i(\psi) \mid \mathcal{G}_{i-1}] = 1\), each product is a
+nonnegative martingale with mean 1, and by Ville's inequality
+\(\mathbb{P}(M_j \ge 20 \text{ for some } j) \le 0.05\) for any number
+of looks and any stopping rule. No independence between strata is
+needed, and the disjoint windows are what make the null coherent. The
+null concerns the monitor's outcomes, not the returns, and no property
+of the detector implies it; a volatility drift over the eight weeks
+around a release can break it in either direction, since most strata
+have unbalanced controls.
+
+\textbf{Results.} Under each of eight null laws, \(M\) reached 20 within
+200 releases in at most 4.4\% of 20,000 simulated sequences. Under the
+planning model of the fixed-date test (Section 7.3) it reaches 20 by 1
+June 2027 with probability 0.43 (the fixed-date test: 0.82), by 1
+January 2028 with 0.82 and by 1 January 2029 with 0.98; at the 2026
+rates with 0.19, 0.51 and 0.81; under the null with 0.010, 0.016 and
+0.022. On releases already seen (post hoc), \(M\) reaches 20 in June to
+August 2024 on all three coins and ends at 3.8 on BTC in 2026. Its first
+stratum on fresh data completes on 26 November 2026.
 
 \hypertarget{s8.-settings-of-the-experiments}{%
 \subsection{S8. Settings of the

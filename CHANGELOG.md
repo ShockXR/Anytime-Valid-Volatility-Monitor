@@ -10,7 +10,7 @@ overlapped in time, so some 0.3.0 work (the first paper drafts, E17) has commits
 
 ## [0.3.0] - Unreleased
 
-Round 3: theory TH4 to TH6, experiments E16 to E24, the paper, and the preparation of a release.
+Round 3: theory TH4 to TH6, experiments E16 to E25, the paper, and the preparation of a release.
 
 ### Added
 
@@ -56,6 +56,10 @@ Round 3: theory TH4 to TH6, experiments E16 to E24, the paper, and the preparati
   error budget split over the windows tried, with a fallback to the awake rank monitor; theory in
   `docs/theory_blind_guard.md`; a forward pre-registration (`docs/preregistration_e24_future.md`) for
   releases up to 1 June 2027.
+- E25: an anytime-valid version of that forward test (`experiments/e25_sequential_events.py`): an
+  e-process over releases with disjoint four-week strata of control windows, pre-registered before any
+  fresh data (`docs/preregistration_e25_sequential.md`, with one amendment also made before any fresh
+  data), proof in `docs/theory_sequential_events.md`; the fresh test can run from 26 November 2026.
 - `docs/demo/replay.html` and `scripts/build_replay.py`: a minute-by-minute replay of two landmark days
   of E18, rebuilt from the data and checked against E18's saved alarm lists.
 - TH4: `avmonitor.robustness`, false alarm bounds when the null holds only approximately (mean drift,

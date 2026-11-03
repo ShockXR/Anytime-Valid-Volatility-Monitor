@@ -614,6 +614,28 @@ IMPROVEMENTS: The confidence-sequence monitor no longer goes blind, with a proof
 
 REMAINING ISSUES: Run the forward test after 1 June 2027. Review round 10 corrected Proposition 3 and added a selection-free sufficient condition (H*) for the guarded null; no result changed.
 
+NEXT ITERATION: An anytime-valid version of the forward test (E25).
+
+---
+
+ITERATION NUMBER: 29 (an anytime-valid version of the forward release test, E25)
+
+OBJECTIVE: Let the release question be checked after every release and continued past 1 June 2027 at level 5%, which the fixed-date test of E24 cannot do, and measure what that costs.
+
+PROBLEM IDENTIFIED: E24's forward test may be run once, on 1 June 2027; nobody may act on the data before then, and after a failure its sample cannot be extended without spending more than its level. The project's own monitor solves the same problem for minutes with Ville's inequality; the release test did not use it.
+
+HYPOTHESIS: If each release gets its own control windows, disjoint from every other release's, the likelihood ratio of the release's outcome given the number of windows with the outcome has conditional mean 1 under exchangeability within the stratum, so the running product over releases, mixed over a grid of odds ratios, is a test martingale whatever the dependence between strata.
+
+CHANGES IMPLEMENTED: `docs/preregistration_e25_sequential.md` (committed before any Binance return after 24 October 2026 was loaded and before any code was written) and `docs/theory_sequential_events.md` (Lemma 1, Theorem 1); `experiments/e25_sequential_events.py` with gates, power, a post hoc illustration and the `status` part that runs the fresh test and refuses until a stratum is complete; `tests/test_e25.py`. Amendment 1, made after the synthetic power and the post hoc run but before any fresh data: no control window may overlap a window of an earlier stratum (30 overlapping pairs of half an hour on the planned calendar), and the drift sentence holds only for balanced strata.
+
+EXPERIMENTS PERFORMED: The exact conditional mean in 216 cases; simulated validity over eight null laws (20,000 sequences of 200 releases each); causality and pipeline gates on E22's and E23's known data; power under F24a's planning model with the amended and the original rules; the post hoc e-process on the releases of 2024 to 2025 and 2026.
+
+RESULTS: [PROVED] P(M ever reaches 20) ≤ 5% under the stated null, for any number of looks. [SYNTHETIC] Simulated 2.5% to 4.4% within 200 releases. Power at the planning rates: 0.43 by 1 June 2027 (F24a 0.82), 0.82 by 2028, 0.98 by 2029; 0.19, 0.51 and 0.81 at the 2026 rates (F24a 0.60). [REAL, known data] 33 gate checks, 0 mismatches. [REAL, post hoc] On 2024 to 2025 M crosses 20 in June to August 2024 on all three coins; on 2026 BTC it ends at 3.8 (ETH 8.4, SOL 5.0). Failed or weak: the amendment cost about a fifth of the power at F24a's date (0.54 under the original rules); Wednesday releases lose controls to the controls of a release a week earlier (the FOMC statement of 17 March 2027 has none, so it cannot add evidence); most strata are unbalanced, so a volatility drift is not removed.
+
+IMPROVEMENTS: The release question can be watched release by release and continued without end, at a proved level, without assuming independence between strata.
+
+REMAINING ISSUES: Run `python experiments/e25_sequential_events.py status` from 26 November 2026; keep the event file updated under F24a's rule.
+
 NEXT ITERATION: Final audit.
 
 ---
