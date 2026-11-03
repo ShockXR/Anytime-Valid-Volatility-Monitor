@@ -23,6 +23,7 @@ from .detectors import (
     summarize_alarms,
     two_sided_alarm,
 )
+from .guard import GuardedPeriodicVolatilityMonitor, GuardedVolatilityMonitor, spending_schedule
 from .monitor import Event, GaussianLRMonitor, VolatilityMonitor
 from .multifreq import MFEvent, MultiFrequencyMonitor, level_for_budget
 from .panel import PanelDiscovery, PanelMonitor, ebh
@@ -54,6 +55,9 @@ __all__ = [
     "Event",
     "PeriodicVolatilityMonitor",
     "restarted_sr_bound",
+    "GuardedVolatilityMonitor",
+    "GuardedPeriodicVolatilityMonitor",
+    "spending_schedule",
     "MultiFrequencyMonitor",
     "MFEvent",
     "level_for_budget",
