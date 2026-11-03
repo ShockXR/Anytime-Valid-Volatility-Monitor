@@ -15,14 +15,23 @@ p_i = S_i / (n_i + 1), the stratum's e-value for the odds ratio psi is e_i(psi) 
 Under H0 (the n_i + 1 outcomes of each stratum are exchangeable given the earlier strata) M is a nonnegative martingale
 with mean 1, so P(M_j >= 20 for some j) <= 5% (Ville's inequality), at every look and with no end date.
 
+Amendment 1 (end of the pre-registration, commit e00c2b0, 3 November 2026, before any fresh data; made after the
+power simulation and the post hoc run on seen data, motivated by section 6): rule 3 also drops a candidate whose
+window [anchor, anchor + 6 h) overlaps the window of any release or of any control already kept for an earlier
+release (release windows are never dropped; overlapping release windows are reported), and the number of balanced
+strata is reported. These amended rules are the default of every part, and the only rules of `status`;
+--rules=original reruns strata, power, posthoc and theory with the rules as first committed and writes
+results/e25_*_original_rules.csv (no figures), kept for comparison.
+
 Parts (each writes its own results/e25_*.csv):
   theory   [PROVED identity checked exactly; SYNTHETIC] gate 1: the exact conditional mean of e(psi) under H0 is 1 for
            n = 0..8, S = 0..n+1 and psi in the grid (rational arithmetic and floating point, results/e25_theory_identity.csv);
            gate 5: simulated validity under H0 with the strata sizes of the planned calendar, 20,000 sequences of 200
            releases, seed 25,000, exchangeable Bernoulli strata at four rates and four other laws of S
            (results/e25_validity.csv).
-  strata   [calendar only, no market data] the deterministic assignment of section 4 (rules 1 to 3; completion, rule 4)
-           on the planned forward calendar (results/e25_strata_planned.csv).
+  strata   [calendar only, no market data] the deterministic assignment of section 4 (rules 1 to 3 with Amendment 1;
+           completion, rule 4) on the planned forward calendar, with the balance of each stratum's controls
+           (results/e25_strata_planned.csv).
   gates    [REAL, known data only, no download] gate 2 (causality: S2 on E23's 2026 BTC stream, full run against runs
            whose data end at three earlier cut-offs) and gate 3 (pipeline: E25's release outcomes on E23's period equal
            E23's committed up_post for S2, every coin and release; E25's own S2 runs reproduce the committed S2 alarm
@@ -42,6 +51,7 @@ Parts (each writes its own results/e25_*.csv):
   figs     results/figures/e25_*.png from the CSVs.
 
 Usage: nice -n 10 python experiments/e25_sequential_events.py <part> [--procs=2] [--cutoff=YYYY-MM-DD]
+       [--rules=amended|original]
 """
 
 from __future__ import annotations
@@ -84,6 +94,16 @@ WINDOW_MIN = E12.POST  # the outcome window [anchor, anchor + 6 h)
 COMPLETE_DAYS = 28  # rule 4: data to t + 28 days + 6 hours (Eastern day arithmetic)
 STATUS_DAYS = 30  # rule 4: no event-file row within 30 days of the release day may still be 'scheduled'
 RELEASED = ("released", "rescheduled")
+# Amendment 1 (docs/preregistration_e25_sequential.md, commit e00c2b0, before any fresh data): rule 3 also drops a
+# candidate whose window overlaps the window of any release or of any control kept for an earlier release. The
+# amended rules are the default everywhere (the status part uses nothing else); "original" reproduces the rules as
+# first committed (30804bb), for the comparison in the report only, and its outputs carry the suffix below.
+RULES = "amended"
+ORIGINAL_SUFFIX = "_original_rules"
+
+
+def _suffix() -> str:
+    return "" if RULES == "amended" else ORIGINAL_SUFFIX
 FUTURE_EVENTS = E24.FUTURE_EVENTS
 STREAM_START = E24.FUTURE_MONITOR_START  # 2026-10-25 00:00 UTC
 LOAD_START = E24.FUTURE_LOAD_START  # 2026-10-05: 20 days of intraday-profile warm-up (known data)
@@ -178,16 +198,25 @@ def releases_frame(releases: pd.DataFrame) -> pd.DataFrame:
     return r[["stratum", "date", "event_type", "release_time_et", "release_utc", "day"]]
 
 
-def assign_strata(releases: pd.DataFrame, event_days, stream_start, data_end=None) -> pd.DataFrame:
-    """Rules 1 to 3 of the pre-registration, section 4. One row per (release, candidate control).
+def assign_strata(releases: pd.DataFrame, event_days, stream_start, data_end=None, rules: str | None = None) -> pd.DataFrame:
+    """Rules 1 to 3 of the pre-registration, section 4, with Amendment 1. One row per (release, candidate control).
 
     Rule 1: candidates at the release's US Eastern clock time on the Eastern days d + 7k, k in +-1..4.
     Rule 2: a candidate is dropped if its day is less than 2 days from any day in ``event_days`` (the release days of
     the event file), if its anchor is earlier than stream start + 1440 + 360 minutes, or if its window
     [anchor, anchor + 6 h) does not end by ``data_end`` (exclusive; None: no data end, for planning).
-    Rule 3: a candidate kept by an earlier release (smaller release time) is dropped.
-    Uses no market data and no outcome."""
+    Rule 3: a candidate kept by an earlier release (smaller release time) is dropped; with the amended rules
+    (default) also a candidate whose window overlaps the window of any release in ``releases`` (earlier or later)
+    or of any control already kept for an earlier release. Release windows are never dropped. When every release
+    day is in ``event_days``, rule 2 already removes every candidate that overlaps a release window (such a candidate
+    is on the release's day or the day next to it); the release part of rule 3 then never binds.
+    ``rules="original"`` gives rule 3 as first committed. Uses no market data and no outcome."""
+    rules = RULES if rules is None else rules
+    if rules not in ("amended", "original"):
+        raise ValueError(rules)
     rel = releases_frame(releases)
+    rel_ns = _ns(rel["release_utc"]) if len(rel) else np.zeros(0, np.int64)
+    span_ns = WINDOW_MIN * 60 * 10**9
     days = sorted({_day(d) for d in event_days})
     days_ns = np.array([d.value for d in days], dtype=np.int64)
     min_anchor = _utc(stream_start) + pd.Timedelta(minutes=START_GAP_MIN)
@@ -209,6 +238,10 @@ def assign_strata(releases: pd.DataFrame, event_days, stream_start, data_end=Non
                 reason = "rule 2: window not inside the data"
             elif a in used:
                 reason = f"rule 3: used by stratum {used[a]}"
+            elif rules == "amended" and (hit := np.flatnonzero(np.abs(rel_ns - a.value) < span_ns)).size:
+                reason = f"rule 3 (Amendment 1): overlaps the release window of stratum {int(rel.stratum.iloc[hit[0]])}"
+            elif rules == "amended" and (hit := [j for b, j in used.items() if abs(b.value - a.value) < span_ns]):
+                reason = f"rule 3 (Amendment 1): overlaps a control of stratum {hit[0]}"
             else:
                 reason = "kept"
                 used[a] = int(r.stratum)
@@ -223,19 +256,34 @@ def assign_strata(releases: pd.DataFrame, event_days, stream_start, data_end=Non
 
 def strata_table(cands: pd.DataFrame) -> pd.DataFrame:
     """One row per stratum: the release, its kept controls (n of them) and the time the data must reach for the
-    stratum to be complete, t + 28 days + 6 hours in Eastern day arithmetic (rule 4)."""
+    stratum to be complete, t + 28 days + 6 hours in Eastern day arithmetic (rule 4). ``balanced`` (Amendment 1,
+    item 2): as many kept controls before the release as after it, and at least one on each side; a stratum without
+    controls (e = 1 whatever happens) is neither balanced nor one-sided."""
     rows = []
+    span = pd.Timedelta(minutes=WINDOW_MIN)
+    rel_t = cands.groupby("stratum", sort=True).release_utc.first()
     for s, g in cands.groupby("stratum", sort=True):
         r = g.iloc[0]
         kept = g[g.kept].sort_values("anchor_utc")
         day = _day(r.date)
+        before, after = int((kept.k < 0).sum()), int((kept.k > 0).sum())
+        other = [f"stratum {int(j)} ({t:%Y-%m-%d %H:%M})" for j, t in rel_t.items()
+                 if j != s and abs(t - r.release_utc) < span]
         rows.append(dict(stratum=int(s), date=r.date, event_type=r.event_type, release_time_et=r.release_time_et,
                          release_utc=r.release_utc, n=int(len(kept)),
                          controls=";".join(f"{a:%Y-%m-%d %H:%M}" for a in kept.anchor_utc),
+                         controls_before=before, controls_after=after, balanced=before == after > 0,
+                         release_window_overlaps=";".join(other),
                          data_needed_until=et_anchor(day + pd.Timedelta(days=COMPLETE_DAYS), r.release_time_et)
                          + pd.Timedelta(minutes=WINDOW_MIN)))
-    cols = ["stratum", "date", "event_type", "release_time_et", "release_utc", "n", "controls", "data_needed_until"]
+    cols = ["stratum", "date", "event_type", "release_time_et", "release_utc", "n", "controls", "controls_before",
+            "controls_after", "balanced", "release_window_overlaps", "data_needed_until"]
     return pd.DataFrame(rows, columns=cols)
+
+
+def _one_sided(tab: pd.DataFrame) -> pd.Series:
+    """Strata with kept controls on one side of the release only (n > 0)."""
+    return (tab.controls_before == 0) != (tab.controls_after == 0)
 
 
 def completion(table: pd.DataFrame, event_rows: pd.DataFrame, data_end=None) -> pd.DataFrame:
@@ -456,7 +504,7 @@ def part_theory():
         res = simulate_h0(ns, law, rate, REPS, rng)
         sh = res["share_M_ever_ge_20"]
         rows.append(dict(law=law, rate=rate, releases=VALIDITY_RELEASES, reps=REPS, seed=f"[{SEED}, {i}]",
-                         n_source="planned calendar to 2029-01-01 (results/e25_power_calendar.csv), cycled",
+                         n_source=f"planned calendar to 2029-01-01 (results/e25_power_calendar{_suffix()}.csv), cycled",
                          **res, mc_se_20=float(np.sqrt(sh * (1 - sh) / REPS)), bound=ALPHA,
                          limit_bound_plus_3se=ALPHA + 3 * se_nom, passes=sh <= ALPHA + 3 * se_nom))
         print(f"gate 5: {law}, rate {rate}: P(M ever >= 20 within {VALIDITY_RELEASES}) = {sh:.4f} "
@@ -464,7 +512,8 @@ def part_theory():
               f"and {VALIDITY_RELEASES} strata {res['mean_M_1']:.3f} ({res['mean_M_1_se']:.3f}), {res['mean_M_10']:.3f} "
               f"({res['mean_M_10_se']:.3f}), {res['mean_M_final']:.3f} ({res['mean_M_final_se']:.3f})", flush=True)
     val = pd.DataFrame(rows)
-    val.to_csv(OUT / "e25_validity.csv", index=False)
+    val["rules"] = RULES
+    val.to_csv(OUT / f"e25_validity{_suffix()}.csv", index=False)
     print(f"gate 5: {'PASS' if val.passes.all() else 'FAIL'} (limit {ALPHA + 3 * se_nom:.4f})")
 
 
@@ -502,10 +551,19 @@ def part_strata():
         ov_key.setdefault(r.window_2, []).append(f"{r.window_1} (stratum {r.stratum_1}, {r.overlap_minutes} min)")
     out["overlaps_window_of_other_stratum"] = [";".join(ov_key.get(f"{a:%Y-%m-%d %H:%M}", [])) if k else ""
                                                for a, k in zip(out.anchor_utc, out.kept)]
-    out.to_csv(OUT / "e25_strata_planned.csv", index=False)
+    out = out.merge(comp[["stratum", "controls_before", "controls_after", "balanced", "release_window_overlaps"]],
+                    on="stratum")
+    out["rules"] = RULES
+    out.to_csv(OUT / f"e25_strata_planned{_suffix()}.csv", index=False)
     with pd.option_context("display.width", 220, "display.max_rows", 400, "display.max_colwidth", 120):
-        print(comp[["stratum", "date", "event_type", "release_utc", "n", "data_needed_until", "controls"]].to_string(index=False))
+        print(comp[["stratum", "date", "event_type", "release_utc", "n", "controls_before", "controls_after",
+                    "data_needed_until", "controls"]].to_string(index=False))
         print(out.groupby("reason").size().to_string())
+        print(f"rules {RULES}: {len(comp)} strata, n from {comp.n.min()} to {comp.n.max()} "
+              f"({';'.join(f'{v}:{int((comp.n == v).sum())}' for v in range(9) if (comp.n == v).any())}), "
+              f"{int(comp.balanced.sum())} balanced, {int(_one_sided(comp).sum())} "
+              f"with controls on one side only; release windows that overlap: "
+              f"{int((comp.release_window_overlaps != '').sum())} strata")
         print(f"windows of different strata that overlap: {len(ov)} pairs")
         if len(ov):
             print(ov.to_string(index=False))
@@ -652,11 +710,13 @@ def part_power():
                                    mean_cpi=float(g[(sub.event_type == "cpi").to_numpy(), j].mean())))
         print(f"{sname}: done", flush=True)
     pw = pd.DataFrame(rows)
-    pw.to_csv(OUT / "e25_power.csv", index=False)
-    pd.DataFrame(curve).to_csv(OUT / "e25_power_curve.csv", index=False)
-    pd.DataFrame(growth).to_csv(OUT / "e25_power_growth.csv", index=False)
+    sfx = _suffix()
+    pw.assign(rules=RULES).to_csv(OUT / f"e25_power{sfx}.csv", index=False)
+    pd.DataFrame(curve).assign(rules=RULES).to_csv(OUT / f"e25_power_curve{sfx}.csv", index=False)
+    pd.DataFrame(growth).assign(rules=RULES).to_csv(OUT / f"e25_power_growth{sfx}.csv", index=False)
     tab.assign(release_utc=tab.release_utc.astype(str), data_needed_until=tab.data_needed_until.astype(str),
-               enters_test=tab.enters_test.astype(str)).to_csv(OUT / "e25_power_calendar.csv", index=False)
+               enters_test=tab.enters_test.astype(str), rules=RULES).to_csv(OUT / f"e25_power_calendar{sfx}.csv",
+                                                                              index=False)
     with pd.option_context("display.width", 250, "display.max_columns", 40, "display.max_rows", 200):
         print(tab[["stratum", "date", "event_type", "kind", "n", "enters_test"]].to_string(index=False))
         cols = ["scenario", "procedure"] + [f"P_cross_by_{d}" for d in POWER_DATES] + [
@@ -664,7 +724,8 @@ def part_power():
             "median_crossing_date_given_crossing", "share_never_crossing_by_2029-01-01", "F24a_power_at_2027-06-01"]
         print(pw[cols].round(4).to_string(index=False))
         print(pd.DataFrame(growth).round(4).to_string(index=False))
-    fig_power(_plt())
+    if RULES == "amended":
+        fig_power(_plt())
 
 
 # ----------------------------------------------------------------------------
@@ -865,6 +926,9 @@ def part_posthoc(procs: int):
                     n_min=int(nk.min()) if len(nk) else np.nan, n_median=float(np.median(nk)) if len(nk) else np.nan,
                     n_max=int(nk.max()) if len(nk) else np.nan,
                     n_counts=";".join(f"{v}:{int((nk == v).sum())}" for v in range(9) if (nk == v).any()),
+                    strata_balanced=int(tt.balanced.sum()),
+                    strata_one_sided=int(_one_sided(tt).sum()),
+                    strata_with_overlapping_release_window=int((tt.release_window_overlaps != "").sum()),
                     final_M=float(tt.M.iloc[-1]) if len(tt) else 1.0, max_M=float(tt.M.max()) if len(tt) else 1.0,
                     first_crossing_20_stratum=j20, first_crossing_20_date=d20,
                     first_crossing_40_stratum=j40, first_crossing_40_date=d40,
@@ -879,17 +943,21 @@ def part_posthoc(procs: int):
     st["label"] = "post hoc, exploratory"
     for c in ("release_utc", "data_needed_until"):
         st[c] = st[c].astype(str)
-    st.to_csv(OUT / "e25_posthoc_strata.csv", index=False)
+    st["rules"] = RULES
+    st.to_csv(OUT / f"e25_posthoc_strata{_suffix()}.csv", index=False)
     sm = pd.DataFrame(summ)
-    sm.to_csv(OUT / "e25_posthoc_summary.csv", index=False)
+    sm["rules"] = RULES
+    sm.to_csv(OUT / f"e25_posthoc_summary{_suffix()}.csv", index=False)
     with pd.option_context("display.width", 250, "display.max_columns", 40, "display.max_rows", 200):
         cols = ["period", "coin", "cell", "strata_in_test", "strata_not_complete", "releases_with_outcome",
-                "release_rate", "control_rate_pooled", "n_counts", "final_M", "max_M", "first_crossing_20_date",
+                "release_rate", "control_rate_pooled", "n_counts", "strata_balanced", "strata_one_sided",
+                "strata_with_overlapping_release_window", "final_M", "max_M", "first_crossing_20_date",
                 "first_crossing_40_date"]
         print(sm[cols].round(4).to_string(index=False))
         print(st[st.coin == PRIMARY_COIN][["period", "stratum", "date", "event_type", "n", "Z", "K", "S", "M",
                                            "in_test", "not_complete_because"]].round(3).to_string(index=False))
-    fig_posthoc(_plt())
+    if RULES == "amended":
+        fig_posthoc(_plt())
 
 
 # ----------------------------------------------------------------------------
@@ -905,7 +973,7 @@ def fresh_plan(events: pd.DataFrame, data_end, stream_start=None) -> tuple[pd.Da
     relrows = events[events.status.isin(RELEASED)]
     utc = [et_anchor(d, h) for d, h in zip(relrows.date, relrows.release_time_et)]
     rel = relrows[np.array([t >= _utc(stream_start) for t in utc], dtype=bool)]
-    cands = assign_strata(rel, relrows["date"], stream_start, data_end)
+    cands = assign_strata(rel, relrows["date"], stream_start, data_end, rules="amended")  # the fresh test: Amendment 1
     comp = completion(strata_table(cands), events, data_end)
     return cands, comp
 
@@ -999,6 +1067,8 @@ def part_status(procs: int, cutoff: str | None):
 
     from avmonitor import data as Dm
 
+    if RULES != "amended":
+        raise SystemExit("status refused: the fresh test uses the amended rules only (Amendment 1)")
     now = pd.Timestamp.now(tz="UTC")
     cut = _utc(cutoff) if cutoff else now.floor("D")
     ev = future_event_rows()
@@ -1089,7 +1159,7 @@ def fig_power(plt):
     ax.set_ylabel("P(M has reached 20 by the date)")
     ax.set_xlabel("date (strata enter when complete: release + 4 weeks + 6 hours)")
     ax.legend(frameon=False, fontsize=8, loc="lower right", bbox_to_anchor=(1.0, 0.06))
-    ax.set_title("E25: chance that the e-process has crossed 20, by date [SYNTHETIC; planning inputs REAL S2 BTC rates]",
+    ax.set_title("E25 (Amendment 1 rules): chance that the e-process has crossed 20, by date [SYNTHETIC; planning inputs REAL S2 BTC rates]",
                  loc="left", fontsize=9.5, color=INK)
     fig.tight_layout()
     FIG.mkdir(parents=True, exist_ok=True)
@@ -1129,7 +1199,7 @@ def fig_posthoc(plt):
     axes[0].annotate("40 (E25b, ETH and SOL)", xy=(0.0, THRESHOLD_E25B), xycoords=("axes fraction", "data"),
                      xytext=(2, 3), textcoords="offset points", fontsize=7.5, color=MUTED)
     axes[0].legend(frameon=False, fontsize=8, loc="upper left", bbox_to_anchor=(0.0, 0.9))
-    fig.suptitle("E25 post hoc, exploratory [REAL, data seen before the design]: the e-process over FOMC and CPI "
+    fig.suptitle("E25 post hoc, exploratory [REAL, data seen before the design], Amendment 1 rules: the e-process over FOMC and CPI "
                  "releases, rank monitor S2 (circles: first crossing of 20)", x=0.01, ha="left", fontsize=10, color=INK)
     fig.tight_layout(rect=(0, 0, 1, 0.94))
     FIG.mkdir(parents=True, exist_ok=True)
@@ -1156,6 +1226,10 @@ def main():
     part = sys.argv[1] if len(sys.argv) > 1 and not sys.argv[1].startswith("--") else ""
     opts = dict(a.lstrip("-").split("=", 1) for a in sys.argv[1:] if a.startswith("--") and "=" in a)
     procs = min(int(opts.get("procs", 2)), 2)
+    global RULES
+    RULES = opts.get("rules", "amended")
+    if RULES not in ("amended", "original"):
+        raise SystemExit("--rules must be amended (default) or original")
     t0 = time.time()
     if part == "theory":
         part_theory()

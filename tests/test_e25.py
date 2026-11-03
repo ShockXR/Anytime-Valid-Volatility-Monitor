@@ -187,14 +187,72 @@ def test_candidate_dropped_by_rule2_is_not_used():
     assert (c[c.candidate_day == "2026-12-30"].reason == "rule 2: window not inside the data").all()
 
 
-def test_window_overlaps_cpi_and_fomc_controls():
-    # a Wednesday CPI release and a Wednesday FOMC statement share control days: windows 08:30 to 14:30 and
-    # 14:00 to 20:00 ET overlap by 30 minutes
+def test_window_overlaps_cpi_and_fomc_controls_original_rules():
+    # under the rules as first committed, a Wednesday CPI release and a Wednesday FOMC statement share control days:
+    # windows 08:30 to 14:30 and 14:00 to 20:00 ET overlap by 30 minutes
     r = rel([("2027-01-13", "cpi"), ("2026-12-09", "fomc")])
-    c = E25.assign_strata(r, ["2026-12-09", "2027-01-13"], START, None)
+    c = E25.assign_strata(r, ["2026-12-09", "2027-01-13"], START, None, rules="original")
     ov = E25.window_overlaps(c)
-    assert len(ov) > 0 and (ov.overlap_minutes == 30).all()
+    assert len(ov) == 4 and (ov.overlap_minutes == 30).all()
     assert set(ov.kind_1) | set(ov.kind_2) == {"control"}
+
+
+def test_amended_rule3_same_day_cpi_and_fomc_controls():
+    """Amendment 1: the CPI release's 08:30 ET candidates on the Wednesdays already kept (14:00 ET) by the earlier FOMC
+    statement are dropped; no two windows of different strata overlap."""
+    r = rel([("2027-01-13", "cpi"), ("2026-12-09", "fomc")])
+    c = E25.assign_strata(r, ["2026-12-09", "2027-01-13"], START, None)  # amended is the default
+    assert E25.window_overlaps(c).empty
+    cpi = c[c.stratum == 2].set_index("candidate_day")
+    for d in ("2026-12-16", "2026-12-23", "2026-12-30", "2027-01-06"):
+        assert not cpi.loc[d, "kept"] and cpi.loc[d, "reason"] == "rule 3 (Amendment 1): overlaps a control of stratum 1"
+        assert c[(c.stratum == 1) & (c.candidate_day == d)].kept.iloc[0]  # the earlier stratum keeps its control
+    t = E25.strata_table(c).set_index("stratum")
+    assert t.loc[2, "n"] == 4 and t.loc[2, "controls_before"] == 0 and t.loc[2, "controls_after"] == 4
+    assert not t.loc[2, "balanced"] and t.loc[1, "n"] == 8 and t.loc[1, "balanced"]
+
+
+def test_amended_rule3_control_overlapping_a_release_window():
+    """A candidate whose window overlaps the window of a later (or earlier) release is dropped by the amended rule 3,
+    even when that release's day is not among the event days of rule 2 (with it, rule 2 drops the candidate first)."""
+    r = rel([("2027-03-17", "fomc"), ("2027-03-24", "cpi")])
+    c = E25.assign_strata(r, [], START, None)  # no event days: only rule 3 can see the release windows
+    f = c[c.stratum == 1].set_index("candidate_day")
+    assert not f.loc["2027-03-24", "kept"]
+    assert f.loc["2027-03-24", "reason"] == "rule 3 (Amendment 1): overlaps the release window of stratum 2"
+    cp = c[c.stratum == 2].set_index("candidate_day")
+    assert cp.loc["2027-03-17", "reason"] == "rule 3 (Amendment 1): overlaps the release window of stratum 1"
+    o = E25.assign_strata(r, [], START, None, rules="original").set_index(["stratum", "candidate_day"])
+    assert o.loc[(1, "2027-03-24"), "kept"] and o.loc[(2, "2027-03-17"), "kept"]
+    c2 = E25.assign_strata(r, ["2027-03-17", "2027-03-24"], START, None).set_index(["stratum", "candidate_day"])
+    assert c2.loc[(1, "2027-03-24"), "reason"].startswith("rule 2: within 2 days")
+
+
+def test_release_windows_never_dropped_overlap_reported():
+    # a CPI release (08:30 ET) and an FOMC statement (14:00 ET) on the same day, as on 12 June 2024
+    r = rel([("2024-06-12", "cpi"), ("2024-06-12", "fomc")])
+    c = E25.assign_strata(r, ["2024-06-12"], "2024-01-21", "2026-01-01")
+    t = E25.strata_table(c)
+    assert list(t.event_type) == ["cpi", "fomc"]
+    assert t.release_window_overlaps.iloc[0] == "stratum 2 (2024-06-12 18:00)"
+    assert t.release_window_overlaps.iloc[1] == "stratum 1 (2024-06-12 12:30)"
+    ov = E25.window_overlaps(c)
+    assert len(ov) == 1 and ov.kind_1.iloc[0] == ov.kind_2.iloc[0] == "release" and ov.overlap_minutes.iloc[0] == 30
+    assert not c[c.kept].anchor_utc.duplicated().any()
+
+
+def test_balance_columns():
+    r = rel([("2027-09-14", "cpi")])
+    t = E25.strata_table(E25.assign_strata(r, ["2027-09-14"], START, None))
+    assert t.controls_before.iloc[0] == 4 and t.controls_after.iloc[0] == 4 and t.balanced.iloc[0]
+    t = E25.strata_table(E25.assign_strata(rel([("2026-10-28", "fomc")]), ["2026-10-28"], START, None))
+    assert (t.controls_before.iloc[0], t.controls_after.iloc[0], t.balanced.iloc[0]) == (0, 4, False)
+    assert E25._one_sided(t).iloc[0]
+    assert (t.controls_before + t.controls_after == t.n).all()
+    # no controls at all (earlier candidates before the stream, later ones after the data end): neither
+    # balanced nor one-sided, since its e-value is 1 whatever happens
+    t = E25.strata_table(E25.assign_strata(rel([("2026-10-28", "fomc")]), ["2026-10-28"], START, "2026-11-02"))
+    assert t.n.iloc[0] == 0 and not t.balanced.iloc[0] and not E25._one_sided(t).iloc[0]
 
 
 def test_planned_calendar_first_stratum():
