@@ -84,6 +84,7 @@ EXPERIMENTS = [
     ("E18 landmark events, pre-registered case studies", ["experiments/e18_landmark_events.py", "run", "figure", "context", "awake"], True, "full"),
     ("E20 re-analysis of the real-data inference", ["experiments/e20_inference.py", "checks", "bootstrap", "holm", "events", "forecast", "classify"], True, "full"),
     ("TH4 robustness to drift in the conditional mean", ["experiments/th4_robustness.py", "sup", "constant", "switching", "garch", "plugin", "ticks", "counterexamples", "figures"], False, "full"),
+    ("TH5 limits for every valid procedure and the plug-in regime", ["experiments/th5_limits.py", "collapse", "floors", "asymptotic", "boundary", "plugin_bound", "plugin_sim", "holdbold", "figures"], False, "full"),
 ]
 
 RESULT_DIRS = ["results"] + [str(p.relative_to(ROOT)) for p in sorted((ROOT / "alternatives").glob("*/results"))]

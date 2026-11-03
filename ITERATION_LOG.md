@@ -464,6 +464,28 @@ NEXT ITERATION: The paper's real-data section is rewritten with these classifica
 
 ---
 
+ITERATION NUMBER: 22 (limits for every valid procedure and the plug-in regime, TH5)
+
+OBJECTIVE: Answer the referee's points M3 and sections 2 and 3: is the decrease speed limit a property of e-detectors or of the problem, how far are the e-detectors from the best possible delay, when does the plug-in baseline keep its level as n, m and A grow together, and why does the growth-optimal decrease bet sit at its upper limit?
+
+PROBLEM IDENTIFIED: The 58-step speed limit of `docs/theory_delay.md` bounds bets, not rules; Lorden-type bounds are asymptotic; TH4's plug-in bound averages over windows but gives no rate in n.
+
+HYPOTHESIS: The null class contains independent two-point laws that put the largest possible mass on any observed value, so a valid rule cannot stop on a path of small null probability; and the plug-in's drift is controlled by the Kolmogorov distance between the window and the return law, of order 1 / √n.
+
+CHANGES IMPLEMENTED: `docs/theory_limits.md` (Theorem 2 pathwise floor, Theorem 5 delay bound, Proposition 6 asymptotics, Theorem 8 and Corollary 10 plug-in regime, Proposition 11 margin, Proposition 12 decrease bet at the boundary), `src/avmonitor/limits.py`, `experiments/th5_limits.py`, `tests/test_limits.py`.
+
+EXPERIMENTS PERFORMED: Closed-form floors for c = 1.5 to 5; delay bounds for 18 post-change laws (10,000 paths of 4,000 steps, levels A and 2A); asymptotics up to A = 10⁸; plug-in bounds and simulations for n = 390 to 92,160 and m = 98 to 7,800; the hold-then-bold stream; the decrease bet for nine laws.
+
+RESULTS: No valid procedure alarms on a complete collapse at c = 3 before step 45 (e-detectors 58, default grid 73). The default grid takes 1.69 to 2.16 times the lower bound on the mean delay and the best single bet 1.34 to 1.76 times; no alarm on 180,000 paths came before the pathwise floor. The plug-in keeps m / A up to 1 + O(m / √n) when m is small compared with √n (C = 0.037 Gaussian, 2.52 for every law) and fails by an unbounded factor beyond; at one day after a 390-step window the worst case lies between 33.8% and 42.4%, the hold-then-bold stream gives 36.5% and i.i.d. returns at most 5.14%. A margin z = Φ⁻¹(1 - δ / 2) restores m / A + δ. The decrease optimum is at its limit only for light tails (ε* = 2.4 × 10⁻⁸ for a Gaussian halving; λ* / λ_max 0.93 to 0.55 for Student t3). Failed first: the least favourable law taken from a tolerance-based maximiser had mass 0.982 (replaced by a root solve; no number changed), overflow in the plug-in bounds (fixed by integration in log space), and a wrong grid factor in a first collapse evaluation (caught before any number was written).
+
+IMPROVEMENTS: The speed limit is now a statement about every valid procedure, the e-detectors' efficiency has a number, and the plug-in's failure has a location (m ≍ √n) and a remedy.
+
+REMAINING ISSUES: The delay bound is for a change at the first step and is a Monte Carlo estimate; the distribution-free plug-in bound is informative only for m below about √n / 20; the i.i.d. boundary is a heuristic; three 2025 to 2026 references were checked from search listings only, because arxiv.org is blocked from the build machine.
+
+NEXT ITERATION: TH6 (what Theorem B says per period, and an algorithm-free form of Theorem D).
+
+---
+
 Further work streams (E13, E14, E16, E17, the alternative prototypes, logs ALT1 to ALT6) keep their own iteration notes in `docs/iterations/`. Their main results are summarised in `docs/experiment_report.md` and `alternatives/ALTERNATIVES.md`.
 
 ---
