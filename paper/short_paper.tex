@@ -1123,8 +1123,9 @@ under jumps or fat tails the parametric detectors alarmed before the
 change on 74\% to 99\% of paths. Truncation matters under jumps (Table
 S5). For decreases the Gaussian detector was faster, at 3\% to 9\% false
 alarms before the change, but this rests on normality: real one-minute
-returns contain many exact zeros (5.7\% of Bitstamp BTC/USD minutes),
-which a Gaussian likelihood reads as low volatility.
+returns contain many exact zeros (5.7\% of Bitstamp BTC/USD minutes;
+5.4\% when the provider's filled minutes are treated as missing), which
+a Gaussian likelihood reads as low volatility.
 
 \textbf{BOCPD and a two-window scan.} Bayesian online change-point
 detection (BOCPD; Adams and MacKay 2007) with a Gaussian model, on raw
@@ -1373,7 +1374,12 @@ blind, flagged 4 of the 6 FOMC statements on each coin (Holm
 of 2024 and 2025 is therefore exploratory: the only confirmatory test on
 releases not seen before did not confirm it, and with power 0.78 this
 says that the contrast was smaller in 2026 or absent, not that there is
-none (Supplement S7.2).
+none (Supplement S7.2). A guard that discards a near-blind calibration
+window and calibrates again, with the error budget split over the
+windows tried, keeps the bounds of Section 4.2 (Supplement S7.6); on BTC
+it removed all blind time, but on these data, now seen, it raised the
+count only to 4 of 16 (\(p = 0.056\), post hoc). A forward test of the
+rank detector on the BTC releases up to 1 June 2027 is pre-registered.
 
 \hypertarget{other-data-and-what-the-real-data-say-about-the-method}{%
 \subsection{7.4 Other data, and what the real data say about the
@@ -1443,7 +1449,9 @@ a tool.
   confidence-sequence baseline needs long calibration to be fast, can be
   blind to increases after an unusually quiet start of its window (on
   BTC in 2026, for 47 days, at two releases), and was run only with a
-  quarter of the window fixing \(\tau\).
+  quarter of the window fixing \(\tau\); a guard proved in Supplement
+  S7.6 removes the blind segments, at the cost of a fresh calibration
+  where a window is discarded.
 \item
   \emph{Speed and precision.} Classical rules on the same statistic,
   calibrated for the law at hand, were as fast for increases, faster for
@@ -4791,7 +4799,8 @@ of its down alarms were confirmed, against 77.9\% and 84.5\% for the
 plug-in; against the EWMA forecast its shares were 81.4\% and 90.7\% in
 July to December 2025 and 82.1\% and 76.2\% out of sample. On Bitstamp
 BTC/USD, July to December 2025, it raised 16\% to 20\% fewer alarms than
-the plug-in at every band. On the five coins in July to December 2025
+the plug-in at every band (17\% to 22\% with the provider's filled
+minutes treated as missing). On the five coins in July to December 2025
 (band 0.25), down alarms that both monitors raised within six hours came
 a median 40.5 to 142 minutes later with the confidence-sequence
 baseline, and up alarms 4 to 9 minutes later; it monitored 46\% to 49\%
@@ -4807,15 +4816,28 @@ window and the increase side bets against
 \(m^{\uparrow} = (1+b)\,\tau^2\min(U_{T_0}, 1)\). If
 \(\tau^2 \le m^{\uparrow}\), every increase factor is at most 1, each
 increase statistic grows by at most 1 per step, and no increase alarm
-can come within \(2A\) monitored steps, whatever the data. This happened
-in 5 of 7031 segments of the confidence-sequence runs, all on BTC
-series, lasting 2.6 to 136 days, and in none of 9184 plug-in segments;
-in one run (BTC, July to December 2025, band 0.5) the monitor was blind
-to increases for its last 4.5 months. It costs power, never protection
-against false alarms. A guard that recalibrates when
-\(\tau^2 \le m^{\uparrow}\) would select windows by their confidence
-bounds, so its coverage would hold only through a union bound over the
-windows tried; it is proposed, not implemented.
+can come within the first \(2A - 1\) monitored steps, whatever the data.
+This happened in 5 of 7031 segments of the confidence-sequence runs, all
+on BTC series, lasting 2.6 to 136 days, and in none of 9184 plug-in
+segments; in one run (BTC, July to December 2025, band 0.5) the monitor
+was blind to increases for its last 4.5 months. It costs power, never
+protection against false alarms. A guard that recalibrates when
+\(\tau^2 \le m^{\uparrow}\) selects windows by their confidence bounds,
+so the kept window's coverage no longer holds as such: with no cap on
+the retries, on a law built for it, the kept window's bounds fail with
+probability 1. Splitting the error budget over the windows tried,
+\(\delta_1 + \dots + \delta_K \le \delta\), restores
+\(\mathbb{P}(\text{the kept window's bounds fail}) \le \delta\) and,
+under the tolerance relative to each window tried, every bound of
+Section 4.2. The guard of \texttt{avmonitor.guard} (at most 3 windows
+with budgets \(\delta/2\), \(\delta/4\), \(\delta/4\), a retry when
+\(\tau^2 \le 1.25\, m^{\uparrow}\), and a fallback to the rank detector)
+detected a later doubling within a day in 86.5\% to 100\% of simulated
+paths where the unguarded monitor detected 0\% to 0.25\%, with no null
+alarm in 800 paths per design, and on real BTC data it left no monitored
+minute blind; the real-data results are post hoc
+(\texttt{docs/theory\_blind\_guard.md},
+\texttt{docs/report\_parts/E24.md}).
 
 \textbf{The forecast-relative null.} With the deseasonalised returns
 divided by a GARCH(1,1) forecast fitted on January to June 2025 and then
