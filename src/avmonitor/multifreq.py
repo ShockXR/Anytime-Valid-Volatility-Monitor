@@ -52,9 +52,17 @@ gives every frequency the same handicap J against its own single-frequency
 monitor at the same budget; ``handicap``), ``"sqrt"`` (proportional to sqrt(k)),
 or any nonnegative sequence.
 
-Missing returns: a block that contains a missing one-minute return is skipped
-(its statistic is unchanged), as the one-minute monitor skips a missing return;
-the certified value covers this case.
+Missing returns: a block in which one of the returns it sums is missing is
+skipped (its statistic is unchanged), as the one-minute monitor skips a missing
+return; the certified value covers this case. With ``gap=True`` a missing return
+in the left-out first minute of a block does not skip the block. In a
+calibration window, only the windows that contain a missing return are dropped.
+
+Separate levels for the two sides: ``threshold_down`` (default: the same as
+``threshold``) lets the decrease side alarm at ``2 A_down`` while the increase
+side alarms at ``2 A``. Every bound below then holds with A replaced by
+``1 / (1 / (2 A) + 1 / (2 A_down))`` (``docs/theory_multifreq.md``, remarks after
+Theorem 1); this is used only for rate-matched comparisons in E17.
 """
 
 from __future__ import annotations
@@ -185,21 +193,29 @@ def calibration_block_returns(r, k: int, gap: bool = False, overlap: bool = True
     L = block_length(k, gap)
     if not overlap or L == 1:
         return block_returns(r, k, gap) if not overlap else r
-    c = np.cumsum(np.concatenate([np.zeros(r.shape[:-1] + (1,)), r], axis=-1), axis=-1)
-    return c[..., L:] - c[..., :-L]
+    # A missing return makes only the windows that contain it missing (a plain cumulative sum would make every
+    # later window missing).
+    fin = np.isfinite(r)
+    z = np.zeros(r.shape[:-1] + (1,))
+    c = np.cumsum(np.concatenate([z, np.where(fin, r, 0.0)], axis=-1), axis=-1)
+    nbad = np.cumsum(np.concatenate([z, (~fin).astype(float)], axis=-1), axis=-1)
+    out = c[..., L:] - c[..., :-L]
+    return np.where(nbad[..., L:] - nbad[..., :-L] > 0, np.nan, out)
 
 
 def plugin_calibration(r_cal, k: int, c: float = 3.0, gap: bool = False, overlap: bool = True,
                        null_band: float = 0.0):
-    """Vectorised plug-in baseline of frequency k for each row of ``r_cal`` (rows without missing values).
+    """Vectorised plug-in baseline of frequency k for each row of ``r_cal``.
 
     Returns ``(scale, tau2, m0, m_up, m_dn)`` with ``scale`` = scaled median |R_k|, ``tau2 = (c scale)^2``,
-    ``m0`` = mean of ``min(R_k^2, tau2)``, ``m_up = m0 (1 + b)``, ``m_dn = m0 (1 - b)``.
+    ``m0`` = mean of ``min(R_k^2, tau2)``, ``m_up = m0 (1 + b)``, ``m_dn = m0 (1 - b)``. Windows with a missing
+    return are left out, as in the streaming monitor (no extension or fallback here).
     """
     R = calibration_block_returns(r_cal, k, gap, overlap)
-    scale = np.median(np.abs(R), axis=-1) * MAD_NORMAL_SCALE
+    med, mean = (np.nanmedian, np.nanmean) if np.isnan(R).any() else (np.median, np.mean)
+    scale = med(np.abs(R), axis=-1) * MAD_NORMAL_SCALE
     tau2 = (c * scale) ** 2
-    m0 = np.mean(np.minimum(R**2, tau2[..., None]), axis=-1)
+    m0 = mean(np.minimum(R**2, tau2[..., None]), axis=-1)
     return scale, tau2, m0, m0 * (1 + null_band), m0 * (1 - null_band)
 
 
@@ -306,7 +322,7 @@ class MultiFrequencyMonitor:
     """Calibrate, monitor, alarm, recalibrate loop with e-detectors at several frequencies.
 
     Parameters follow ``VolatilityMonitor`` (plug-in baseline only). ``threshold`` is A; each side alarms when
-    its combined statistic reaches 2A. ``freqs`` are block lengths in minutes; ``weights`` see
+    its combined statistic reaches 2A (the decrease side at ``2 * threshold_down`` if that is given). ``freqs`` are block lengths in minutes; ``weights`` see
     ``resolve_weights``; ``combine`` and ``check`` see the module docstring. ``gap=True`` leaves out the first
     return of every block of length k >= 2. ``cal_overlap=True`` estimates each coarse frequency's MAD and
     baseline from all windows of the block length in the calibration window. ``known_baseline`` (for
@@ -319,8 +335,9 @@ class MultiFrequencyMonitor:
                  cal_len: int = 1440, null_band: float = 0.0, up_grid=DEFAULT_UP_GRID,
                  down_fractions=DEFAULT_DOWN_FRACTIONS, scale_floor: float = 0.0, *, combine: str = "average",
                  check: str = "certified", gap: bool = False, cal_overlap: bool = True, cal_max: int | None = None,
-                 known_baseline: dict | None = None, trace: bool = False):
+                 known_baseline: dict | None = None, trace: bool = False, threshold_down: float | None = None):
         self.A = float(threshold)
+        self.A_down = self.A if threshold_down is None else float(threshold_down)
         self.freqs = _check_freqs(freqs)
         self.w = resolve_weights(weights, self.freqs)
         if combine not in ("average", "max"):
@@ -356,7 +373,8 @@ class MultiFrequencyMonitor:
 
     def proved_bound(self, m: int) -> float:
         """Proved bound on P(false alarm within m monitored minutes) for this configuration (true baseline)."""
-        return proved_bound(m, self.A, self.freqs, self.w, self.combine, self.check)
+        a_eff = 1.0 / (0.5 / self.A + 0.5 / self.A_down)  # equals A when both sides use the same level
+        return proved_bound(m, a_eff, self.freqs, self.w, self.combine, self.check)
 
     def _reset(self):
         self.buffer: list[float] = []
@@ -510,7 +528,7 @@ class MultiFrequencyMonitor:
         ev = None
         if mu >= 2 * self.A:
             ev = self._event("up", mu, self.w * vu)
-        elif md >= 2 * self.A:
+        elif md >= 2 * self.A_down:
             ev = self._event("down", md, self.w * vd)
         if ev is not None:
             self.events.append(ev)

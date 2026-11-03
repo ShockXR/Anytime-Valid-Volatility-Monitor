@@ -16,12 +16,18 @@ Parts, each runnable alone (``python experiments/e17_multifrequency.py baselines
             preceding 1440 minutes. 10,000 days per cell, seeds (17, law, baseline, chunk).
             -> results/e17_null.csv
   change    [SYNTHETIC] Detection with the true baseline: persistent sd changes x1.25, x1.5, x2, x0.8, x2/3, x0.5;
-            bursts x2 and x3 lasting 15 or 60 minutes; a trend (lag-one autocorrelation 0 -> 0.3 with the
-            one-minute variance unchanged, so only block variances move). Change at monitored minute 247 (not a
+            bursts x2 and x3 lasting 15 or 60 minutes; a jump in the lag-one autocorrelation of the efficient
+            returns from 0 to 0.3 with the one-minute variance unchanged, so mainly block variances move (labelled
+            "trend" in the CSV files). Change at monitored minute 247 (not a
             multiple of 5 or 15, so coarse blocks straddle it), 1440 minutes after it; Gaussian, Student t3 and
             price noise gamma = 1 and 2. 2000 paths per cell, seeds (171, law, cell, chunk).
             -> results/e17_change.csv, results/e17_change_summary.csv
   real      [REAL] Five Binance coins, 1 July to 31 December 2025, E6 validation. -> results/e17_real*.csv
+  ratematch [REAL] POST HOC, added after review round 4 (finding M5), after the real results were seen: the 5- and
+            15-minute detectors against the one-minute monitor with its increase and decrease levels matched, per
+            coin, to the coarse detector's numbers of up and down alarms (coordinate-wise bisection on log A, as
+            E6's match_rule); validation as in the real part; two-proportion z-tests on pooled counts.
+            -> results/e17_ratematch_*.csv
   figures   -> results/figures/e17_*.png
 
 Monitors (fixed before any run). All have a proved bound of 5% per 1440-minute day under their nulls with the
@@ -32,8 +38,8 @@ true baseline, except the row marked "no proof at this level":
   * the plain average with balanced weights checked every minute at the certified level (Theorem 3 proves only
     3 times the budget for it);
   * the weighted maximum with balanced weights (Theorem 3, same 5% bound);
-  * under price noise also the gap versions (first return of each coarse block left out) and the balanced
-    average of 5 and 15 minutes only.
+  * the balanced average of 5 and 15 minutes only;
+  * under price noise also the gap versions (first return of each coarse block left out).
 All with c = 3, the default bet grids, band 0 in the synthetic parts.
 
 REAL settings, FROZEN before the real part was run for the first time (committed with this script):
@@ -58,6 +64,7 @@ Runtime on 2 cores of a shared machine: baselines about 10 seconds, null and cha
 
 from __future__ import annotations
 
+import math
 import sys
 import time
 from multiprocessing import Pool
@@ -70,6 +77,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "experiments"))
 
 from avmonitor.multifreq import (  # noqa: E402
+    MultiFrequencyMonitor,
     block_length,
     block_returns,
     component_paths,
@@ -536,6 +544,153 @@ def part_real():
 
 
 # ----------------------------------------------------------------------------
+# Part: rate-matched comparison on real data (POST HOC, added after review round 4, M5)
+# ----------------------------------------------------------------------------
+
+RM_TARGETS = (("5 min", (5,)), ("15 min", (15,)))
+RM_ROUNDS, RM_ITER = 3, 18
+# On real data the one-minute statistic grows so fast after a change that matching the coarse detectors' alarm
+# counts needs levels far above 28,800 (a first run capped at 2.88e8 could not reach the targets), hence the range.
+RM_LOG_RANGE = (math.log(28_800.0), math.log(1e80))
+
+
+def _one_minute_events(u, a_up, a_dn):
+    mon = MultiFrequencyMonitor(threshold=a_up, threshold_down=a_dn, freqs=(1,), weights=[1.0], c=C, cal_len=DAY,
+                                null_band=REAL_BAND)
+    return mon.run(u)
+
+
+def match_one_minute(u, n_up, n_dn):
+    """Levels (A_up, A_down) of the one-minute monitor (band 0.25) that give n_up up and n_dn down alarms.
+
+    Coordinate-wise bisection on log A, as E6's ``match_rule``: each side takes the smallest level on the grid at
+    which its count is at most the target. Returns (A_up, A_down, up count, down count, events).
+    """
+    cache = {}
+
+    def counts(a_up, a_dn):
+        if (a_up, a_dn) not in cache:
+            ev = _one_minute_events(u, a_up, a_dn)
+            cache[(a_up, a_dn)] = (sum(e.direction == "up" for e in ev), sum(e.direction == "down" for e in ev), ev)
+        return cache[(a_up, a_dn)]
+
+    a_up = a_dn = math.exp(RM_LOG_RANGE[0])
+    for _ in range(RM_ROUNDS):
+        for side in ("up", "down"):
+            lo, hi = RM_LOG_RANGE
+            for _ in range(RM_ITER):
+                mid = 0.5 * (lo + hi)
+                if side == "up":
+                    too_many = counts(math.exp(mid), a_dn)[0] > n_up
+                else:
+                    too_many = counts(a_up, math.exp(mid))[1] > n_dn
+                lo, hi = (mid, hi) if too_many else (lo, mid)
+            if side == "up":
+                a_up = math.exp(hi)
+            else:
+                a_dn = math.exp(hi)
+    nu, nd, ev = counts(a_up, a_dn)
+    return a_up, a_dn, nu, nd, ev
+
+
+def ratematch_job(ci_coin):
+    ci, coin = ci_coin
+    from e06b_five_coins_monitor import Series, forecast_hits, prepare, summarise
+
+    t0 = time.time()
+    idx, u, i0 = prepare(coin, REAL_PERIOD)
+    S = Series(idx, u, i0)
+    events, levels = {}, []
+    for name, freqs in RM_TARGETS:
+        A = level_for_budget(ALPHA, DAY, freqs, [1.0])
+        ev = MultiFrequencyMonitor(threshold=A, freqs=freqs, weights=[1.0], c=C, cal_len=DAY,
+                                   null_band=REAL_BAND).run(u[i0:])
+        n_up = sum(e.direction == "up" for e in ev)
+        n_dn = len(ev) - n_up
+        a_up, a_dn, nu, nd, ev1 = match_one_minute(u[i0:], n_up, n_dn)
+        events[(name, REAL_BAND)] = [(e.index + i0, e.direction, e.monitored_since + i0, e.baseline_scale) for e in ev]
+        events[(f"1 min matched to {name}", REAL_BAND)] = [(e.index + i0, e.direction, e.monitored_since + i0,
+                                                            e.baseline_scale) for e in ev1]
+        # descriptive: share of the coarse alarms with a same-direction matched one-minute alarm within 60 minutes
+        t1 = np.array([e.index for e in ev1])
+        d1 = np.array([e.direction for e in ev1])
+        near = [bool(np.any((d1 == e.direction) & (np.abs(t1 - e.index) <= 60))) for e in ev] if t1.size else []
+        levels.append(dict(source=coin, target=name, target_A=A, target_up=n_up, target_down=n_dn, A_up=a_up,
+                           A_down=a_dn, matched_up=nu, matched_down=nd,
+                           share_target_alarms_with_matched_1min_alarm_within_60=float(np.mean(near)) if near else np.nan))
+    rows, _ = summarise(coin, REAL_PERIOD, S, events, np.random.default_rng(1717 + ci))
+    hits, _ = forecast_hits(coin, REAL_PERIOD, S, events, np.random.default_rng(1770 + ci))
+    print(f"ratematch {coin}: {time.time() - t0:.0f} s", flush=True)
+    return levels, rows, hits
+
+
+def _two_prop_p(k1, n1, k2, n2):
+    from scipy import stats
+
+    if n1 == 0 or n2 == 0:
+        return np.nan
+    p = (k1 + k2) / (n1 + n2)
+    se = math.sqrt(p * (1 - p) * (1 / n1 + 1 / n2))
+    return float(2 * stats.norm.sf(abs(k1 / n1 - k2 / n2) / se)) if se > 0 else np.nan
+
+
+def part_ratematch():
+    """POST HOC (review round 4, M5): the 5- and 15-minute detectors against the one-minute monitor with its two
+    levels matched, per coin, to the coarse detector's numbers of up and down alarms. Validation as in the real part;
+    two-proportion z-tests on the pooled counts (independence assumed, so p-values are optimistic)."""
+    from e06b_five_coins_monitor import COINS
+
+    with Pool(2) as pool:
+        res = pool.map(ratematch_job, list(enumerate(COINS)))
+    levels = pd.DataFrame(sum([r[0] for r in res], []))
+    summ = pd.DataFrame(sum([r[1] for r in res], [])).rename(columns={"detector": "monitor"})
+    hits = pd.concat([r[2] for r in res], ignore_index=True).rename(columns={"rule": "monitor"})
+    levels.to_csv(OUT / "e17_ratematch_levels.csv", index=False)
+    summ.to_csv(OUT / "e17_ratematch_summary.csv", index=False)
+    hits.to_csv(OUT / "e17_ratematch_forecast_hits.csv", index=False)
+    days = float(summ[summ.monitor == RM_TARGETS[0][0]]["days"].sum())
+    out = []
+    for name, _ in RM_TARGETS:
+        pair = (name, f"1 min matched to {name}")
+        counts = {}
+        for mname in pair:
+            s = summ[summ.monitor == mname]
+            rec = dict(comparison=name, monitor=mname, alarms=int(s.alarms.sum()), alarms_per_day=s.alarms.sum() / days,
+                       up=int(s.up.sum()), down=int(s.down.sum()))
+            for dn in ("up", "down"):
+                n = int(s[f"{dn}_validated_n"].sum())
+                k = int(np.round(s[f"{dn}_share_in_flagged_direction"] * s[f"{dn}_validated_n"]).sum())
+                lo, hi = wilson(k, n)
+                rec.update({f"{dn}_confirmed_n": n, f"{dn}_confirmed": k, f"{dn}_confirmed_share": k / n if n else np.nan,
+                            f"{dn}_confirmed_wilson_lo": lo, f"{dn}_confirmed_wilson_hi": hi,
+                            f"{dn}_matched_control_share": float(np.average(s[f"{dn}_matched_delay_control_share"],
+                                                                            weights=s[f"{dn}_validated_n"]))})
+                counts[(mname, dn, "confirmed")] = (k, n)
+                for fc in ("EWMA", "HAR"):
+                    h = hits[(hits.monitor == mname) & (hits.forecast == fc)]
+                    kh, nh = int(h[f"{dn}_hits"].sum()), int(h[f"n_{dn}"].sum())
+                    lo, hi = wilson(kh, nh)
+                    rec.update({f"{dn}_{fc.lower()}_n": nh, f"{dn}_{fc.lower()}_hit_rate": kh / nh if nh else np.nan,
+                                f"{dn}_{fc.lower()}_wilson_lo": lo, f"{dn}_{fc.lower()}_wilson_hi": hi})
+                    counts[(mname, dn, fc)] = (kh, nh)
+            out.append(rec)
+        # p-values: coarse detector against the matched one-minute monitor
+        prec = dict(comparison=name, monitor="p-value, coarse against matched 1 min (two-proportion z-test)")
+        for dn in ("up", "down"):
+            for what in ("confirmed", "EWMA", "HAR"):
+                k1, n1 = counts[(pair[0], dn, what)]
+                k2, n2 = counts[(pair[1], dn, what)]
+                key = "confirmed_share" if what == "confirmed" else f"{what.lower()}_hit_rate"
+                prec[f"{dn}_{key}"] = _two_prop_p(k1, n1, k2, n2)
+        out.append(prec)
+    df = pd.DataFrame(out)
+    df.to_csv(OUT / "e17_ratematch_pooled.csv", index=False)
+    pd.set_option("display.width", 250)
+    print(levels.round(1).to_string())
+    print(df.round(4).T.to_string())
+
+
+# ----------------------------------------------------------------------------
 # Part: figures
 # ----------------------------------------------------------------------------
 
@@ -555,19 +710,26 @@ def part_figures():
     for ax, law in zip(axes, ("gaussian", "student_t3", "noise_1", "noise_2")):
         g = shifts[shifts.law == law]
         changes = list(dict.fromkeys(g.change))
-        for m in mons:
-            y = [g[(g.change == c) & (g.monitor == m)].median_delay.iloc[0] for c in changes]
+        for mi, m in enumerate(mons):
+            y = np.array([g[(g.change == c) & (g.monitor == m)].median_delay.iloc[0] for c in changes])
+            det = np.array([g[(g.change == c) & (g.monitor == m)].detected.iloc[0] for c in changes])
             single = not ("average" in m or "max" in m)
-            ax.plot(range(len(changes)), y, marker="o", label=m, lw=2.5 if single else 1.5, ls="--" if single else "-")
+            col = f"C{mi}"
+            ax.plot(range(len(changes)), y, marker="o", color=col, label=m, lw=2.5 if single else 1.5,
+                    ls="--" if single else "-")
+            low = det < 0.5  # open markers: detected on fewer than half of the paths
+            ax.plot(np.flatnonzero(low), y[low], ls="none", marker="o", mfc="white", mec=col, mew=1.5)
         ax.set_xticks(range(len(changes)))
         ax.set_xticklabels(changes, rotation=30, fontsize=8)
         ax.set_yscale("log")
-        ax.set_title(titles[law] + (" (1 min not valid)" if law.startswith("noise") else ""), fontsize=10)
+        ax.set_title(titles[law] + ("\n(no plotted monitor has a proof)" if law.startswith("noise") else ""),
+                     fontsize=10)
         ax.grid(alpha=0.3)
     axes[0].set_ylabel("median delay among detections (minutes, log scale)")
     handles, labels = axes[0].get_legend_handles_labels()
     fig.legend(handles, labels, loc="lower center", ncol=7, fontsize=8, frameon=False)
-    fig.suptitle("E17 [SYNTHETIC]: median detection delay, persistent sd changes, true baseline, 5% per day proved")
+    fig.suptitle("E17 [SYNTHETIC]: median detection delay, persistent sd changes, true baseline; 5% per day proved for "
+                 "the i.i.d. panels only; open markers: detected on fewer than half of the paths", fontsize=10)
     fig.tight_layout(rect=(0, 0.07, 1, 1))
     FIG.mkdir(parents=True, exist_ok=True)
     fig.savefig(FIG / "e17_delays.png", dpi=130)
@@ -575,7 +737,7 @@ def part_figures():
 
 
 PARTS = {"baselines": part_baselines, "levels": part_levels, "null": part_null, "change": part_change,
-         "real": part_real, "figures": part_figures}
+         "real": part_real, "ratematch": part_ratematch, "figures": part_figures}
 
 if __name__ == "__main__":
     for p in sys.argv[1:] or list(PARTS):

@@ -16,6 +16,7 @@ from avmonitor.multifreq import (
     handicap,
     level_for_budget,
     minute_values,
+    plugin_calibration,
     proved_bound,
     resolve_weights,
 )
@@ -33,6 +34,7 @@ def true_baseline_gauss(k, gap=False, n=400_000, c=3.0, seed=0):
 
 
 KNOWN = {k: true_baseline_gauss(k, seed=k) for k in FREQS}
+KNOWN_GAP = {k: true_baseline_gauss(k, gap=True, seed=k) for k in FREQS}
 
 
 def vectorised_first_alarm(r, A, freqs, weights, known, combine="average", certified=True, gap=False):
@@ -187,17 +189,19 @@ def test_streaming_average_equals_weighted_sum_of_components():
             assert np.all(mu <= su + 1e-9)
 
 
+@pytest.mark.parametrize("gap", [False, True])
 @pytest.mark.parametrize("combine,check", [("average", "certified"), ("average", "stale"), ("max", "stale")])
-def test_vectorised_matches_streaming(combine, check):
+def test_vectorised_matches_streaming(combine, check, gap):
     rng = np.random.default_rng(7)
     cal, n = 60, 1500
+    known = KNOWN_GAP if gap else KNOWN
     for rep in range(6):
         ratio = [1.0, 1.5, 0.6][rep % 3]
         r = rng.standard_normal(cal + n) * np.where(np.arange(cal + n) >= cal + 400, ratio, 1.0)
         mon = MultiFrequencyMonitor(threshold=200.0, freqs=FREQS, weights="balanced", cal_len=cal, combine=combine,
-                                    check=check, known_baseline=KNOWN)
+                                    check=check, gap=gap, known_baseline=known)
         mon.run(r)
-        idx, d = vectorised_first_alarm(r[cal:], 200.0, FREQS, "balanced", KNOWN, combine, check == "certified")
+        idx, d = vectorised_first_alarm(r[cal:], 200.0, FREQS, "balanced", known, combine, check == "certified", gap)
         if mon.events:
             e = mon.events[0]
             assert idx[0] == e.index - cal and d[0] == (1 if e.direction == "up" else -1)
@@ -249,7 +253,8 @@ def test_frozen_two_minute_statistic_violates_optional_stopping():
     """Theory note, Proposition 2: stop in the middle of block 2 when |r_3| <= 1, else at its end.
 
     With i.i.d. N(0, 1) returns, no truncation and one bet lambda on R^2 / 2, E[M_tau] exceeds the expected number
-    of completed blocks by 0.484 lambda (exact value 2 lambda E[(Z^2 - 1) 1{|Z| > 1}] / 2 = 0.48396 lambda).
+    of completed blocks by 0.484 lambda (exact value lambda E[(Z^2 - 1) 1{|Z| > 1}] = 0.48394 lambda).
+    The tolerance is about 4 Monte Carlo standard errors.
     """
     rng = np.random.default_rng(10)
     lam, n = 0.5, 400_000
@@ -260,7 +265,7 @@ def test_frozen_two_minute_statistic_violates_optional_stopping():
     M_tau = np.where(stop_mid, f1, f2 * (f1 + 1))
     blocks_done = np.where(stop_mid, 1, 2)
     gap = M_tau.mean() - blocks_done.mean()
-    assert gap == pytest.approx(0.48396 * lam, abs=0.03)
+    assert gap == pytest.approx(0.48394 * lam, abs=0.01)
 
 
 # ----------------------------------------------------------------------------
@@ -282,3 +287,76 @@ def test_gap_blocks_remove_noise_dependence():
     # calibration windows have the block length of the monitored statistic
     assert calibration_block_returns(r[:100], k, gap=True).shape[-1] == 100 - (k - 1) + 1
     assert block_returns(np.arange(10.0), 5, gap=True).tolist() == [1 + 2 + 3 + 4, 6 + 7 + 8 + 9]
+
+
+# ----------------------------------------------------------------------------
+# Calibration: missing minutes, vectorised against streaming
+# ----------------------------------------------------------------------------
+
+
+def test_calibration_windows_with_a_missing_minute():
+    """Only the windows that contain the missing return are missing (review round 4, M6)."""
+    r = np.arange(1.0, 21.0)
+    r[3] = np.nan
+    R = calibration_block_returns(r, 5)
+    assert R.shape == (16,)
+    assert np.all(np.isnan(R[:4])) and np.all(np.isfinite(R[4:]))
+    assert R[4] == pytest.approx(5 + 6 + 7 + 8 + 9)
+    Rg = calibration_block_returns(r, 5, gap=True)  # windows of 4 returns
+    assert np.all(np.isnan(Rg[:4])) and np.all(np.isfinite(Rg[4:]))
+
+
+@pytest.mark.parametrize("pos", [0, 10, 700])
+def test_monitor_calibrates_on_time_with_a_missing_minute(pos):
+    rng = np.random.default_rng(12)
+    cal = 1440
+    r = rng.standard_normal(cal + 200)
+    ref = MultiFrequencyMonitor(threshold=1e9, freqs=FREQS, cal_len=cal)
+    ref.run(r)
+    r2 = r.copy()
+    r2[pos] = np.nan
+    mon = MultiFrequencyMonitor(threshold=1e9, freqs=FREQS, cal_len=cal)
+    mon.run(r2)
+    seg, seg0 = mon.segments[0], ref.segments[0]
+    assert seg["start"] == cal and not seg["extended"] and not seg["fallback"]
+    assert mon.cal_stats["restarted"] == 0
+    for j in range(len(FREQS)):
+        assert seg["scale"][j] == pytest.approx(seg0["scale"][j], rel=0.05)
+        assert seg["m0"][j] == pytest.approx(seg0["m0"][j], rel=0.05)
+
+
+@pytest.mark.parametrize("gap", [False, True])
+def test_plugin_calibration_matches_streaming(gap):
+    rng = np.random.default_rng(13)
+    cal = 300
+    r = rng.standard_t(4, (3, cal + 10))
+    r[2, 50] = np.nan  # one row with a missing minute
+    for i in range(3):
+        mon = MultiFrequencyMonitor(threshold=1e9, freqs=FREQS, cal_len=cal, gap=gap, null_band=0.25)
+        mon.run(r[i])
+        seg = mon.segments[0]
+        for j, k in enumerate(FREQS):
+            scale, tau2, m0, m_up, m_dn = plugin_calibration(r[i:i + 1, :cal], k, 3.0, gap, null_band=0.25)
+            assert scale[0] == pytest.approx(seg["scale"][j], rel=1e-12)
+            assert tau2[0] == pytest.approx(seg["tau2"][j], rel=1e-12)
+            assert m0[0] == pytest.approx(seg["m0"][j], rel=1e-12)
+            assert m_up[0] == pytest.approx(1.25 * seg["m0"][j], rel=1e-12)
+            assert m_dn[0] == pytest.approx(0.75 * seg["m0"][j], rel=1e-12)
+
+
+def test_separate_level_for_the_decrease_side():
+    rng = np.random.default_rng(14)
+    r = rng.standard_normal(20_000) * np.repeat([1.0, 0.5, 1.6, 0.6, 1.0], 4000)
+    base = MultiFrequencyMonitor(threshold=50.0, freqs=FREQS, cal_len=200)
+    same = MultiFrequencyMonitor(threshold=50.0, freqs=FREQS, cal_len=200, threshold_down=50.0)
+    e1, e2 = base.run(r), same.run(r)
+    assert [(e.index, e.direction) for e in e1] == [(e.index, e.direction) for e in e2]
+    assert any(e.direction == "down" for e in e1)
+    n_down = sum(e.direction == "down" for e in e1)
+    high = MultiFrequencyMonitor(threshold=50.0, freqs=FREQS, cal_len=200, threshold_down=1e6).run(r)
+    assert sum(e.direction == "down" for e in high) < n_down
+    assert any(e.direction == "up" for e in high)
+    assert same.proved_bound(1440) == pytest.approx(base.proved_bound(1440))
+    # 1 / (1 / (2 A) + 1 / (2 A_down)) replaces A in the bound
+    two = MultiFrequencyMonitor(threshold=50.0, freqs=FREQS, threshold_down=150.0)
+    assert two.proved_bound(1440) == pytest.approx(proved_bound(1440, 1 / (0.5 / 50 + 0.5 / 150), FREQS, "balanced"))
