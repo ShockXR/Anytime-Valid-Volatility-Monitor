@@ -39,6 +39,7 @@ To rerun: `pip install -r requirements.txt && pip install -e .`, then `python sc
 | E22 | Does E12's pre-registered FOMC result hold with a monitor that carries a proved per-day false alarm bound (referee round 2, J1)? | Yes [REAL], pre-registered: the confidence-sequence baseline restarted every UTC day (5% per day of a segment under the ±25% tolerance) flags 8 of 16 BTC FOMC statements within 6 hours against 10.9% of matched controls, Holm p = 0.00033 (plug-in: 9 of 16, Holm 0.00025); it watches more releases than the plug-in (80 of 114 against 55). The tolerance fails on real days: the monitor alarms on about half of its monitored days, so E22 does not test the bound. |
 | E23 | Does E22's FOMC and CPI contrast hold on fresh releases (January to October 2026), which no analysis had seen? | **No** [REAL], pre-registered: with the guaranteed monitor of E22 on BTC, 2 of 16 releases had an up alarm within 6 hours against 5.9% of matched controls, p = 0.25 (planned power 0.82). The monitor could not raise an increase alarm for 28% of its monitored time on BTC (one segment of 47 days). Secondary: the never-blind rank monitor flagged 4 of 6 FOMC statements on each coin (Holm 0.016 to 0.055); no CPI contrast under any monitor. |
 | E24 | Can a guard remove the blind segments of the confidence-sequence baseline without losing its proved bounds, and what test on unseen releases would settle the release question? | Yes, if the error budget is split over the calibration windows tried (proved; without the split, uncapped retries keep a failing window with probability 1, and K retries multiply the failure probability about K-fold). Recommended guard: up to 3 windows, budgets δ/2, δ/4, δ/4, retry when τ² ≤ 1.25 m↑, rank-monitor fallback. [SYNTHETIC] It detects a later doubling within a day in 86.5% to 100% of paths where the unguarded monitor detects 0% to 0.25%, with no null alarm in 800 paths. [REAL, post hoc] On BTC it removed all blind time but did not rescue E23 (4 of 16, p = 0.056). A forward test is pre-registered: rank monitor, BTC FOMC and CPI pooled, data to 1 June 2027, power 0.82 at planning rates. |
+| E25 | Can the forward release test be checked after every release and continued past 1 June 2027 at level 5%, and at what cost in power? | Yes (proved): an e-process over releases, each release with its own control windows within four weeks that no other stratum's window overlaps, rejecting when M reaches 20; pre-registered before any fresh data, with one amendment also made before any fresh data (no overlapping windows). [SYNTHETIC] Under the null M ever reaches 20 in 2.5% to 4.4% of simulated sequences of 200 releases. At the planning rates it reaches 20 by 1 June 2027 with probability 0.43 (F24a's fixed-date power: 0.82), by 2028 with 0.82 and by 2029 with 0.98. [REAL, post hoc] On 2024 to 2025 it would have crossed in June to August 2024 on all three coins; on 2026 BTC it ends at 3.8. The fresh test cannot be computed before 26 November 2026. |
 | TH5 | How fast can any valid procedure detect a change, and when does the plug-in baseline keep its level? | Proved: a deterministic rule valid at levels n / A, even one that sees raw returns, can stop on a path only where a product of per-step likelihood bounds reaches A / n (a randomised rule only with probability at most n W_n / A). On a complete collapse no valid deterministic rule alarms before 45 steps (randomised: mean at least 43.4; Shiryaev-Roberts e-detectors 58, the default grid 73), and over 18 post-change laws the default grid's mean delay is at most 1.7 to 2.2 times that of the best valid deterministic rule. The plug-in baseline keeps m / A, up to a factor 1 + O(m / √n), when m is small compared with √n, and some stream with the right conditional mean breaks it by an unbounded factor when m is large compared with √n and log A; a margin z = Φ⁻¹(1 - δ / 2) restores m / A + δ. The growth-optimal decrease bet is at its upper limit only for light tails. |
 | TH6 | Does Theorem B give 5% per day, and what gives a bound for every day? | No: it bounds the first day after each (re)start and, through Corollary C, the long-run count (0.05 false alarms per day); a constant null law makes the default detector alarm with certainty on day 40. Measured on later days: 4.7% on average over days 11 to 20 for i.i.d. returns, 5.25% for bold play, 28% on a day after nine calm days. With a known baseline, restarting the statistics at every day boundary gives a proved m / A for every day given the past (with the confidence-sequence baseline, δ + m / A per day of a segment, not given the past, while Theorem D's tolerance holds) (mean delay 1.06 to 1.44 times longer at 390-step days, 1.02 to 1.14 at 1440); the e-CUSUM gives 5.146% for any window of a day, but only for exchangeable nulls. Theorem D restated with a tolerance hypothesis that does not depend on the bets, plus a version with no assumption. |
 | ALT1 | Quarticity stream; pre-averaging for noise | Price noise breaks the raw-return guarantee; non-overlapping pre-averaged blocks restore it. |
@@ -4159,6 +4160,164 @@ The retry guard with error spending is a proved fix for blind segments of the co
 ### Data files [REAL]
 
 Binance spot one-minute bars, BTCUSDT, ETHUSDT, SOLUSDT, exactly as read by E22 (2024 to 2025) and E23 (2026, to 24 October 23:59 UTC); E19's calm-day pool (BTC, July to December 2025) for two synthetic designs; E6's sources and periods (five Binance coins and Bitstamp BTC, through E6's `prepare`) for the E19 diagnostic. No file after 24 October 2026 was read.
+
+---
+
+## E25. An anytime-valid version of the forward release test: an e-process over releases
+
+Pre-registration `docs/preregistration_e25_sequential.md` (commit `30804bb`, 3 November 2026, before any Binance return after 24 October 2026 23:59 UTC was loaded and before any code for this test was written), with **Amendment 1** at its end (commit `e00c2b0`, 3 November 2026, about 10:50 UTC, also before any fresh data); proof `docs/theory_sequential_events.md`; script `experiments/e25_sequential_events.py` (parts `theory`, `strata`, `gates`, `power`, `posthoc`, `status`, `figs`; `--rules=original` reruns the rules as first committed); outputs `results/e25_*.csv` (amended rules) and `results/e25_*_original_rules.csv` (original rules, for comparison), figures `results/figures/e25_*.png`; tests `tests/test_e25.py` [SYNTHETIC]; iteration notes `docs/iterations/E25.md`. Labels: [PROVED], [SYNTHETIC], [REAL]. Every real-data result here is either a gate on known data or **post hoc and exploratory**: no fresh stratum is complete yet, and the fresh test has not been run.
+
+**Question.** E24's forward test F24a is a fixed-sample test: it may be run once, on 1 June 2027, nobody may act on the data before then, and its sample cannot be extended after a failure without spending more than its 5%. Can the same question (do the rank monitor's up alarms come more often within six hours of FOMC statements and CPI releases than at matched control times?) be asked with a test that may be checked after every release and continued without an end date, at level 5% for every look; what does that cost in power; and what does it do on releases already seen?
+
+**Design** (fixed in the pre-registration and Amendment 1; implemented without change). Each release i, in order of release time, gets a stratum: its own window [t, t + 6 h) and up to eight control windows at the same US Eastern weekday and clock time 1 to 4 weeks before and after it, chosen from the calendar only (rule 1); a candidate is dropped if its day is less than 2 days from a release day, if it is earlier than the stream start plus 1440 + 360 minutes, or if its window is not inside the data (rule 2), or if an earlier release already kept it or (Amendment 1) its window overlaps the window of any release or of any control already kept for an earlier release (rule 3); release windows are never dropped, and two that overlap are reported. A stratum enters the test when the data reach t + 28 days + 6 hours and no event-file row within 30 days still says "scheduled" (rule 4), and strata enter in order. With Z_i the release window's outcome (an up alarm of S2, E14's awake rank monitor as in F24a), n_i controls kept, S_i windows with the outcome and p_i = S_i/(n_i + 1), the e-value is e_i(ψ) = ψ^{Z_i}/(1 - p_i + ψ p_i) and the e-process is M_j = (1/4) Σ_{ψ ∈ {2,4,8,16}} Π_{i≤j} e_i(ψ). Under H0 (the n_i + 1 outcomes of each stratum are exchangeable given the earlier strata), M is a nonnegative martingale with mean 1, so P(M_j ≥ 20 for some j) ≤ 5% whenever anyone looks and whatever stopping rule is used (Theorem 1 of the theory note, by Ville's inequality). Primary E25a: BTC, FOMC and CPI pooled, reject at the first complete stratum with M ≥ 20. Secondary E25b: ETH and SOL, M ≥ 40 each. F24a runs on 1 June 2027 unchanged; if either test is used to call the contrast confirmed, the report must say that two pre-registered 5% tests were run on the same releases (at most 10% together).
+
+**Summary.**
+* **Every gate passes.** [PROVED, checked exactly] The conditional mean of e(ψ) under H0 is exactly 1 in all 216 cases (n = 0 to 8, every S, every ψ of the grid; rational arithmetic). [REAL, known data] S2's alarms before each of three cut-offs are identical whether or not later data exist; E25's code reproduces the committed S2 alarms and the release outcomes of E22 and E23 exactly (33 checks, 0 mismatches). [SYNTHETIC] Under H0 the chance that M ever reaches 20 within 200 releases is 2.5% to 4.4% over eight laws (limit 5.46%).
+* **Amendment 1 made the windows disjoint and costs controls.** [calendar only] On the planned calendar to December 2027 no two windows of different strata overlap any more (30 pairs under the original rules), and 95 of 184 candidates are kept (125 before): n_i ranges from 0 to 8, 5 of the 23 strata are balanced (as many kept controls before the release as after, at least one each side), 10 have controls on one side only and one (the FOMC statement of 17 March 2027) has none.
+* **The fresh test cannot be computed yet.** Its first stratum, the FOMC statement of 28 October 2026 with 3 controls (4, 18 and 25 November 2026), completes on 26 November 2026 at 01:00 UTC, unchanged by the amendment; the status part refuses before any download until then, and was not run.
+* **Power: less than F24a on 1 June 2027, more from early 2028.** [SYNTHETIC; planning inputs REAL] At the pooled 2024 to 2026 planning rates M reaches 20 by 1 June 2027 with probability 0.43 (F24a: 0.82), by 1 January 2028 with 0.82, by 1 January 2029 with 0.98; at the 2026 rates 0.19, 0.51, 0.81 (F24a: 0.60); at half the pooled excess 0.13, 0.29, 0.52 (F24a: 0.37); under the null 0.010, 0.016, 0.022. The original rules gave 0.54, 0.89, 0.99 at the planning rates: disjoint windows cost about a fifth of the power at F24a's date.
+* **Post hoc, on seen data** [REAL, exploratory]: on 2024 to 2025, M crosses 20 on BTC at the 8th of 36 strata (12 June 2024) and ends at 4.8 × 10⁴; on 2026, BTC's M ends at 3.8 after 15 strata and never reaches 20 (ETH 8.4, SOL 5.0).
+
+### Amendment 1: what changed, when and why
+
+The implementation of the rules as first committed (commits `d0c2d8f` to `80ee004`) found that rule 3 forbids a window being used twice but not two windows overlapping in time (a CPI control at 08:30 ET and an FOMC control at 14:00 ET on the same day share the half hour from 14:00 to 14:30 ET; 30 such pairs on the planned calendar), and that section 6's sentence on drift holds only for strata whose kept controls are balanced around the release. Both findings were reported, and the coordinator adopted them as Amendment 1 (rule 3 extended as above; the drift sentence restricted to balanced strata and the number of balanced strata reported; section 9's reference to "rule 4's assignment" corrected to rules 1 to 3).
+
+**Order of events.** The amendment was written after the synthetic power simulation (section 9) and after the post hoc run on seen data (section 10) had been done with the original rules, and before any Binance return after 24 October 2026 23:59 UTC was downloaded or loaded, so before any data of the fresh test. Its stated motivation is the logic of section 6 (an alarm in shared minutes would count in two strata, and a later stratum's control outcome would be partly known from an earlier one), not those results. A reader can check the direction: the amended rules lower both the simulated power and the post hoc values (table below), so the change did not favour the test. Every figure in this report uses the amended rules unless it says otherwise; the original-rule runs are kept in `results/e25_*_original_rules.csv` and compared in one table below. The status part (the fresh test) uses the amended rules only.
+
+### Gates (pre-registration, section 8)
+
+| Gate | What is checked | Result | Label, file |
+|---|---|---|---|
+| 1. Identity | E[e(ψ) given S] = 1 under H0, n = 0..8, S = 0..n+1, ψ ∈ {2, 4, 8, 16}, by enumerating the arrangements of the S windows with the outcome | exactly 1 in all 216 cases (rational arithmetic); largest floating-point deviation 8.9 × 10⁻¹⁶ (n = 0 included: its e-value is 1) | [PROVED, checked exactly] `e25_theory_identity.csv` |
+| 2. Causality | S2 on E23's BTC stream (1 January to 24 October 2026): full run against runs whose data end on 1 April, 1 July and 15 September 2026 | alarms before each cut-off identical (77, 143, 211 alarms; index, direction, delay, baseline scale, recent return), and so are the deseasonalised returns and the monitoring flags | [REAL, known data] `e25_gates.csv` |
+| 3. Pipeline | E25's release outcomes Z_i for S2 on E23's period equal `up_post` of `results/e23_windows.csv`, every coin and release; E25's own S2 runs equal the committed alarm files; the same on E22's period; E25's window function on E12's own control anchors gives `control_up_post_rate` | 16 releases per coin in 2026 and 38 in 2024 to 2025, 0 mismatches; own runs reproduce 243, 225, 207 (2026) and 658, 570, 461 (2024 to 2025) alarms exactly; 33 checks, 0 mismatches (none of these checks depends on the strata rules) | [REAL, known data] `e25_gates.csv` |
+| 4. Refusals | a stratum is computed only when complete; the status part refuses before any download when none is complete, never writes an outcome of an incomplete stratum, uses the amended rules only, and records the git HEAD and `git diff --stat 30804bb` of the shared pipeline | tested on synthetic calendars (`tests/test_e25.py`, 33 tests, including the amended rule 3 and the balance counts); on the committed event file the part refuses on 3 November 2026 without attempting a download; a dry run of the whole part on E23's known period (data to 24 October 2026, no download, outputs outside the repository) reproduced the amended post hoc numbers below exactly | [SYNTHETIC]; dry run [REAL, known data], `docs/iterations/E25.md` |
+| 5. Simulated validity | H0 with the strata sizes of the planned calendar under the amended rules (41 strata to 2029, cycled to 200), 20,000 sequences per law, seeds [25000, i] | P(M ever ≥ 20) ≤ 0.044 in every law; limit 0.05 + 3 × 0.0015 = 0.0546 | [SYNTHETIC] `e25_validity.csv` |
+
+Gate 5 in detail (shares of 20,000 sequences of 200 strata on which M ever reaches the level; amended strata sizes):
+
+| Law of the strata under H0 | ≥ 10 (bound 0.10) | ≥ 20 (bound 0.05) | ≥ 100 (bound 0.01) |
+|---|---|---|---|
+| n_i + 1 i.i.d. Bernoulli(5%) windows, release one of them at random | 0.057 | 0.025 | 0.004 |
+| the same at 10% | 0.062 | 0.030 | 0.006 |
+| the same at 20% | 0.065 | 0.031 | 0.006 |
+| the same at 40% | 0.072 | 0.036 | 0.007 |
+| all or nothing (S = 0 or n + 1): every e-value is 1 | 0 | 0 | 0 |
+| exactly one window with the outcome, at a uniform position | 0.063 | 0.031 | 0.006 |
+| S uniform on 0..n + 1, release position uniform | 0.070 | 0.035 | 0.006 |
+| S chosen from the earlier strata (1 after a release without the outcome, n after one with it) | 0.077 | 0.044 | 0.008 |
+
+The bound is not attained by these laws, because M overshoots the threshold at the stratum where it crosses; the last law, in which S depends on the past (allowed by H0, which needs no independence between strata), comes closest. The mean of M after 1 and after 10 strata is 1 within two Monte Carlo standard errors in every law; after 200 strata the sample mean is below 1 in most laws, as expected for a test martingale whose mean is carried by rare very large values.
+
+### The strata of the planned calendar (`e25_strata_planned.csv`)
+
+The forward event file's released and scheduled rows (scheduled treated as released, for planning only) without the statement of 27 January 2027, stream start 25 October 2026 00:00 UTC, no data end: 23 strata to December 2027 (8 FOMC, 15 CPI). 95 of 184 candidates are kept. Rule 2 drops 6 candidates before the stream start plus 1800 minutes and 37 within 2 days of a release; rule 3 drops 14 already used by an earlier release (two each from seven strata) and, under Amendment 1, 32 whose windows overlap a control window already kept for an earlier release (none overlaps a release window on this calendar, and no two release windows overlap). The mechanism is the Wednesday: CPI releases (08:30 ET) and FOMC statements (14:00 ET) often fall on Wednesdays within four weeks of each other, and the earlier one's Wednesday controls, [08:30, 14:30) or [14:00, 20:00) ET, overlap the later one's Wednesday candidates by 30 minutes. The FOMC statement of 17 March 2027 loses all eight candidates (six to the controls of the CPI release of 10 March 2027, two to rule 2) and enters with n = 0, so its e-value is 1 whatever happens; the CPI releases of 12 May and 10 November 2027 keep one control each.
+
+| | n_i = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | balanced | one side only |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| amended rules (23 strata to December 2027) | 1 | 2 | 3 | 3 | 5 | 3 | 2 | 1 | 3 | 5 | 10 |
+| amended rules, with F24a's 2028 placeholders (41 strata to January 2029) | 1 | 4 | 6 | 5 | 9 | 4 | 4 | 3 | 5 | 8 | 19 |
+
+Balanced means as many kept controls before the release as after it and at least one on each side (Amendment 1, item 2); the five balanced strata are the CPI releases of 10 December 2026, 11 February, 10 March, 14 September and 10 December 2027. In the other 17 strata with controls, a linear drift is not removed to first order and can move the stratum's e-value in either direction, which is part of what H0 assumes away.
+
+Eastern day arithmetic follows the clock across daylight saving changes: the controls of the CPI release of 10 March 2027 are at 13:30 UTC before 14 March and 12:30 UTC after. The first stratum (FOMC, 28 October 2026, 18:00 UTC) keeps 4, 18 and 25 November 2026 at 14:00 EST, as under the original rules (its earlier candidates precede the stream; 11 November is one day from the CPI release of 10 November) and completes when the data reach 25 November 2026 20:00 EST (four weeks after the release, plus 6 hours), that is **26 November 2026, 01:00 UTC**, provided the event file's row for the CPI release of 10 November 2026 has been updated by then. With the 2028 placeholders of F24a's plan, 41 strata enter by early January 2029 (`e25_power_calendar.csv`).
+
+### Power (pre-registration, section 9) [SYNTHETIC; planning inputs REAL] (`e25_power.csv`, `e25_power_growth.csv`, figure `e25_power.png`)
+
+F24a's planning model: the release window has the outcome with S2's BTC rate of its type, each control with the matched control rate of its type, all independently (pooled 2024 to 2026: FOMC 77.3% against 16.5%, CPI 37.5% against 12.5%; `results/e24_future_planning_inputs.csv`). Strata from E25's amended rules on F24a's planning calendar; a stratum enters when complete, assuming each event-file row is updated when its release happens. 10 strata enter by 1 June 2027 (F24a counts 11 releases: the CPI release of 12 May 2027 is in F24a's sample, but its stratum completes on 10 June), 21 by 1 January 2028, 39 by 1 January 2029. Seed 25,000; 20,000 replications per scenario (Monte Carlo s.e. at most 0.0035).
+
+| Scenario | F24a, power on 1 June 2027 | E25: P(M ≥ 20) by 1 June 2027 | by 1 January 2028 | by 1 January 2029 | median releases to the crossing | oracle that knows the control rate, by the same three dates |
+|---|---|---|---|---|---|---|
+| pooled 2024 to 2026 (planning) | 0.822 | 0.435 | 0.820 | 0.981 | 12 | 0.753, 0.957, 0.998 |
+| 2026 rates only | 0.596 | 0.194 | 0.509 | 0.809 | 20 (18 among those that cross by 2029) | 0.409, 0.786, 0.953 |
+| half of the pooled excess | 0.369 | 0.127 | 0.295 | 0.516 | 38 (19 among those that cross by 2029) | 0.268, 0.452, 0.669 |
+| null (release rate = control rate) | 0.031 | 0.010 | 0.016 | 0.022 | never in 97.8% | 0.018, 0.022, 0.025 |
+
+(F24a's values are those of `results/e24_future_power.csv`, S2 pooled; the script checks them. The oracle's e-value does not depend on n_i, so its column is the same under both rule sets.) Estimating each stratum's control rate from at most 8 controls lowers the crossing probability on 1 June 2027 by 42% to 53% relative to the oracle (29% to 40% under the original rules). The expected log e-value per release, exact under the model, is largest at ψ = 8 under the pooled rates (0.26 per release; 0.53 for an FOMC statement, 0.11 for a CPI release) and at ψ = 4 under the 2026 rates (0.14; a CPI release contributes −0.005) and at half the excess (0.074). If only the best ψ contributed, M ≥ 20 would need that ψ's product to reach 80 (the average over four ψ pays a factor 4), a log growth of 4.4, that is about 17 releases at the mean growth of the pooled rates; the simulated median, 12, is earlier because the other products also contribute and the path fluctuates.
+
+So at F24a's date E25 has about half of F24a's power at the planning rates and about a third at the smaller effects; its crossing probability passes F24a's power on 1 June 2027 on 6 January 2028 at the planning rates (0.855), on 10 February 2028 at the 2026 rates (0.601) and on 5 April 2028 at half the excess (0.371) (`e25_power_curve.csv`), and it is the only one of the two that can continue.
+
+### Post hoc illustration on seen data (pre-registration, section 10) [REAL, post hoc, exploratory] (`e25_posthoc_summary.csv`, `e25_posthoc_strata.csv`, figure `e25_posthoc.png`)
+
+**These releases were seen before E25 was designed, and the 2024 to 2025 contrast is what motivated the forward tests; nothing in this section is evidence for the release contrast.** S2 on BTC, ETH and SOL; strata built by section 4 with Amendment 1 within each period (E22's period, 21 January 2024 to 31 December 2025, and E23's, 1 January to 24 October 2026), with the period's end as the data end, so the last strata of each period are incomplete and do not enter (December 2025; 14 October 2026). Outcomes from the committed S2 alarm files, which gate 3 shows are E25's own.
+
+| Period | Coin | Strata in the test (controls per stratum) | Releases with an up alarm within 6 h | Control windows with one | First M ≥ 20 | Final M |
+|---|---|---|---|---|---|---|
+| 2024 to 2025 | BTC | 36 (0 to 8, median 3; 3 balanced, 17 on one side, 3 without controls) | 21 / 36 | 15 / 119 (12.6%) | 8th stratum, 12 June 2024 (also 40) | 4.8 × 10⁴ |
+| | ETH | 36 | 20 / 36 | 16 / 119 (13.4%) | 11th, 31 July 2024 (also 40) | 785 |
+| | SOL | 36 | 20 / 36 | 15 / 119 (12.6%) | 12th, 14 August 2024 (40 on 11 September 2024) | 5.3 × 10³ |
+| 2026 | BTC | 15 (0 to 8, median 4; 3 balanced, 3 on one side, 1 without controls) | 6 / 15 | 7 / 66 (10.6%) | never | 3.8 |
+| | ETH | 15 | 7 / 15 | 9 / 66 (13.6%) | never | 8.4 |
+| | SOL | 15 | 7 / 15 | 9 / 66 (13.6%) | never | 5.0 |
+
+The strata without controls are FOMC statements one week after a Wednesday CPI release or on its day (12 June 2024, which shares its day with a CPI release; 18 December 2024; 18 June 2025; 17 June 2026). The release windows of the CPI release and the FOMC statement of 12 June 2024 overlap by 30 minutes; both enter, as Amendment 1 requires, and this is the only such pair in either period. On 2024 to 2025 the procedure would have crossed at a release of June to August 2024 on every coin (the crossing is known when that stratum completes, four weeks after the release). On 2026, BTC's M fell to 0.28 by mid February 2026 and stayed there until the FOMC statement of 29 April (the first release with an alarm), recovered with the releases of July to September, and ended at 3.8; BTC's FOMC statements alone (exploratory) end at 7.7, CPI releases alone at 0.66. E23's fixed-sample stratified test of the same S2 BTC releases (a secondary family) gave p = 0.007 with 29 to 39 controls per release; with at most 8 controls (median 4) and Ville's threshold the e-process does not reach 20 on the same evidence, which is the cost the power section describes.
+
+### Original rules against Amendment 1
+
+Every row is computed by the same code with `--rules=original` (files `results/e25_*_original_rules.csv`) or with the default amended rules. The original-rule numbers are those first reported in this part (commit `80ee004`); the rerun reproduces every committed original-rule file exactly (only new columns are added).
+
+| Quantity | Label | Original rules (as first committed) | Amendment 1 (main) |
+|---|---|---|---|
+| Planned calendar to December 2027: candidates kept | calendar only | 125 of 184 | 95 of 184 |
+| n_i: range; counts of 0, 1, ..., 8 | calendar only | 3 to 8; 0, 0, 0, 1, 5, 8, 4, 2, 3 | 0 to 8; 1, 2, 3, 3, 5, 3, 2, 1, 3 |
+| balanced strata; one side only; no controls | calendar only | 6; 2; 0 (of 23) | 5; 10; 1 (of 23) |
+| pairs of overlapping windows of different strata | calendar only | 30 | 0 |
+| with the 2028 placeholders (41 strata): kept; balanced; overlapping pairs | calendar only | 228 of 328; 10; 56 | 172 of 328; 8; 0 |
+| first fresh stratum completes | calendar only | 26 November 2026, 01:00 UTC | the same |
+| gate 5: P(M ever ≥ 20) over eight laws | [SYNTHETIC] | 0.028 to 0.046 | 0.025 to 0.044 |
+| power by 1 June 2027, 1 January 2028, 1 January 2029: pooled rates | [SYNTHETIC] | 0.536, 0.891, 0.992 | 0.435, 0.820, 0.981 |
+| the same, 2026 rates | [SYNTHETIC] | 0.276, 0.626, 0.875 | 0.194, 0.509, 0.809 |
+| the same, half the excess | [SYNTHETIC] | 0.162, 0.356, 0.580 | 0.127, 0.295, 0.516 |
+| the same, null | [SYNTHETIC] | 0.011, 0.017, 0.021 | 0.010, 0.016, 0.022 |
+| median releases to the crossing (pooled; 2026; half) | [SYNTHETIC] | 10; 17; 33 | 12; 20; 38 |
+| date E25 passes F24a's power on 1 June 2027 (pooled; 2026; half) | [SYNTHETIC] | 14 October 2027; 25 November 2027; 6 January 2028 | 6 January 2028; 10 February 2028; 5 April 2028 |
+| best expected log e-value per release, pooled rates | [SYNTHETIC] | 0.31 (ψ = 8) | 0.26 (ψ = 8) |
+| post hoc 2024 to 2025: controls; n_i median; balanced; one side; no controls | [REAL, post hoc] | 161; 4.5; 8; 10; 0 | 119; 3; 3; 17; 3 |
+| BTC: first M ≥ 20; final M | [REAL, post hoc] | 9th stratum, 12 June 2024; 4.3 × 10⁵ | 8th stratum, 12 June 2024; 4.8 × 10⁴ |
+| ETH; SOL: first M ≥ 20; final M | [REAL, post hoc] | 31 July 2024, 8.5 × 10³; 12 June 2024, 8.4 × 10⁴ | 31 July 2024, 785; 14 August 2024, 5.3 × 10³ |
+| post hoc 2026: controls; n_i median; balanced; one side; no controls | [REAL, post hoc] | 85; 6; 4; 0; 0 | 66; 4; 3; 3; 1 |
+| final M, BTC; ETH; SOL; BTC FOMC alone | [REAL, post hoc] | 6.7; 13.1; 15.9; 19.6 | 3.8; 8.4; 5.0; 7.7 |
+
+### What E25 shows and what it does not
+
+* It shows [PROVED; checked exactly and by simulation] that the pre-registered e-process has the guarantee claimed: under H0 the chance that it ever reaches 20 is at most 5%, for any number of looks and releases; in the simulated laws it is 2.5% to 4.4% within 200 releases. The guarantee does not depend on the strata rules; Amendment 1 strengthens the case for H0 (no shared minutes between strata), not the proof.
+* It shows [REAL, known data] that the pipeline that will compute it is causal and reproduces E22's and E23's committed outcomes exactly.
+* It shows [SYNTHETIC] that the price of looking at any time is power at a fixed date (0.43 against F24a's 0.82 on 1 June 2027 at the planning rates) and that the gain is the ability to continue (0.82 by 2028, 0.98 by 2029); the price of disjoint windows is about 0.1 of that power on 1 June 2027.
+* It does **not** yet test anything on fresh data: the first fresh stratum completes on 26 November 2026. The post hoc paths are illustrations on seen data.
+* A crossing would say that release windows differ from their controls under this monitor; it would not say which release type carries the effect, how large it is (M is not an effect size), or that the monitor's own 5% bound holds on these data (it does not; E22, E23).
+
+### Caveats and what failed
+
+* Amendment 1 was made after the synthetic power and the post hoc run on seen data had been seen (order of events above). It lowered both; the original-rule results are kept in full.
+* Under the amended rules most strata are unbalanced (of the 22 planned strata with controls, 10 have them on one side only and 7 more on both sides in unequal numbers), so H0's exchangeability within a stratum carries more of the weight against slow drift than section 6 first claimed. An earlier version of this part counted 4 balanced strata under the original rules using a stricter criterion (mean offset of the controls from the release equal to zero); the amendment's criterion (equal numbers before and after) gives 6 under the original rules and 5 under the amended ones.
+* Wednesday releases lose the most controls: the FOMC statement of 17 March 2027 has none, and so do four of the seen FOMC statements. A stratum without controls contributes e = 1 and only delays the test.
+* The planning entry times assume that the event file is updated at each release; a later update delays strata, never changes them.
+* The mean of M after 200 simulated strata was first reported as a validity check and replaced by the means after 1 and 10 strata (a test martingale's sample mean over long horizons is dominated by rare values).
+* A test of the status refusal assumed that complete data make a stratum complete; the code was right (a scheduled row within 30 days also blocks), the test was corrected. An empty release list broke a pandas mask; fixed (iteration 1).
+* E12's `alarm_frame` prints division-by-zero warnings for S2 alarms with a zero baseline scale, in a diagnostic column that E25 does not use.
+* The official schedule hosts cannot be fetched from this machine; the forward calendar rests on E24's event file, verified through search results that index the official pages.
+
+### Reproduction
+
+```
+python experiments/e25_sequential_events.py theory                     # gates 1 and 5, seconds
+python experiments/e25_sequential_events.py strata                     # the planned strata, under a second
+nice -n 10 python experiments/e25_sequential_events.py gates --procs=2  # gates 2 and 3, known data, about 3 minutes
+python experiments/e25_sequential_events.py power                      # section 9, seconds
+python experiments/e25_sequential_events.py posthoc                    # section 10, seconds (reads e25_gates.csv)
+python experiments/e25_sequential_events.py figs
+python experiments/e25_sequential_events.py <theory|strata|power|posthoc> --rules=original
+                                                                       # the rules as first committed, for comparison
+                                                                       # (writes results/e25_*_original_rules.csv)
+nice -n 10 python experiments/e25_sequential_events.py status --procs=2 [--cutoff=YYYY-MM-DD]
+                                                                       # the fresh test at a look (amended rules only);
+                                                                       # refuses before 26 November 2026 01:00 UTC
+python -m pytest -q tests/test_e25.py
+```
+
+### Data files [REAL]
+
+Binance spot one-minute bars, BTCUSDT, ETHUSDT, SOLUSDT, exactly as read by E22 (2024 to 2025) and E23 (12 December 2025 to 24 October 2026 23:59 UTC), already on disk; the committed alarm and window files of E22 and E23. No file was downloaded and no return after 24 October 2026 23:59 UTC was read.
 
 ---
 
