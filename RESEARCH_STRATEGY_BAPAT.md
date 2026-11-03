@@ -56,7 +56,7 @@ The paper solves the first problem for a fixed sample. It does not address the s
 ## 6. Minimum scientifically credible implementation, and extensions
 
 1. **Core (done).** Estimators as printed and normalised; the e-detector with a proof; simulation of false alarms and delay against benchmarks; one real-data run.
-2. **Research extensions (done or in progress).** Five coins and Nifty; the confidence-sequence baseline (E8); stress tests (E9); forecast-relative monitoring (E10); event studies (E7, E12); delay theory (E11); running truncation (E14); panel monitoring (E15); several sampling frequencies in one monitor (E17); benchmark against published change-point methods (E13).
+2. **Research extensions (done or in progress).** Five coins and Nifty; the confidence-sequence baseline (E8); stress tests (E9); forecast-relative monitoring (E10); event studies (E7, E12); delay theory (E11); running truncation (E14); panel monitoring (E15); an adversarial search for null streams (E16); several sampling frequencies in one monitor (E17); benchmark against published change-point methods (E13).
 3. **Advanced computational improvements.** Not needed: the monitor runs at about 10 microseconds per step in plain NumPy (E9d).
 4. **Optional demonstration features.** CLI, executed notebook; a live dashboard was judged unnecessary.
 
@@ -120,7 +120,7 @@ Five candidate directions were scored from 1 (weak) to 10 (strong) on the seven 
 
 ## 11. Development roadmap
 
-**Done in rounds 1 and 2.** Everything in sections 3 to 6, about 240 automated tests, experiments E1 to E15, alternatives ALT1 to ALT6, two independent reviews (rounds 1 and 2a), a one-command reproduction script (`scripts/reproduce.py`) and a short paper draft (`paper/`).
+**Done in rounds 1 and 2.** Everything in sections 3 to 6, about 240 automated tests, experiments E1 to E17, alternatives ALT1 to ALT6, two independent reviews (rounds 1 and 2a), a one-command reproduction script (`scripts/reproduce.py`) and a short paper draft (`paper/`).
 
 **Next, after a first meeting with Prof. Bapat (about 2 to 3 weeks).**
 1. Confirm the code conventions (weight normalisation, MAD scaling, simulation σ, the σ_J = 0.10 design, the RMSE definition, the DOGE data) and rerun E1 and E6 with his settings.
