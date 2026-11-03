@@ -1,0 +1,17 @@
+date,event_type,release_time_et,release_time_utc,eastern_zone,weekday,status,original_date,source_url
+2026-01-13,cpi,08:30,2026-01-13 13:30,EST,Tuesday,released,,https://www.bls.gov/news.release/archives/cpi_01132026.htm
+2026-01-28,fomc,14:00,2026-01-28 19:00,EST,Wednesday,released,,https://www.federalreserve.gov/newsevents/pressreleases/monetary20260128a.htm
+2026-02-13,cpi,08:30,2026-02-13 13:30,EST,Friday,rescheduled,2026-02-11,https://www.bls.gov/news.release/archives/cpi_02132026.htm
+2026-03-11,cpi,08:30,2026-03-11 12:30,EDT,Wednesday,released,,https://www.bls.gov/news.release/archives/cpi_03112026.htm
+2026-03-18,fomc,14:00,2026-03-18 18:00,EDT,Wednesday,released,,https://www.federalreserve.gov/newsevents/pressreleases/monetary20260318a.htm
+2026-04-10,cpi,08:30,2026-04-10 12:30,EDT,Friday,released,,https://www.bls.gov/news.release/archives/cpi_04102026.htm
+2026-04-29,fomc,14:00,2026-04-29 18:00,EDT,Wednesday,released,,https://www.federalreserve.gov/newsevents/pressreleases/monetary20260429a.htm
+2026-05-12,cpi,08:30,2026-05-12 12:30,EDT,Tuesday,released,,https://www.bls.gov/news.release/archives/cpi_05122026.htm
+2026-06-10,cpi,08:30,2026-06-10 12:30,EDT,Wednesday,released,,https://www.bls.gov/news.release/archives/cpi_06102026.htm
+2026-06-17,fomc,14:00,2026-06-17 18:00,EDT,Wednesday,released,,https://www.federalreserve.gov/newsevents/pressreleases/monetary20260617a.htm
+2026-07-14,cpi,08:30,2026-07-14 12:30,EDT,Tuesday,released,,https://www.bls.gov/news.release/archives/cpi_07142026.htm
+2026-07-29,fomc,14:00,2026-07-29 18:00,EDT,Wednesday,released,,https://www.federalreserve.gov/newsevents/pressreleases/monetary20260729a.htm
+2026-08-12,cpi,08:30,2026-08-12 12:30,EDT,Wednesday,released,,https://www.bls.gov/news.release/archives/cpi_08122026.htm
+2026-09-11,cpi,08:30,2026-09-11 12:30,EDT,Friday,released,,https://www.bls.gov/regions/northeast/news-release/2026/consumerpriceindex_newyork_20260911.htm
+2026-09-16,fomc,14:00,2026-09-16 18:00,EDT,Wednesday,released,,https://www.federalreserve.gov/newsevents/pressreleases/monetary20260916a.htm
+2026-10-14,cpi,08:30,2026-10-14 12:30,EDT,Wednesday,released,,https://www.bls.gov/news.release/archives/cpi_10142026.htm

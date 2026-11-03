@@ -1,0 +1,55 @@
+check,column,compared,mismatches,max_abs_diff
+P1 BTC through the E23 period switch vs e22_tests.csv,(row keys),30,0,
+P1 BTC through the E23 period switch vs e22_tests.csv,events,30,0,0.0
+P1 BTC through the E23 period switch vs e22_tests.csv,events_with,30,0,0.0
+P1 BTC through the E23 period switch vs e22_tests.csv,rate_event,30,0,0.0
+P1 BTC through the E23 period switch vs e22_tests.csv,rate_event_lo,30,0,0.0
+P1 BTC through the E23 period switch vs e22_tests.csv,rate_event_hi,30,0,0.0
+P1 BTC through the E23 period switch vs e22_tests.csv,control_windows,30,0,0.0
+P1 BTC through the E23 period switch vs e22_tests.csv,weekday_time_groups,30,0,0.0
+P1 BTC through the E23 period switch vs e22_tests.csv,rate_control_matched,30,0,0.0
+P1 BTC through the E23 period switch vs e22_tests.csv,expected_from_matched_controls,30,0,0.0
+P1 BTC through the E23 period switch vs e22_tests.csv,rate_ratio_matched,30,0,0.0
+P1 BTC through the E23 period switch vs e22_tests.csv,expected_under_null,30,0,0.0
+P1 BTC through the E23 period switch vs e22_tests.csv,p_stratified_permutation,30,0,0.0
+P1 BTC through the E23 period switch vs e22_tests.csv,p_stratified_permutation_fewer,30,0,0.0
+P1 BTC through the E23 period switch vs e22_tests.csv,p_stratified_fisher,30,0,0.0
+P1 BTC windows vs e22_windows.csv,(row keys),38,0,
+P1 BTC windows vs e22_windows.csv,monitoring_at_start,38,0,0.0
+P1 BTC windows vs e22_windows.csv,monitored_share_post,38,0,0.0
+P1 BTC windows vs e22_windows.csv,any_post,38,0,0.0
+P1 BTC windows vs e22_windows.csv,up_post,38,0,0.0
+P1 BTC windows vs e22_windows.csv,up_post_1h,38,0,0.0
+P1 BTC windows vs e22_windows.csv,n_up_post,38,0,0.0
+P1 BTC windows vs e22_windows.csv,down_post,38,0,0.0
+P1 BTC windows vs e22_windows.csv,first_up_delay_min,38,0,0.0
+P1 BTC windows vs e22_windows.csv,first_up_max_abs_recent_over_scale,38,0,0.0
+P1 BTC windows vs e22_windows.csv,first_up_post_over_baseline,38,0,0.0
+P1 BTC windows vs e22_windows.csv,up_pre,38,0,0.0
+P1 BTC windows vs e22_windows.csv,last_up_lead_min,38,0,0.0
+P1 BTC windows vs e22_windows.csv,down_follow,38,0,0.0
+P1 BTC windows vs e22_windows.csv,first_down_follow_min,38,0,0.0
+P1 BTC windows vs e22_windows.csv,down_after_up,38,0,0.0
+P1 BTC windows vs e22_windows.csv,abs_ret_first_hour_over_pre,38,0,0.0
+P1 BTC windows vs e22_windows.csv,abs_ret_post_over_pre,38,0,0.0
+P1 BTC windows vs e22_windows.csv,n_controls,38,0,0.0
+P1 BTC windows vs e22_windows.csv,control_up_post_rate,38,0,0.0
+P1 BTC windows vs e22_windows.csv,control_up_post_1h_rate,38,0,0.0
+P1 BTC windows vs e22_windows.csv,control_up_pre_rate,38,0,0.0
+P1 BTC windows vs e22_windows.csv,control_down_follow_rate,38,0,0.0
+P1 BTC windows vs e22_windows.csv,control_down_after_up_given_up_rate,38,0,0.0
+P1 BTC windows vs e22_windows.csv,control_monitoring_at_start_rate,38,0,0.0
+P1 BTC windows vs e22_windows.csv,watched_at_start,38,0,0.0
+P1 BTC windows vs e22_windows.csv,watched_share_post,38,0,0.0
+P1 BTC windows vs e22_windows.csv,control_watched_at_start_rate,38,0,0.0
+P1 BTC summary vs e22_monitor_summary.csv,(row keys),1,0,
+P1 BTC summary vs e22_monitor_summary.csv,alarms,1,0,0.0
+P1 BTC summary vs e22_monitor_summary.csv,up,1,0,0.0
+P1 BTC summary vs e22_monitor_summary.csv,down,1,0,0.0
+P1 BTC summary vs e22_monitor_summary.csv,monitored_share,1,0,0.0
+P1 BTC summary vs e22_monitor_summary.csv,periods,1,0,0.0
+P1 BTC summary vs e22_monitor_summary.csv,periods_with_alarm,1,0,0.0
+"pooled function on one type vs E12.stratified_tests (fomc, up_post)",(all),7,0,
+"pooled function on one type vs E12.stratified_tests (fomc, up_post_1h)",(all),7,0,
+"pooled function on one type vs E12.stratified_tests (cpi, up_post)",(all),7,0,
+"pooled function on one type vs E12.stratified_tests (cpi, up_post_1h)",(all),7,0,
