@@ -231,13 +231,14 @@ bounds. Our contributions are the following.
 \item
   \textbf{Evidence.} Simulations of validity and delay against Gaussian
   likelihood-ratio, CUSUM and repeated-test benchmarks and against two
-  published change-point methods, and of the failure modes (clustering,
-  estimated baselines). Real-data studies on the five cryptocurrencies
-  of Bapat (2026), the Nifty 50 index with India VIX, and FOMC and CPI
-  releases, with random-time, forecast and rate-matched controls. First
-  results on a running truncation level and on restarts without a blind
-  period, on combining detectors at 1, 5 and 15 minutes, and on a panel
-  of assets with false discovery control.
+  published change-point methods, of the failure modes (clustering,
+  estimated baselines), and an adversarial search over null streams.
+  Real-data studies on the five cryptocurrencies of Bapat (2026), the
+  Nifty 50 index with India VIX, and FOMC and CPI releases, with
+  random-time, forecast and rate-matched controls. First results on a
+  running truncation level and on restarts without a blind period, on
+  combining detectors at 1, 5 and 15 minutes, and on a panel of assets
+  with false discovery control.
 \end{itemize}
 
 We also report, briefly and as questions, what an independent
@@ -1378,15 +1379,40 @@ function of the band \(b\) (E9) {[}SYNTHETIC{]}.}
 
 The bound holds for every law, and the four laws give almost the same
 rates, which is what a nonparametric guarantee should look like once the
-statistic is bounded. It is conservative by a factor of about 4 at one
-day and about 2 at \(m = A\). An exact optional stopping identity traces
-the slack to overshoot (a factor of about 1.25) and to expected wealth
-stranded on paths that never alarm (a factor of about 4), most of it
-held by the decrease side and the smallest increase bets. The bound
-itself is nearly sharp: for a single bet of 0.5, dynamic programming
-over the whole nonparametric null finds a law that reaches 95\% of it;
-for the default mixture the worst law found reaches 42\%, and a
-certified sharper bound is open (E11, Q11d; Supplement S2).
+statistic is bounded. Against these natural laws it is conservative by a
+factor of about 4 at one day and about 2 at \(m = A\); against the worst
+stream found by the adversarial search below, by about 2 at one day. An
+exact optional stopping identity traces the slack to overshoot (a factor
+of about 1.25) and to expected wealth stranded on paths that never alarm
+(a factor of about 4), most of it held by the decrease side and the
+smallest increase bets. For a single bet of 0.5 the bound is nearly
+sharp: dynamic programming over the whole nonparametric null finds a law
+that reaches 95\% of it. For the default mixture the best i.i.d. law
+found reaches 42\% for the increase grid alone and the adaptive stream
+below 52\% for the two-sided detector, and a certified sharper bound is
+open (E11, Q11d; E16; Supplement S2).
+
+\textbf{An adversarial search.} E16 asks how close to the bound a stream
+inside the class of Theorem B can get, including streams that react to
+the detector's own state. The worst stream found is \emph{bold play}: it
+watches the detector's state, always uses the widest legal spread
+\(\lbrace 0, B \rbrace\) and, when one draw can reach the threshold,
+lands exactly on it. On fresh paths it alarmed within one day on 2.62\%
+of paths (95\% interval 2.50\% to 2.75\%) against 5\%, and within five
+days on 18.1\% against 25\% (Gaussian returns: 0.97\% and 12.4\%)
+{[}SYNTHETIC{]}. Against the worst stream found, the bound is thus about
+two times conservative at one day and 1.4 times over five days. A search
+gives lower bounds on the worst case only: the only proved limit below
+\(m/A\) is 0.98 of the bound at one day, and whether a worse stream
+exists is open. Outside the class each failure matched the broken
+condition and disappeared when it was restored (for ticks, the same
+values drawn independently): GARCH clustering exceeded the bound from a
+mean drift of the conditional mean of 3.9\% at one day (1.6\% over five
+days), a plug-in baseline from 390 calibration steps gave 41\% to 42\%
+over five days against 25\%, and 32.5\% in one day under a shape change
+that keeps the conditional mean, and price ticks exceeded it from 4
+standard deviations over five days (6 at one day) (E16; Supplement S6)
+{[}SYNTHETIC{]}.
 
 \hypertarget{detection-delay-bet-design-and-the-cost-of-an-estimated-baseline}{%
 \subsection{5.3 Detection delay, bet design and the cost of an estimated
@@ -2173,7 +2199,12 @@ analysis.
   needs long calibration to be fast (Table 6).
 \item
   \emph{Conservatism.} With the default grid the bound is about four
-  times larger than the observed rate at one day (Section 5.2).
+  times larger than the observed rate at one day for natural return
+  laws, and about two times larger (1.4 times over five days) than the
+  rate of the worst stream that an adversarial search found inside the
+  theorem's conditions. A search gives lower bounds on the worst case
+  only, and the only proved limit is 0.98 of the bound at one day
+  (Section 5.2).
 \item
   \emph{Speed and precision against published methods.} On Gaussian
   returns, Bayesian online change-point detection found large decreases
@@ -2221,11 +2252,13 @@ analysis.
 \def\labelenumi{\arabic{enumi}.}
 \tightlist
 \item
-  \emph{A certified sharper threshold for mixtures.} For single bets the
-  bound \(m/A\) is nearly attained by an adversarial null law, but for
-  the default mixture the worst law found reaches only 42\% of it
-  (Section 5.2). A sharper bound that is still provable would translate
-  directly into speed.
+  \emph{A certified sharper threshold for mixtures.} For the single bets
+  0.5 and 0.2 and the largest decrease bet the bound \(m/A\) is nearly
+  attained by an adversarial null law at one day or more, but for the
+  default two-sided mixture the worst stream found reaches only 52\% of
+  it at one day, and the only proved limit is 98\% of it (Section 5.2).
+  A sharper bound that is still provable would translate directly into
+  speed.
 \item
   \emph{A running truncation level and a restart without a blind period,
   with a proof that costs little.} Real data want \(\tau_t\) to follow
@@ -2886,6 +2919,14 @@ E17 & Gaussian, Student \(t_3\), jumps (0.005, sd 8); price noise
 2000 per change & at monitored minute 247: sd ratio 1.25, 1.5, 2, 0.8,
 0.67, 0.5; bursts ×2 or ×3 for 15 or 60 minutes; lag-one autocorrelation
 from 0 to 0.3; \(\gamma = 2\) added after the \(\gamma = 1\) results \\
+E16 & inside the class: i.i.d. two- and three-point laws for \(Y\),
+scale mixtures, Student \(t\) (\(\nu \ge 2.1\)), rounded returns, shape
+switching, adaptive policies; outside: GARCH(1,1) on 64 cells,
+price-level ticks of 0.05 to 6 sd & true \(\tau\) and \(m_0\)
+(unconditional for GARCH and ticks); plug-in from 390 or 1440 steps in
+the baseline part & \(A = 7800\), two-sided & search 20,000 (one day)
+and 6000 to 8000 (five days); fresh seeds 200,000 and 60,000; outside
+the class 6000 to 30,000 per cell & none (validity) \\
 ALT1 (noise) & one-second returns, 23,400 per day, i.i.d. Gaussian price
 noise & per experiment & \(A\) = steps per day / 0.05 & 200 days per
 cell & none (validity) \\
@@ -2975,6 +3016,9 @@ Proposition 10 & \texttt{docs/report\_parts/E10.md}, Q10d \\
 Section 5.5, Supplement S4.1 & \texttt{docs/theory\_running\_tau.md},
 \texttt{docs/report\_parts/E14.md} \\
 Section 5.6, Table 8 & \texttt{docs/report\_parts/E13.md} \\
+Section 5.2 (adversarial search), Supplement S6 &
+\texttt{docs/report\_parts/E16.md}; the identity and the dynamic
+programme in \texttt{docs/theory\_delay.md}, sections 8.1 to 8.4 \\
 Supplement S4.2 & \texttt{docs/theory\_panel.md},
 \texttt{docs/report\_parts/E15.md} \\
 Section 5.5, Supplement S4.3 & \texttt{docs/theory\_multifreq.md}
@@ -2996,7 +3040,8 @@ Experiments & \texttt{experiments/e04\_detection.py},
 \texttt{e07c\_india\_vix.py}, \texttt{e07d\_events.py},
 \texttt{e12\_crypto\_events.py}, \texttt{e13\_benchmarks.py},
 \texttt{e14\_running\_tau.py}, \texttt{e15\_panel.py},
-\texttt{e17\_multifrequency.py}; results in \texttt{results/}, report in
+\texttt{e16\_adversarial\_null.py}, \texttt{e17\_multifrequency.py};
+results in \texttt{results/}, report in
 \texttt{docs/experiment\_report.md} \\
 Figure 1 & \texttt{paper/make\_paper\_figures.py} \\
 \end{longtable}
@@ -3217,14 +3262,16 @@ overshoot factor \(F_3\) (E11, Q11d). For the default two-sided monitor
 \(F_2 = 0.24\) and \(F_3 = 0.80\): the slack is overshoot (a factor of
 1.25) times wealth stranded on paths that never alarm (a factor of about
 4). Of the stranded wealth, 60\% is held by the decrease side and 31\%
-by the three smallest increase bets, which cannot build wealth within a
-day. The split of the budget between the two sides costs almost nothing
-(both sides alarm on the same day in 0.00\% of days). The bound itself
-is nearly sharp: for a single increase bet of 0.5, dynamic programming
-over the whole nonparametric null finds a law with a one-day false alarm
-rate of 4.73\%, 95\% of the bound, against 3.52\% for Gaussian data. For
-the default mixture the worst law found reaches 42\% of the bound; a
-certified sharper bound for mixtures is open. Provable gains are
+by the three smallest increase bets, which build little wealth within a
+day on Gaussian data. The split of the budget between the two sides
+costs almost nothing (both sides alarm on the same day in 0.00\% of
+days). The bound itself is nearly sharp: for a single increase bet of
+0.5, dynamic programming over the whole nonparametric null finds a law
+with a one-day false alarm rate of 4.73\%, 95\% of the bound, against
+3.52\% for Gaussian data. For the default mixture the best i.i.d. law
+found reaches 42\% of the bound for the increase grid alone, and an
+adaptive law reaches 52\% for the two-sided detector (E16, Supplement
+S6); a certified sharper bound for mixtures is open. Provable gains are
 possible by splitting the budget unevenly between the sides and by
 dropping bets that cannot use it.
 
@@ -3798,5 +3845,144 @@ Nifty 50 in the panel, its discoveries were confirmed 87\% to 95\% of
 the time, and four times (band 0.25) e-BH discovered it after its
 session had closed, because crypto discoveries later in the day lowered
 the e-BH bar below its frozen e-value.
+
+\hypertarget{s6.-adversarial-null-streams-e16}{%
+\subsection{S6. Adversarial null streams
+(E16)}\label{s6.-adversarial-null-streams-e16}}
+
+\textbf{Set-up.} The detector is the full default: \(c = 3\), six
+increase bets from 0.02 to 0.5, five decrease bets from 0.1 to 0.95 of
+\(1/(B-1)\) with \(B = \tau^2/m_0\), Shiryaev-Roberts statistics and
+each side alarming at \(2A\), \(A = 7800\), so the bound is 5\% for a
+390-step day and 25\% for five days. Inside the class of Theorem B only
+the law of \(Y_t = X_t/m_0\) matters: \(Y_t \in [0, B]\) with
+conditional mean exactly 1. At each step both statistics are affine in
+\(Y_t\), so a two-point law with mean 1 is as good as any law for the
+adversary (as in the proof of Lemma 5(a)), whose whole choice is a pair
+of points at each step, possibly depending on everything seen so far,
+including the detector's state. Any \(B > 1\) is legitimate for a level
+fixed in advance (Gaussian returns give \(B = 9.045\)). The families
+searched were i.i.d. two- and three-point laws for \(Y\); return laws
+with their own \(\tau\) and \(m_0\) (scale mixtures of two normals,
+Student \(t\) with \(\nu \ge 2.1\), returns rounded to a tick);
+exogenous switching between the shape \(\lbrace 0, B \rbrace\) and the
+Gaussian shape; and adaptive laws: bold play, an 8-parameter policy
+family that contains it, and bold play after holding \(Y_t = 1\) for a
+while. Search maxima are biased upwards, so the worst law of each family
+was re-run on fresh seeds (200,000 paths at one day, 60,000 at five
+days).
+
+\emph{Table S4. Worst law found per family: false alarm rate on fresh
+seeds with its 95\% Wilson interval, and its ratio to the bound (E16,
+Q16a and Q16b) {[}SYNTHETIC{]}. The last row is bold play at the worst
+value of \(B\) (2 at one day; 3 and 5 tie over five days) on 60,000
+paths.}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2000}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Family
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+One day
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+/ bound
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Five days
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+/ bound
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+i.i.d. two-point, \(B = 9.045\) & 1.92\% (1.86 to 1.98) & 0.38 & 14.5\%
+(14.3 to 14.8) & 0.58 \\
+i.i.d. two-point, \(B\) free in {[}2, 40{]} & 2.14\% (2.08 to 2.21) &
+0.43 & 15.8\% (15.5 to 16.1) & 0.63 \\
+i.i.d. three-point, \(B = 9.045\) & 1.83\% (1.77 to 1.89) & 0.37 &
+14.6\% (14.3 to 14.9) & 0.58 \\
+scale mixture of two normals & 2.07\% (2.01 to 2.13) & 0.41 & 15.4\%
+(15.1 to 15.7) & 0.62 \\
+Student \(t\), \(\nu = 2.1\) & 1.66\% (1.60 to 1.72) & 0.33 & 14.5\%
+(14.2 to 14.8) & 0.58 \\
+returns rounded to a tick of 0.5 sd & 1.49\% (1.44 to 1.55) & 0.30 &
+14.1\% (13.8 to 14.4) & 0.56 \\
+Gaussian (reference) & 0.97\% (0.93 to 1.02) & 0.19 & 12.4\% (12.2 to
+12.7) & 0.50 \\
+exogenous shape switching & 1.89\% (1.80 to 1.97) & 0.38 & 15.0\% (14.6
+to 15.3) & 0.60 \\
+bold play, \(B = 9.045\) & 2.40\% (2.34 to 2.47) & 0.48 & 17.6\% (17.3
+to 17.9) & 0.70 \\
+best of the 8-parameter policy family & 2.37\% (2.30 to 2.43) & 0.47 &
+17.2\% (16.9 to 17.5) & 0.69 \\
+hold \(Y_t = 1\), then bold play & 2.39\% (2.32 to 2.46) & 0.48 & 17.8\%
+(17.5 to 18.1) & 0.71 \\
+bold play, worst \(B\) & 2.62\% (2.50 to 2.75) & 0.52 & 18.1\% (17.8 to
+18.5) & 0.73 \\
+\end{longtable}
+
+No interval reaches the bound. Seeing the detector's state adds about
+half a point at one day and three points over five days (bold play
+against the best i.i.d. two-point law at the same \(B\)). The
+8-parameter search beat bold play only on its own training paths (2.82\%
+against 2.63\%). Bold play uses 0.22 of the bound at a quarter of a day,
+0.71 to 0.72 between about 2,000 and 4,000 steps and 0.62 at \(m = A\);
+for \(B\) from 1.2 to 39 its one-day rate stays between 2.0\% and 2.6\%,
+and at \(B\) = 100 to 1,000 it is below its rate at \(B = 2\) (Q16b).
+
+\textbf{Where the slack sits, and what is proved.} In the identity of
+Supplement S2, bold play has a stopping factor of 0.99, \(F_2 = 0.49\)
+and \(F_3 = 1.00\), against 1.00, 0.25 and 0.79 for Gaussian data: it
+removes the overshoot and doubles the share of expected wealth on
+alarmed paths. Under every law tried, the rest is wealth on paths that
+never alarm, 60\% of it in the decrease bets and 36\% in the increase
+bets 0.02, 0.05 and 0.1; whether a null law can move it onto alarmed
+paths is open. For single bets bold play comes within 0.03 of the bound
+fraction reached by the dynamic programme of E11 for the bets 0.5 and
+0.2 and the largest decrease bet at one to ten days, and beats it for
+the bet 0.05 (0.26 against 0.18 at one day), whose programme value is a
+loose lower bound from a coarse grid of wealth states (0.232 on a finer
+grid) (Q16c). The only proved limit is a floor. On a day without an
+alarm every increase bet is at least where draws of 0 at every step
+would leave it and every decrease bet at least where draws of \(B\)
+would, so the two-sided statistic is at least \(c = 8.3\); optional
+stopping gives \(A\,P + c\,(1 - P) \le m\) for the probability \(P\) of
+a false alarm within \(m\) steps, so \(P \le (m - c)/(A - c) = 4.90\%\)
+at one day, 0.98 of the bound.
+
+\textbf{Outside the class.} \emph{GARCH(1,1)} with Gaussian innovations
+and the true unconditional \(\tau\) and \(m_0\), on 64 cells
+(persistence 0.5 to 0.999, \(\alpha\) from 0.002 to 0.3; 6000 paths of
+five days each): the rate was significantly above the bound in 43 cells
+at one day, in every cell whose mean absolute drift
+\(\mathbb{E}\lvert \mu_t/m_0 - 1 \rvert\) of the conditional mean
+\(\mu_t\) exceeded 5.6\% and in none below 3.9\% (over five days the cut
+lies between 1.6\% and 2.5\%), with a Spearman correlation of 0.99
+between drift and rate. Betting against the true \(\mu_t\) on the same
+paths, the detector stayed at or below 0.24 of the bound at one day and
+0.56 over five days (Q16d). \emph{A plug-in baseline} with i.i.d.
+returns and 390 calibration steps alarmed within five days on 41\% to
+42\% of fresh paths under the worst law of each of four families,
+against 25\%, while the same \(\hat\tau\) with the true mean at that
+level stayed at or below 0.59 of the bound: the excess comes from
+\(\hat m\). After a Gaussian calibration, replacing every monitored
+\(X\) by the constant \(m(\hat\tau)\), which keeps the conditional mean,
+raised the plug-in rate to 32.5\% within one day, while that oracle
+never alarmed (Q16e). \emph{Price-level ticks} (a Gaussian random walk
+rounded to a tick, true unconditional \(\tau\) and \(m_0\)) exceeded the
+bound from a tick of 4 standard deviations over five days (28.8\%,
+interval 28.0\% to 29.7\%), where the price is unchanged in 80\% of
+steps and the conditional mean after an unchanged price is 0.88 of
+\(m_0\), and from 6 at one day (17.6\%). The same values drawn
+independently, with the same \(\tau\) and \(m_0\), stayed at or below
+0.32 of the bound at one day and 0.57 over five days at every tick (at 4
+standard deviations, 0.90\% and 7.4\%) (Q16f). A search finds lower
+bounds on the worst case only, the policy families are broad but not
+exhaustive, and everything here is synthetic.
 
 \end{document}
