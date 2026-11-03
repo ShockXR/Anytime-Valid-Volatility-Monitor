@@ -58,10 +58,13 @@ Round 3: theory TH4 to TH6, experiments E16 to E25, the paper, and the preparati
   releases up to 1 June 2027.
 - E25: an anytime-valid version of that forward test (`experiments/e25_sequential_events.py`): an
   e-process over releases with disjoint four-week strata of control windows, pre-registered before any
-  fresh data (`docs/preregistration_e25_sequential.md`, with one amendment also made before any fresh
+  fresh data (`docs/preregistration_e25_sequential.md`, with two amendments, both made before any fresh
   data), proof in `docs/theory_sequential_events.md`; the fresh test can run from 26 November 2026.
 - `docs/demo/replay.html` and `scripts/build_replay.py`: a minute-by-minute replay of two landmark days
   of E18, rebuilt from the data and checked against E18's saved alarm lists.
+- The pre-registered live run on the Nifty 50 session of 3 November 2026 (`results/live/2026-11-03/`,
+  result added to `docs/preregistration_nifty_2026-11-03.md`): no alarm, because the monitor was still
+  recalibrating after an alarm on 2 November for the whole session.
 - TH4: `avmonitor.robustness`, false alarm bounds when the null holds only approximately (mean drift,
   plug-in baseline, GARCH), checked against E16.
 - TH5: `avmonitor.limits`, limits for every valid procedure (pathwise and mean delay floors after a
