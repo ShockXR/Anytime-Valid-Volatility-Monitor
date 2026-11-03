@@ -332,9 +332,12 @@ def two_sided_sr(x, tau2, m_up, m_dn, levels, up_grid=DEFAULT_UP_GRID, down_frac
 
     ``x, tau2, m_up, m_dn``: arrays (reps, n) (or broadcastable), all predictable except x.
     Increase factors ``1 + lam (x / m_up - 1)`` with lam in ``up_grid``; decrease factors
-    ``1 + lam_t (1 - x / m_dn)`` with ``lam_t = frac / (tau2 / m_dn - 1)`` recomputed every step
-    (a step with ``m_dn <= 0`` or ``tau2 <= m_dn`` gets factor 1). Statistics are averages
-    over the grid. Returns dict level -> (first up alarm, first down alarm), -1 if none.
+    ``1 + lam_t (1 - x / m_dn)`` with ``lam_t = frac / (tau2 / m_dn - 1)`` recomputed every step.
+    A step with ``m_dn <= 0`` or ``tau2 <= m_dn`` has no admissible decrease bet ("off"): it
+    leaves the decrease statistic unchanged (no new chain starts, earlier chains keep their
+    wealth), so a decrease side that is off for the whole segment stays at 0, as in
+    docs/math.md 6.3. Statistics are averages over the grid. Returns dict
+    level -> (first up alarm, first down alarm), -1 if none.
     """
     x = np.atleast_2d(np.asarray(x, float))
     reps, n = x.shape
@@ -356,14 +359,14 @@ def two_sided_sr(x, tau2, m_up, m_dn, levels, up_grid=DEFAULT_UP_GRID, down_frac
         B = np.where(on, tau2[:, t] / md, 2.0)
         lam = np.where(on[:, None], df / (B[:, None] - 1.0), 0.0)
         fu = 1.0 + ug * (yu[:, None] - 1.0)
-        fd = 1.0 + lam * (1.0 - (xt / md)[:, None])
+        fd = 1.0 + lam * (1.0 - (xt / md)[:, None])  # exactly 1 at an off step
         with np.errstate(over="ignore"):
             if kind == "SR":
                 Su = fu * (Su + 1.0)
-                Sd = fd * (Sd + 1.0)
+                Sd = fd * (Sd + on[:, None])  # an off step starts no chain
             else:
                 Su = fu * np.maximum(Su, 1.0)
-                Sd = fd * np.maximum(Sd, 1.0)
+                Sd = np.where(on[:, None], fd * np.maximum(Sd, 1.0), Sd)
         Mu = Su.mean(axis=1)
         Md = Sd.mean(axis=1)
         for L in levels:
@@ -627,7 +630,9 @@ class RunningTauMonitor:
     ``tau_t`` to the grid level nearest ``c * scaled MAD`` of the last ``window`` finite
     returns (refreshed every ``every`` monitored steps; the first value comes from the end of
     the calibration window). The increase side bets against ``(1 + b) U(tau_t)``, the
-    decrease side against ``(1 - b) L(tau_t)``; each side alarms at ``2 A``. Missing returns
+    decrease side against ``(1 - b) L(tau_t)``; each side alarms at ``2 A``. A step at which the
+    decrease side has no admissible bet (``L(tau_t) <= 0`` or ``tau_t^2 <= L(tau_t)``) leaves the
+    decrease statistic unchanged, so a side that is off throughout stays at 0. Missing returns
     are skipped. ``running=False`` keeps ``tau`` at the grid centre (route A with a fixed level).
     If the calibration window has scale 0 (more than half zero returns), it is extended
     until usable (the extension rule uses only past data, so the stopping-time argument of
@@ -720,8 +725,7 @@ class RunningTauMonitor:
         if md > 0 and tau2 > md:
             lam = self.down_fractions / (tau2 / md - 1.0)
             self.S_dn = (1.0 + lam * (1.0 - x / md)) * (self.S_dn + 1.0)
-        else:
-            self.S_dn = self.S_dn + 1.0
+        # else: no admissible decrease bet at this level; the decrease statistic is left unchanged
         self.recent.append(r)
         self.n_mon += 1
         mu, mdn = self.S_up.mean(), self.S_dn.mean()
@@ -964,6 +968,8 @@ def awake_route_a(r_pre, r_seg, levels_list, delta: float = 0.01, c: float = 3.0
     The chain started at step s bets against the band snapshot of size ``e(s)``
     (``awake_epochs``); chains with the same snapshot share one Shiryaev-Roberts statistic,
     and the alarm statistic is the sum over snapshots (docs/theory_running_tau.md, Theorem A.4).
+    On the decrease side, a snapshot with no admissible bet at ``tau_t`` (lower bound 0, as for
+    the trivial snapshot of size 0) starts no chain at that step and leaves its chains unchanged.
     Returns (dict level -> (up alarms, down alarms), centre).
     """
     r_pre = np.atleast_2d(np.asarray(r_pre, float))
@@ -998,12 +1004,14 @@ def awake_route_a(r_pre, r_seg, levels_list, delta: float = 0.01, c: float = 3.0
         ls = np.where(on, l_, 1.0)
         B = np.where(on, tau2[:, None] / ls, 2.0)
         lam = np.where(on[:, :, None], df[None, None, :] / (B[:, :, None] - 1.0), 0.0)
-        fd = 1.0 + lam * (1.0 - (x[:, None] / ls)[:, :, None])
+        fd = 1.0 + lam * (1.0 - (x[:, None] / ls)[:, :, None])  # exactly 1 where the snapshot is off
         add = np.zeros((1, e_now + 1, 1))
         add[0, e_now, 0] = 1.0
+        add_d = np.zeros((reps, e_now + 1, 1))
+        add_d[:, e_now, 0] = on[:, e_now]  # a decrease chain starts only if its snapshot has an admissible bet
         with np.errstate(over="ignore"):
             Su[:, : e_now + 1] = fu * (Su[:, : e_now + 1] + add)
-            Sd[:, : e_now + 1] = fd * (Sd[:, : e_now + 1] + add)
+            Sd[:, : e_now + 1] = fd * (Sd[:, : e_now + 1] + add_d)
         Mu = Su.mean(axis=2).sum(axis=1)
         Md = Sd.mean(axis=2).sum(axis=1)
         for Lv in levels_list:
@@ -1118,9 +1126,10 @@ class AwakeRunningTauMonitor:
         lam = np.where(on[:, None], self.down_fractions[None, :] / (np.where(on, tau2 / Ls, 2.0)[:, None] - 1.0), 0.0)
         fd = 1.0 + lam * (1.0 - (x / Ls)[:, None])
         self.S_up[-1] += 1.0
-        self.S_dn[-1] += 1.0
+        if on[-1]:  # a decrease chain starts only if the latest snapshot has an admissible bet at tau_t
+            self.S_dn[-1] += 1.0
         self.S_up *= fu
-        self.S_dn *= fd
+        self.S_dn *= fd  # factor 1 for snapshots with no admissible bet: their chains keep their wealth
         if s < self.n_learn:
             self.cs.update(r)
             self.seg_returns.append(r)

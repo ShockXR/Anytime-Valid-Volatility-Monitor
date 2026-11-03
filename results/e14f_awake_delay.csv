@@ -107,13 +107,13 @@ student_t3,120,1.5,plugin (1440-step recalibration),0.0,0.075,1728.0,1951.600000
 student_t3,120,1.5,cs (1440-step recalibration),0.0,0.0,,,1000
 student_t3,120,1.5,A-grid-run (1440-step recalibration),0.0,0.0,,,1000
 student_t3,120,1.5,B-lr (1440-step recalibration),0.0,0.048,1686.0,1965.9,1000
-student_t3,120,0.5,awake-A,0.0,0.81,428.0,1255.6000000000001,1000
+student_t3,120,0.5,awake-A,0.0,0.81,428.0,1262.7000000000003,1000
 student_t3,120,0.5,awake-B,0.005,0.994,42.0,89.0,1000
 student_t3,120,0.5,plugin (1440-step recalibration),0.0,0.214,1806.5,1967.7,1000
 student_t3,120,0.5,cs (1440-step recalibration),0.0,0.0,,,1000
 student_t3,120,0.5,A-grid-run (1440-step recalibration),0.0,0.0,,,1000
 student_t3,120,0.5,B-lr (1440-step recalibration),0.0,0.11,1696.0,1920.4,1000
-student_t3,120,0.667,awake-A,0.0,0.028,966.5,1831.9,1000
+student_t3,120,0.667,awake-A,0.0,0.028,967.0,1831.9,1000
 student_t3,120,0.667,awake-B,0.004,0.828,112.5,423.30000000000007,1000
 student_t3,120,0.667,plugin (1440-step recalibration),0.0,0.111,1796.0,1971.0,1000
 student_t3,120,0.667,cs (1440-step recalibration),0.0,0.001,1919.0,1919.0,1000

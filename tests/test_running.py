@@ -323,3 +323,138 @@ def test_conformal_monitor_restarts_without_warmup():
     ev = mon.run(r)
     assert ev and ev[0].direction == "up" and 1500 <= ev[0].index < 1600
     assert len(mon.segments) >= 2 and mon.segments[1]["start"] == ev[0].index + 1
+
+
+# ----------------------------------------------------------------------------
+# A decrease side with no admissible bet stays at 0 (docs/math.md 6.3)
+# ----------------------------------------------------------------------------
+
+
+def test_off_decrease_side_stays_at_zero():
+    """With m_dn <= 0 at every step the decrease statistic stays 0 and never alarms (it used to grow by 1 per step)."""
+    rng = np.random.default_rng(21)
+    x = np.minimum(rng.standard_normal((4, 400)) ** 2, 9.0)
+    L = 50.0
+    au, ad = R.two_sided_sr(x, 9.0, 1.0, 0.0, [L])[L]
+    assert np.all(ad == -1)
+    # streaming route A: switch the lower band off after calibration
+    mon = R.RunningTauMonitor(threshold=25.0, cal_len=300, method="grid")
+    r = rng.standard_normal(1000) * 0.3  # a strong decrease that the side would otherwise catch
+    for v in rng.standard_normal(300):
+        mon.update(v)
+    assert mon.calibrated
+    mon.L = np.zeros_like(mon.L)
+    for v in r:
+        mon.update(v)
+    assert np.all(mon.S_dn == 0.0) and not any(e.direction == "down" for e in mon.events)
+
+
+def test_off_steps_leave_the_decrease_statistic_unchanged():
+    """Mixed on and off steps (running tau): matches a direct recursion in which an off step changes nothing."""
+    rng = np.random.default_rng(22)
+    reps, n = 6, 300
+    tau2 = np.where(rng.random((reps, n)) < 0.5, 4.0, 9.0)
+    m_dn = np.where(rng.random((reps, n)) < 0.3, 0.0, 0.8)
+    x = np.minimum(rng.standard_normal((reps, n)) ** 2 * 0.5, tau2)
+    fr = np.asarray(R.DEFAULT_DOWN_FRACTIONS)
+    L = 40.0
+    ad = R.two_sided_sr(x, tau2, 1.0, m_dn, [L])[L][1]
+    for i in range(reps):
+        S, first = np.zeros(fr.size), -1
+        for t in range(n):
+            if m_dn[i, t] > 0 and tau2[i, t] > m_dn[i, t]:
+                lam = fr / (tau2[i, t] / m_dn[i, t] - 1.0)
+                S = (1.0 + lam * (1.0 - x[i, t] / m_dn[i, t])) * (S + 1.0)
+            if first < 0 and S.mean() >= L:
+                first = t
+        assert ad[i] == first
+
+
+def test_awake_trivial_snapshot_adds_nothing_to_the_decrease_side():
+    """The snapshot of size 0 has lower bound 0, so its decrease chains never start."""
+    rng = np.random.default_rng(23)
+    mon = R.AwakeRunningTauMonitor(threshold=1e9)
+    mon.run(rng.standard_normal(R.AWAKE_PRE + 200))
+    assert mon.S_dn.shape[0] > 2
+    assert np.all(mon.S_dn[0] == 0.0) and np.all(mon.S_up[0] > 0.0)
+
+
+# ----------------------------------------------------------------------------
+# The streaming rank monitor equals the vectorised rank detector (alarms and restarts)
+# ----------------------------------------------------------------------------
+
+
+class _FixedTheta:
+    """Stands in for a numpy Generator and hands out given tie-breakers (theta_t for the return at index t)."""
+
+    def __init__(self, theta, index=None, offset=0):
+        self.theta, self.index, self.offset = theta, index, offset
+
+    def random(self, size=None):
+        if size is None:
+            return float(self.theta[self.index()])
+        n = size[1]
+        return self.theta[None, self.offset : self.offset + n].copy()
+
+
+@pytest.mark.parametrize("family,band,restart", [("lr", 0.0, None), ("lr", 0.25, 0), ("ind", 0.0, 0), ("lr", 0.0, 0)])
+def test_streaming_conformal_monitor_matches_conformal_detector(family, band, restart):
+    """``ConformalMonitor.run`` and ``conformal_detector`` give the same alarms with the same tie-breakers,
+    segment by segment after each restart (ties included: returns on a grid of 0.25)."""
+    rng = np.random.default_rng(24)
+    n, cal, A = 3000, 60, 15.0
+    vol = np.repeat(rng.choice([0.5, 1.0, 2.0], size=12), n // 12)
+    r = np.round(rng.standard_normal(n) * vol * 4) / 4
+    theta = rng.random(n)
+    mon = R.ConformalMonitor(threshold=A, cal_len=cal, family=family, band=band, restart_len=restart)
+    mon.rng = _FixedTheta(theta, index=lambda: mon.t)
+    got = [(e.index, e.direction) for e in mon.run(r)]
+    want, start, warm = [], 0, cal
+    while start < n:
+        seg = np.abs(r[start:])
+        out, _ = R.conformal_detector(seg[None, :], _FixedTheta(theta, offset=start), warm, [2 * A], family=family,
+                                      band=band)
+        au, ad = out[2 * A]
+        hits = [v for v in (au[0], ad[0]) if v >= 0]
+        if not hits:
+            break
+        t1 = min(hits)
+        want.append((start + t1, "up" if au[0] == t1 else "down"))
+        start, warm = start + t1 + 1, (cal if restart is None else restart)
+    assert len(got) >= 5 and got == want
+
+
+# ----------------------------------------------------------------------------
+# Lemma A.7 of the theory note: a calm calibration window gives the plug-in a positive drift
+# ----------------------------------------------------------------------------
+
+
+def test_lemma_a7_calm_window_gives_positive_drift():
+    """On the event {eps/2 < |r_i| <= eps for all i}, B = tau^2 / m is in (4.946, 79.13) and the bet 0.5 has
+    drift at least 1.0895 (1 - q) - 0.6931 q under the law of r (Gaussian, eps = 0.1: at least 0.477)."""
+    rng = np.random.default_rng(25)
+    a = 3.0 * R.MAD_NORMAL_SCALE
+    eps = 0.1
+    q = 2 * stats.norm.cdf(a * eps) - 1
+    eta = (1 - q) * math.log(1 + 0.5 * (a * a / 4 - 1)) - q * math.log(2.0)
+    assert q == pytest.approx(0.3435, abs=1e-4) and eta == pytest.approx(0.4771, abs=1e-4)
+    z = stats.norm.ppf((np.arange(200_000) + 0.5) / 200_000)  # quadrature points of the Gaussian
+    for n in (7, 8, 390):
+        for _ in range(20):
+            w = rng.uniform(eps / 2, eps, n) * rng.choice([-1.0, 1.0], n)
+            w[0] = eps  # the boundary values are allowed
+            tau2 = (3.0 * R.scaled_mad(w)) ** 2
+            m = np.mean(np.minimum(w**2, tau2))
+            B = tau2 / m
+            assert a * a / 4 < B < 4 * a * a
+            drift = np.mean(np.log1p(0.5 * (np.minimum(z**2, tau2) / m - 1.0)))
+            assert drift >= eta
+            assert 1 + 0.5 * (B - 1) < 41 and 1 + 0.95 / (B - 1) < 41
+    # ticks of 0.5: a window of +-0.5 only gives B = 19.78 and drift 0.472 for the bet 0.5
+    w = np.full(390, 0.5) * rng.choice([-1.0, 1.0], 390)
+    tau2 = (3.0 * R.scaled_mad(w)) ** 2
+    m = np.mean(np.minimum(w**2, tau2))
+    k = np.arange(0, 40)
+    p = np.where(k == 0, 2 * stats.norm.cdf(0.25) - 1, 2 * (stats.norm.cdf(k * 0.5 + 0.25) - stats.norm.cdf(k * 0.5 - 0.25)))
+    drift = np.sum(p * np.log1p(0.5 * (np.minimum((k * 0.5) ** 2, tau2) / m - 1.0)))
+    assert tau2 / m == pytest.approx(19.783, abs=1e-3) and drift == pytest.approx(0.4724, abs=1e-4)
