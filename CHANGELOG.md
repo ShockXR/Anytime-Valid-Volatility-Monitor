@@ -118,6 +118,18 @@ Round 3: theory TH4 to TH6, experiments E16 to E25, the paper, and the preparati
   types; `sr_steps_constant_factor` is exact at integer boundaries; `load_bitstamp_csv` marks the
   provider's filled minutes as missing returns instead of zero returns (0.30% of minutes in July to
   December 2025).
+- Reproduction, after a full clean-clone rerun of E1 to E14 (no committed number changed):
+  `scripts/reproduce.py` runs E13's review round 3 parts (`offline-long`, `online-long`, `fix-nominal`,
+  `cap-check`, `real-long nifty`, `real-long crypto`, `long-pooled`) before E13's figures, and E14's
+  parts a and b one calibration length or one law at a time, which writes the committed
+  `e14a_validity_cal*.csv` and `e14b_delay_*.csv` (the unsuffixed files made E14's figures count every
+  row twice and stop with an error); `compare` reports a file as "equal except timing columns" when only
+  the listed run-time columns differ, treats missing text as equal to missing text, and the run step has
+  a `--to` option. `e07_nifty.py` computes the package row of `results/e07b_deseason_check.csv` with
+  `intraday_scale` as it was when the check was made (pooled start, the 09:15 bar left out); today's
+  function leaves the first and last seven minutes of each session without a scale, so the row did not
+  reproduce. `results/e13a_offline_size.csv` reproduces within a relative 1e-14 only: its first-run rows
+  were read back once with pandas' default float parser when the label "null" became "no change".
 
 ## [0.2.0] - 2026-11-03
 

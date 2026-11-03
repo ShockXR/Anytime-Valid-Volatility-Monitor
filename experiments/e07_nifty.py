@@ -23,6 +23,13 @@ The package function ``intraday_scale`` was written for 24-hour crypto and smoot
 profile circularly across the clock. On a 375-bar session that wraps the closing minutes
 into the opening ones. This script therefore uses a session-aware profile
 (``session_profile``) and reports the check that led to it (results/e07b_deseason_check.csv).
+That check was made with ``intraday_scale`` as it was before commit 0e7d160: pooled start, and
+the 09:15 bar, which never has a return (overnight gaps are left out), not in the profile. The
+current function keeps such a minute as an empty column, and its circular smoothing then leaves
+the first and last seven minutes of every session (09:15 to 09:22, 15:23 to 15:29) without a
+scale, so the check would measure 09:23 and 15:18 to 15:22 under the 09:16 and 15:25 to 15:29
+labels. ``deseason_check`` therefore asks for the old behaviour explicitly
+(``package_scale_as_checked``), which reproduces the committed numbers exactly.
 
 Usage
   python experiments/e07_nifty.py q7a
@@ -295,12 +302,24 @@ def q7a():
 # ----------------------------------------------------------------------------
 
 
+def package_scale_as_checked(r: pd.Series) -> pd.Series:
+    """``intraday_scale`` as it was when the deseasonalisation check was made (before commit 0e7d160).
+
+    Pooled start, and clock minutes without a return on any day (the 09:15 bar) left out of the profile, as the
+    old function's pivot table did. The result is bit for bit the old function's on these data. With the current
+    defaults the circular smoothing spreads the empty 09:15 column over 09:15 to 09:22 and 15:23 to 15:29.
+    """
+    clock = r.index.hour * 60 + r.index.minute
+    has = r.notna().groupby(clock).transform("any").to_numpy()
+    return intraday_scale(r[has], lookback_days=LOOKBACK, start="pooled").reindex(r.index)
+
+
 def deseason_check(df: pd.DataFrame, period_mask: np.ndarray) -> pd.DataFrame:
     """How flat is median |u| across the session after deseasonalising? (1 = perfectly flat)."""
     rows = []
     r = df["logret"]
     variants = {
-        "package intraday_scale (circular, smooth 15)": intraday_scale(r, lookback_days=LOOKBACK),
+        "package intraday_scale (circular, smooth 15)": package_scale_as_checked(r),
         "session_profile smooth 1": session_profile(df, smooth=1),
         "session_profile smooth 5": session_profile(df, smooth=5),
         "session_profile smooth 15": session_profile(df, smooth=15),

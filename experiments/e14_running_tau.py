@@ -52,6 +52,9 @@ and two pilots on other seeds (docs/iterations/TH2.md); nothing was tuned on the
 Seeds are fixed below.
 Usage: python experiments/e14_running_tau.py a|b|c|d|e|f|g|h|w|figures [--smoke] [--cal=390] [--law=jumps]
        [--sub=null|delay] [--procs=2]
+The committed results of Q14a and Q14b were written one calibration length or one law at a time:
+"a --cal=390" and "a --cal=1440" (results/e14a_validity_cal<n>.csv), "b --law=gaussian", "b --law=student_t3"
+and "b --law=jumps" (results/e14b_delay_<law>.csv); scripts/reproduce.py runs these commands.
 """
 
 from __future__ import annotations
@@ -889,8 +892,12 @@ def figures():
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
 
+    # The committed files are split by calibration length (a --cal=...) and by law (b --law=...); a run without the
+    # option writes the unsuffixed file with the same rows (the seeds do not depend on the split), so keep one copy.
     a = pd.concat([pd.read_csv(f) for f in sorted(OUT.glob("e14a_validity*.csv")) if "smoke" not in f.name])
+    a = a.drop_duplicates(["law", "cal_len", "method", "horizon"], keep="last")
     b = pd.concat([pd.read_csv(f) for f in sorted(OUT.glob("e14b_delay*.csv")) if "smoke" not in f.name])
+    b = b.drop_duplicates(["law", "cal_len", "sd_ratio", "method"], keep="last")
     order = ["oracle", "plugin", "plugin-run", "cs", "A-grid-fixed", "A-grid-run", "A-dkw-run", "B-lr", "B-ind", "B-freeze"]
     fig, axes = plt.subplots(2, 2, figsize=(12, 7.5), sharey="row")
     for col, cal in enumerate(CAL_LENS):

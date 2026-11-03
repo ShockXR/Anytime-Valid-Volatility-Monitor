@@ -6,6 +6,7 @@ Usage:
     python scripts/reproduce.py --steps data,tests
     python scripts/reproduce.py --steps manifest   # rewrite results/MANIFEST.csv from the files on disk
     python scripts/reproduce.py --tier full --steps run,compare --from E15   # resume a full run at E15
+    python scripts/reproduce.py --tier full --steps run,compare --from E13 --to E14   # only the E13 and E14 entries
 
 Steps (run in this order; pick a subset with --steps):
 
@@ -15,8 +16,10 @@ tests     Run the test suite (no data needed).
 run       Run the experiments of the chosen tier. Each experiment script writes its CSV files
           to results/ (or alternatives/<name>/results/), overwriting the committed copies.
 compare   Compare every result file against results/MANIFEST.csv: identical bytes, numerically
-          equal within a tolerance (CSV only), different, or missing. With git available the
-          committed copy can also be restored with `git checkout -- results`.
+          equal within a tolerance (CSV only), equal except timing columns (CSV only; the columns
+          listed in TIMING_COLUMNS hold run times, which no rerun reproduces), different, or
+          missing. With git available the committed copy can also be restored with
+          `git checkout -- results`.
 report    Rebuild docs/experiment_report.md from docs/report_parts/.
 manifest  Write results/MANIFEST.csv (path, bytes, SHA-256) for every result file on disk.
 
@@ -69,8 +72,24 @@ EXPERIMENTS = [
     ("E13 five coins, Jan to Jun 2025 (held out)", ["experiments/e13_benchmarks.py", "real-crypto-h1-2025"], True, "full"),
     ("E13 Nifty", ["experiments/e13_benchmarks.py", "real-nifty"], True, "full"),
     ("E13 cost per step", ["experiments/e13_benchmarks.py", "cost"], False, "full"),
+    # Review round 3 of E13, in the order of the script's docstring: these parts add rows to, or rewrite rows of, the
+    # files written above (e13a_*, e13b_*, e13c_*_part0/1, e13d_real_*), so they must run after them; the figures last.
+    ("E13 review round 3: VR scan with k = 250 and 500 offline", ["experiments/e13_benchmarks.py", "offline-long"], False, "full"),
+    ("E13 review round 3: rolling VR scan with k = 250 and 500 online", ["experiments/e13_benchmarks.py", "online-long"], False, "full"),
+    ("E13 review round 3: nominal rolling VR scan rows with the right series length", ["experiments/e13_benchmarks.py", "fix-nominal"], False, "full"),
+    ("E13 review round 3: capped BOCPD against the exact recursion", ["experiments/e13_benchmarks.py", "cap-check"], False, "full"),
+    ("E13 review round 3: longer competitor windows, Nifty", ["experiments/e13_benchmarks.py", "real-long", "nifty"], True, "full"),
+    ("E13 review round 3: longer competitor windows, five coins, both half-years", ["experiments/e13_benchmarks.py", "real-long", "crypto"], True, "full"),
+    ("E13 review round 3: pooled table with clustered tests", ["experiments/e13_benchmarks.py", "long-pooled"], False, "full"),
     ("E13 figures", ["experiments/e13_benchmarks.py", "figures"], True, "full"),
-    ("E14 running truncation, synthetic", ["experiments/e14_running_tau.py", "a", "b", "c", "e", "f", "h", "w"], False, "full"),
+    # Parts a and b of E14 were committed one calibration length or one law at a time (e14a_validity_cal<n>.csv,
+    # e14b_delay_<law>.csv); the seeds do not depend on the split, so these commands rewrite exactly those files.
+    ("E14 running truncation, validity, calibration 390", ["experiments/e14_running_tau.py", "a", "--cal=390"], False, "full"),
+    ("E14 running truncation, validity, calibration 1440", ["experiments/e14_running_tau.py", "a", "--cal=1440"], False, "full"),
+    ("E14 running truncation, delay, Gaussian", ["experiments/e14_running_tau.py", "b", "--law=gaussian"], False, "full"),
+    ("E14 running truncation, delay, Student t3", ["experiments/e14_running_tau.py", "b", "--law=student_t3"], False, "full"),
+    ("E14 running truncation, delay, jumps", ["experiments/e14_running_tau.py", "b", "--law=jumps"], False, "full"),
+    ("E14 running truncation, synthetic", ["experiments/e14_running_tau.py", "c", "e", "f", "h", "w"], False, "full"),
     ("E14 running truncation, real data and figures", ["experiments/e14_running_tau.py", "d", "g", "figures"], True, "full"),
     ("E15 panel, synthetic", ["experiments/e15_panel.py", "synthetic"], False, "full"),
     ("E15 panel, horizon", ["experiments/e15_panel.py", "horizon"], False, "full"),
@@ -130,6 +149,21 @@ EXPERIMENTS = [
     ("TH5 limits for every valid procedure and the plug-in regime", ["experiments/th5_limits.py", "collapse", "floors", "asymptotic", "boundary", "plugin_bound", "plugin_sim", "holdbold", "figures"], False, "full"),
 ]
 
+# Columns that hold measured run times (wall-clock or CPU time on the machine of the run), by result file. Compare
+# leaves them out and reports such a file as "equal except timing columns" when every other column matches. The E9,
+# E13 and E14 columns were checked against a full rerun (only these columns differed); the E22 to E24 "seconds"
+# column is the wall time of one monitor run (experiments/e22_guaranteed_events.py, also used by E23 and E24).
+TIMING_COLUMNS = {
+    "results/e09d_profile.csv": ("seconds", "microseconds_per_unit"),
+    "results/e13e_cost.csv": ("seconds", "microseconds_per_step"),
+    "results/e14d_real_summary.csv": ("seconds", "us_per_step"),
+    "results/e14e_cost.csv": ("seconds", "us_per_step"),
+    "results/e14h_streaming.csv": ("us_per_step",),
+    "results/e22_monitor_summary.csv": ("seconds",),
+    "results/e23_monitor_summary.csv": ("seconds",),
+    "results/e24_real_summary.csv": ("seconds",),
+}
+
 RESULT_DIRS = ["results"] + [str(p.relative_to(ROOT)) for p in sorted((ROOT / "alternatives").glob("*/results"))]
 RESULT_SUFFIXES = {".csv", ".txt", ".md", ".json"}
 MANIFEST = ROOT / "results" / "MANIFEST.csv"
@@ -187,12 +221,19 @@ def step_tests() -> bool:
     return res.returncode == 0
 
 
-def step_run(tier: str, have_data: bool, start: str | None = None, only: str | None = None) -> bool:
+def step_run(tier: str, have_data: bool, start: str | None = None, only: str | None = None,
+             stop: str | None = None) -> bool:
     import csv
 
     rows, ok = [], True
     started = start is None
-    for label, cmd, needs_data, t in EXPERIMENTS:
+    last = max((i for i, e in enumerate(EXPERIMENTS) if e[0].startswith(stop)), default=-1) if stop else len(EXPERIMENTS)
+    if stop and last < 0:
+        print(f"run: no experiment label begins with {stop!r}")
+        return False
+    for i, (label, cmd, needs_data, t) in enumerate(EXPERIMENTS):
+        if i > last:
+            break
         if tier == "quick" and t != "quick":
             continue
         started = started or label.startswith(start)
@@ -211,7 +252,7 @@ def step_run(tier: str, have_data: bool, start: str | None = None, only: str | N
         dt = time.time() - t0
         rows.append(dict(experiment=label, command=" ".join(cmd), seconds=round(dt), status=res.returncode))
         ok &= res.returncode == 0
-    if tier == "full" and rows and start is None and only is None:
+    if tier == "full" and rows and start is None and only is None and stop is None:
         with open(ROOT / "results" / "MANIFEST_RUNTIMES.csv", "w", newline="") as fh:
             w = csv.DictWriter(fh, fieldnames=list(rows[0]))
             w.writeheader()
@@ -219,7 +260,9 @@ def step_run(tier: str, have_data: bool, start: str | None = None, only: str | N
     return ok
 
 
-def _numeric_equal(a: Path, b_text: str, rtol: float) -> bool:
+def _numeric_equal(a: Path, b_text: str, rtol: float, ignore: tuple = ()) -> bool:
+    """Same columns and shape, numeric columns equal within rtol, other columns equal as text; columns in ``ignore``
+    are left out of the comparison (they must still exist in both files)."""
     import io
 
     import numpy as np
@@ -233,6 +276,8 @@ def _numeric_equal(a: Path, b_text: str, rtol: float) -> bool:
     if list(x.columns) != list(y.columns) or x.shape != y.shape:
         return False
     for c in x.columns:
+        if c in ignore:
+            continue
         xa, ya = x[c], y[c]
         if pd.api.types.is_numeric_dtype(xa) and pd.api.types.is_numeric_dtype(ya):
             xv, yv = xa.to_numpy(float), ya.to_numpy(float)
@@ -240,8 +285,8 @@ def _numeric_equal(a: Path, b_text: str, rtol: float) -> bool:
             fin = ~np.isnan(xv) & ~np.isnan(yv)
             if not same_nan.all() or not np.allclose(xv[fin], yv[fin], rtol=rtol, atol=1e-12):
                 return False
-        elif not (xa.astype(str) == ya.astype(str)).all():
-            return False
+        elif not ((xa.astype(str) == ya.astype(str)) | (xa.isna() & ya.isna())).all():
+            return False  # (pandas reads the text "null" as missing; missing equals missing)
     return True
 
 
@@ -252,7 +297,7 @@ def step_compare(rtol: float) -> bool:
         print("compare: no results/MANIFEST.csv")
         return False
     ref = {r["file"]: r for r in csv.DictReader(open(MANIFEST))}
-    counts = dict(identical=0, close=0, different=0, missing=0)
+    counts = dict(identical=0, close=0, timing=0, different=0, missing=0)
     for f, r in ref.items():
         p = ROOT / f
         if not p.exists():
@@ -270,12 +315,17 @@ def step_compare(rtol: float) -> bool:
             pass
         if committed is not None and p.suffix == ".csv" and _numeric_equal(p, committed, rtol):
             counts["close"] += 1
+        elif (committed is not None and p.suffix == ".csv" and f in TIMING_COLUMNS
+              and _numeric_equal(p, committed, rtol, ignore=TIMING_COLUMNS[f])):
+            counts["timing"] += 1
+            print(f"  equal except timing columns ({', '.join(TIMING_COLUMNS[f])}): {f}")
         else:
             counts["different"] += 1
             print(f"  different: {f}")
     new = [p for p in result_files() if str(p.relative_to(ROOT)) not in ref]
     print(f"compare: {counts['identical']} identical, {counts['close']} equal within rtol {rtol:g}, "
-          f"{counts['different']} different, {counts['missing']} missing; {len(new)} files not in the manifest")
+          f"{counts['timing']} equal except timing columns, {counts['different']} different, "
+          f"{counts['missing']} missing; {len(new)} files not in the manifest")
     return counts["different"] == 0 and counts["missing"] == 0
 
 
@@ -304,6 +354,8 @@ def main(argv=None) -> int:
     ap.add_argument("--from", dest="start", default=None,
                     help="run step: start at the first experiment whose label begins with this text (to resume)")
     ap.add_argument("--only", default=None, help="run step: run only experiments whose label contains this text")
+    ap.add_argument("--to", dest="stop", default=None,
+                    help="run step: stop after the last experiment whose label begins with this text")
     ap.add_argument("--rtol", type=float, default=1e-9, help="relative tolerance for numeric comparison")
     a = ap.parse_args(argv)
     steps = [s.strip() for s in a.steps.split(",") if s.strip()]
@@ -316,7 +368,7 @@ def main(argv=None) -> int:
         elif s == "tests":
             status[s] = step_tests()
         elif s == "run":
-            status[s] = step_run(a.tier, have_data, a.start, a.only)
+            status[s] = step_run(a.tier, have_data, a.start, a.only, a.stop)
         elif s == "compare":
             status[s] = step_compare(a.rtol)
         elif s == "report":
