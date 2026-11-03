@@ -41,13 +41,21 @@ Parts (each writes its own results/e25_*.csv):
            rate (results/e25_power.csv, e25_power_curve.csv, e25_power_calendar.csv, e25_power_growth.csv; figure
            results/figures/e25_power.png).
   posthoc  [REAL, post hoc, exploratory] section 10: the e-process on E22's period (2024 to 2025) and E23's period
-           (2026), S2 on BTC, ETH and SOL, outcomes from the committed S2 alarm files (gate 3 shows they are E25's own)
+           (2026), S2 on BTC, ETH and SOL, outcomes from the committed S2 alarm files (gate 3 shows they are E25's own);
+           also the control rates before and after the release, M over the balanced strata alone, and the missing
+           minutes inside each window (read from the files on disk, no download)
            (results/e25_posthoc_strata.csv, e25_posthoc_summary.csv; figure results/figures/e25_posthoc.png).
-  status   the fresh test at a look (sections 3, 4, 7, 8.4). Refuses (SystemExit with the reasons) before any download
-           when no stratum is complete at the cut-off; downloads the Binance monthly files as E24's future part does;
-           runs S2 (and G1, exploratory) from 25 October 2026 (loaded from 5 October); writes only complete strata
-           (results/e25_status_<cut-off>_*.csv) and a provenance file. NOT RUN in this commit: the first stratum
-           (the FOMC statement of 28 October 2026) completes on 26 November 2026 at 01:00 UTC.
+  status   the fresh test at a look (sections 3, 4, 7, 8.4 and Amendment 2). Refuses (SystemExit with the reasons)
+           before any download when no stratum is complete at the cut-off (including, by Amendment 2, while the event
+           file is incomplete within 30 days of a stratum's windows); downloads the Binance monthly files as E24's
+           future part does; refuses again with the data's actual end; runs S2 (and G1, exploratory) from 25 October
+           2026 (loaded from 5 October); refuses, writing nothing, when a stratum already in results/e25_status_ledger.csv
+           is recomputed differently; then writes only complete strata (results/e25_status_<YYYY-MM-DD_HHMM of the
+           cut-off>_*.csv, with the missing minutes of each window), the provenance file and the new ledger rows. NOT
+           RUN in this commit: the first stratum (the FOMC statement of 28 October 2026) completes on 26 November 2026
+           at 01:00 UTC.
+  dryrun   [REAL, known data] gate 4's dry run: the status part on E23's known period (data to 24 October 2026), no
+           download, two looks, outputs in a temporary directory; summaries in results/e25_dryrun_known_data_summary.csv.
   figs     results/figures/e25_*.png from the CSVs.
 
 Usage: nice -n 10 python experiments/e25_sequential_events.py <part> [--procs=2] [--cutoff=YYYY-MM-DD]
@@ -120,7 +128,16 @@ VALIDITY_RATES = (0.05, 0.10, 0.20, 0.40)
 POWER_DATES = ("2027-06-01", "2028-01-01", "2029-01-01")
 PLANNING_END = "2029-01-01"
 F24A_POWER_AT = "2027-06-01"
-CAUSALITY_CUTS = ("2026-04-01", "2026-07-01", "2026-09-15")
+CAUSALITY_CUTS = ("2026-04-01", "2026-07-01", "2026-08-12 14:37", "2026-09-15")  # mid-day cut: review round 11, m8
+# Amendment 2 (docs/preregistration_e25_sequential.md, after review round 11, before any fresh data), additional
+# refusals of the status part only (they change no rule, e-value or threshold): M1 (i) the event file must be complete around each stratum, as F24a's refusals require
+# for its own period: FOMC_SCHEDULED is F24a's list of scheduled meetings, known to the end of the last listed year;
+# M1 (ii) strata already reported are frozen in LEDGER and a later look that recomputes any of them differently refuses.
+FOMC_SCHEDULED = E24.FUTURE_FOMC_SCHEDULED
+INTEGRITY_DAYS = COMPLETE_DAYS + STATUS_DAYS  # 30 days of the windows, which lie within 28 days of the release day
+LEDGER = "e25_status_ledger.csv"
+LEDGER_EXACT = ("date", "event_type", "release_utc", "controls", "n", "Z", "K", "S")
+LEDGER_FLOAT = tuple(f"e_psi{int(p)}" for p in PSI) + ("M",)
 SCENARIOS = ("pooled 2024 to 2026 (planning)", "2026 only (E23 design)", "half of the pooled excess",
              "null (release rate = control rate)")
 
@@ -286,10 +303,56 @@ def _one_sided(tab: pd.DataFrame) -> pd.Series:
     return (tab.controls_before == 0) != (tab.controls_after == 0)
 
 
-def completion(table: pd.DataFrame, event_rows: pd.DataFrame, data_end=None) -> pd.DataFrame:
+def calendar_integrity(table: pd.DataFrame, event_rows: pd.DataFrame, stream_start, fomc_scheduled=None) -> list[str]:
+    """Amendment 2, item 1 (review round 11, M1; F24a's refusals, applied around each stratum). For each stratum of
+    ``table``, the reasons the event file cannot yet be trusted within 30 days of the stratum's windows (an empty
+    string when it can). The candidate windows of release day d lie from d - 28 to d + 28 days, so the range is the
+    Eastern days [d - 58, d + 58]: every calendar month that meets it, from the month after the stream start's, must
+    have a CPI row (as date or original_date, any status); every scheduled FOMC meeting of ``fomc_scheduled`` in it
+    must have a row (as date or original_date; rows are never deleted), and the schedule must be known to its end (to
+    the end of the last listed year); no 'released' row in it may have an access date before its date. A missing row
+    would otherwise neither exclude nearby candidates (rule 2) nor block completion (rule 4), and a missing release
+    within 56 days could later take candidates through Amendment 1's overlap rule."""
+    sched = tuple(FOMC_SCHEDULED if fomc_scheduled is None else fomc_scheduled)
+
+    def col(c):
+        return event_rows[c].astype(str) if c in event_rows else pd.Series([""] * len(event_rows), index=event_rows.index,
+                                                                           dtype=str)
+
+    date, orig, acc = col("date"), col("original_date"), col("access_date")
+    typ, status = col("event_type"), col("status")
+    cpi_months = {pd.Period(x, "M") for x in list(date[typ == "cpi"]) + list(orig[typ == "cpi"]) if x}
+    fomc_rows = set(date[typ == "fomc"]) | set(orig[typ == "fomc"])
+    known_to = _day(f"{max(sched)[:4]}-12-31") if sched else None
+    first_month = pd.Period(_day(stream_start), "M") + 1
+    ev_days = np.array([_day(x).value for x in date], dtype=np.int64)
+    span = INTEGRITY_DAYS * 86_400 * 10**9
+    bad_access = (status == "released").to_numpy() & (acc < date).to_numpy()
+    out = []
+    for r in table.itertuples(index=False):
+        d = _day(r.date)
+        lo, hi = d - pd.Timedelta(days=INTEGRITY_DAYS), d + pd.Timedelta(days=INTEGRITY_DAYS)
+        why = [f"no CPI row for {m}" for m in pd.period_range(max(pd.Period(lo, "M"), first_month), pd.Period(hi, "M"))
+               if m not in cpi_months]
+        if known_to is None or hi > known_to:
+            why.append(f"the FOMC schedule (FOMC_SCHEDULED) is known only to "
+                       f"{'nothing' if known_to is None else f'{known_to:%Y-%m-%d}'}; extend it to {hi:%Y-%m-%d}")
+        why += [f"no FOMC row for the scheduled meeting of {d0}" for d0 in sched
+                if lo <= _day(d0) <= hi and d0 not in fomc_rows]
+        near = np.abs(ev_days - d.value) <= span
+        why += [f"{date.iloc[i]} {typ.iloc[i]}: 'released' with an access date before the release"
+                for i in np.flatnonzero(near & bad_access)]
+        out.append("; ".join(why))
+    return out
+
+
+def completion(table: pd.DataFrame, event_rows: pd.DataFrame, data_end=None, integrity: list[str] | None = None
+               ) -> pd.DataFrame:
     """Rule 4. A stratum is complete when the data reach t + 28 days + 6 hours (``data_end``, exclusive, is at or after
     it; None: no data end) and no row of the event file within 30 days of the release day still says 'scheduled'.
-    Strata enter the test in the order i, so ``in_test`` is the complete prefix."""
+    With ``integrity`` (the reasons of ``calendar_integrity``, one per stratum; the status part only), a stratum is
+    also not complete while the event file around it is incomplete. Strata enter the test in the order i, so
+    ``in_test`` is the complete prefix."""
     t = table.copy()
     ev_days = np.array([_day(d).value for d in event_rows["date"]], dtype=np.int64)
     sched = (event_rows["status"].astype(str) == "scheduled").to_numpy()
@@ -311,6 +374,10 @@ def completion(table: pd.DataFrame, event_rows: pd.DataFrame, data_end=None) -> 
     t["data_complete"] = data_ok
     t["status_complete"] = status_ok
     t["complete"] = t["data_complete"] & t["status_complete"]
+    if integrity is not None:
+        t["calendar_complete"] = [not x for x in integrity]
+        t["complete"] = t["complete"] & t["calendar_complete"]
+        why = ["; ".join(x for x in (w, f"event file: {i}" if i else "") if x) for w, i in zip(why, integrity)]
     t["in_test"] = np.cumprod(t["complete"].to_numpy(bool)).astype(bool) if len(t) else np.zeros(0, bool)
     t["not_complete_because"] = why
     return t
@@ -562,7 +629,8 @@ def part_strata():
         print(f"rules {RULES}: {len(comp)} strata, n from {comp.n.min()} to {comp.n.max()} "
               f"({';'.join(f'{v}:{int((comp.n == v).sum())}' for v in range(9) if (comp.n == v).any())}), "
               f"{int(comp.balanced.sum())} balanced, {int(_one_sided(comp).sum())} "
-              f"with controls on one side only; release windows that overlap: "
+              f"with controls on one side only (kept controls before the release {int(comp.controls_before.sum())}, after "
+              f"{int(comp.controls_after.sum())}); release windows that overlap: "
               f"{int((comp.release_window_overlaps != '').sum())} strata")
         print(f"windows of different strata that overlap: {len(ov)} pairs")
         if len(ov):
@@ -887,6 +955,30 @@ def period_strata(events_file, monitor_start, end) -> tuple[pd.DataFrame, pd.Dat
     return cands, comp
 
 
+def period_gaps(per: dict) -> pd.DataFrame:
+    """Runs of missing minutes of the three coins over a known period's monitored minutes (files already on disk,
+    no download), for the missing minutes inside each window (review round 11, m10)."""
+    from avmonitor import data as Dm
+
+    out = []
+    for coin, sym in E12.COINS.items():
+        df = Dm.load_binance(sym, per["monitor_start"], per["end"], download=False)
+        out.append(gap_runs(df.index, df["close"].isna().to_numpy(), coin))
+    return pd.concat(out, ignore_index=True)
+
+
+def side_rates(cands: pd.DataFrame, strata, up) -> dict:
+    """Exploratory (review round 11, m2): kept controls before and after their release, and those with the outcome."""
+    kept = cands[cands.kept & cands.stratum.isin(strata)]
+    o = window_outcomes(up, kept["anchor_utc"]).astype(int)
+    b = (kept.k < 0).to_numpy()
+    nb, na = int(b.sum()), int((~b).sum())
+    return dict(control_windows_before=nb, controls_before_with_outcome=int(o[b].sum()),
+                control_rate_before=float(o[b].mean()) if nb else np.nan,
+                control_windows_after=na, controls_after_with_outcome=int(o[~b].sum()),
+                control_rate_after=float(o[~b].mean()) if na else np.nan)
+
+
 def part_posthoc(procs: int):
     g = pd.read_csv(OUT / "e25_gates.csv")
     g3 = g[g.gate == "3 pipeline"]
@@ -898,6 +990,7 @@ def part_posthoc(procs: int):
     srows, summ = [], []
     for plabel, per, aname in periods:
         cands, comp = period_strata(per["events"], per["monitor_start"], per["end"])
+        gaps = period_gaps(per)
         if use_committed:
             com = _committed_alarms(aname)
             ups = {c: _up_times(com[com.coin == c]) for c in E12.COINS}
@@ -905,19 +998,21 @@ def part_posthoc(procs: int):
             res = _run_many([(c, PRIMARY_ARM, per) for c in E12.COINS], procs)
             ups = {r["coin"]: _up_times(r["alarms"]) for r in res}
         for coin in E12.COINS:
-            out = stratum_outcomes(cands, comp, ups[coin])
+            out = add_missing(stratum_outcomes(cands, comp, ups[coin]), cands, gaps, coin)
             t = add_e_process(out[out.in_test])
-            for cell in ("fomc+cpi", "fomc", "cpi"):
-                sub = out[out.in_test] if cell == "fomc+cpi" else out[out.in_test & (out.event_type == cell)]
+            for cell in ("fomc+cpi", "fomc", "cpi", "fomc+cpi, balanced strata only"):
+                sub = (out[out.in_test] if cell == "fomc+cpi" else
+                       out[out.in_test & out.balanced.astype(bool)] if cell.endswith("balanced strata only") else
+                       out[out.in_test & (out.event_type == cell)])
                 tt = add_e_process(sub)
                 j20, d20 = crossing(tt, THRESHOLD)
                 j40, d40 = crossing(tt, THRESHOLD_E25B)
                 nk = tt["n"].to_numpy(int)
                 summ.append(dict(
                     period=plabel, coin=coin, cell=cell, label="post hoc, exploratory (data seen before the design)",
-                    releases_in_period=int(len(out) if cell == "fomc+cpi" else (out.event_type == cell).sum()),
-                    strata_in_test=len(tt), strata_not_complete=int((~out.in_test).sum()) if cell == "fomc+cpi" else
-                    int((~out.in_test & (out.event_type == cell)).sum()),
+                    releases_in_period=int(len(out) if cell.startswith("fomc+cpi") else (out.event_type == cell).sum()),
+                    strata_in_test=len(tt), strata_not_complete=int((~out.in_test).sum()) if cell.startswith("fomc+cpi")
+                    else int((~out.in_test & (out.event_type == cell)).sum()),
                     releases_with_outcome=int(tt.Z.sum()), release_rate=float(tt.Z.mean()) if len(tt) else np.nan,
                     control_windows=int(nk.sum()), controls_with_outcome=int(tt.K.sum()),
                     control_rate_pooled=float(tt.K.sum() / nk.sum()) if nk.sum() else np.nan,
@@ -929,6 +1024,9 @@ def part_posthoc(procs: int):
                     strata_balanced=int(tt.balanced.sum()),
                     strata_one_sided=int(_one_sided(tt).sum()),
                     strata_with_overlapping_release_window=int((tt.release_window_overlaps != "").sum()),
+                    **side_rates(cands, tt.stratum, ups[coin]),
+                    windows_with_missing_minutes=int(tt.windows_with_missing_minutes.sum()),
+                    missing_minutes_in_windows=int(tt.missing_minutes_total.sum()),
                     final_M=float(tt.M.iloc[-1]) if len(tt) else 1.0, max_M=float(tt.M.max()) if len(tt) else 1.0,
                     first_crossing_20_stratum=j20, first_crossing_20_date=d20,
                     first_crossing_40_stratum=j40, first_crossing_40_date=d40,
@@ -951,8 +1049,8 @@ def part_posthoc(procs: int):
     with pd.option_context("display.width", 250, "display.max_columns", 40, "display.max_rows", 200):
         cols = ["period", "coin", "cell", "strata_in_test", "strata_not_complete", "releases_with_outcome",
                 "release_rate", "control_rate_pooled", "n_counts", "strata_balanced", "strata_one_sided",
-                "strata_with_overlapping_release_window", "final_M", "max_M", "first_crossing_20_date",
-                "first_crossing_40_date"]
+                "strata_with_overlapping_release_window", "control_rate_before", "control_rate_after",
+                "missing_minutes_in_windows", "final_M", "max_M", "first_crossing_20_date", "first_crossing_40_date"]
         print(sm[cols].round(4).to_string(index=False))
         print(st[st.coin == PRIMARY_COIN][["period", "stratum", "date", "event_type", "n", "Z", "K", "S", "M",
                                            "in_test", "not_complete_because"]].round(3).to_string(index=False))
@@ -965,20 +1063,22 @@ def part_posthoc(procs: int):
 # ----------------------------------------------------------------------------
 
 
-def fresh_plan(events: pd.DataFrame, data_end, stream_start=None) -> tuple[pd.DataFrame, pd.DataFrame]:
+def fresh_plan(events: pd.DataFrame, data_end, stream_start=None, fomc_scheduled=None) -> tuple[pd.DataFrame, pd.DataFrame]:
     """The strata of the fresh test at a look with data to ``data_end`` (exclusive): the releases of the event file
     (released or rescheduled, at or after the stream start), every release day of the file for rule 2, and the
-    completion of rule 4 against the event file's statuses. Uses no market data."""
+    completion of rule 4 against the event file's statuses and (review round 11, M1) its completeness around each
+    stratum (``calendar_integrity``). Uses no market data."""
     stream_start = STREAM_START if stream_start is None else stream_start
     relrows = events[events.status.isin(RELEASED)]
     utc = [et_anchor(d, h) for d, h in zip(relrows.date, relrows.release_time_et)]
     rel = relrows[np.array([t >= _utc(stream_start) for t in utc], dtype=bool)]
     cands = assign_strata(rel, relrows["date"], stream_start, data_end, rules="amended")  # the fresh test: Amendment 1
-    comp = completion(strata_table(cands), events, data_end)
+    tab = strata_table(cands)
+    comp = completion(tab, events, data_end, integrity=calendar_integrity(tab, events, stream_start, fomc_scheduled))
     return cands, comp
 
 
-def status_refusals(events: pd.DataFrame, cutoff, now=None, stream_start=None) -> list[str]:
+def status_refusals(events: pd.DataFrame, cutoff, now=None, stream_start=None, fomc_scheduled=None) -> list[str]:
     """Reasons the status part must not compute anything (empty when it may). Checked before any market data are
     downloaded or read, and again with the data's actual end."""
     stream_start = STREAM_START if stream_start is None else stream_start
@@ -990,7 +1090,7 @@ def status_refusals(events: pd.DataFrame, cutoff, now=None, stream_start=None) -
     if cut <= _utc(stream_start):
         why.append("the cut-off is not after the stream start")
         return why
-    cands, comp = fresh_plan(events, cut, stream_start)
+    cands, comp = fresh_plan(events, cut, stream_start, fomc_scheduled)
     if not len(comp):
         why.append("no release in the event file at or after the stream start")
     elif not comp.in_test.any():
@@ -1000,10 +1100,53 @@ def status_refusals(events: pd.DataFrame, cutoff, now=None, stream_start=None) -
     return why
 
 
-def status_tables(cands: pd.DataFrame, comp: pd.DataFrame, up_times_by_key: dict, data_end) -> tuple:
+def missing_in_windows(gaps: pd.DataFrame | None, coin: str, anchors) -> np.ndarray:
+    """Minutes of missing data inside each window [anchor, anchor + 6 h) (review round 11, m10; descriptive). ``gaps``
+    lists runs of missing minutes as E23.data_checks writes them (coin, first_missing, minutes). S2 cannot alarm on a
+    missing minute, so such a window counts as one without an alarm; the rules are not changed."""
+    a = _ns(anchors) if len(anchors) else np.zeros(0, np.int64)
+    if gaps is None or not len(gaps) or not len(a):
+        return np.zeros(len(a), int)
+    g = gaps[gaps.coin == coin]
+    if not len(g):
+        return np.zeros(len(a), int)
+    g0 = _ns(pd.to_datetime(g["first_missing"], utc=True))
+    g1 = g0 + g["minutes"].to_numpy(np.int64) * 60 * 10**9
+    a1 = a + WINDOW_MIN * 60 * 10**9
+    ov = np.minimum(a1[:, None], g1[None, :]) - np.maximum(a[:, None], g0[None, :])
+    return (np.clip(ov, 0, None).sum(axis=1) // (60 * 10**9)).astype(int)
+
+
+def gap_runs(index: pd.DatetimeIndex, missing: np.ndarray, coin: str) -> pd.DataFrame:
+    """Runs of missing minutes in E23.data_checks' layout (coin, first_missing, minutes)."""
+    m = np.asarray(missing, bool)
+    if not m.any():
+        return pd.DataFrame(columns=["coin", "first_missing", "minutes"])
+    d = np.diff(np.concatenate(([0], m.astype(np.int8), [0])))
+    starts, stops = np.flatnonzero(d == 1), np.flatnonzero(d == -1)
+    return pd.DataFrame(dict(coin=coin, first_missing=[str(index[i]) for i in starts], minutes=stops - starts))
+
+
+def add_missing(t: pd.DataFrame, cands: pd.DataFrame, gaps: pd.DataFrame | None, coin: str) -> pd.DataFrame:
+    """Per stratum of ``t``: missing minutes in the release window, in each kept control window (in the order of
+    ``controls``) and in all of them, and the number of the stratum's windows with any missing minute."""
+    t = t.copy()
+    rel = missing_in_windows(gaps, coin, t["release_utc"]) if len(t) else np.zeros(0, int)
+    kept = cands[cands.kept & cands.stratum.isin(t.stratum)].sort_values(["stratum", "anchor_utc"])
+    ctl = missing_in_windows(gaps, coin, kept["anchor_utc"])
+    by = {s: ctl[(kept.stratum == s).to_numpy()] for s in t.stratum}
+    t["missing_minutes_release_window"] = rel
+    t["missing_minutes_controls"] = [";".join(str(int(v)) for v in by[s]) for s in t.stratum]
+    t["missing_minutes_total"] = [int(r + by[s].sum()) for r, s in zip(rel, t.stratum)]
+    t["windows_with_missing_minutes"] = [int((r > 0) + (by[s] > 0).sum()) for r, s in zip(rel, t.stratum)]
+    return t
+
+
+def status_tables(cands: pd.DataFrame, comp: pd.DataFrame, up_times_by_key: dict, data_end, gaps=None) -> tuple:
     """Outcomes and the e-process of the complete strata only (rule 4; refusal 8.4). ``up_times_by_key`` maps
-    (arm, coin) to that run's up-alarm times. Returns (strata rows, path rows, summary rows, pending rows); pending rows
-    carry no outcome. Raises if any window of a stratum in the test ends after ``data_end``."""
+    (arm, coin) to that run's up-alarm times; ``gaps`` (E23.data_checks' runs of missing minutes) gives each window's
+    missing minutes. Returns (strata rows, path rows, summary rows, pending rows); pending rows carry no outcome.
+    Raises if any window of a stratum in the test ends after ``data_end``."""
     end = _utc(data_end)
     span = pd.Timedelta(minutes=WINDOW_MIN)
     t = comp[comp.in_test]
@@ -1016,6 +1159,7 @@ def status_tables(cands: pd.DataFrame, comp: pd.DataFrame, up_times_by_key: dict
         # only alarms inside the windows of complete strata are ever looked at
         up = pd.DatetimeIndex(up)
         out = add_e_process(stratum_outcomes(cands, t, up)) if len(t) else t.assign(Z=[], K=[], S=[], p=[], M=[])
+        out = add_missing(out, cands, gaps, coin)
         out.insert(0, "coin", coin)
         out.insert(0, "arm", arm)
         srows.append(out)
@@ -1032,6 +1176,8 @@ def status_tables(cands: pd.DataFrame, comp: pd.DataFrame, up_times_by_key: dict
                              release_rate=float(sub.Z.mean()) if len(sub) else np.nan,
                              control_windows=int(nk.sum()), control_rate=float(sub.K.sum() / nk.sum()) if nk.sum() else np.nan,
                              M=float(sub.M.iloc[-1]) if len(sub) else 1.0, max_M=float(sub.M.max()) if len(sub) else 1.0,
+                             windows_with_missing_minutes=int(sub.windows_with_missing_minutes.sum()) if len(sub) else 0,
+                             missing_minutes_in_windows=int(sub.missing_minutes_total.sum()) if len(sub) else 0,
                              crossed=j is not None, first_crossing_stratum=j, first_crossing_date=d,
                              rejects_H0=bool(j is not None and role != "exploratory, no decision"),
                              **{f"prod_psi{int(ps)}": float(sub[f"prod_psi{int(ps)}"].iloc[-1]) if len(sub) else 1.0
@@ -1043,26 +1189,92 @@ def status_tables(cands: pd.DataFrame, comp: pd.DataFrame, up_times_by_key: dict
             pd.concat(prows, ignore_index=True) if prows else pd.DataFrame(), pd.DataFrame(summ), pend)
 
 
-def provenance() -> str:
-    def git(*args):
-        try:
-            res = subprocess.run(["git", *args], cwd=ROOT, capture_output=True, text=True, check=True)
-            return res.stdout.strip()
-        except (OSError, subprocess.CalledProcessError) as err:
-            return f"git failed: {err}"
+def _git(*args) -> str:
+    try:
+        res = subprocess.run(["git", *args], cwd=ROOT, capture_output=True, text=True, check=True)
+        return res.stdout.strip()
+    except (OSError, subprocess.CalledProcessError) as err:
+        return f"git failed: {err}"
 
+
+def provenance(cutoff=None, data_end=None) -> str:
+    """The git HEAD, the changes to the shared pipeline since the pre-registration's commit, the commits to this
+    script, and (review round 11, m11) uncommitted changes to this script and the shared pipeline."""
+    git = _git
+    own = ("experiments/e25_sequential_events.py",) + PIPELINE_FILES
     lines = [f"run at {pd.Timestamp.now(tz='UTC'):%Y-%m-%d %H:%M} UTC", f"HEAD {git('rev-parse', 'HEAD')}",
+             f"cut-off {'' if cutoff is None else f'{_utc(cutoff):%Y-%m-%d %H:%M} UTC'}",
+             f"data end (exclusive) {'' if data_end is None else f'{_utc(data_end):%Y-%m-%d %H:%M} UTC'}",
              f"pre-registration commit {PREREG_COMMIT}",
              f"git diff --stat {PREREG_COMMIT} -- {' '.join(PIPELINE_FILES)}:",
              git("diff", "--stat", PREREG_COMMIT, "--", *PIPELINE_FILES) or "(no change)",
              f"git log --oneline {PREREG_COMMIT}..HEAD -- experiments/e25_sequential_events.py:",
-             git("log", "--oneline", f"{PREREG_COMMIT}..HEAD", "--", "experiments/e25_sequential_events.py") or "(none)"]
+             git("log", "--oneline", f"{PREREG_COMMIT}..HEAD", "--", "experiments/e25_sequential_events.py") or "(none)",
+             f"git status --porcelain -- {' '.join(own)} (uncommitted changes):",
+             git("status", "--porcelain", "--", *own) or "(none)",
+             f"git diff --stat HEAD -- {' '.join(own)}:",
+             git("diff", "--stat", "HEAD", "--", *own) or "(none)",
+             "written after every refusal check of the look passed (pre-download, data end, ledger)"]
     return "\n".join(lines) + "\n"
+
+
+def ledger_rows(strata: pd.DataFrame, cutoff, data_end, head: str) -> pd.DataFrame:
+    """Review round 11, M1 (ii): one row per reported stratum and (arm, coin), as first reported: the release, the kept
+    control anchors, n, Z, K, S, the e-values and M, with the look's cut-off, data end and git HEAD. Exact fields as
+    strings, so a later look compares them exactly."""
+    if not len(strata):
+        return pd.DataFrame(columns=["arm", "coin", "stratum", *LEDGER_EXACT, *LEDGER_FLOAT, "first_reported_cutoff",
+                                     "first_reported_data_end", "first_reported_head"])
+    r = strata[["arm", "coin", "stratum"]].copy()
+    r["stratum"] = r["stratum"].astype(int).astype(str)
+    r["date"] = strata["date"].astype(str)
+    r["event_type"] = strata["event_type"].astype(str)
+    r["release_utc"] = [f"{_utc(x):%Y-%m-%d %H:%M}" for x in strata["release_utc"]]
+    r["controls"] = strata["controls"].fillna("").astype(str)
+    for c in ("n", "Z", "K", "S"):
+        r[c] = strata[c].astype(int).astype(str)
+    for c in LEDGER_FLOAT:
+        r[c] = strata[c].astype(float).map(repr)
+    r["first_reported_cutoff"] = f"{_utc(cutoff):%Y-%m-%d %H:%M}"
+    r["first_reported_data_end"] = f"{_utc(data_end):%Y-%m-%d %H:%M}"
+    r["first_reported_head"] = head
+    return r.reset_index(drop=True)
+
+
+def read_ledger(path: Path) -> pd.DataFrame | None:
+    return pd.read_csv(path, dtype=str, keep_default_na=False) if path.exists() else None
+
+
+def ledger_differences(ledger: pd.DataFrame | None, new: pd.DataFrame) -> list[str]:
+    """Every stratum already in the ledger must be recomputed identically at a later look: the same release, the same
+    kept controls, n, Z, K and S exactly, the e-values and M to 1e-12 (relative). Returns the differences (empty when
+    none). A data revision by the mirror, a reschedule into a reported stratum's 30 days, or an edit to the code would
+    otherwise change a stratum that has been reported."""
+    if ledger is None or not len(ledger):
+        return []
+    key = ["arm", "coin", "stratum"]
+    cur = new.set_index(key)
+    diffs = []
+    for _, row in ledger.iterrows():
+        k = tuple(row[c] for c in key)
+        if k not in cur.index:
+            diffs.append(f"{k[0]} {k[1]} stratum {k[2]} ({row['date']} {row['event_type']}): reported at the look of "
+                         f"{row['first_reported_cutoff']}, not in the test now")
+            continue
+        now = cur.loc[k]
+        bad = [c for c in LEDGER_EXACT if str(now[c]) != str(row[c])]
+        bad += [c for c in LEDGER_FLOAT if not np.isclose(float(now[c]), float(row[c]), rtol=1e-12, atol=0.0)]
+        if bad:
+            diffs.append(f"{k[0]} {k[1]} stratum {k[2]} ({row['date']} {row['event_type']}): "
+                         + ", ".join(f"{c} {row[c]} then, {now[c]} now" for c in bad))
+    return diffs
 
 
 def part_status(procs: int, cutoff: str | None):
     """The fresh test at a look. Refuses before any download when no stratum is complete at the cut-off (default: today
-    00:00 UTC). Writes only the complete strata, never an outcome of an incomplete one."""
+    00:00 UTC); refuses again with the data's actual end; refuses, writing nothing, when a stratum already in the ledger
+    is recomputed differently (review round 11, M1). Writes only the complete strata, never an outcome of an incomplete
+    one, tagged by the cut-off to the minute; the provenance file is written only after every refusal check passed."""
     import urllib.error
 
     from avmonitor import data as Dm
@@ -1075,10 +1287,7 @@ def part_status(procs: int, cutoff: str | None):
     why = status_refusals(ev, cut, now)
     if why:
         raise SystemExit("status refused:\n  " + "\n  ".join(why))
-    tag = f"{cut:%Y-%m-%d}"
-    prov = provenance()
-    (OUT / f"e25_status_{tag}_provenance.txt").write_text(prov)
-    print(prov, flush=True)
+    tag = f"{cut:%Y-%m-%d_%H%M}"
     months = pd.period_range(pd.Period(LOAD_START, "M"), pd.Period(cut - pd.Timedelta(minutes=1), "M"))
     paths = {}
     for coin, sym in E12.COINS.items():
@@ -1103,24 +1312,93 @@ def part_status(procs: int, cutoff: str | None):
         files, checks, gaps = E23.data_checks(paths, end_s)
     finally:
         E23.LOAD_START, E23.MONITOR_START = saved
-    files.to_csv(OUT / f"e25_status_{tag}_data_files.csv", index=False)
-    checks.to_csv(OUT / f"e25_status_{tag}_data_checks.csv", index=False)
-    gaps.to_csv(OUT / f"e25_status_{tag}_data_gaps.csv", index=False)
     period = dict(events=str(FUTURE_EVENTS), start=LOAD_START, monitor_start=STREAM_START, end=end_s)
     res = _run_many([(c, a, period) for a in STATUS_ARMS for c in E12.COINS], procs)
     cands, comp = fresh_plan(ev, d_end)
     ups = {(r["arm"], r["coin"]): _up_times(r["alarms"]) for r in res}
     del res  # the alarm lists are never written or printed
-    strata, path, summ, pend = status_tables(cands, comp, ups, d_end)
+    strata, path, summ, pend = status_tables(cands, comp, ups, d_end, gaps)
+    head = _git("rev-parse", "HEAD")
+    new_rows = ledger_rows(strata, cut, d_end, head)
+    ledger = read_ledger(OUT / LEDGER)
+    diffs = ledger_differences(ledger, new_rows)
+    if diffs:
+        raise SystemExit("status refused, nothing written: strata already reported are recomputed differently "
+                         f"(ledger {OUT / LEDGER}):\n  " + "\n  ".join(diffs))
+    prov = provenance(cut, d_end)
+    (OUT / f"e25_status_{tag}_provenance.txt").write_text(prov)
+    print(prov, flush=True)
+    files.to_csv(OUT / f"e25_status_{tag}_data_files.csv", index=False)
+    checks.to_csv(OUT / f"e25_status_{tag}_data_checks.csv", index=False)
+    gaps.to_csv(OUT / f"e25_status_{tag}_data_gaps.csv", index=False)
     kept = cands[cands.stratum.isin(comp.stratum[comp.in_test])]
     kept.to_csv(OUT / f"e25_status_{tag}_candidates.csv", index=False)
     strata.to_csv(OUT / f"e25_status_{tag}_strata.csv", index=False)
     path.to_csv(OUT / f"e25_status_{tag}_path.csv", index=False)
     summ.assign(data_end=end_s, cutoff=f"{cut:%Y-%m-%d %H:%M}").to_csv(OUT / f"e25_status_{tag}_summary.csv", index=False)
     pend.to_csv(OUT / f"e25_status_{tag}_pending.csv", index=False)
+    known = set() if ledger is None else set(map(tuple, ledger[["arm", "coin", "stratum"]].to_numpy()))
+    add = new_rows[[tuple(k) not in known for k in new_rows[["arm", "coin", "stratum"]].to_numpy()]]
+    out = add if ledger is None else pd.concat([ledger, add], ignore_index=True)
+    out.to_csv(OUT / LEDGER, index=False)
     with pd.option_context("display.width", 250, "display.max_columns", 40):
         print(summ.round(4).to_string(index=False))
         print(pend.to_string(index=False))
+        print(f"ledger: {len(ledger) if ledger is not None else 0} rows verified, {len(add)} added ({OUT / LEDGER})")
+
+
+DRYRUN_LOOKS = ("2026-10-10", "2026-10-25")
+
+
+def part_dryrun(procs: int):
+    """Gate 4's dry run on KNOWN data (review round 11, m9): the status part pointed at E23's period (event file
+    us_macro_events_2026.csv followed by the forward file's later rows, which Amendment 2's check needs for the strata
+    of September 2026; E23's FOMC meetings and F24a's as the schedule; stream from 1 January 2026, data to 24 October
+    2026 23:59 UTC already on disk), with the downloader replaced by a guard that only returns files already on disk and
+    none later than October 2026, and its outputs in a temporary directory. Two looks (10 and 25 October 2026), so
+    the second verifies the ledger of the first. Writes the two looks' summaries to results/e25_dryrun_known_data_
+    summary.csv. Not the fresh test: every number is on data seen before the design."""
+    import tempfile
+
+    from avmonitor import data as Dm
+
+    def guard(url, dest, overwrite=False):
+        dest = Path(dest)
+        if not dest.exists() or dest.stem.split("_")[-1] > "2026-10":
+            raise SystemExit(f"dry run refused: {dest.name} is not a known month on disk")
+        return dest
+
+    g = globals()
+    names = ("OUT", "FUTURE_EVENTS", "FOMC_SCHEDULED", "STREAM_START", "LOAD_START")
+    saved, fetch = {k: g[k] for k in names}, Dm.fetch
+    p23 = period_e23()
+    ev = pd.read_csv(p23["events"], dtype=str, keep_default_na=False)
+    fwd = future_event_rows()
+    ev = pd.concat([ev, fwd[fwd.date > ev.date.max()]], ignore_index=True)[ev.columns]
+    sched = tuple(sorted(set(ev.loc[ev.event_type == "fomc", "date"]) | set(FOMC_SCHEDULED)))
+    rows = []
+    with tempfile.TemporaryDirectory() as tmp:
+        try:
+            ev.to_csv(Path(tmp) / "events.csv", index=False)
+            g.update(OUT=Path(tmp), FUTURE_EVENTS=Path(tmp) / "events.csv", STREAM_START=p23["monitor_start"],
+                     LOAD_START=p23["start"], FOMC_SCHEDULED=sched)
+            Dm.fetch = guard
+            for cut in DRYRUN_LOOKS:
+                part_status(procs, cut)
+                sm = pd.read_csv(Path(tmp) / f"e25_status_{_utc(cut):%Y-%m-%d_%H%M}_summary.csv")
+                rows.append(sm.assign(look=cut))
+            led = pd.read_csv(Path(tmp) / LEDGER, dtype=str)
+        finally:
+            g.update(saved)
+            Dm.fetch = fetch
+    out = pd.concat(rows, ignore_index=True)
+    out.insert(0, "label", "dry run of the status part on known data (E23's period), not the fresh test")
+    out["ledger_rows_after_look"] = [int((led.first_reported_cutoff <= f"{_utc(c):%Y-%m-%d %H:%M}").sum())
+                                     for c in out.look]
+    out.to_csv(OUT / "e25_dryrun_known_data_summary.csv", index=False)
+    with pd.option_context("display.width", 250, "display.max_columns", 40):
+        print(out[["look", "arm", "coin", "cell", "role", "strata_in_test", "M", "missing_minutes_in_windows",
+                   "ledger_rows_after_look"]].round(4).to_string(index=False))
 
 
 # ----------------------------------------------------------------------------
@@ -1157,7 +1435,8 @@ def fig_power(plt):
     ax.set_ylim(0, 1)
     ax.grid(color=GRID_C, lw=0.6)
     ax.set_ylabel("P(M has reached 20 by the date)")
-    ax.set_xlabel("date (strata enter when complete: release + 4 weeks + 6 hours)")
+    ax.set_xlabel("date (a stratum enters when complete: data to release + 4 weeks + 6 hours, and every event row "
+                  "within 30 days settled)")
     ax.legend(frameon=False, fontsize=8, loc="lower right", bbox_to_anchor=(1.0, 0.06))
     ax.set_title("E25 (Amendment 1 rules): chance that the e-process has crossed 20, by date [SYNTHETIC; planning inputs REAL S2 BTC rates]",
                  loc="left", fontsize=9.5, color=INK)
@@ -1243,6 +1522,8 @@ def main():
         part_posthoc(procs)
     elif part == "status":
         part_status(procs, opts.get("cutoff"))
+    elif part == "dryrun":
+        part_dryrun(procs)
     elif part == "figs":
         part_figs()
     else:

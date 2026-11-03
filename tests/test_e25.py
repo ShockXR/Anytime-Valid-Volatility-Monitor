@@ -1,6 +1,7 @@
 """Tests for experiments/e25_sequential_events.py [SYNTHETIC]: the e-value and the e-process, the strata of the
-pre-registration (section 4), completion, and the status part's refusals. No market data are read; two tests read the
-committed forward event file only."""
+pre-registration (section 4), completion, the status part's refusals, its event-file checks and ledger (review round
+11, M1) and the missing minutes per window (m10). No market data are read; two tests read the committed forward event
+file only."""
 
 from __future__ import annotations
 
@@ -25,9 +26,10 @@ def rel(rows):
 
 
 def events(rows):
-    """A synthetic event file: (date, type, status)."""
-    return pd.DataFrame([dict(date=d, event_type=t, release_time_et="14:00" if t == "fomc" else "08:30", status=s)
-                         for d, t, s in rows])
+    """A synthetic event file: (date, type, status), each row verified on its own date (access date = date)."""
+    return pd.DataFrame([dict(date=d, event_type=t, release_time_et="14:00" if t == "fomc" else "08:30", status=s,
+                              original_date="", access_date=d) for d, t, s in rows],
+                        columns=["date", "event_type", "release_time_et", "status", "original_date", "access_date"])
 
 
 # ----------------------------------------------------------------------------
@@ -327,7 +329,8 @@ def test_completion_rule_and_prefix():
 
 
 def test_status_refuses_when_nothing_complete():
-    ev = events([("2026-10-28", "fomc", "released"), ("2026-11-10", "cpi", "scheduled")])
+    ev = events([("2026-10-28", "fomc", "released"), ("2026-11-10", "cpi", "scheduled"),
+                 ("2026-12-09", "fomc", "scheduled"), ("2026-12-10", "cpi", "scheduled")])
     now = pd.Timestamp("2026-11-20", tz="UTC")
     why = E25.status_refusals(ev, "2026-11-20", now=now)
     assert why and "no stratum is complete" in why[0]
@@ -362,7 +365,7 @@ def test_status_part_refuses_today_before_any_download(monkeypatch, tmp_path):
 
 def test_status_tables_report_only_complete_strata():
     ev = events([("2026-10-28", "fomc", "released"), ("2026-11-10", "cpi", "released"),
-                 ("2026-12-09", "fomc", "released")])
+                 ("2026-12-09", "fomc", "released"), ("2026-12-10", "cpi", "scheduled")])
     d_end = pd.Timestamp("2026-12-01", tz="UTC")  # stratum 1 complete, stratum 2 needs 8 December
     cands, comp = E25.fresh_plan(ev, d_end)
     assert list(comp.in_test) == [True, False, False]
@@ -387,3 +390,217 @@ def test_status_tables_report_only_complete_strata():
     # a window of a stratum in the test may never end after the data end
     with pytest.raises(RuntimeError):
         E25.status_tables(cands, comp.assign(in_test=True), {("S2", "BTC"): base}, d_end)
+
+
+# ----------------------------------------------------------------------------
+# Review round 11: event-file checks (M1 i), the ledger (M1 ii), missing minutes (m10), provenance and tags (m11)
+# ----------------------------------------------------------------------------
+
+
+def test_calendar_integrity_missing_cpi_row_blocks_the_stratum():
+    """The reviewer's case: with the CPI row of 10 November 2026 missing, the FOMC stratum of 28 October would be
+    complete with 11 November kept (n = 4); the event-file check now keeps it out of the test."""
+    ev = events([("2026-10-28", "fomc", "released"), ("2026-12-09", "fomc", "released")])
+    cands, comp = E25.fresh_plan(ev, "2026-12-01")
+    assert comp.n.iloc[0] == 4 and comp.data_complete.iloc[0] and comp.status_complete.iloc[0]
+    assert not comp.calendar_complete.iloc[0] and not comp.in_test.any()
+    assert "no CPI row for 2026-11" in comp.not_complete_because.iloc[0]
+    why = E25.status_refusals(ev, "2026-12-01", now=pd.Timestamp("2026-12-02", tz="UTC"))
+    assert why and "no CPI row for 2026-11" in why[0]
+    # the range is within 30 days of the stratum's windows, [d - 58, d + 58]: December 2026 needs its row as well
+    assert "no CPI row for 2026-12" in comp.not_complete_because.iloc[0]
+    ev2 = events([("2026-10-28", "fomc", "released"), ("2026-11-10", "cpi", "released"), ("2026-12-09", "fomc", "released"),
+                  ("2026-12-10", "cpi", "scheduled")])
+    cands, comp = E25.fresh_plan(ev2, "2026-12-01")
+    assert comp.in_test.iloc[0] and comp.n.iloc[0] == 3 and comp.calendar_complete.iloc[0]
+    # a cancelled CPI row is a row: the month is accounted for
+    ev3 = events([("2026-10-28", "fomc", "released"), ("2026-11-10", "cpi", "cancelled"), ("2026-12-09", "fomc", "released"),
+                  ("2026-12-10", "cpi", "scheduled")])
+    assert E25.fresh_plan(ev3, "2026-12-01")[1].calendar_complete.iloc[0]
+
+
+def test_calendar_integrity_fomc_rows_access_dates_and_schedule_coverage():
+    base = [("2026-10-28", "fomc", "released"), ("2026-11-10", "cpi", "released"), ("2026-12-10", "cpi", "scheduled")]
+    tab = E25.strata_table(E25.assign_strata(rel([("2026-10-28", "fomc")]), ["2026-10-28", "2026-11-10"], START, None))
+    # a scheduled meeting inside [d - 30, d + 30] without a row
+    why = E25.calendar_integrity(tab, events(base), START, ("2026-10-28", "2026-11-18"))
+    assert "no FOMC row for the scheduled meeting of 2026-11-18" in why[0]
+    # present as the original date of a rescheduled row: accounted for
+    ev = events(base + [("2026-11-19", "fomc", "rescheduled")])
+    ev.loc[3, "original_date"] = "2026-11-18"
+    assert E25.calendar_integrity(tab, ev, START, ("2026-10-28", "2026-11-18")) == [""]
+    # a meeting outside the range [d - 58, d + 58] (to 25 December) is not required
+    assert E25.calendar_integrity(tab, events(base), START, ("2026-10-28", "2026-12-26")) == [""]
+    assert E25.calendar_integrity(tab, events(base), START, ("2026-10-28", "2026-12-25")) != [""]
+    # 'released' with an access date before the release
+    ev = events(base)
+    ev.loc[1, "access_date"] = "2026-11-09"
+    assert "2026-11-10 cpi: 'released' with an access date before the release" in E25.calendar_integrity(
+        tab, ev, START, ("2026-10-28",))[0]
+    ev.loc[1, "access_date"] = ""
+    assert E25.calendar_integrity(tab, ev, START, ("2026-10-28",))[0]
+    # the schedule must be known to d + 30: a December release needs the next year's schedule
+    tab2 = E25.strata_table(E25.assign_strata(rel([("2026-12-10", "cpi")]), ["2026-12-10"], START, None))
+    ev = events([("2026-10-28", "fomc", "released"), ("2026-11-10", "cpi", "released"), ("2026-12-10", "cpi", "released"),
+                 ("2027-01-13", "cpi", "released"), ("2027-02-10", "cpi", "scheduled")])
+    why = E25.calendar_integrity(tab2, ev, START, ("2026-10-28",))
+    assert "known only to 2026-12-31; extend it to 2027-02-06" in why[0]
+    assert E25.calendar_integrity(tab2, ev, START, ("2026-10-28", "2027-06-16")) == [""]
+    # the committed schedule reaches December 2027, so the last planned strata wait for the 2028 schedule
+    pr = E25.planned_releases()
+    t = E25.strata_table(E25.assign_strata(pr, pr["date"], E25.STREAM_START, None))
+    why = E25.calendar_integrity(t, E25.future_event_rows(), E25.STREAM_START)
+    assert all(w == "" for w in why[:20]) and all("known only to 2027-12-31" in w for w in why[20:])
+
+
+def test_calendar_integrity_blocks_later_strata_too():
+    ev = events([("2026-10-28", "fomc", "released"), ("2026-11-10", "cpi", "released"),
+                 ("2026-12-09", "fomc", "released"), ("2026-12-10", "cpi", "released"),
+                 ("2027-01-13", "cpi", "released"), ("2027-03-10", "cpi", "released")])  # no row for February 2027
+    cands, comp = E25.fresh_plan(ev, "2027-06-01", fomc_scheduled=("2026-10-28", "2026-12-09", "2027-03-17"))
+    # the range of stratum 3 (9 December 2026) reaches 5 February 2027; stratum 6 (10 March) also misses April, May
+    # and the March meeting
+    assert list(comp.calendar_complete) == [True, True, False, False, False, False]
+    assert "no CPI row for 2027-02" in comp.not_complete_because.iloc[2]
+    assert "no FOMC row for the scheduled meeting of 2027-03-17" in comp.not_complete_because.iloc[5]
+    assert list(comp.in_test) == [True, True, False, False, False, False]
+
+
+def test_missing_minutes_in_windows():
+    a = pd.DatetimeIndex([pd.Timestamp("2026-11-04 19:00", tz="UTC"), pd.Timestamp("2026-11-18 19:00", tz="UTC")])
+    gaps = pd.DataFrame(dict(coin=["BTC", "BTC", "ETH"], first_missing=["2026-11-04 18:55:00+00:00",
+                                                                         "2026-11-05 00:58:00+00:00",
+                                                                         "2026-11-18 20:00:00+00:00"],
+                             minutes=[10, 5, 3]))
+    assert list(E25.missing_in_windows(gaps, "BTC", a)) == [5 + 2, 0]  # 19:00 to 19:05; 00:58 and 00:59
+    assert list(E25.missing_in_windows(gaps, "ETH", a)) == [0, 3]
+    assert list(E25.missing_in_windows(None, "BTC", a)) == [0, 0]
+    idx = pd.date_range("2026-11-04 18:50", periods=20, freq="1min", tz="UTC")
+    miss = np.zeros(20, bool)
+    miss[5:15] = True
+    miss[19] = True
+    g = E25.gap_runs(idx, miss, "BTC")
+    assert list(g.minutes) == [10, 1] and g.first_missing.iloc[0] == str(idx[5])
+
+
+def test_ledger_rows_and_differences():
+    strata = pd.DataFrame(dict(arm="S2", coin="BTC", stratum=[1, 2], date=["2026-10-28", "2026-11-10"],
+                               event_type=["fomc", "cpi"],
+                               release_utc=pd.to_datetime(["2026-10-28 18:00", "2026-11-10 13:30"], utc=True),
+                               controls=["2026-11-04 19:00;2026-11-18 19:00;2026-11-25 19:00", "2026-11-03 13:30"],
+                               n=[3, 1], Z=[1, 0], K=[1, 0], S=[2, 0]))
+    strata = E25.add_e_process(strata)
+    led = E25.ledger_rows(strata, "2026-12-09 00:00", "2026-12-09 00:00", "abc123")
+    assert list(led.stratum) == ["1", "2"] and led.first_reported_head.iloc[0] == "abc123"
+    assert E25.ledger_differences(None, led) == []
+    assert E25.ledger_differences(led, led) == []
+    # round trip through the CSV
+    import io
+    buf = io.StringIO()
+    led.to_csv(buf, index=False)
+    back = pd.read_csv(io.StringIO(buf.getvalue()), dtype=str, keep_default_na=False)
+    later = E25.ledger_rows(strata, "2027-01-09 00:00", "2027-01-09 00:00", "def456")
+    assert E25.ledger_differences(back, later) == []
+    # a changed outcome, a changed control set, a stratum that left the test
+    s2 = strata.copy()
+    s2.loc[0, "K"] = 0
+    s2.loc[0, "S"] = 1
+    d = E25.ledger_differences(back, E25.ledger_rows(E25.add_e_process(s2), "2027-01-09", "2027-01-09", "x"))
+    assert len(d) == 2 and "K 1 then, 0 now" in d[0] and "stratum 2" in d[1] and "M " in d[1]
+    s3 = strata.copy()
+    s3.loc[1, "controls"] = "2026-11-24 13:30"
+    d = E25.ledger_differences(back, E25.ledger_rows(s3, "2027-01-09", "2027-01-09", "x"))
+    assert len(d) == 1 and "controls" in d[0]
+    d = E25.ledger_differences(back, E25.ledger_rows(strata.iloc[:1], "2027-01-09", "2027-01-09", "x"))
+    assert len(d) == 1 and "not in the test now" in d[0]
+
+
+def _fake_status(monkeypatch, tmp_path, ev, alarms, gaps=None):
+    """The status part on a synthetic calendar and synthetic alarms: no download, no market data, outputs to tmp."""
+    import e23_fresh_releases as E23
+    import e24_blind_guard as E24
+    from avmonitor import data as Dm
+
+    monkeypatch.setattr(E25, "OUT", tmp_path)
+    monkeypatch.setattr(E25, "STREAM_START", "2026-01-01")
+    monkeypatch.setattr(E25, "LOAD_START", "2025-12-12")
+    monkeypatch.setattr(E25, "FOMC_SCHEDULED", ("2026-01-28", "2026-03-18"))
+    monkeypatch.setattr(E25, "future_event_rows", lambda: ev.copy())
+    monkeypatch.setattr(Dm, "fetch", lambda url, dest, overwrite=False: dest)
+    monkeypatch.setattr(E24, "_month_complete", lambda dest, m: True)
+    monkeypatch.setattr(E23, "data_end", lambda paths: "2030-01-01 00:00")
+    g = pd.DataFrame(columns=["coin", "first_missing", "minutes", "in_monitored_period"]) if gaps is None else gaps
+    monkeypatch.setattr(E23, "data_checks", lambda paths, end: (pd.DataFrame(dict(file=["x"])),
+                                                                 pd.DataFrame(dict(coin=["BTC"])), g))
+
+    def runs(jobs, procs):
+        return [dict(arm=a, coin=c, alarms=pd.DataFrame(dict(direction="up", time=pd.DatetimeIndex(alarms))))
+                for c, a, _ in jobs]
+
+    monkeypatch.setattr(E25, "_run_many", runs)
+
+
+def test_status_part_ledger_tags_and_provenance(monkeypatch, tmp_path):
+    ev = events([("2026-01-13", "cpi", "released"), ("2026-01-28", "fomc", "released"),
+                 ("2026-02-11", "cpi", "released"), ("2026-03-11", "cpi", "released"),
+                 ("2026-03-18", "fomc", "released"), ("2026-04-10", "cpi", "released")])
+    alarms = [pd.Timestamp("2026-01-13 14:00", tz="UTC"), pd.Timestamp("2026-02-11 15:00", tz="UTC")]
+    gaps = pd.DataFrame(dict(coin=["BTC"], first_missing=["2026-01-13 19:00:00+00:00"], minutes=[45],
+                             in_monitored_period=[True]))
+    _fake_status(monkeypatch, tmp_path, ev, alarms, gaps)
+    # refused before any download: nothing written, no provenance
+    with pytest.raises(SystemExit):
+        E25.part_status(1, "2026-01-20")
+    assert not list(tmp_path.iterdir())
+    E25.part_status(1, "2026-03-01")
+    first = sorted(p.name for p in tmp_path.iterdir())
+    assert "e25_status_2026-03-01_0000_provenance.txt" in first and E25.LEDGER in first
+    prov = (tmp_path / "e25_status_2026-03-01_0000_provenance.txt").read_text()
+    assert "git status --porcelain" in prov and "cut-off 2026-03-01 00:00 UTC" in prov
+    led = pd.read_csv(tmp_path / E25.LEDGER, dtype=str)
+    assert len(led) == 2 * len(E25.STATUS_ARMS) * len(E12.COINS) and set(led.stratum) == {"1", "2"}
+    st = pd.read_csv(tmp_path / "e25_status_2026-03-01_0000_strata.csv")
+    btc = st[(st.coin == "BTC") & (st.arm == "S2")]
+    # the gap 19:00 to 19:45 UTC on 13 January covers the last 30 minutes of the CPI window (13:30 to 19:30 UTC)
+    assert btc.missing_minutes_release_window.tolist() == [30, 0] and btc.missing_minutes_total.tolist() == [30, 0]
+    sm = pd.read_csv(tmp_path / "e25_status_2026-03-01_0000_summary.csv")
+    assert sm[(sm.cell == "fomc+cpi")].set_index(["arm", "coin"]).missing_minutes_in_windows.to_dict() == {
+        (a, c): 30 if c == "BTC" else 0 for a in E25.STATUS_ARMS for c in E12.COINS}
+    # a second look at a later cut-off, with the same data: the ledger is verified, new strata added, nothing
+    # overwritten
+    E25.part_status(1, "2026-04-01 06:30")
+    assert "e25_status_2026-04-01_0630_summary.csv" in {p.name for p in tmp_path.iterdir()}
+    led2 = pd.read_csv(tmp_path / E25.LEDGER, dtype=str)
+    assert set(led2.stratum) == {"1", "2", "3"} and len(led2) == 3 * len(E25.STATUS_ARMS) * len(E12.COINS)
+    assert (led2[led2.stratum == "1"].first_reported_cutoff == "2026-03-01 00:00").all()
+    before = {p.name: p.read_bytes() for p in tmp_path.iterdir()}
+    # a revision of the data (an alarm of stratum 1's release window disappears): refused, nothing written
+    _fake_status(monkeypatch, tmp_path, ev, alarms[1:], gaps)
+    with pytest.raises(SystemExit) as err:
+        E25.part_status(1, "2026-04-02")
+    assert "recomputed differently" in str(err.value) and "stratum 1" in str(err.value)
+    assert {p.name: p.read_bytes() for p in tmp_path.iterdir()} == before
+    # a release added later inside a reported stratum's range changes its controls: refused as well
+    ev2 = pd.concat([ev, events([("2026-02-02", "cpi", "rescheduled")])], ignore_index=True)
+    _fake_status(monkeypatch, tmp_path, ev2, alarms, gaps)
+    with pytest.raises(SystemExit) as err:
+        E25.part_status(1, "2026-04-02")
+    assert "recomputed differently" in str(err.value)
+    assert {p.name: p.read_bytes() for p in tmp_path.iterdir()} == before
+
+
+def test_status_part_reports_missing_minutes(monkeypatch, tmp_path):
+    ev = events([("2026-01-13", "cpi", "released"), ("2026-01-28", "fomc", "released"),
+                 ("2026-02-11", "cpi", "released"), ("2026-03-11", "cpi", "released")])
+    cands, comp = E25.fresh_plan(ev, "2026-03-01", stream_start="2026-01-01", fomc_scheduled=("2026-01-28",))
+    a = cands[(cands.stratum == 1) & cands.kept].anchor_utc.iloc[0]
+    gaps = pd.DataFrame(dict(coin=["BTC"], first_missing=[str(a + pd.Timedelta(minutes=350))], minutes=[30],
+                             in_monitored_period=[True]))
+    _fake_status(monkeypatch, tmp_path, ev, [], gaps)
+    E25.part_status(1, "2026-03-01")
+    st = pd.read_csv(tmp_path / "e25_status_2026-03-01_0000_strata.csv", keep_default_na=False)
+    btc = st[(st.coin == "BTC") & (st.arm == "S2") & (st.stratum == 1)].iloc[0]
+    assert btc.missing_minutes_total == 10 and btc.windows_with_missing_minutes == 1
+    assert str(btc.missing_minutes_controls).split(";")[0] == "10"
+    eth = st[(st.coin == "ETH") & (st.arm == "S2")]
+    assert (eth.missing_minutes_total == 0).all()

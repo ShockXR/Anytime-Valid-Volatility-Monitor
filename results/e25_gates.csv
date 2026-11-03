@@ -1,6 +1,7 @@
 gate,period,coin,check,compared,mismatches,detail
 2 causality,2026 (E23 design),BTC,cut at 2026-04-01,77,0,"alarms before the cut: full run 77, cut run 77; columns ['index', 'direction', 'delay', 'baseline_scale', 'max_abs_recent_over_scale'] identical: True; deseasonalised returns before the cut identical: True; monitoring flags identical: True"
 2 causality,2026 (E23 design),BTC,cut at 2026-07-01,143,0,"alarms before the cut: full run 143, cut run 143; columns ['index', 'direction', 'delay', 'baseline_scale', 'max_abs_recent_over_scale'] identical: True; deseasonalised returns before the cut identical: True; monitoring flags identical: True"
+2 causality,2026 (E23 design),BTC,cut at 2026-08-12 14:37,174,0,"alarms before the cut: full run 174, cut run 174; columns ['index', 'direction', 'delay', 'baseline_scale', 'max_abs_recent_over_scale'] identical: True; deseasonalised returns before the cut identical: True; monitoring flags identical: True"
 2 causality,2026 (E23 design),BTC,cut at 2026-09-15,211,0,"alarms before the cut: full run 211, cut run 211; columns ['index', 'direction', 'delay', 'baseline_scale', 'max_abs_recent_over_scale'] identical: True; deseasonalised returns before the cut identical: True; monitoring flags identical: True"
 3 pipeline,2026 (E23 design),BTC,E25's S2 run reproduces the committed S2 alarms (e23_alarms.csv),243,0,"own 243 alarms, committed 243"
 3 pipeline,2026 (E23 design),BTC,committed e23_alarms.csv: time = stream start + index minutes,243,0,
