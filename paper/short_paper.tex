@@ -86,25 +86,25 @@ returns with robust truncation}
 \hypertarget{abstract}{%
 \section{Abstract}\label{abstract}}
 
-We study online detection of volatility changes in one-minute returns
-with jumps and fat tails, by a monitor checked at every step. Two
-Shiryaev-Roberts betting e-detectors, for increases and decreases,
-monitor the squared return clipped at a multiple of a robust scale from
-past data. With a known baseline the average run length to a false alarm
-is at least \(A\) and a false alarm within the first \(m\) steps has
-probability at most \(m/A\), whenever the conditional mean of the
-clipped squared return stays on the null side; restarting at every day
-boundary extends this bound to every day, and a small drift of that mean
-inflates it by a closed-form factor. No nontrivial e-process exists for
-the null that the variance has not fallen, so a decrease detector needs
-a bounded statistic, whose clipping level limits the speed of any valid
-rule. A baseline from a confidence sequence gives \(\delta + m/A\) when
-the conditional truncated variance varies within a tolerance fixed in
-advance. We bound the delay and split its cost of robustness into three
-factors. On streams that permute calm days of five cryptocurrencies the
-proved monitors keep their bounds, but real days rarely satisfy the
-null; simulations, these data and FOMC statements show what the
-guarantee buys and what it does not.
+We detect volatility changes online in one-minute returns with jumps and
+fat tails by two Shiryaev-Roberts betting e-detectors on the squared
+return clipped at a multiple of a robust scale. Under the null, with a
+known baseline, the average run length to a false alarm is at least
+\(A\) and a false alarm within \(m\) steps has probability at most
+\(m/A\); a daily restart extends it to every day. No nontrivial
+e-process exists for the null that the variance has not fallen, so a
+decrease detector needs a bounded statistic, whose clipping level limits
+the speed of every deterministic valid rule. A confidence-sequence
+baseline gives \(\delta + m/A\) under a tolerance on the conditional
+truncated variance. We also bound the delay. Proved monitors keep their
+bounds on permuted calm days of five cryptocurrencies; most other
+real-data analyses use a plug-in baseline, whose level is measured, not
+proved. In a pre-registered rerun with a confidence-sequence baseline
+restarted daily, an up alarm followed 8 of 16 FOMC statements on BTC
+within six hours, against 11\% of matched controls (Holm
+\(p = 0.0003\)); it alarmed on about half of its monitored days, so real
+days break its tolerance and the guarantee belongs to the monitor, not
+to these data.
 
 \textbf{Keywords.} Sequential change detection; e-processes; testing by
 betting; high-frequency volatility; truncation; jumps; anytime validity.
@@ -149,60 +149,71 @@ each comes from; our contributions are three.
 \def\labelenumi{\arabic{enumi}.}
 \tightlist
 \item
-  \textbf{A robust anytime-valid monitor and its limits.} We monitor the
-  clipped squared return under nulls that restrict only its conditional
-  mean, prove run-length and finite-horizon guarantees, say what they
-  give over many days, restart the monitor to bound every day, bound the
-  effect of a small drift, and show that no nontrivial e-process exists
-  for ``the variance has not fallen'': a decrease detector needs a
-  bounded statistic, whose clipping level limits the speed of every
-  valid rule.
+  \textbf{A robust anytime-valid monitor and its limits.} With a known
+  baseline, we monitor the clipped squared return under nulls that
+  restrict only its conditional mean, prove run-length and
+  finite-horizon guarantees, read them over many days, restart the
+  monitor to bound every day and bound the effect of a small drift. No
+  nontrivial e-process exists for ``the variance has not fallen'', so a
+  decrease detector needs a bounded statistic, whose clipping level
+  limits the speed of every deterministic valid rule (a rule \(T\) is
+  \emph{valid} if \(\mathbb{P}(T \le n) \le n/A\) for every \(n\) and
+  every law in the null, with a known baseline; randomised rules obey a
+  slightly weaker bound).
 \item
   \textbf{An estimated baseline with a clean null.} The plug-in baseline
-  keeps its level for horizons short compared with the square root of
-  the calibration length and can lose it by an unbounded factor
-  otherwise; a baseline from a confidence sequence gives
-  \(\delta + m/A\) under a tolerance on the conditional truncated
-  variance that does not depend on the algorithm.
+  keeps its level asymptotically for horizons \(m = o(\sqrt n)\), with
+  \(n\) the calibration length (far above 152,100 returns for a 390-step
+  day), and can lose it by an unbounded factor otherwise; a
+  confidence-sequence baseline gives \(\delta + m/A\) under a tolerance
+  on the conditional truncated variance that does not depend on the
+  algorithm.
 \item
   \textbf{Evidence, including negative results.} A delay theory that
   splits the cost of robustness into three losses, with a delay floor
   for every valid rule; simulations against parametric, robust and
-  calibrated classical competitors; and real data on which the monitor
-  is about as precise as simpler rules matched to its alarm counts and
-  adds little to a forecast that sees the last hour, so that its value
-  lies in the proof and in settings fixed in advance.
+  calibrated classical competitors; null streams built from real
+  returns, on which the proved monitors keep their bounds; and real
+  series, on which the monitor with a plug-in baseline is about as
+  precise as simpler rules matched to its alarm counts and adds little
+  to a forecast that sees the last hour.
 \end{enumerate}
 
 \textbf{Related work.} Retrospective tests for volatility breaks include
 the cumulative sums of squares of Inclán and Tiao (1994) and the
-high-frequency test of Bibinger, Jirak and Vetter (2017). Monitoring
-with a training sample and asymptotic control of any false alarm goes
-back to Chu, Stinchcombe and White (1996) and covers GARCH parameters
-(Berkes, Gombay, Horváth and Kokoszka 2004; Horváth, Trapani and Wang
-2025), the unconditional variance (Horváth, Kokoszka and Zhang 2006) and
-general parameters (Dette and Gösmann 2020); our guarantee is
-non-asymptotic and needs no model for the returns, at the price of a
-null on a conditional mean. Robust change detection censors likelihood
-ratios (Huber 1965), uses least favourable laws (Unnikrishnan,
-Veeravalli and Meyn 2009), bounded losses (Fearnhead and Rigaill 2019)
-or robust divergences in Bayesian online change-point detection (Adams
-and MacKay 2007; Knoblauch, Jewson and Damoulas 2018); clipping is the
-betting analogue of censoring. E-value methods for change detection
-include sequential estimation (Shekhar and Ramdas 2024), conformal
-detectors (Vovk et al.~2021) and many streams (Dandapanthula and Ramdas
-2025); Wang and Ramdas (2023) and Mineiro (2022) give confidence
-sequences under heavy tails, Clerico (2025) shows that coin betting is
-optimal for bounded means, and e-values have been applied to risk
-backtesting (Wang, Wang and Ziegel 2026) and high-volatility days (Choe
-and Ramdas 2024). Lai (1998) introduced a window-limited false alarm
-criterion, Mei (2008) showed that the run length can be uninformative,
-and Tartakovsky, Nikiforov and Basseville (2014) is the standard
-reference. Andersen, Todorov and Zhou (2025) monitor high-frequency
-prices in real time for local no-arbitrage violations. Our search
-(November 2026, not exhaustive) found no method that combines
-jump-robust high-frequency volatility measures with anytime-valid change
-detection.
+high-frequency test of Bibinger, Jirak and Vetter (2017).\footnote{We
+  could not read in full Bibinger, Jirak and Vetter (2017), Chu,
+  Stinchcombe and White (1996), Clerico (2025), Horváth, Hušková,
+  Kokoszka and Steinebach (2004), Horváth, Kokoszka and Zhang (2006),
+  Knoblauch, Jewson and Damoulas (2018), Ram and Ramdas (2026) and
+  Shekhar and Ramdas (2024), which we checked from listings, abstracts
+  and search excerpts, nor Lai (1998) and Mei (2008), known to us
+  through secondary sources. What we say about them, and every claim of
+  novelty that rests on it, is subject to this caveat.} Monitoring with
+a training sample and asymptotic control of any false alarm goes back to
+Chu, Stinchcombe and White (1996) and covers GARCH parameters (Berkes,
+Gombay, Horváth and Kokoszka 2004; Horváth, Trapani and Wang 2025), the
+unconditional variance (Horváth, Kokoszka and Zhang 2006) and general
+parameters (Dette and Gösmann 2020); our guarantee is non-asymptotic and
+needs no model for the returns, at the price of a null on a conditional
+mean. Robust change detection censors likelihood ratios (Huber 1965),
+uses least favourable laws (Unnikrishnan, Veeravalli and Meyn 2009),
+bounded losses (Fearnhead and Rigaill 2019) or robust divergences in
+Bayesian online change-point detection (Adams and MacKay 2007;
+Knoblauch, Jewson and Damoulas 2018); clipping is the betting analogue
+of censoring. E-value methods for change detection include sequential
+estimation (Shekhar and Ramdas 2024), conformal detectors (Vovk et
+al.~2021) and many streams (Dandapanthula and Ramdas 2025); Wang and
+Ramdas (2023) and Mineiro (2022) give confidence sequences under heavy
+tails, and e-values have been applied to risk backtesting (Wang, Wang
+and Ziegel 2026) and high-volatility days (Choe and Ramdas 2024).
+Tartakovsky, Nikiforov and Basseville (2014) is the standard reference
+on change detection. Andersen, Todorov and Zhou (2025) monitor
+high-frequency prices in real time for local no-arbitrage violations. To
+our knowledge, and subject to the caveat in footnote 1, no published
+method combines jump-robust high-frequency volatility measures with
+anytime-valid change detection (our search, of November 2026, was not
+exhaustive).
 
 \textbf{Organisation.} Sections 2 to 5 give the statistic, the
 guarantees, estimated baselines and the delay; Sections 6 and 7 report
@@ -258,8 +269,7 @@ smoothed across neighbouring minutes; Andersen and Bollerslev 1997;
 Boudt, Croux and Laurent 2011), treated as known; errors in it violate
 the null. Missing returns, and the first return after a gap, are
 skipped, not set to zero; validity then needs that, given the past,
-whether \(r_t\) is observed carries no information about its size, which
-is not innocuous, since outages tend to coincide with volatile periods.
+whether \(r_t\) is observed carries no information about its size.
 Horizons \(m\) count monitored steps.
 
 \textbf{Nulls.} Let \(\mu_t = \mathbb{E}[X_t \mid \mathcal{F}_{t-1}]\)
@@ -397,8 +407,8 @@ Corollary 18 covers a confidence-sequence baseline.
 alarm rule: \(M_t\) for one side at level \(A\), or the average of
 Proposition 5 for the two-sided rule.
 
-\textbf{Proposition 7 (after the first day).} Under the null, for every
-\(s \ge 0\) and \(m \ge 1\),
+\textbf{Proposition 7 (after the first day).} Under the null, with a
+known baseline and \(b = 0\), for every \(s \ge 0\) and \(m \ge 1\),
 \(\mathbb{P}(\text{an alarm at one of } s + 1, \dots, s + m \mid \mathcal{F}_s) \le \min\lbrace 1, (\bar M_s + m)/A\rbrace\),
 so a false alarm on day \(d\) has probability at most \(\min(1, dm/A)\).
 No bound below 1 holds for all days, even over i.i.d. laws: the law with
@@ -409,45 +419,47 @@ two-sided null and makes every Shiryaev-Roberts statistic equal to
 \((1440, 28{,}800)\).
 
 By Lemma 2 the statistic enters day \(d\) with up to \((d-1)m\) in
-expectation. The bound \(dm/A\) for one day was not reached in any
-example, but the effect is real: with 390-step days the probability of a
-first false alarm on day \(d\), given none before, rose from 0.98\% on
-day 1 to 4.7\% on average over days 11 to 20 for i.i.d. Gaussian
-returns, and after \(d - 1\) days with \(Y_t = 1\) a Gaussian day had a
-false alarm with probability 28.0\% at \(d = 10\) and 65.1\% at
-\(d = 20\) (Supplement S1.7). The plain detector's guarantee over many
-days is therefore an expected count (Corollary 6); it meets the
-window-limited criterion of Lai (1998) only for the first window, and
-Mei (2008) shows why the run length alone can mislead.
+expectation. With 390-step days and i.i.d. Gaussian returns the
+probability of a first false alarm on day \(d\), given none before, rose
+from 0.98\% on day 1 to 4.7\% on average over days 11 to 20, and after
+\(d - 1\) days with \(Y_t = 1\) a Gaussian day had a false alarm with
+probability 28.0\% at \(d = 10\) and 65.1\% at \(d = 20\) (Supplement
+S1.7). Over many days the plain detector's guarantee is thus an expected
+count (Corollary 6); it meets the window-limited criterion of Lai (1998)
+only for the first window, and Mei (2008) shows why the run length alone
+can mislead (footnote 1).
 
 \textbf{A bound for every day.} Let \(0 = b_0 < b_1 < \dots\) be
 stopping times with \(b_{i+1} - b_i \le m\) (in practice the day
 starts), and at each \(b_i\) scale each side's statistics down by a
-common factor so that the side's average is at most \(\kappa \ge 0\);
-\(\kappa = 0\) is a restart at 0.
+common factor so that the side's average is at most \(\iota \ge 0\);
+\(\iota = 0\) is a restart at 0.
 
 \textbf{Theorem 8 (restart at every day boundary).} With a known
 baseline and under the null of Theorem 4, or of Proposition 5 for the
 two-sided rule,
-\(\mathbb{P}(\text{an alarm in } (b_i, b_{i+1}] \mid \mathcal{F}_{b_i}) \le \min\lbrace 1, (m + \kappa)/A\rbrace\)
+\(\mathbb{P}(\text{an alarm in } (b_i, b_{i+1}] \mid \mathcal{F}_{b_i}) \le \min\lbrace 1, (m + \iota)/A\rbrace\)
 almost surely for every \(i\). If the statistics also restart after
 every alarm, the expected number of alarms in \((b_i, b_{i+1}]\) given
-\(\mathcal{F}_{b_i}\) is at most \((m + \kappa)/A\).
+\(\mathcal{F}_{b_i}\) is at most \((m + \iota)/A\).
 
-With \(\kappa = 0\) and \(A = m/\alpha\), the false alarm probability,
-the expected number of false alarms and, since
-\(\lbrace T_A > b_i\rbrace \in \mathcal{F}_{b_i}\), the hazard of every
-day are at most \(\alpha\) given the past; a window of \(m\) steps
-across one boundary has at most \((2m + \kappa)/A\) (Supplement S1.7).
-With the confidence-sequence baseline the restart gives \(\delta + m/A\)
-per day only marginally, while the tolerance holds to the end of the
-day; with the plug-in nothing per day is proved. The price is delay for
-a change late in a day: 1.06 to 1.44 times the plain detector's mean
-delay with 390-step days and 1.02 to 1.14 times with 1440-step days
-(Proposition S6). A CUSUM-type statistic bounds the unconditional
-probability of an alarm in every window by 5.146\% at \((390, 7800)\),
-for exchangeable returns and fixed bets only, and was 1.24 to 1.83 times
-slower (Theorem S7, Proposition S8).
+With \(\iota = 0\) and \(A = m/\alpha\), the false alarm probability,
+the expected number of false alarms and the hazard of every day are at
+most \(\alpha\) given the past (since
+\(\lbrace T_A > b_i\rbrace \in \mathcal{F}_{b_i}\)), and a window of
+\(m\) steps that starts in day \(i\) and crosses one boundary has an
+alarm with probability at most \((2m + \iota - 1)/A\) given
+\(\mathcal{F}_{b_i}\), though not given the past at its start
+(Supplement S1.7). With the confidence-sequence baseline the restart
+gives \(\delta + m/A\) per day only marginally, while the tolerance
+holds (Corollary S14); with the plug-in nothing per day is proved. The
+price is delay for a change late in a day, 1.06 to 1.44 times the plain
+detector's mean delay with 390-step days and 1.02 to 1.14 times with
+1440-step days (Proposition S6), whose rates before the change were
+4.6\% to 4.9\% and 6.6\% to 7.0\%. A CUSUM-type statistic bounds the
+unconditional probability of an alarm in every window, but only for
+exchangeable returns, fixed bets and a known baseline, and was 1.24 to
+1.83 times slower (Theorem S7, Proposition S8).
 
 \hypertarget{a-small-drift-of-the-conditional-mean}{%
 \subsection{3.2 A small drift of the conditional
@@ -476,11 +488,11 @@ The proof is in Supplement S1.2. For the default detector (\(c = 3\),
 times the horizon is small (5.80\% instead of 5\% at one day for a drift
 of 0.5\% on both sides) and then compounds: the one-day bound doubles at
 a drift of 1.63\%, and a drift of 0.5\% exhausts the five-day bound
-(Table S1). A drift that alternates costs far less, but only a pathwise
-bound shows it; no bound in the mean drift alone exists (Supplement
-S1.3). So the null holds approximately when the conditional mean stays
-within a few tenths of a percent of the baseline over a day, or when a
-band \(b\) absorbs the drift.
+(Table S1). A drift that alternates costs far less, but no bound in the
+mean drift alone exists (Supplement S1.3). So the null holds
+approximately when the conditional mean stays within a few tenths of a
+percent of the baseline over a day, or when a band \(b\) absorbs the
+drift.
 
 \hypertarget{why-a-decrease-detector-needs-a-bounded-statistic}{%
 \subsection{3.3 Why a decrease detector needs a bounded
@@ -507,35 +519,35 @@ The proof (Supplement S1.4) builds, for any path, a law in
 \(\mathcal{P}^{\downarrow}\) that follows the path with probability
 close to 1, a one-sided relative of the result of Bahadur and Savage
 (1956). The increase null admits nontrivial e-variables such as
-\(E(y) = y\), so an increase detector works on raw squared returns; no
-nonparametric e-test detects a fall in the variance itself. For a
+\(E(y) = y\), so an increase detector works on raw squared returns, but
+no nonparametric e-test detects a fall in the variance itself. For a
 statistic in \([0, B]\) the null ``mean at least 1'' admits the bets
 \(1 + \lambda(1 - y)\), \(\lambda \in [0, 1/(B-1)]\), and up to
 domination only these (Lemma 20). Truncation is one bounded functional
-with a volatility meaning (Lemma 1); exceedance indicators or ranks
-would also do. Its price is a speed limit: one step multiplies a
-decrease bet's wealth by at most \(B/(B-1)\) (Corollary 22). For
-increases clipping is not needed for validity, but it bounds the effect
-of one jump: \(f_t^{\uparrow} \le 1 + \lambda(B-1)\).
+with a volatility meaning (Lemma 1); ranks are another (Section 6.5).
+Its price is a speed limit: one step multiplies a decrease bet's wealth
+by at most \(B/(B-1)\) (Corollary 22); for increases, clipping bounds
+the effect of one jump.
 
-\textbf{Every valid rule.} The next result bounds every rule with the
-guarantee of Theorem 4. Let \(\pi(y)\) be the largest probability that a
-law on \([0, B]\) in the null can put on the value \(y\): under the
-decrease null (conditional mean at least 1), \(\pi(y) = (B-1)/(B-y)\)
-for \(y < 1\) and 1 otherwise; under the increase null (at most 1),
-\(\pi(y) = 1/y\) for \(y > 1\) and 1 otherwise; under the two-sided null
-(equal to 1), the product of the two. For a path
-\(y = (y_1, y_2, \dots)\) of \(Y_t = X_t/m_0\) let
-\(W_n(y) = \prod_{s \le n} 1/\pi(y_s)\).
+\textbf{Every valid rule.} The next result bounds every valid rule
+(Section 1), with a known baseline and \(b = 0\). Let \(\pi(y)\) be the
+largest probability that a law on \([0, B]\) in the null can put on the
+value \(y\): under the decrease null (conditional mean at least 1),
+\(\pi(y) = (B-1)/(B-y)\) for \(y < 1\) and 1 otherwise; under the
+increase null (at most 1), \(\pi(y) = 1/y\) for \(y > 1\) and 1
+otherwise; under the two-sided null (equal to 1), the product of the
+two. For a path \(y = (y_1, y_2, \dots)\) of \(Y_t = X_t/m_0\) let
+\(\Pi_n(y) = \prod_{s \le n} 1/\pi(y_s)\).
 
 \textbf{Theorem 12 (pathwise floor).} Let \(T\) be a stopping rule with
 \(\mathbb{P}(T \le n) \le n/A\) for every \(n\) and every law of
-\((Y_t)\) on \([0, B]\) in one of the three nulls. (a) If \(T\) is
-deterministic, it stops at step \(n\) on the path \(y\) only if
-\(W_n(y) \ge A/n\). (b) If \(T\) is randomised independently of the
-data, \(\mathbb{P}(T \le n \mid y) \le (n/A)\,W_n(y)\). (c) For every
-path \(y\) and every \(n\) with \(W_n(y) \ge A/n\), some deterministic
-rule with the same guarantee stops at \(n\) on \(y\).
+\((Y_t)\) on \([0, B]\) in one of the three nulls, with a known baseline
+and \(b = 0\). (a) If \(T\) is deterministic, it stops at step \(n\) on
+the path \(y\) only if \(\Pi_n(y) \ge A/n\). (b) If \(T\) is randomised
+independently of the data,
+\(\mathbb{P}(T \le n \mid y) \le (n/A)\,\Pi_n(y)\). (c) For every path
+\(y\) and every \(n\) with \(\Pi_n(y) \ge A/n\), some deterministic rule
+with the same guarantee stops at \(n\) on \(y\).
 
 \textbf{Corollary 13.} (a) For the decrease null on \([0, \infty)\),
 that is without truncation, no deterministic rule valid at levels
@@ -544,17 +556,19 @@ collapse, \(y_s = 0\) for every \(s\), every deterministic rule valid at
 levels \(n/A\) for the decrease or the two-sided null needs at least
 \(\min\lbrace n : n \log(B/(B-1)) \ge \log(A/n)\rbrace\) steps: 45 at
 \(c = 3\) and \(A = 7800\). A randomised valid rule alarms by step \(n\)
-on that path with probability at most \(\min(1, nW_n/A)\), which is 0.98
-at step 44, and its mean delay there is at least 43.4.
+on that path with probability at most \(\min(1, n\Pi_n/A)\), which is
+0.98 at step 44; this cap alone gives a mean delay there of at least
+37.8, and a linear programme that imposes validity at every \(n\) gives
+43.4 (Supplement S1.6).
 
 The proof (Supplement S1.6) places at each step the two-point null law
 that gives \(y_s\) its largest probability; under this product law the
-path has probability \(1/W_n(y)\), so a rule that stops there spends at
-least that much of its budget \(n/A\). The laws can be placed on the
+path has probability \(1/\Pi_n(y)\), so a rule that stops there spends
+at least that much of its budget \(n/A\). The laws can be placed on the
 returns, so the floor binds rules that see \(r_t\), and part (a) extends
 Corollary 11 to every deterministic procedure. We claim no priority for
 this elementary argument; Clerico (2025) shows a related optimality of
-betting for a bounded mean.
+betting for a bounded mean (footnote 1).
 
 \hypertarget{estimated-baseline}{%
 \section{4 Estimated baseline}\label{estimated-baseline}}
@@ -596,13 +610,17 @@ plug-in has no guarantee of the form \(C\,m/A\) at practical calibration
 lengths, but it does have a computable one.
 
 \textbf{When \(n\), \(m\) and \(A\) grow together.} Assume that the
-calibration returns are i.i.d. with a law \(F\) that has no atom at 0,
-and let \(\mathcal{C}(W)\) be the class of monitored streams whose
-conditional truncated mean at the window's level,
+calibration returns are i.i.d. with a law \(F\) that has no atom at 0
+and under which \(\lvert r\rvert\) has a unique median, and let
+\(\mathcal{C}(W)\) be the class of monitored streams whose conditional
+truncated mean at the window's level,
 \(\mathbb{E}[\min(r_t^2, \hat\tau^2) \mid \mathcal{F}_{t-1}]\), equals
 its value under \(F\); i.i.d. returns from \(F\) are one such stream.
-Write \(\bar\Phi\) for the standard normal upper tail and
-\(\widehat{\mathrm{se}}\) for the standard error of \(\hat m\).
+This null is defined given the window \(W\), after calibration, unlike
+the null of Theorem 16. Write \(T\) for the first alarm of the two-sided
+rule with the plug-in baseline, \(\bar\Phi\) for the standard normal
+upper tail and \(\widehat{\mathrm{se}}\) for the standard error of
+\(\hat m\).
 
 \textbf{Theorem 15 (the plug-in as \(n\), \(m\) and \(A\) grow).} Let
 \(n \to \infty\), with \(m = m_n\) and \(A = A_n \ge m\). (a) If
@@ -622,13 +640,12 @@ restores \(m/A + \delta\).
 The proof (Supplement S2) bounds the drift of the plug-in by \(\hat B\)
 times the Kolmogorov distance between the window and \(F\); the stream
 of (b) holds the conditional mean fixed and then bets boldly on \(0\)
-and \(\hat B\). The scale \(\sqrt n\) is sharp when \(\log A\) is small
-compared with \(m\), and \(C\) is a first-order upper bound. After a
-390-step Gaussian window the worst one-day false alarm probability over
-\(\mathcal{C}(W)\) is about 33\% to 42\%, against at most 5.14\% for
-i.i.d. returns (Supplement S2). The confidence-sequence baseline
-achieves (c) without asymptotics, at an effective \(z\) of 3.8 to 5.7
-against 2.576 for \(\delta = 0.01\).
+and \(\hat B\). After a 390-step Gaussian window the worst one-day false
+alarm probability over \(\mathcal{C}(W)\) is about 33\% to 42\%, while
+for i.i.d. returns the largest simulated rate was 5.14\% (4.72\% to
+5.59\%; Supplement S2). The confidence-sequence baseline achieves (c)
+without asymptotics, at an effective \(z\) of 3.8 to 5.7 against 2.576
+for \(\delta = 0.01\).
 
 \hypertarget{a-baseline-from-a-confidence-sequence}{%
 \subsection{4.2 A baseline from a confidence
@@ -673,8 +690,8 @@ beyond \(0 \le X \le \tau^2\): during the first \(h\) monitored steps
 the conditional truncated variance never rises above its smallest
 calibration value by more than the factor \(1 + b\), and never falls
 below its largest calibration value by more than the factor \(1 - b\).
-Let \(V_m\) be the event that one of the two inequalities fails at some
-\(t \in (T_0, T_0 + m]\).
+Let \(\mathcal{O}_m\) be the event that one of the two inequalities
+fails at some \(t \in (T_0, T_0 + m]\).
 
 \textbf{Theorem 16 (guarantee with an estimated baseline).} Let
 \(\delta = \delta_u + \delta_l\).
@@ -697,7 +714,7 @@ Let \(V_m\) be the event that one of the two inequalities fails at some
   its half of the condition with \(h = m\).
 \item
   With no assumption on the law of the returns,
-  \(\mathbb{P}(\text{an alarm at one of } T_0 + 1, \dots, T_0 + m) \le \delta + \mathbb{P}(V_m) + m/A\).
+  \(\mathbb{P}(\text{an alarm at one of } T_0 + 1, \dots, T_0 + m) \le \delta + \mathbb{P}(\mathcal{O}_m) + m/A\).
 \end{enumerate}
 
 The condition does not involve the bets, so with a fixed calibration
@@ -705,8 +722,7 @@ length it concerns the data-generating process alone. The proof
 (Supplement S2) uses two facts: the time-uniform bounds hold at the
 random time \(T_0\) with probability at least \(1 - \delta\), and on
 that event the condition puts every \(\mu_t\) of the horizon on the null
-side of the baselines, since a weighted average lies between its
-smallest and largest terms. Part 4 charges the probability that the
+side of the baselines. Part 4 charges the probability that the
 conditional truncated variance leaves the band; Theorem 9 charges the
 size of a drift instead.
 
@@ -716,10 +732,9 @@ estimation error, not against a moving conditional mean. Under
 GARCH(1,1) with 390 calibration steps and a 390-step day, the smallest
 band that held on a path had a median of 0.90 to 2.58 across
 persistences 0.95 to 0.9999 (2.05 to 5.01 with 1440 steps), and no path
-met \(b = 0.25\); as parts 1 to 3 need the tolerance almost surely, they
-never apply to these models, and part 4 charges a failure of probability
-1. The theorem covers a constant conditional law (Corollary 17) and much
-weaker clustering.
+met \(b = 0.25\), so parts 1 to 3, which need the tolerance almost
+surely, never apply to these models, and part 4 charges a failure of
+probability 1.
 
 \textbf{Corollary 17 (a constant conditional law).} If from step
 \(n_\tau + 1\) until the change the conditional law of \(r_t\) given
@@ -745,8 +760,9 @@ and \(36{,}000\) for a 1440-minute day. The larger \(A\) costs little
 delay (\(\log 9750/\log 7800 \approx 1.025\)); the real cost is the
 width of the bounds (Section 6.3). Shekhar and Ramdas (2024) combine a
 confidence sequence for the pre-change parameter with a detector in a
-similar way; we add one-sided ranges, the sample split and the explicit
-tolerance.
+similar way; to our knowledge, and subject to the caveat in footnote 1,
+the one-sided ranges, the sample split and the explicit tolerance are
+new.
 
 \hypertarget{detection-delay}{%
 \section{5 Detection delay}\label{detection-delay}}
@@ -796,12 +812,9 @@ Part (b) is the dual form, for a bounded statistic, of the information
 number of Honda and Takemura (2010), and \(P^\ast\) is the reverse
 information projection of \(Q\) onto the null (Grünwald, de Heide and
 Koolen 2024; Larsson, Ramdas and Ruf 2024). For decreases under light
-tails the maximiser is only barely interior
-(\(\lambda^\ast/\lambda_{\max}\) from 0.9917 to
-\(1 - 2.4\times 10^{-8}\) for the falls of Table 1, against 0.55 to 0.93
-for Student \(t_3\) returns; Supplement S3), so the relevant decrease
-bets lie just below \(\lambda_{\max}\), and the constants of the
-asymptotic theory below are large.
+tails the maximiser is only barely interior (Supplement S3), so the
+relevant decrease bets lie just below \(\lambda_{\max}\), and the
+constants of the asymptotic theory below are large.
 
 Since every bet is an e-variable for the true pre-change law \(P_0\)
 when \(P_0 \in \mathcal{N}_B\), and since \(X\) and \(Y\) are functions
@@ -838,8 +851,8 @@ while an e-detector must spread \(\mathbb{E} M_n \le n\) over all paths
 
 \textbf{A delay floor for every valid rule.} For a change at the first
 step with post-change law \(Q\), let
-\(N_A = \min\lbrace n : W_n \ge A/n\rbrace\), with \(W_n\) of Theorem 12
-evaluated on the data.
+\(N_A = \min\lbrace n : \Pi_n \ge A/n\rbrace\), with \(\Pi_n\) of
+Theorem 12 evaluated on the data.
 
 \textbf{Theorem 23 (delay floor).} Let \(T\) be valid at levels \(n/A\)
 for one of the three nulls. (a) If \(T\) is deterministic, \(T \ge N_A\)
@@ -849,7 +862,7 @@ almost surely under \(Q\), so
 steps, is absolutely continuous, \(Q(T \le n) \le \beta_n\), the largest
 \(Q\)-probability of rejection of a test of \(P^\circ\) at level \(n/A\)
 that rejects only where \(N_A \le n\) if \(T\) is deterministic, or with
-probability at most \(\min\lbrace 1, (n/A)W_n\rbrace\) if \(T\) is
+probability at most \(\min\lbrace 1, (n/A)\Pi_n\rbrace\) if \(T\) is
 randomised; hence
 \(\mathrm{WADD}(T) \ge 1 + \sum_{n \ge 1}(1 - \beta_n)\).
 
@@ -918,23 +931,23 @@ bets on an interval \([a, b'] \ni \lambda^\ast\) with
 
 Ram and Ramdas (2026) prove a universal lower bound of the form (a) for
 composite pre- and post-change classes and show that it is attained for
-bounded means; Theorem 25 is an instance with explicit constants for
-linear bets, and we claim no priority. A refined grid is first-order
-optimal over the nonparametric null; the default grid is not, but its
-ratio \(\mathrm{KL}_{\inf}/g_{\mathrm{grid}}\) is 1.00 to 1.08 in our
-cases. For decreases the constant behind the \(O(1)\) in (c) grows
-without bound as \(\lambda^\ast\) approaches \(\lambda_{\max}\).
+bounded means (footnote 1); Theorem 25 is an instance with explicit
+constants for linear bets, and we claim no priority. A refined grid is
+first-order optimal over the nonparametric null; the default grid is
+not, but its ratio \(\mathrm{KL}_{\inf}/g_{\mathrm{grid}}\) is 1.00 to
+1.08 in our cases. For decreases the constant behind the \(O(1)\) in (c)
+grows without bound as \(\lambda^\ast\) approaches \(\lambda_{\max}\).
 
 \hypertarget{practical-alarm-levels-and-the-price-of-robustness}{%
 \subsection{5.3 Practical alarm levels and the price of
 robustness}\label{practical-alarm-levels-and-the-price-of-robustness}}
 
 At \(A = 7800\) the first-order formula \(\log A/g\) overstates the
-delay of small changes by up to 112\%; a heuristic second-order
-approximation from nonlinear renewal theory was within 3\% of the
-simulated mean delay of a single bet in all 20 cases of Table S2
-(Supplement S4), and the default grid costs 9\% to 26\% against the best
-single bet.
+delay of small changes by up to 112\%; a second-order expansion from
+nonlinear renewal theory (Proposition S20), with a heuristic value of
+its constant, was within 3\% of the simulated mean delay of a single bet
+in all 20 cases of Table S2 (Supplement S4), and the default grid costs
+9\% to 26\% against the best single bet.
 
 Table 1 splits the first-order delay ratio against the Gaussian
 likelihood-ratio detector into the three factors of Corollary 21, for
@@ -1069,11 +1082,11 @@ half-life 390 steps.}
 Where the null holds (first three columns) all e-detectors stayed below
 5\%, including the increase detector on raw squared returns, as Section
 3.3 predicts. Calibrated on Gaussian data, the Gaussian likelihood-ratio
-and CUSUM detectors raised false alarms on 70\% to 97\% of days under
-jumps or fat tails, and the repeated \(z\)-test failed everywhere. In
-the last two columns the null is false: price noise makes the
-conditional mean of \(r_t^2\) depend on the previous return, and slow
-stochastic volatility moves it.
+and CUSUM detectors raised false alarms within the first day on 70\% to
+97\% of paths under jumps or fat tails, and the repeated \(z\)-test
+failed everywhere. In the last two columns the null is false: price
+noise makes the conditional mean of \(r_t^2\) depend on the previous
+return, and slow stochastic volatility moves it.
 
 \begin{figure}
 \centering
@@ -1099,8 +1112,7 @@ dynamic programming over the whole nonparametric null reaches 95\% of it
 watches the detector's own state, alarmed within one day on 2.62\% of
 paths (95\% interval 2.50\% to 2.75\%) against the bound of 5\%, and
 within five days on 18.1\% against 25\%; outside the class each failure
-matched the broken condition (clustering, a plug-in baseline, coarse
-price ticks). The companion note gives the details.
+matched the broken condition (companion note).
 
 \hypertarget{delay-against-parametric-and-robust-competitors}{%
 \subsection{6.2 Delay against parametric and robust
@@ -1110,49 +1122,45 @@ With the designs of Table 2 and a change 500 steps into monitoring
 (Table S5), the Gaussian likelihood-ratio e-detector detected increases
 of the standard deviation by 25\%, 50\% and 100\% in a median of 78, 26
 and 10 steps on clean Gaussian data, against 87, 35 and 17 for the
-robust detector, which thus pays 10\% to 70\% extra delay, close to
-Table 1; with jumps or fat tails the parametric detectors alarmed before
-the change on 74\% to 99\% of paths, so their delays have no meaning.
-Truncation matters under jumps (102 against 246 steps for the e-detector
-on raw \(r_t^2\) at sd ratio 1.25). For decreases the Gaussian detector
-was faster, at 3\% to 9\% false alarms before the change, but this rests
-on normality: real one-minute returns contain many exact zeros (5.7\% of
-Bitstamp BTC/USD minutes), which a Gaussian likelihood reads as low
-volatility.
+robust detector, an extra delay of 10\% to 70\%, close to Table 1, but
+under jumps or fat tails the parametric detectors alarmed before the
+change on 74\% to 99\% of paths. Truncation matters under jumps (102
+against 246 steps for the e-detector on raw \(r_t^2\) at sd ratio 1.25).
+For decreases the Gaussian detector was faster, at 3\% to 9\% false
+alarms before the change, but this rests on normality: real one-minute
+returns contain many exact zeros (5.7\% of Bitstamp BTC/USD minutes),
+which a Gaussian likelihood reads as low volatility.
 
 \textbf{BOCPD and a two-window scan.} Bayesian online change-point
 detection (BOCPD; Adams and MacKay 2007) with a Gaussian model, on raw
 or clipped returns, and a two-window variance-ratio scan inspired by
-Bibinger, Jirak and Vetter (2017), our own construction (Supplement S5),
-were matched to the e-detector's false alarm rate per 390-step day on
-clean Gaussian paths. BOCPD then alarmed within one day on 73.2\% of
-paths with jumps and 53.2\% with Student \(t_5\) returns (e-detector
-with a plug-in baseline 1.3\% and 1.2\%); clipping fixed jumps (1.6\%)
-but not fat tails (7.5\%). On clean Gaussian data BOCPD was faster for
-large changes (median 26 against 81 steps for a halving of the standard
-deviation) but detected fewer small changes.
+Bibinger, Jirak and Vetter (2017) but of our own construction (footnote
+1; Supplement S5) were matched to the e-detector's first-day false alarm
+rate on clean Gaussian paths. BOCPD then alarmed within the first day on
+73.2\% of paths with jumps and 53.2\% with Student \(t_5\) returns
+(e-detector 1.3\% and 1.2\%); clipping fixed jumps (1.6\%) but not fat
+tails (7.5\%). On clean Gaussian data BOCPD was faster for large changes
+(median 26 against 81 steps for a halving of the standard deviation) but
+detected fewer small changes.
 
-\textbf{Competitors calibrated for the data at hand.} On new paths we
-also ran classical rules on the e-detector's own statistic, a Student
-\(t\) BOCPD and CUSUM monitoring rules with a training sample
-(Supplement S5). At the e-detector's first-day Gaussian rate (1.3\%),
-its own betting statistic with a simulated threshold in place of Ville's
-\(2A\) detected increases of the standard deviation by 25\%, 50\% and
-100\% in 106, 41 and 20 steps (e-detector 100, 39 and 19), and Page's
-CUSUM on \(X\) was as fast for increases and 15\% to 40\% faster for
-decreases, where validity caps the e-detector's bets. But calibrated
-thresholds hold only for their calibration law: Gaussian-calibrated
-CUSUMs on \(X\) had 5.0\% to 8.2\% false alarms per day under Student
-\(t\) returns (target 1.3\%; per-path bootstrap thresholds held 1.4\% to
-2.2\%). A training-sample rule on \(X\) was about twice as slow, and the
-Student \(t\) BOCPD found only 56\% of 25\% increases within 1500 steps
-(e-detector 98\%). At a matched rate, Ville's threshold costs this
-statistic little delay and adds a guarantee that needs no calibration.
-
-Bet design matters less than the grid's coverage: a plug-in bet built
-from a local truncated quarticity was slower than the fixed grid in 14
-of 18 cells, and a grid tuned on Gaussian data was up to 55\% slower
-under Student \(t_3\) returns (Supplement S5).
+\textbf{Competitors calibrated for the data at hand.} We also ran
+classical rules on the e-detector's own statistic, a Student \(t\) BOCPD
+and CUSUM monitoring rules with a training sample of the type of Chu,
+Stinchcombe and White (1996) and Horváth, Kokoszka and Zhang (2006), not
+reproductions (footnote 1; Supplement S5). At its first-day Gaussian
+rate (1.3\%), the e-detector's own betting statistic with a simulated
+threshold in place of \(2A\) detected increases of the standard
+deviation by 25\%, 50\% and 100\% in 106, 41 and 20 steps (e-detector
+100, 39 and 19), and Page's CUSUM on \(X\) was as fast for increases and
+15\% to 40\% faster for decreases, where validity caps the e-detector's
+bets. But calibrated thresholds hold only for their calibration law:
+Gaussian-calibrated CUSUMs on \(X\) had 5.0\% to 8.2\% first-day false
+alarms under Student \(t\) returns, and per-path bootstrap thresholds
+were significantly above target in 5 of 24 cells. Training-sample rules
+were about twice as slow, and the Student \(t\) BOCPD found only 56\% of
+25\% increases within 1500 steps (e-detector 98\%). At a matched rate,
+Ville's threshold costs this statistic little delay and adds a guarantee
+that needs no calibration.
 
 \hypertarget{the-cost-of-an-estimated-baseline}{%
 \subsection{6.3 The cost of an estimated
@@ -1178,34 +1186,43 @@ true unconditional baseline, the monitor alarmed on 78\% of 1440-step
 days at persistence 0.95 and on 100\% at 0.99 or more; a band
 \(b = 0.5\) absorbs short-lived clustering, but even \(b = 1\) leaves
 12\% to 20\% of days with an alarm when the half-life is an hour or more
-(Figure 1, right). Persistent clusters are changes in conditional
-volatility, and the monitor reports them. Dividing returns by a frozen
-GARCH(1,1) forecast (Bollerslev 1986) brought the one-day rate to 3.0\%
-to 6.2\%, with a plug-in baseline that no theorem covers, but at
+(Figure 1, right). Dividing returns by a frozen GARCH(1,1) forecast
+(Bollerslev 1986) brought the one-day rate to 3.0\% to 6.2\%, but at
 persistence 0.99 a doubling of the long-run variance was detected within
 a day on only 34\% to 43\% of paths: with GARCH parameters
 \((\omega, \alpha, \beta)\), no break of \(\omega\) lifts the ratio of
 the mean squared return to the mean forecast above \((1-\beta)/\alpha\)
-(Proposition S13), the mirror image of the finding that unmodelled
-shifts make GARCH fits look nearly integrated (Diebold 1986; Lamoureux
-and Lastrapes 1990; Mikosch and Starica 2004). Price-level
-microstructure noise also breaks the null (a one-day rate of 41.5\% at
-one-second sampling and a noise-to-signal ratio of 4), but not for a
-statistic pre-averaged over non-overlapping blocks of prices, to which
-Theorems 3 and 4 apply (Supplement S6).
+(Proposition S13). Price-level noise also breaks the null (a one-day
+rate of 41.5\% at one-second sampling and a noise-to-signal ratio of 4),
+but not for a statistic pre-averaged over non-overlapping blocks of
+prices, to which Theorems 3 and 4 apply (Supplement S6).
 
 \hypertarget{extensions}{%
 \subsection{6.5 Extensions}\label{extensions}}
 
-The companion note shows that a running truncation level and restarts
-that bet from the first return after an alarm keep a proof and remove
-the blind period (the rank restart detected 99.6\% of Gaussian changes
-within a day where volatility moves about once a day, against 56\% to
-66\% for monitors that recalibrate), that e-BH (Wang and Ramdas 2022)
-controls the false discovery rate over many assets under any dependence,
-and that a certified average over 1, 5 and 15 minutes caught a jump in
-lag-one autocorrelation that the one-minute detector missed but beat no
-single frequency on persistent variance changes.
+\textbf{A null without a baseline.} The \emph{rank detector} bets
+\(f(p_t)\) on the smoothed conformal p-value \(p_t\) of Vovk,
+Nouretdinov and Gammerman (2003), the share of
+\(\lvert r_1\rvert, \dots, \lvert r_t\rvert\) above \(\lvert r_t\rvert\)
+with ties split at random, where \(f \ge 0\) and \(\int_0^1 f = 1\). For
+exchangeable returns the \(p_t\) are i.i.d. uniform, so Lemma 2 holds in
+their filtration and Theorems 3 and 4 hold with no baseline, no \(\tau\)
+and no \(\delta\); for i.i.d. returns they hold also when the detector
+restarts at once after an alarm with an empty reference set (Supplement
+S1.9). Its null, exchangeability, is stronger than the conditional-mean
+null.
+
+\textbf{Other extensions.} A running truncation level with a band for
+all levels, and restarts that learn their band while they monitor, keep
+a proof for i.i.d. returns (Supplement S1.9). Restarts remove the blind
+period: where volatility moved about once a day, the rank restart
+detected 99.6\% of Gaussian changes within a day, against 56\% to 66\%
+for monitors that recalibrate. The companion note also shows that e-BH
+(Wang and Ramdas 2022) controls the false discovery rate over many
+assets under any dependence, and that a certified average over 1, 5 and
+15 minutes caught a jump in lag-one autocorrelation that the one-minute
+detector missed but beat no single frequency on persistent variance
+changes.
 
 \hypertarget{application}{%
 \section{7 Application}\label{application}}
@@ -1215,197 +1232,192 @@ single frequency on persistent variance changes.
 test}\label{data-design-and-what-real-data-can-test}}
 
 \textbf{Data.} Binance spot one-minute bars for BTC, ETH, XRP, SOL and
-DOGE against USDT, from a public mirror of the exchange's files with no
-missing minutes: 1 July to 31 December 2025 (264,959 returns per coin)
-and, out of sample, 21 January 2024 to 30 June 2025 (527 days),
-deseasonalised as in Section 2. The monitor uses \(c = 3\) and the band
-\(b = 0.25\), each side alarming at \(2A\), and recalibrates on one day
-of data after every alarm, with \(A = 28{,}800\) for the plug-in
-baseline and \(\delta = 0.01\) and \(A = 36{,}000\) for the
-confidence-sequence baseline (5\% for the first 1440-minute day). The
-settings were fixed after one run on Bitstamp BTC/USD for July to
-December 2025 and before these data were examined, so only January to
-June 2025 is fully held out.
+DOGE against USDT, with no missing minutes: 1 July to 31 December 2025
+(264,959 returns per coin) and, out of sample, 21 January 2024 to 30
+June 2025 (527 days), deseasonalised as in Section 2. The monitor uses
+\(c = 3\) and the band \(b = 0.25\), each side alarming at \(2A\), and
+recalibrates on one day of data after every alarm, with \(A = 28{,}800\)
+for the plug-in baseline and \(\delta = 0.01\) and \(A = 36{,}000\) for
+the confidence-sequence baseline (5\% for the first 1440-minute day).
+The band tolerates slow drift of the conditional variance: under slow
+log-normal stochastic volatility it cut the first-day alarm rates from
+24.7\% and 26.7\% to 8.3\% and 5.0\%, while 90\% of doublings and 94\%
+of halvings were still detected (Supplement S6). The settings were fixed
+after one run on Bitstamp BTC/USD for July to December 2025, so only
+January to June 2025 is fully held out.
 
-\textbf{Which results are confirmatory.} Two real-data analyses were
-specified in advance as primary: the FOMC and CPI test on BTC of Section
-7.3, fixed before the first run in analysis code first saved with its
-results (so the order cannot be checked independently), and the null
-streams and confidence-sequence configuration below, pre-registered in a
-document committed before any of their real-data runs; later decisions
-are called post hoc. Other real-data results are secondary (described in
-advance) or exploratory (chosen after results were seen). Secondary
-results have 95\% intervals from a block bootstrap over calendar days,
-joint across coins, and p-values adjusted by Holm's (1979) method within
-families, methods fixed after the original results had been read
-(Supplement S7.4).
+\textbf{What the real data test.} Three pre-registered analyses use
+proved monitors, each specified in a document committed before any of
+its real-data runs (later decisions are called post hoc): the null
+streams below, on which the null holds by construction, the
+confidence-sequence configuration of Section 7.2 and the rerun of the
+event test with a daily restart (Section 7.3). All other real-data
+analyses use the plug-in baseline, whose level is measured (Sections 4.1
+and 6.1), not proved, and show how the monitor behaves as a tool. Of
+these, the FOMC and CPI test on BTC (Section 7.3) is primary, fixed
+before the first run in analysis code first saved with its results; the
+Nifty 50 and Budget analyses, the forecast regressions and the
+comparisons with classical rules are secondary (described in advance);
+the rest is exploratory. Secondary results carry 95\% intervals from a
+block bootstrap over calendar days and p-values adjusted by Holm's
+(1979) method within families (Supplement S7.4).
 
 \textbf{Null streams built from real returns.} Real data cannot show
 where the null holds, but streams built from real returns can make it
-hold. A day is calm if its robust volatility (\(1.4826\) times the
-median absolute deseasonalised return) lies within 0.8 to 1.25 times its
-median over the previous 20 days. The primary endpoint uses 20,000
-streams that permute the returns of the calm days of July to December
-2025, pooled over the five coins; they keep the real zeros, ticks and
-heavy tails and remove all time dependence. A uniformly random ordering
-stays uniformly random given the past, also at stopping times, so the
-null holds exactly for the rank detector of the companion note and, for
-the other monitors, up to the drift of a finite pool (median 0.24\% to
-0.31\% of \(m_0\), at most 1.19\%). At band 0 the first-day false alarm
-probability was 2.26\% (95\% interval 2.06\% to 2.48\%) with the known
-baseline, 0.01\% (0.00\% to 0.04\%) with the confidence-sequence
-baseline and 3.38\% (3.14\% to 3.64\%) for the rank detector, against
-5\%; for these three no interval lay above its bound in any of 252 cells
-(Supplement S7.6). The plug-in gave 5.50\% (5.19\% to 5.82\%), and 41\%
-within five days against 25\%. Streams that bootstrap blocks of calm
-days, keeping their real order, made every monitor alarm within a day on
-86\% to 100\% of streams, at about the alarm rate of the real series,
-and dividing each day by its own volatility (post hoc) did not repair
-this for the coins. Real minute-level data rarely satisfy the null, so
-real alarm rates are not false alarm rates.
+hold; on real data they are the test of the guarantee. A day is calm if
+its robust volatility lies within 0.8 to 1.25 times its median over the
+previous 20 days. The primary endpoint uses 20,000 streams that permute
+the returns of the calm days of July to December 2025, pooled over the
+five coins; they keep the real zeros, ticks and heavy tails and remove
+all time dependence. A uniformly random ordering stays uniformly random
+given the past, also at stopping times, so the null holds exactly for
+the rank detector and, for the other monitors, up to the drift of a
+finite pool (median 0.24\% to 0.31\% of \(m_0\), at most 1.19\%). At
+band 0 the first-day false alarm probability was 2.26\% (95\% interval
+2.06\% to 2.48\%) with the known baseline, 0.01\% (0.00\% to 0.04\%)
+with the confidence-sequence baseline and 3.38\% (3.14\% to 3.64\%) for
+the rank detector, against 5\%, and no interval of these three lay above
+its bound in any of 252 cells (Supplement S7.6). The plug-in gave 5.50\%
+(5.19\% to 5.82\%), and 41\% within five days against 25\%. Streams that
+bootstrap blocks of calm days, keeping their real order, made every
+monitor alarm within a day on 86\% to 100\% of streams, and dividing
+each day by its own volatility (post hoc) did not repair this for the
+coins: real minute-level data rarely satisfy the null, so real alarm
+rates are not false alarm rates.
 
 \hypertarget{five-cryptocurrencies}{%
 \subsection{7.2 Five cryptocurrencies}\label{five-cryptocurrencies}}
 
-With the plug-in baseline the monitor raised 0.66 to 0.71 alarms per day
-for every coin in both periods. Of its increase alarms, 75\% to 84\%
-were followed by a day whose robust volatility over the next 1440
-minutes was above the calibration baseline, and of its decrease alarms
-83\% to 93\% by a day below it, against about 50\% at random times with
-the same delay (pooled differences 27 and 38 points in July to December
-2025, 95\% intervals 22 to 33 and 34 to 44); out of sample the shares
-fell by 1 to 4 points.
+\textbf{The confidence-sequence baseline (pre-registered).} In the
+primary configuration (July to December 2025, band 0.25), the only
+real-data configuration whose monitor has a proof (under the tolerance
+of Theorem 16), it raised 0.51 to 0.53 alarms per day per coin, against
+0.66 to 0.70 for the plug-in (16\% to 20\% fewer on Bitstamp BTC/USD).
+These data had already been analysed with the plug-in, so the
+pre-registration fixed the configuration, not the novelty of the data.
+Of its up alarms 78.2\% were followed by higher volatility, against
+79.6\% for the plug-in (difference \(-1.3\) points, day-block bootstrap
+interval \(-5.8\) to 3.2), and of its down alarms 96.3\% by lower
+volatility, against 88.3\% (\(+8.0\), 2.7 to 13.7); out of sample,
+80.8\% and 90.9\% against 77.9\% and 84.5\%. In July to December 2025
+matched up alarms came a median 4 to 9 minutes later, and it monitored
+46\% to 49\% of the minutes, against 30\% to 33\%, since it recalibrates
+less often. In 5 of 7031 segments, all on BTC,
+\(\tau^2 \le m^{\uparrow}\), so that no increase bet could gain, for up
+to 136 days (post hoc; Supplement S7.6).
 
-\textbf{The confidence-sequence baseline.} In the pre-registered primary
-configuration (July to December 2025, band 0.25) it raised 0.51 to 0.53
-alarms per day per coin, against 0.66 to 0.70 for the plug-in (on
-Bitstamp BTC/USD it cut the alarms by 16\% to 20\%). Of its up alarms
-78.2\% were followed by higher volatility, against 79.6\% for the
-plug-in (difference \(-1.3\) points, day-block bootstrap interval
-\(-5.8\) to 3.2), and of its down alarms 96.3\% by lower volatility,
-against 88.3\% (\(+8.0\), 2.7 to 13.7). Matched up alarms came a median
-4 to 10 minutes later, and as it recalibrates less often it monitored
-46\% to 49\% of the minutes, against 30\% to 33\%. In 5 of 7031
-segments, all on BTC, \(\tau^2 \le m^{\uparrow}\), so that no increase
-bet could gain, for up to 136 days (post hoc); a guard is proposed, not
-implemented, since it needs its own proof (Supplement S7.6).
+\textbf{The plug-in baseline (applied).} With the plug-in baseline the
+monitor raised 0.66 to 0.71 alarms per day for every coin in both
+periods. Of its increase alarms, 75\% to 84\% were followed by a day
+whose robust volatility over the next 1440 minutes was above the
+calibration baseline, and of its decrease alarms 83\% to 93\% by a day
+below it, against about 50\% at random times with the same delay (pooled
+differences 27 and 38 points in July to December 2025, 95\% intervals 22
+to 33 and 34 to 44); out of sample the shares fell by 1 to 4 points.
 
-\textbf{Forecasts and a rule tuned with hindsight.} The outcome above
-partly measures the persistence of volatility. At each alarm we
-therefore also forecast the robust volatility of the next 1440 minutes,
-from data up to the alarm, with an EWMA (half-life one day) and a HAR
-regression (Corsi 2009) refitted daily, and compared with a ratio rule
-that alarms when the robust volatility of the last 60 or 240 minutes,
-divided by that of the preceding day, crosses thresholds chosen on the
-same data to give the e-detector's numbers of up and down alarms, with
-the same dead time; this hindsight favours the rule. In July to December
-2025 the next day was on the flagged side of the EWMA forecast after
-78.5\% of the plug-in monitor's up alarms and 80.5\% of its down alarms
-(81.4\% and 90.7\% with the confidence-sequence baseline), against
-48.7\% to 51.3\% at random times and 73.9\% to 82.3\% for the ratio
-rules (Table S8). After Holm adjustment every comparison with random
-times or controls holds (Holm \(p \le 0.0016\)), but only 1 of 48
-comparisons with the ratio rule does, in a subgroup noticed after the
-results were seen (band 0.5, out of sample, decrease alarms, Holm
-\(p = 0.0096\)); out of sample the intervals of the differences lie
-within plus or minus 5 points in 7 of 8 cells at band 0.25, but in July
-to December 2025 they reach 9.7 points.
-
-\textbf{Information beyond a strong forecast.} In hourly regressions of
-the log realised variance of the next 1440 minutes on the log of a
-forecast and on indicators of an up and a down alarm in the past hour
-(Supplement S7.4), the alarms of every rule were significant against the
-EWMA and HAR forecasts (Holm \(p \le 0.002\)). Against a HAR that
-includes the last hour's realised variance, the e-detector's increase
-alarms added no significant information (Holm \(p = 0.32\)) and its
-decrease alarms a little (about 6\% lower next-day realised variance,
-Holm \(p = 0.046\)), no more than a 240-minute ratio rule, and scaling
-the forecast at alarms did not lower its out-of-sample QLIKE loss
-(Patton 2011). The alarms say that volatility has just moved, which such
-a forecast mostly knows.
+\textbf{Forecasts.} The outcome above partly measures the persistence of
+volatility, so at each alarm we also forecast the robust volatility of
+the next 1440 minutes (EWMA with a half-life of one day, or HAR; Corsi
+2009). In July to December 2025 the next day was on the flagged side of
+the EWMA forecast after 78.5\% of the plug-in monitor's up alarms and
+80.5\% of its down alarms, against 48.7\% to 51.3\% at random times
+(Holm \(p \le 0.0016\)); ratio rules on the last 60 or 240 minutes,
+tuned with hindsight to the same alarm counts, reached 73.9\% to 82.3\%,
+and only 1 of 48 comparisons with them held after Holm (Table S8;
+Supplement S7.3). In hourly regressions the alarms added little to a HAR
+forecast that includes the last hour's realised variance (Supplement
+S7.4): such a forecast mostly knows that volatility has just moved.
 
 \textbf{Competitors at matched alarm counts.} Against BOCPD and the
 two-window scan of Section 6.2, the e-detector's alarms were confirmed
 more often in 15 of 16 comparisons with windows fixed before the first
-run (Holm \(p \le 0.021\)), but not significantly more often than the
-decrease alarms of competitors with day-long windows, added later. The
-classical rules of Section 6.2, matched in the same way, did as well:
-the calibrated betting rule and both CUSUMs on \(X\) were never
-significantly less precise in 24 comparisons (differences \(-5.0\) to
-\(+3.0\) points), while the training-sample rules were below the
-e-detector in 13 of 16 (6 significant) and the Student \(t\) BOCPD in 20
-of 24 (14 significant; Supplement S7.3). The advantage over BOCPD and
-the scan thus comes from the clipped statistic and the restart design (a
-one-day baseline, recalibrated after each alarm); the e-detector is not
-shown to be more precise than a well-calibrated classical rule on the
-same statistic.
+run (Holm-adjusted \(p \le 0.021\)), but not significantly more often
+than the decrease alarms of competitors with day-long windows, added
+later. Classical rules on the same statistic, matched in the same way,
+did as well: the calibrated betting rule and both CUSUMs on \(X\) were
+never significantly less precise in 24 comparisons (unadjusted p-values;
+Supplement S7.3). The advantage over BOCPD and the scan is thus
+consistent with coming from the clipped statistic and the restart
+design; the e-detector is not shown to be more precise than a
+well-calibrated classical rule.
 
-\hypertarget{scheduled-announcements-and-landmark-shocks}{%
-\subsection{7.3 Scheduled announcements and landmark
-shocks}\label{scheduled-announcements-and-landmark-shocks}}
+\hypertarget{scheduled-announcements}{%
+\subsection{7.3 Scheduled announcements}\label{scheduled-announcements}}
 
 \textbf{FOMC and CPI: the pre-specified primary test.} For BTC, ETH and
-SOL from 21 January 2024 to 31 December 2025, with 16 FOMC statements,
-22 CPI releases and control windows at the same weekday and clock time,
-the primary family (BTC, the streaming monitor, Holm over FOMC and CPI)
-found an increase alarm within six hours after 9 of 16 FOMC statements
-against 14\% of matched controls (Holm \(p = 0.00025\)). The CPI test
-was not significant on BTC (\(p = 0.11\)) but was on ETH and SOL, as
-secondary replications (Holm \(p = 0.0032\) and 0.00015). The monitor
-was recalibrating about 70\% of the time; at the FOMC statements at
-which it was monitoring it alarmed every time, a restriction made after
-the first run (Supplement S7.2).
+SOL in 2024 and 2025, with 16 FOMC statements, 22 CPI releases and
+control windows at the same weekday and clock time, the primary family
+(BTC, the streaming monitor, Holm over FOMC and CPI) found an increase
+alarm within six hours after 9 of 16 FOMC statements against 14\% of
+matched controls (Holm \(p = 0.00025\)). The CPI test was not
+significant on BTC (\(p = 0.11\)) but was on ETH and SOL, as secondary
+replications (Holm \(p = 0.0032\) and 0.00015). The monitor was
+recalibrating about 70\% of the time and alarmed at every FOMC statement
+at which it was monitoring, a restriction made after the first run
+(Supplement S7.2). This test used the plug-in baseline, which has no
+finite-sample guarantee.
 
-\textbf{Landmark shocks: four case studies.} Four shocks fixed before
-any return was examined (the Indian election results of June 2024, the
-global sell-off of August 2024, the tariff sell-off of April 2025 and
-the crypto liquidation cascade of October 2025; Supplement S7.5) are
-case studies, not evidence. The streaming monitor flagged the three
-Nifty shocks 11 to 172 minutes after the open but none of the fifteen
-crypto coin and event pairs within 24 hours, because it had alarmed 4.5
-to 6.9 hours earlier as each episode began and was recalibrating; with a
-fresh calibration it flagged all 18 cases in 15 to 207 minutes, and in
-an exploratory run monitors without a blind period flagged 15 and 17 of
-the 18 within 24 hours (companion note, Section 1).
+\textbf{The rerun with a proved monitor (pre-registered).} Before any of
+its real-data runs we pre-registered the same test with the
+confidence-sequence baseline restarted at every UTC midnight
+(\(\delta = 0.01\), \(A = 36{,}000\), band 0.25), whose false alarm
+probability is at most \(\delta + m/A = 5\%\) on each day of a segment,
+marginally, while the tolerance holds to the end of that day (Corollary
+S14). The primary test passes: an up alarm came within six hours of 8 of
+16 FOMC statements on BTC, against 10.9\% of matched controls (Holm
+\(p = 0.00033\)). The FOMC result also held on ETH and SOL, without the
+restart and with the rank detector of Section 6.5, in every cell after
+Holm. CPI on BTC, a secondary hypothesis, gave 5 of 22 against 5.9\%
+(Holm \(p = 0.0097\)) but is fragile: 3 of 22 without the restart
+(\(p = 0.12\)), and Holm \(p = 0.075\) on ETH and SOL. This monitor
+watched 80 of the 114 coin and release pairs, the plug-in 55. Yet it
+alarmed on 48.1\% to 53.5\% of its monitored days, against the 5\% it
+allows under the tolerance: real one-minute returns break the tolerance
+on most days, so the rerun shows a monitor that carries the guarantee
+finding the releases, not the guarantee at work. The data and the
+plug-in result were known when the rerun was designed (Supplement S7.2).
 
 \hypertarget{other-data-and-what-the-real-data-say-about-the-method}{%
 \subsection{7.4 Other data, and what the real data say about the
 method}\label{other-data-and-what-the-real-data-say-about-the-method}}
 
-On the Nifty 50 index (2,361 sessions from April 2017 to October 2026,
-configuration pre-registered on 2017 to 2021), 78\% of the held-out
-increase alarms and 76\% of the decrease alarms were followed by a
-session on the flagged side of the baseline, against 47\% and 53\% at
-random times (Holm \(p = 0.0008\)). In an event analysis outside that
-configuration, Union Budget sessions were followed by alarms far more
-often than ordinary sessions (9 of 11 against 25\%, Holm \(p = 0.0006\)
-over five event types), and Reserve Bank of India policy days showed no
+On the Nifty 50 index (2,361 sessions from April 2017 to October 2026;
+secondary, with a configuration pre-registered on 2017 to 2021), 78\% of
+the held-out increase alarms and 76\% of the decrease alarms were
+followed by a session on the flagged side of the baseline, against 47\%
+and 53\% at random times (Holm \(p = 0.0008\)). In a secondary event
+analysis, Union Budget sessions were followed by alarms far more often
+than ordinary sessions (9 of 11 against 25\%, Holm \(p = 0.0006\) over
+five event types); Reserve Bank of India policy days showed no
 significant excess (Supplement S7.1).
 
-Two lessons qualify the simulations. Alarm rates on real data, 0.66 to
-0.71 per day on crypto with the plug-in, are far above the budget of
-0.05 false alarms per day of Corollary 6, because within real calm days
-the conditional variance moves (Section 7.1). And a monitor that
-recalibrates for a day after every alarm is blind most of the time when
-alarms come every 1.4 days (about 70\% of the time in the event study);
-in the crypto shocks it was blind when it mattered, which restarts
-without a blind period address (Section 6.5).
+Two lessons qualify the simulations. With the plug-in the coins raised
+2.0 to 2.35 alarms per monitored day (July to December 2025, band 0.25),
+far above the budget of 0.05 false alarms per monitored day of Corollary
+6, because within real calm days the conditional variance moves (Section
+7.1). And a monitor that recalibrates for a day after every alarm is
+blind most of the time when alarms come every 1.4 days (about 70\% of
+the time in the event study); at the four landmark shocks of Supplement
+S7.5, fixed in advance, it was recalibrating at all fifteen crypto
+cases, which restarts without a blind period address (Section 6.5).
 
 \hypertarget{discussion}{%
 \section{8 Discussion}\label{discussion}}
 
 \textbf{What is new and what is not.} The probabilistic tools (Ville's
 inequality, test supermartingales, Shiryaev-Roberts e-detectors,
-empirical Bernstein confidence sequences, the Bahadur-Savage phenomenon,
-Lorden's and Lai's lower bounds) are known, and Theorems 3, 4 and 25 and
-Proposition 10 are known results or direct instances of them. We add
-their combination for jump-robust online volatility monitoring, the
-reading over many days and the daily restart, the drift bound, the
-plug-in regime, the bounded statistic with a speed limit for every valid
-rule, a confidence-sequence baseline with a null that does not depend on
-the algorithm, the decomposition of the delay cost, and evidence that
-includes null streams built from real returns. The real-data case rests
-on the proof and on settings fixed in advance, not on precision.
+empirical Bernstein confidence sequences, conformal p-values, the
+Bahadur-Savage phenomenon, Lorden's and Lai's lower bounds) are known,
+and Theorems 3, 4 and 25 and Proposition 10 are known results or direct
+instances of them. To our knowledge, and subject to the caveat in
+footnote 1, what we add is their combination for jump-robust online
+volatility monitoring, the reading over many days and the daily restart,
+the drift bound, the plug-in regime, the bounded statistic with a speed
+limit for every deterministic valid rule, a confidence-sequence baseline
+with a null that does not depend on the algorithm, the decomposition of
+the delay cost, and null streams built from real returns. The real-data
+case rests on the proof and on settings fixed in advance, not on
+precision.
 
 \textbf{Limitations.}
 
@@ -1413,22 +1425,23 @@ on the proof and on settings fixed in advance, not on precision.
 \tightlist
 \item
   \emph{The null is a statement about conditional means.} Clustering,
-  price-level noise, estimated baselines, errors in the intraday
-  profile, a change of tail shape at constant volatility and a leverage
-  effect all move it without a structural change, and on real calm days
-  it fails within a day. Theorem 9 bounds a small drift; the remedies (a
-  band, forecast-relative monitoring, non-overlapping blocks, the
-  confidence-sequence baseline) cost speed.
+  price-level noise, estimated baselines, errors in the intraday profile
+  (which no experiment isolates), a change of tail shape at constant
+  volatility and a leverage effect all move it without a structural
+  change, and on real calm days it fails within a day. Theorem 9 bounds
+  a small drift; the remedies (a band, forecast-relative monitoring,
+  non-overlapping blocks, the confidence-sequence baseline) cost speed.
 \item
   \emph{Per-period guarantees.} Over many days the plain detector's
   guarantee is an expected count; a bound for every day needs the
   restart of Theorem 8, proved for a known baseline and, marginally, for
-  the confidence-sequence baseline, at a cost in delay.
+  the confidence-sequence baseline (Corollary S14), at a cost in delay.
 \item
-  \emph{Estimated baselines.} The plug-in keeps its level only for
-  horizons short compared with \(\sqrt n\); the confidence-sequence
-  baseline needs long calibration to be fast and can be blind to
-  increases after an unusually quiet start of its window.
+  \emph{Estimated baselines.} The plug-in keeps its level only
+  asymptotically, for horizons \(m = o(\sqrt n)\); the
+  confidence-sequence baseline needs long calibration to be fast, can be
+  blind to increases after an unusually quiet start of its window, and
+  was run only with a quarter of the window fixing \(\tau\).
 \item
   \emph{Speed and precision.} Classical rules on the same statistic,
   calibrated for the law at hand, were as fast for increases, faster for
@@ -1438,24 +1451,27 @@ on the proof and on settings fixed in advance, not on precision.
 \item
   \emph{Delay theory.} It assumes i.i.d. post-change data and a fixed
   baseline; the delay floor covers a change at the first step and is a
-  Monte Carlo estimate; the second-order formula is heuristic; Theorem
-  25 is asymptotic.
+  Monte Carlo estimate; the constant of the second-order expansion is
+  heuristic; Theorem 25 is asymptotic.
 \item
   \emph{Data and benchmarks.} One-minute bars from public mirrors, no
-  tick data and no ground truth; the training-sample rules and the
-  robust BOCPD are of the type of the published procedures, not
-  reproductions, because the original papers could not be read.
+  tick data and no ground truth; apart from the null streams, one
+  confidence-sequence configuration and the rerun of the event test, the
+  real-data analyses use the plug-in baseline, whose level is measured,
+  not proved; the training-sample rules and the robust BOCPD are of the
+  type of the published procedures, not reproductions (footnote 1).
 \end{itemize}
 
 \textbf{Open problems.} (1) A certified threshold for mixtures sharper
 than \(m/A\): the worst stream found reaches about half of the bound at
-one day, and the only proved limit is 0.98 of it. (2) A running
-truncation level and a restart without a blind period that are as fast
-as the plug-in. (3) A narrower baseline, for example from a betting
-confidence sequence. (4) Theory under clustering: a bound for the mean
-of the ratio \(\mathbb{E}[r_t^2/\hat\sigma_t^2]\) that the monitor sees,
-and a principled band. (5) Monitoring the truncated variance and the
-truncated quarticity under one false alarm budget.
+one day, but the best proved bound is barely below \(m/A\) (companion
+note, Section 4). (2) A running truncation level and a restart without a
+blind period that are as fast as the plug-in. (3) A narrower baseline,
+for example from a betting confidence sequence. (4) Theory under
+clustering: a bound for the mean of the ratio
+\(\mathbb{E}[r_t^2/\hat\sigma_t^2]\) that the monitor sees, and a
+principled band. (5) Monitoring the truncated variance and the truncated
+quarticity under one false alarm budget.
 
 \hypertarget{reproducibility}{%
 \section{Reproducibility}\label{reproducibility}}
@@ -1470,6 +1486,8 @@ script traces every number of the paper to a committed source.
 
 \hypertarget{references}{%
 \section{References}\label{references}}
+
+Issue numbers and DOIs are given where we could confirm them.
 
 Adams, R. P. and MacKay, D. J. C. (2007). Bayesian online changepoint
 detection. arXiv:0710.3742.
@@ -1693,6 +1711,10 @@ quickest change detection. arXiv:0911.2551.
 Ville, J. (1939). \emph{Étude critique de la notion de collectif}.
 Thèse, Paris.
 
+Vovk, V., Nouretdinov, I. and Gammerman, A. (2003). Testing
+exchangeability on-line. \emph{Proceedings of the 20th International
+Conference on Machine Learning (ICML 2003)}, 768-775.
+
 Vovk, V., Petej, I., Nouretdinov, I., Ahlberg, E., Carlsson, L. and
 Gammerman, A. (2021). Retrain or not retrain: conformal test martingales
 for change-point detection. \emph{Proceedings of Machine Learning
@@ -1729,9 +1751,11 @@ The supplement holds the proofs of the results of the main text, the
 details of several results that the main text summarises, the settings
 of every experiment and a map from each table and figure to its script
 and result file. Section, table and figure numbers refer to the main
-text unless they start with S. A companion note,
-\texttt{paper/extensions.md}, treats the extensions summarised in
-Section 6.5 and the adversarial search of Section 6.1.
+text unless they start with S. Supplement S1.9 proves the results behind
+the rank detector, the running truncation level and the restarts of
+Section 6.5. A companion note, \texttt{paper/extensions.md}, reports the
+experiments on these extensions, treats the others summarised in Section
+6.5 and the adversarial search of Section 6.1.
 
 \hypertarget{s1.-proofs-and-details-for-sections-2-and-3}{%
 \subsection{S1. Proofs and details for Sections 2 and
@@ -1755,8 +1779,12 @@ convergence as \(n \to \infty\) give \(A\,\mathbb{E}[N_m] - m \le 0\).
 monitor raised 26.5 alarms per 10,000 monitored steps against the bound
 of 33.3; with the confidence-sequence baseline and \(A = 36{,}000\) it
 raised 0.000 (Gaussian) and 0.001 (Student \(t_3\)) false alarms per
-1440-step day in 30-day streams, against a bound of 0.041. Corollary 6
-itself was not checked at an operating level.
+1440-step day in 30-day streams, against a bound of 0.041. At operating
+levels with a known baseline, the monitor restarted after every alarm
+raised 0.037 to 0.048 false alarms per day over 20 days at \(A = 7800\)
+and \(28{,}800\) (Supplement S1.7), and 0.040 per monitored day on null
+streams built from real returns (Supplement S7.6), against the 0.05 of
+Corollary 6.
 
 \hypertarget{s1.2-theorem-9-proof-design-numbers-and-sharpness}{%
 \subsubsection{S1.2 Theorem 9: proof, design numbers and
@@ -2052,20 +2080,20 @@ let \(Q_s\) be the law just described for \(y_s\), and
 \(Q_s = \delta_1\) for \(s > n\); let \(P_y\) make \(Y_1, Y_2, \dots\)
 independent with laws \(Q_1, Q_2, \dots\). Each conditional mean is that
 of \(Q_s\), so \(P_y\) is in the null, and
-\(P_y(Y_{1:n} = y_{1:n}) = \prod_{s \le n}\pi(y_s) = 1/W_n(y) > 0\). (a)
-The event \(\lbrace T \le n\rbrace\) is a set of values of \(Y_{1:n}\);
-if it contains \(y_{1:n}\), then \(n/A \ge P_y(T \le n) \ge 1/W_n(y)\).
-(b) If \(T = T(Y, U)\) with \(U\) uniform and independent of the data,
-Fubini's theorem gives
-\(n/A \ge P_y(T \le n) \ge \mathbb{P}_U(T(y, U) \le n)/W_n(y)\). (c) For
-any law \(P\) in the null and
+\(P_y(Y_{1:n} = y_{1:n}) = \prod_{s \le n}\pi(y_s) = 1/\Pi_n(y) > 0\).
+(a) The event \(\lbrace T \le n\rbrace\) is a set of values of
+\(Y_{1:n}\); if it contains \(y_{1:n}\), then
+\(n/A \ge P_y(T \le n) \ge 1/\Pi_n(y)\). (b) If \(T = T(Y, U)\) with
+\(U\) uniform and independent of the data, Fubini's theorem gives
+\(n/A \ge P_y(T \le n) \ge \mathbb{P}_U(T(y, U) \le n)/\Pi_n(y)\). (c)
+For any law \(P\) in the null and
 \(E_s = \lbrace Y_{1:s} = y_{1:s}\rbrace\), the conditional law of
 \(Y_s\) given \(E_{s-1}\), when \(P(E_{s-1}) > 0\), has its mean on the
 null side, so \(P(Y_s = y_s \mid E_{s-1}) \le \pi(y_s)\) and
-\(P(E_n) \le 1/W_n(y)\). The rule ``stop at \(n\) if
+\(P(E_n) \le 1/\Pi_n(y)\). The rule ``stop at \(n\) if
 \(Y_{1:n} = y_{1:n}\), otherwise never'' therefore has
 \(\mathbb{P}(T \le k) = 0\) for \(k < n\) and
-\(\mathbb{P}(T \le k) \le 1/W_n(y) \le n/A \le k/A\) for \(k \ge n\).
+\(\mathbb{P}(T \le k) \le 1/\Pi_n(y) \le n/A \le k/A\) for \(k \ge n\).
 
 If the null is stated for the returns, the two-point laws can be placed
 on \(\lbrace r_s, \tau\rbrace\) (decrease) or \(\lbrace r_s, 0\rbrace\)
@@ -2074,17 +2102,17 @@ see \(r_t\), and for rules that use other information whose law the null
 leaves free. The proof uses independent laws that are not identically
 distributed. If validity were required only over i.i.d. null laws, the
 floor would be the largest i.i.d. null probability of the path, which is
-never larger than \(1/W_n(y)\) and equals it on paths with one repeated
-value, such as the collapse. \(\square\)
+never larger than \(1/\Pi_n(y)\) and equals it on paths with one
+repeated value, such as the collapse. \(\square\)
 
 \emph{Proof of Corollary 13.} (a) The decrease null on \([0, \infty)\)
 contains the decrease null on \([0, B']\) for every
 \(B' > \max_{s \le n} y_s\), and \((B'-1)/(B'-y) \to 1\) as
-\(B' \to \infty\), so \(W_n(y)\) can be made as close to 1 as we like,
+\(B' \to \infty\), so \(\Pi_n(y)\) can be made as close to 1 as we like,
 and Theorem 12(a) needs \(1 \ge A/n\), that is \(n \ge A\); by Theorem
 12(b) a randomised valid rule alarms by step \(n\) with probability at
 most \(n/A\) times a factor that can be made as close to 1 as we like.
-(b) On the collapse \(W_n = (B/(B-1))^n\). \(\square\)
+(b) On the collapse \(\Pi_n = (B/(B-1))^n\). \(\square\)
 
 \emph{Numbers.} With Gaussian truncation the collapse floor for every
 deterministic valid rule is 23, 33, 45, 73 and 106 steps at
@@ -2095,20 +2123,38 @@ grid (63.6 and 79 at \(2A\) for \(c = 3\)). On the collapse a single bet
 just below \(\lambda_{\max}\) gives \(M_n \le B(F^n - 1)\) with
 \(F = B/(B-1)\), so no Shiryaev-Roberts e-detector whose bets are valid
 over the whole null can alarm before
-\(n = \log(1 + A/B)/\log(B/(B-1))\). On a complete explosion,
-\(y_s = B\) for every \(s\), the floor for the increase side is 4 steps
-at \(c = 3\), against 5 for the e-detectors and 7 for the default grid.
-A rule valid at one horizon only, with
-\(\mathbb{P}(T \le 390) \le 0.05\), could alarm on the collapse after 26
-steps at \(c = 3\), so controlling every \(n\) at once costs 19 steps on
-this path. For randomised rules, the largest probability of an alarm by
-step \(n\) on the collapse is \(\min(1, nW_n/A)\): 0.13 at \(n = 30\),
-0.56 at 40, 0.85 at 43 and 0.98 at 44, and a linear programme over such
-rules gives a smallest mean delay of 43.4 steps. Corollary 13 does not
-mean that a practical rule detects collapses after 45 steps from any
-starting point: a rule that tests disjoint blocks of 45 steps for
-all-zero returns is valid, but finds a collapse that starts inside a
-block only at the end of the next block.
+\(n = \log(1 + A/B)/\log(B/(B-1))\). A deterministic valid rule needs
+only \(\Pi_n = (B/(B-1))^n \ge A/n\) (Theorem 12(a)), while the
+e-detector needs \((B/(B-1))^n \ge 1 + A/B\). The two thresholds differ
+by the factor \((1 + A/B)\,n/A\), which is about \(n/B\) because \(A/B\)
+is large, and this factor accounts for the gap between 45 and 57.7 steps
+at \(c = 3\): the e-detector must keep \(\mathbb{E}M_n \le n\) under
+every null law at once, while a valid rule may spend its whole budget
+\(n/A\) on one path. On a complete explosion, \(y_s = B\) for every
+\(s\), the floor for the increase side is 4 steps at \(c = 3\), against
+5 for the e-detectors and 7 for the default grid. A rule valid at one
+horizon only, with \(\mathbb{P}(T \le 390) \le 0.05\), could alarm on
+the collapse after 26 steps at \(c = 3\), so controlling every \(n\) at
+once costs 19 steps on this path. For randomised rules, the largest
+probability of an alarm by step \(n\) on the collapse is
+\(\min(1, n\Pi_n/A)\): 0.13 at \(n = 30\), 0.56 at 40, 0.85 at 43 and
+0.98 at 44. Summing \(1 - \min(1, n\Pi_n/A)\) over \(n\) bounds the mean
+delay of such a rule on the collapse from below by only 37.8, because
+each cap spends the whole budget \(n/A\) at its own \(n\), while a valid
+rule must respect every \(n\) at once. Let \(p_k\) be the probability
+that the rule stops at step \(k\) on the collapse path, with
+\(\sum_k p_k = 1\). Under the i.i.d. law with mass \((B-1)/B\) at 0 and
+\(1/B\) at \(B\), which has mean 1 and lies in the decrease and the
+two-sided null, the collapse path up to step \(k\) has probability
+\(((B-1)/B)^k\), so validity requires
+\(\sum_{k \le n} p_k((B-1)/B)^k \le n/A\) for every \(n\); by the
+argument of Theorem 12(c) these constraints also suffice for a rule that
+stops only on the collapse path. The smallest mean delay
+\(\sum_k k\,p_k\) under them, a linear programme, is 43.39 steps.
+Corollary 13 does not mean that a practical rule detects collapses after
+45 steps from any starting point: a rule that tests disjoint blocks of
+45 steps for all-zero returns is valid, but finds a collapse that starts
+inside a block only at the end of the next block.
 
 \hypertarget{s1.7-later-days-proposition-7-theorem-8-the-delay-of-the-restart-and-the-cusum-statistic}{%
 \subsubsection{S1.7 Later days: Proposition 7, Theorem 8, the delay of
@@ -2129,40 +2175,77 @@ because \(m_0 \le \tau^2\), so \(Y_t = 1\), every factor equals 1, and
 each recursion gives \(M_t = M_{t-1} + 1 = t\). \(\square\)
 
 \textbf{Proof of Theorem 8.} The baseline is known, so Lemma 2 holds at
-every step. At \(b_i\) each side's average is at most \(\kappa\), so
-\(\bar M_{b_i} \le \kappa\). Until the first alarm in the period the
+every step. At \(b_i\) each side's average is at most \(\iota\), so
+\(\bar M_{b_i} \le \iota\). Until the first alarm in the period the
 statistics with and without restarts after alarms coincide, so it
 suffices to bound the chance that the statistic without such restarts
 reaches \(A\) in the period. For \(b_i \le t \le b_i + m\) put
 \(S_t = \bar M_t + (b_i + m - t)\); as in the proof of Proposition 7,
 \(S\) is a nonnegative supermartingale given \(\mathcal{F}_{b_i}\) with
-\(S_{b_i} \le \kappa + m\), and Ville's inequality gives the first
-claim, since the period ends at \(b_{i+1} \le b_i + m\). For the second,
-let \(W_t\) be the sum of \(\bar M\) at the alarms in \((b_i, t]\), plus
-the current \(\bar M_t\), minus \(t - b_i\). As in Supplement S1.1,
-\(W\) is a supermartingale with \(W_{b_i} = \bar M_{b_i} \le \kappa\),
-and each alarm adds at least \(A\), so optional stopping at the bounded
-time \(b_{i+1}\) gives
-\(A\,\mathbb{E}[N_i \mid \mathcal{F}_{b_i}] - m \le \kappa\), where
+\(S_{b_i} \le \iota + m\), and Ville's inequality gives the first claim,
+since the period ends at \(b_{i+1} \le b_i + m\). For the second, let
+\(W_t\) be the sum of \(\bar M\) at the alarms in \((b_i, t]\), plus the
+current \(\bar M_t\), minus \(t - b_i\). As in Supplement S1.1, \(W\) is
+a supermartingale with \(W_{b_i} = \bar M_{b_i} \le \iota\), and each
+alarm adds at least \(A\), so optional stopping at the bounded time
+\(b_{i+1}\) gives
+\(A\,\mathbb{E}[N_i \mid \mathcal{F}_{b_i}] - m \le \iota\), where
 \(N_i\) is the number of alarms in the period. \(\square\)
 
-A window of \(m\) steps that starts at a time \(s\) and meets one
-boundary has at most \((2m + \kappa)/A\): apply Proposition 7 from
-\(s\), with \(\mathbb{E}[\bar M_s] \le \kappa + m\) because \(s\) lies
-at most \(m\) steps after the last boundary; a restart inside the window
-only lowers the statistic.
+\textbf{A window across a boundary.} Let a window \((s, s + m]\) start
+in day \(i\), that is \(b_i \le s \le b_i + m - 1\), an event known at
+\(b_i\). Let \(\tilde M\) be the statistic that continues from
+\(\bar M_{b_i}\) with no restart after \(b_i\). Every recursion is
+nondecreasing in its previous value and every statistic is nonnegative,
+so a restart only lowers the statistic, \(\bar M_t \le \tilde M_t\) for
+\(t \ge b_i\), and an alarm in the window needs \(\tilde M_t \ge A\)
+there. Ville's inequality as in the proof of Proposition 7, applied from
+\(s\), gives
+\(\mathbb{P}(\tilde M_t \ge A \text{ for some } t \in (s, s + m] \mid \mathcal{F}_s) \le (\tilde M_s + m)/A\),
+and Lemma 2 from \(b_i\) gives
+\(\mathbb{E}[\tilde M_s \mid \mathcal{F}_{b_i}] \le \bar M_{b_i} + s - b_i \le \iota + s - b_i\).
+Hence, given \(\mathcal{F}_{b_i}\) and so also unconditionally, an alarm
+in the window has probability at most
+\((\iota + m + s - b_i)/A \le (2m + \iota - 1)/A\). Given
+\(\mathcal{F}_s\) no such bound holds, since the statistic at \(s\) may
+already be close to \(A\).
 
-\textbf{Estimated baselines.} Theorem 8 needs a known baseline. With the
-confidence-sequence baseline of Theorem 16 and restarts at the day
-boundaries of a segment, Step 3 of the proof of Theorem 16, started at a
-boundary on the event that the bounds hold, gives at most
-\(\delta + m/A\) for an alarm on each day of the segment, provided the
-tolerance condition holds to the end of that day. This bound is
-marginal: given the observed past, the same argument gives only the
-conditional probability that the bounds failed plus \(m/A\). With the
-plug-in baseline nothing per day is proved. The simulations of this
-section use a known baseline, and the accompanying package offers the
-restart with a known baseline.
+\textbf{Corollary S14 (day restarts with the confidence-sequence
+baseline).} Take one segment of the monitor of Section 4.2: calibration
+ends at \(T_0\), \(\Omega_G\) is the event that both bounds hold at
+\(T_0\) (proof of Theorem 16, Supplement S2), so that
+\(\mathbb{P}(\Omega_G^c) \le \delta\), and both statistics start at 0 at
+\(b_0 = T_0\) and are scaled down at each later boundary, as in Theorem
+8, so that each side's average is at most \(\iota\); the boundaries
+\(b_0 < b_1 < \dots\) are stopping times with \(b_{i+1} - b_i \le m\).
+If the two inequalities of the tolerance condition hold at every \(t\)
+with \(T_0 < t \le b_{i+1}\), then \[
+\mathbb{P}(\text{an alarm in } (b_i, b_{i+1}] \mid \mathcal{F}_{b_i}) \le 1_{\Omega_G^c} + 1_{\Omega_G}\,\frac{m + \iota}{A}, \qquad \mathbb{P}(\text{an alarm in } (b_i, b_{i+1}]) \le \delta + \frac{m + \iota}{A}.
+\]
+
+\emph{Proof.}
+\(\Omega_G \in \mathcal{F}_{T_0} \subseteq \mathcal{F}_{b_i}\). On
+\(\Omega_G\), Step 2 of the proof of Theorem 16, which uses the
+tolerance condition only at the step at hand, gives
+\(\mathbb{E}[\bar M_t \mid \mathcal{F}_{t-1}] \le \bar M_{t-1} + 1\) for
+\(b_i < t \le b_{i+1}\). So
+\(S_t = 1_{\Omega_G}(\bar M_t + b_i + m - t)\),
+\(b_i \le t \le b_{i+1}\), is a nonnegative supermartingale given
+\(\mathcal{F}_{b_i}\) with \(S_{b_i} \le 1_{\Omega_G}(\iota + m)\), and
+Ville's inequality gives
+\(\mathbb{P}(\Omega_G \cap \lbrace \text{an alarm in } (b_i, b_{i+1}]\rbrace \mid \mathcal{F}_{b_i}) \le 1_{\Omega_G}(m + \iota)/A\).
+Add \(1_{\Omega_G^c}\) and take expectations. \(\square\)
+
+The bound is marginal. \(\Omega_G\) is not observed, so given the
+observed past (for example, given no alarm so far) the probability of an
+alarm in a day is bounded only by
+\(\mathbb{P}(\Omega_G^c \mid \text{past}) + (m + \iota)/A\), which can
+exceed \(\delta + (m + \iota)/A\). The tolerance must hold up to the end
+of the day, not only for the first \(m\) steps after \(T_0\) as in part
+1 of Theorem 16, and the statement is per segment: after an alarm the
+monitor recalibrates, and the next segment has its own \(\Omega_G\).
+With the plug-in baseline nothing per day is proved. The simulations of
+this section use a known baseline.
 
 \textbf{The delay of the restart.} Let the returns after a change at
 step \(\nu\) be i.i.d. with some post-change law and independent of the
@@ -2197,8 +2280,8 @@ counted from that boundary is
 The restart thus costs little when a change is usually detected within a
 day from a fresh start and does not fall in the last steps of a day, and
 it loses changes whose detection from a fresh start needs more than a
-day. A carry \(\kappa\) keeps part of the evidence across the boundary
-at the price of \((m + \kappa)/A\).
+day. A carry \(\iota\) keeps part of the evidence across the boundary at
+the price of \((m + \iota)/A\).
 
 \textbf{The CUSUM-type statistic.} For bet \(k\) let
 \(C_{k,t} = f_{k,t}\max(C_{k,t-1}, 1) = \max_{j \le t}\prod_{i=j}^{t} f_{k,i}\),
@@ -2209,9 +2292,9 @@ null exchangeable if, in addition, the law of \((Y_1, \dots, Y_s)\) is
 invariant under permutations for every \(s\); i.i.d. returns are the
 main example.
 
-\textbf{Theorem S7 (window bound for the CUSUM statistic).} Assume an
-exchangeable null and fixed bets, and let \(s \ge 0\) and \(m \ge 1\).
-(a) For one bet at level \(A\),
+\textbf{Theorem S7 (window bound for the CUSUM statistic).} Assume a
+known baseline, an exchangeable null and fixed bets, and let \(s \ge 0\)
+and \(m \ge 1\). (a) For one bet at level \(A\),
 \(\mathbb{P}(C_t \ge A \text{ for some } t \in (s, s + m]) \le m/A\).
 (b) For one side averaging its bets at level \(A\),
 \(\mathbb{P}(\sum_k w_k C_{k,t} \ge A \text{ for some } t \in (s, s + m]) \le (m + \log A + H(w))/A\).
@@ -2261,40 +2344,58 @@ the window the probability can be far larger (from a state just below
 the threshold, the next step alarms with probability about
 \(\mathbb{P}(Y > 1)\), 32\% for i.i.d. Gaussian returns), and given the
 past only the conditional bound in the proof of (b), which is Lemma 2 at
-work, remains. In the terms of Lai (1998), Theorem 8 gives, with a known
-baseline, the window-limited criterion given the past for windows
-aligned with the days over the whole null, and Theorem S7 an
-unconditional version for every window over exchangeable nulls.
+work, remains. In the terms of Lai (1998; footnote 1 of the main text),
+Theorem 8 gives, with a known baseline, the window-limited criterion
+given the past for windows aligned with the days over the whole null,
+and Theorem S7 an unconditional version for every window over
+exchangeable nulls.
 
 \textbf{Proposition S8 (no window bound under martingale differences).}
 Fix the bets and \(A\). For every \(s\) there is a null stream with
 \(\mathbb{E}[Y_t \mid \mathcal{F}_{t-1}] = 1\) and \(Y_t \in [0, B]\) at
 every step under which the two-sided CUSUM-type rule has no alarm up to
 \(s\) and an alarm at \(s + 1\) with probability at least
-\(\mathbb{P}(\rho \le s)/B\), where \(\rho\) is a stopping time, finite
+\(\mathbb{P}(T_h \le s)/B\), where \(T_h\) is a stopping time, finite
 almost surely, that does not depend on \(s\). Hence, for every
 \(m \ge 1\) and every \(A\), the largest probability over the null of an
 alarm in \((s, s + m]\), given none before, is at least \((1 - o(1))/B\)
 as \(s \to \infty\), while the bound of Theorem S7 tends to 0 as \(A\)
 grows.
 
-\emph{Proof.} \emph{Hunt:} draw \(Y_t\) from \(\lbrace 0, B\rbrace\)
-with \(\mathbb{P}(Y_t = B) = 1/B\), independently, until the first time
-\(\rho\) at which one draw could take a side to \(2A\). \emph{Park:}
-from \(\rho + 1\) to \(s\) play \(Y_t = 1\). \emph{Strike:} at \(s + 1\)
-draw from \(\lbrace 0, B\rbrace\) again. Every draw has conditional mean
-1 and lies in \([0, B]\) (returns 0, \(\pm\sqrt{m_0}\) or of absolute
-value at least \(\tau\)). Before \(\rho\) no value of \(Y\) in
-\([0, B]\) takes a side to \(2A\), because the increase statistics are
-nondecreasing in \(Y\) and the decrease statistics nonincreasing;
-\(Y = 1\) replaces each \(C\) by \(\max(C, 1)\) and then leaves it
-unchanged, so there is no alarm while parked. \(\rho\) is finite almost
-surely, because a run of \(B\)'s of a length that depends only on \(A\)
-and the bets takes the increase side to \(2A\), and such runs occur
-almost surely. If the increase side parked, the draw \(B\), with
-probability \(1/B\), raises an alarm at \(s + 1\); if the decrease side
-parked, the draw 0, with probability \(1 - 1/B \ge 1/B\), does.
-\(\square\)
+\emph{Proof.} Write
+\(\bar U^{\uparrow}_t(y) = \sum_k w_k f_k(y)\max(C_{k,t}, 1)\) for the
+increase side's average at \(t + 1\) if \(Y_{t+1} = y\), and
+\(\bar U^{\downarrow}_t(y)\) for the decrease side's, with weights
+\(v\); the first is nondecreasing and the second nonincreasing in \(y\).
+Let \(Y'_1, Y'_2, \dots\) be i.i.d. on \(\lbrace 0, B\rbrace\) with
+\(\mathbb{P}(Y'_t = B) = 1/B\), and let \(T_h\) be the first \(t \ge 0\)
+at which, on the stream \(Y'\), \(\bar U^{\uparrow}_t(B) \ge 2A\) or
+\(\bar U^{\downarrow}_t(0) \ge 2A\): the first time at which one draw
+could take a side to \(2A\). \emph{Hunt:} \(Y_t = Y'_t\) for
+\(t \le \min(T_h, s)\). \emph{Park:} \(Y_t = 1\) for \(T_h < t \le s\).
+\emph{Strike:} if \(T_h \le s\), draw \(Y_{s+1}\) from
+\(\lbrace 0, B\rbrace\) as before; what follows does not matter. Every
+draw has conditional mean 1 and lies in \([0, B]\) (returns 0,
+\(\pm\sqrt{m_0}\) or of absolute value at least \(\tau\)). No alarm
+comes during the hunt: at each \(t \le \min(T_h, s)\) we have
+\(t - 1 < T_h\), so \(\bar U^{\uparrow}_{t-1}(B)\) and
+\(\bar U^{\downarrow}_{t-1}(0)\) are below \(2A\), and by monotonicity
+the actual draw keeps both sides below \(2A\). None comes while parked
+either: \(Y = 1\) replaces each \(C\) by \(\max(C, 1)\) and then leaves
+it unchanged, and on the increase side \(f_k(B) \ge 1\) gives
+\(\max(C_{k,T_h}, 1) \le f_k(B)\max(C_{k,T_h - 1}, 1)\), so the parked
+average \(\sum_k w_k\max(C_{k,T_h}, 1)\) is at most
+\(\bar U^{\uparrow}_{T_h - 1}(B) < 2A\) (and equals 1 if \(T_h = 0\));
+the decrease side is the same with \(f_l(0) \ge 1\). At \(s + 1\) each
+statistic is \(f(Y_{s+1})\max(C_{T_h}, 1)\), the value that the same
+draw would have given at \(T_h + 1\). So if
+\(\bar U^{\uparrow}_{T_h}(B) \ge 2A\), the draw \(B\), with probability
+\(1/B\), raises an alarm at \(s + 1\); otherwise
+\(\bar U^{\downarrow}_{T_h}(0) \ge 2A\), and the draw 0, with
+probability \(1 - 1/B \ge 1/B\), does. \(T_h\) is defined on \(Y'\), so
+it does not depend on \(s\), and it is finite almost surely, because a
+run of \(B\)'s whose length depends only on \(A\) and the bets takes the
+increase side to \(2A\), and such runs occur almost surely. \(\square\)
 
 The conditional window bound in the proof of Theorem S7(b) still holds
 under martingale differences, and it predicts the strike: at a parked
@@ -2321,32 +2422,37 @@ had a false alarm with probability 11.33\%, 28.02\% and 65.07\% for
 \(d\) = 5, 10 and 20 with 390-step days and 15.13\%, 34.30\% and 70.82\%
 with 1440-step days (a second run of day 10 gave 28.16\% and 34.03\%);
 with a two-point day on \(\lbrace 0, B\rbrace\) instead of a Gaussian
-one the plain detector reached 70.09\% (390) and 73.16\% (1440) on day
-20. The largest single-day probabilities found, 35.7\% against
-\(dm/A = 50\%\) on day 10 and 73.2\% against 100\% on day 20, stay well
-below \(dm/A\); Proposition 7 shows only that no bound below 1 holds for
-all days. The restarted detector repeated its first day on every day
-(0.87\% to 1.03\% for Gaussian returns with 390-step days); on any day
-of any stream its false alarm probability was at most 2.66\% (390) and
-3.52\% (1440), and its hazard at most 2.75\% and 3.52\%, all for bold
-play. The CUSUM-type rule stayed at or below 0.18\% on every day for
-i.i.d. returns and 0.40\% for bold play, far below its bound. The
-parking stream against the CUSUM-type rule passed the i.i.d. bound only
-on day 17 with 390-step days (5.43\% against 5.146\%) and on day 16 with
+one the plain detector reached 31.29\% (390) and 35.7\% (1440) on day 10
+and 70.09\% (390) and 73.16\% (1440) on day 20. The largest single-day
+probabilities found, 35.7\% on day 10 and 73.2\% on day 20, both for a
+two-point day with 1440-step days, stay well below \(dm/A\) (50\% and
+100\%); Proposition 7 shows only that no bound below 1 holds for all
+days. The restarted detector repeated its first day on every day (0.87\%
+to 1.03\% for Gaussian returns with 390-step days); on any day of any
+stream its false alarm probability was at most 2.66\% (390) and 3.52\%
+(1440), and its hazard at most 2.75\% and 3.52\%, all for bold play. The
+CUSUM-type rule stayed at or below 0.18\% on every day for i.i.d.
+returns and 0.40\% for bold play, far below its bound. The parking
+stream against the CUSUM-type rule passed the i.i.d. bound only on day
+17 with 390-step days (5.43\% against 5.146\%) and on day 16 with
 1440-step days (5.30\% against 5.044\%), and reached 6.16\% and 6.44\%
 on day 20, 7.3 and 9.8 standard errors above the bounds; scaled down to
 days of 20 steps with \(A = 400\), where the i.i.d. bound is 7.1\%, it
 reached 27.0\% by day 120. In the delay comparison (20,000 paths per
 cell, changes at a uniformly random step of day 3, horizon 12 days) the
-CUSUM-type rule at its certified level was 1.30 to 1.83 times slower
-than the plain detector with 390-step days and 1.24 to 1.66 times with
-1440-step days, and a carry of \(m\) at level \(2A\) helped the
-restarted detector a little for decreases with 390-step days and cost a
-little elsewhere. The restarted detector's mean delay was below the
-bound of Proposition S6 in every cell; that comparison was chosen after
-the delays had been seen. Part of the plain detector's speed comes from
-the statistic it builds up under the null, which is also what raises its
-false alarm probability on later days.
+plain detector raised a false alarm before the change on 4.6\% to 4.9\%
+of paths with 390-step days and 6.6\% to 7.0\% with 1440-step days, and
+the restarted detector on 2.1\% to 2.4\% and 4.4\% to 4.7\%, so the
+delays are not compared at equal false alarm rates. The CUSUM-type rule
+at its certified level was 1.30 to 1.83 times slower than the plain
+detector with 390-step days and 1.24 to 1.66 times with 1440-step days,
+and a carry of \(m\) at level \(2A\) helped the restarted detector a
+little for decreases with 390-step days and cost a little elsewhere. The
+restarted detector's mean delay was below the bound of Proposition S6 in
+every cell; that comparison was chosen after the delays had been seen.
+Part of the plain detector's speed comes from the statistic it builds up
+under the null, which is also what raises its false alarm probability on
+later days.
 
 \hypertarget{s1.8-the-statistic-fourth-powers-and-zero-returns}{%
 \subsubsection{S1.8 The statistic: fourth powers and zero
@@ -2359,6 +2465,239 @@ window's returns are exactly zero, \(\hat s = 0\); the monitor then
 extends the window, up to twice its length, and if that does not help it
 uses the scaled median of the nonzero absolute returns. The rule uses
 past data only, so \(\tau\) stays predictable and positive.
+
+\hypertarget{s1.9-the-rank-detector-a-running-truncation-level-and-restarts-without-a-blind-period}{%
+\subsubsection{S1.9 The rank detector, a running truncation level and
+restarts without a blind
+period}\label{s1.9-the-rank-detector-a-running-truncation-level-and-restarts-without-a-blind-period}}
+
+The results of this section are the proofs behind Section 6.5 and the
+companion note. They assume more than the conditional-mean null of
+Section 2: exchangeable or i.i.d. returns.
+
+\textbf{The rank detector.} Let \(a_t = \lvert r_t\rvert\) and let
+\(\theta_1, \theta_2, \dots\) be i.i.d. uniform on \([0, 1]\) and
+independent of the returns. The smoothed conformal p-value of step \(t\)
+is \[
+p_t = \frac{\#\lbrace i \le t : a_i > a_t\rbrace + \theta_t\,\#\lbrace i \le t : a_i = a_t\rbrace}{t},
+\] where the second count includes \(i = t\); a small \(p_t\) means that
+\(\lvert r_t\rvert\) is large compared with all earlier absolute
+returns, and ties, such as zero returns, are split at random. Let
+\(\mathcal{G}_t = \sigma(p_1, \dots, p_t)\). A betting function is a
+measurable \(f: [0, 1] \to [0, \infty)\) with \(\int_0^1 f(u)\,du = 1\).
+The rank detector chooses betting functions \(f_t\) that are predictable
+in \(\mathcal{G}\) (fixed functions are the simplest case), runs
+\(M_t = f_t(p_t)(M_{t-1} + 1)\) from \(M_W = 0\) after a warm-up of
+\(W \ge 0\) steps whose returns only enter the reference set, averages
+several betting functions on each side and alarms when either side
+reaches \(2A\). The default increase bets are the densities of \(p_t\)
+when the new return is a normal draw scaled by 1.25, 1.5 or 2 relative
+to a normal reference law, and the decrease bets the same for 0.8, 0.67
+or 0.5, each clipped at the p-value of a return of 3 standard deviations
+and renormalised to integrate to 1, with the decrease bets putting
+weight 0.95 on this density and the rest on the uniform one; normality
+only tunes the bets and is not used for validity. A band \(b\) divides
+each payoff by \(1 + b\).
+
+\textbf{Proposition S15 (Vovk, Nouretdinov and Gammerman 2003).} If
+\(r_1, \dots, r_N\) (\(N \le \infty\)) is exchangeable, then
+\(p_1, \dots, p_N\) are independent and uniform on \([0, 1]\).
+
+\emph{Proof.} Fix \(n \le N\). For \(t \le n\) let \(\mathcal{B}_t\) be
+the bag (multiset) of \(a_1, \dots, a_t\) and
+\(\mathcal{H}_t = \sigma(\mathcal{B}_t, a_{t+1}, \dots, a_n, \theta_{t+1}, \dots, \theta_n)\).
+Then \(\mathcal{H}_1 \supseteq \dots \supseteq \mathcal{H}_n\), since
+\(\mathcal{B}_t\) and \(a_{t+1}\) give \(\mathcal{B}_{t+1}\); each
+\(p_s\) with \(s > t\) is a function of \(\mathcal{B}_s\), \(a_s\) and
+\(\theta_s\), so it is \(\mathcal{H}_t\)-measurable; and given
+\(\mathcal{H}_t\), by exchangeability \(a_t\) is a uniformly random
+element of the bag \(\mathcal{B}_t\), while \(\theta_t\) is uniform and
+independent of it. If the bag has distinct values \(v_1 > v_2 > \dots\)
+with multiplicities \(k_1, k_2, \dots\) and \(a_t = v_j\), which has
+conditional probability \(k_j/t\), then
+\(p_t = (k_1 + \dots + k_{j-1} + \theta_t k_j)/t\) is uniform on the
+\(j\)-th of consecutive intervals of lengths \(k_j/t\) that tile
+\([0, 1]\). So \(p_t\) is uniform given \(\mathcal{H}_t\), hence
+independent of \(\mathcal{H}_t\) and of \(p_{t+1}, \dots, p_n\), and
+\(\mathbb{P}(p_1 \le u_1, \dots, p_n \le u_n) = u_1\,\mathbb{P}(p_2 \le u_2, \dots, p_n \le u_n)\);
+induction gives \(\prod_{t \le n} u_t\). \(\square\)
+
+The p-values are independent of each other, not of the raw past: given
+\(r_1, \dots, r_{t-1}\), \(p_t\) is the rank of a new draw against a
+fixed sample, which is not uniform. The martingale property therefore
+holds in \(\mathcal{G}\), and the bets may use past p-values only.
+
+\textbf{Theorem S16 (validity of the rank detector).} (a) If the returns
+are exchangeable, then for every warm-up \(W\) and every predictable
+choice of betting functions, \(M_t - (t - W)\), \(t \ge W\), is a
+\(\mathcal{G}\)-martingale. Hence Theorems 3 and 4 hold for the rank
+detector, one side at level \(A\) or the two-sided rule with each side
+at \(2A\): an alarm within \(m\) steps of \(W\) has probability at most
+\(m/A\), and the expected time to the first alarm is at least \(A\),
+with no baseline, no truncation level and no failure probability. With a
+band \(b > 0\) the statistic minus \(t - W\) is a supermartingale and
+both bounds still hold. (b) Suppose that the detector restarts after
+every alarm with an empty reference set and bets from the next return,
+and that, given the returns and tie-breakers up to each alarm, the later
+returns are exchangeable. Then the bounds of (a) hold for every segment,
+and the number \(N_m\) of alarms within the first \(m\) steps satisfies
+\(\mathbb{E}[N_m] \le m/A\). The condition holds for i.i.d. returns and
+for every infinite exchangeable sequence.
+
+\emph{Proof.} (a) By Proposition S15, \(p_t\) is uniform and independent
+of \(\mathcal{G}_{t-1}\), so
+\(\mathbb{E}[f_t(p_t) \mid \mathcal{G}_{t-1}] = \int_0^1 f_t = 1\) and
+\(\mathbb{E}[M_t \mid \mathcal{G}_{t-1}] = M_{t-1} + 1\): this is Lemma
+2 in the filtration \(\mathcal{G}\), and the alarm time is a
+\(\mathcal{G}\)-stopping time, so the proofs of Theorems 3 and 4 and of
+Proposition 5 apply. A band multiplies the conditional mean of each
+factor by \(1/(1 + b) < 1\). (b) Let \(q_t\) be the p-value that the
+restarted detector uses at step \(t\), computed within the current
+segment. It suffices to show that \(q_1, q_2, \dots\) are i.i.d.
+uniform: the detector is then the detector of (a) driven by the \(q_t\),
+and the argument of Supplement S1.1 in the filtration of the \(q_t\)
+gives \(\mathbb{E}[N_m] \le m/A\). Up to the first alarm \(T_1\),
+\(q_t = p_t\), and whether \(T_1 \ge t\) is fixed by
+\(q_1, \dots, q_{t-1}\), so on that event \(q_t\) is uniform and
+independent of \(q_1, \dots, q_{t-1}\) by Proposition S15. Given
+\(\mathcal{F}_{T_1}\), which determines \(q_1, \dots, q_{T_1}\), the
+returns after \(T_1\) are exchangeable by assumption and the
+tie-breakers after \(T_1\) are fresh, so Proposition S15 applied given
+\(\mathcal{F}_{T_1}\) makes the p-values of the second segment i.i.d.
+uniform and independent of \(\mathcal{F}_{T_1}\); induction over
+segments completes the argument. For i.i.d. returns, the returns after a
+stopping time are i.i.d. with the same law and independent of the past.
+For an infinite exchangeable sequence, de Finetti's theorem makes the
+returns i.i.d. given a random law; given that law, the returns after
+\(T_1\) are i.i.d. and independent of \(\mathcal{F}_{T_1}\), so they are
+exchangeable given \(\mathcal{F}_{T_1}\). \(\square\)
+
+Early p-values after a restart are coarse (the first is just
+\(\theta\)), which costs power, not validity.
+
+\textbf{Lemma S17 (permuted pools at stopping times).} Let
+\(Y_1, \dots, Y_N\) be a uniformly random ordering of a finite multiset,
+and \(T\) a stopping time of \((Y_t)\) and of randomisation independent
+of the ordering. Given \(T\) and \(Y_1, \dots, Y_T\), the remaining
+values \(Y_{T+1}, \dots, Y_N\) are a uniformly random ordering of the
+values not yet drawn, so they are exchangeable given the past.
+
+\emph{Proof.} Given \(Y_1, \dots, Y_t\), every ordering of the remaining
+values has the same conditional probability, and the event
+\(\lbrace T = t\rbrace\) is fixed by \(Y_1, \dots, Y_t\) and by
+randomisation independent of the ordering. \(\square\)
+
+On the permuted null streams of Section 7.1 the condition of Theorem
+S16(b) therefore holds after every alarm until the pool runs out, and
+the bounds of the restarted rank detector hold exactly, whatever the
+pool.
+
+\textbf{A running truncation level.} Let the calibration returns
+\(r_1, \dots, r_{T_0}\) be i.i.d. with an unknown law \(F\), write
+\(m_F(s) = \mathbb{E}_F\min(r^2, s^2)\) for \(s > 0\), and fix a band
+\(b \in [0, 1)\). The null asks that, for every \(t > T_0\) and every
+\(s > 0\),
+\(\mathbb{E}[\min(r_t^2, s^2) \mid \mathcal{F}_{t-1}] \le (1 + b)\,m_F(s)\)
+(increase side) and \(\ge (1 - b)\,m_F(s)\) (decrease side); returns
+that stay i.i.d. with law \(F\) satisfy both with \(b = 0\). Both sides
+of each inequality are continuous and nondecreasing in \(s\), so the
+null then holds for all \(s\) at once almost surely, and in particular
+at a random level known at time \(t - 1\). Let \(\mathcal{S}\) be the
+set of levels that the truncation level may take. A band at \(T_0\) is a
+pair of functions \(L \le U\) on \(\mathcal{S}\), computed from data up
+to \(T_0\), whose failure event
+\(D = \lbrace m_F(s) \notin [L(s), U(s)] \text{ for some } s \in \mathcal{S}\rbrace\)
+has \(\mathbb{P}(D) \le \delta\). The monitor uses any predictable
+\(\tau_t \in \mathcal{S}\), the statistic
+\(X_t = \min(r_t^2, \tau_t^2)\), the increase baseline
+\(m_t^{\uparrow} = (1 + b)\,U(\tau_t)\) and the decrease baseline
+\(m_t^{\downarrow} = (1 - b)\,L(\tau_t)\), with decrease bets
+\(\lambda_t = s_l/(B_t - 1)\), \(B_t = \tau_t^2/m_t^{\downarrow}\), for
+the fractions \(s_l < 1\) of Section 3.1; at a step with
+\(m_t^{\downarrow} \le 0\) or \(B_t \le 1\) the decrease statistic is
+left unchanged.
+
+\textbf{Theorem S18 (a running truncation level).} Under this null,
+\(\mathbb{P}(\text{an alarm at one of } T_0 + 1, \dots, T_0 + m) \le \delta + m/A\)
+for every \(m \ge 1\), and the expected number of monitored steps before
+the first alarm is at least \((1 - \delta)A\). A band with these
+properties on a grid \(\mathcal{S} = \lbrace s_1, \dots, s_K\rbrace\),
+fixed by a short pilot before the band's data start, is given by the
+upper and lower bounds of Lemma S10 for each level, each at error
+\(\delta/(2K)\).
+
+\emph{Proof.} Let \(G = D^c \in \mathcal{F}_{T_0}\). Every factor is
+positive on every path: \(f_t^{\uparrow} \ge 1 - \lambda > 0\), and
+\(f_t^{\downarrow} \ge 1 - s_l > 0\) because \(X_t \le \tau_t^2\),
+whether or not the band holds, which matters because a failure of the
+band is not observed. On \(G\) and for \(t > T_0\),
+\(\mu_t = \mathbb{E}[X_t \mid \mathcal{F}_{t-1}] \le (1 + b)\,m_F(\tau_t) \le (1 + b)\,U(\tau_t) = m_t^{\uparrow}\),
+so \(\mathbb{E}[f_t^{\uparrow} \mid \mathcal{F}_{t-1}] \le 1\), and
+likewise \(\mu_t \ge m_t^{\downarrow}\) when the decrease side is on.
+This is Step 2 of the proof of Theorem 16 with \(G\) in place of
+\(\Omega_G\), and Steps 3 and 4 and part 2 of that proof apply word for
+word; they need only that, on an event known at \(T_0\), every factor
+has conditional mean at most 1, and allow predictable bets. For the grid
+band, the levels are fixed before the bounds start, and under i.i.d.
+returns \(\min(r_i^2, s_k^2)/s_k^2\) has the constant conditional mean
+\(m_F(s_k)/s_k^2\), so Lemma S10 bounds the failure probability of each
+of the \(2K\) one-sided bounds by \(\delta/(2K)\); add them up.
+\(\square\)
+
+\textbf{Restarts that learn their band.} After a stopping time \(S\),
+for example an alarm, the grid is fixed from returns before \(S\), the
+bounds of the grid run on \(r_{S+1}, r_{S+2}, \dots\), and snapshots
+\(\mathsf{B}(e) = (U, L)\) of the band after \(e\) observations are kept
+for sizes \(0 = e_0 < e_1 < \dots\) fixed in advance, with
+\(\mathsf{B}(0)\) the trivial band \((s_k^2, 0)\). The Shiryaev-Roberts
+chain started at segment step \(j\) bets against \(\mathsf{B}(e(j))\),
+where \(e(j)\) is the largest snapshot size at most \(j - 1\), so all of
+its band's data come before \(j\); the statistic is the sum of the
+chains' wealths, averaged over bets, and a decrease chain is not started
+at a step at which its snapshot admits no bet.
+
+\textbf{Theorem S19 (restart with a learning band).} If the returns
+after \(S\) are i.i.d. with some law given \(\mathcal{F}_S\), then an
+alarm within \(m\) steps of \(S\) has probability at most
+\(\delta + m/A\), and the expected number of steps to the first alarm is
+at least \((1 - \delta)A\). If the monitor restarts in this way after
+every alarm and the condition holds in every segment, the number of
+alarms within the first \(m\) monitored steps satisfies
+\(\mathbb{E}[N_m] \le (\delta + m/A)/(1 - \delta)\).
+
+\emph{Proof.} Work given \(\mathcal{F}_S\) and number the segment's
+steps \(1, 2, \dots\). Let \(N\) be the first step at which the band
+fails at some grid level (\(N = \infty\) if never). By Theorem S18,
+\(\mathbb{P}(N < \infty) \le \delta\), and \(N\) is a stopping time. Let
+\(W_t^{(j)}\) be the wealth of the chain started at \(j\) and
+\(W_t'^{(j)} = 1\lbrace N > e(j)\rbrace\,W_t^{(j)}\). The event
+\(\lbrace N > e(j)\rbrace\) is known at step \(e(j) \le j - 1\); on it
+the snapshot covers \(m_F\) at every grid level, and
+\(\mathbb{E}[X_t \mid \mathcal{F}_{t-1}] = m_F(\tau_t)\) because \(r_t\)
+is independent of \(\mathcal{F}_{t-1}\) and \(\tau_t\) is predictable,
+so every factor of the chain has conditional mean at most 1. Each
+\(W'^{(j)}\) is thus a nonnegative supermartingale from step \(j\) on,
+started at most at 1, and \(M'_t = \sum_{j \le t} W_t'^{(j)}\) satisfies
+\(\mathbb{E}[M'_t \mid \mathcal{F}_{t-1}] \le M'_{t-1} + 1\), so Ville's
+inequality as in Theorem 4 gives
+\(\mathbb{P}(\max_{t \le m} M'_t \ge A) \le m/A\). On
+\(\lbrace N = \infty\rbrace\), \(M' = M\), which gives the first claim;
+the two-sided rule follows as in Proposition 5. For the run length, let
+\(\vartheta\) be the first step with \(M_\vartheta \ge A\); every chain
+started at \(j \le \vartheta\) has \(e(j) \le \vartheta - 1\), so
+\(M'_\vartheta = M_\vartheta\) on \(\lbrace N \ge \vartheta\rbrace\),
+and optional stopping of \(M'_t - t\) at \(\vartheta \wedge n\) gives
+\(\mathbb{E}[\vartheta \wedge n] \ge A\,(\mathbb{P}(\vartheta \le n) - \delta)\);
+let \(n \to \infty\). The count follows as in the proof of Corollary 18,
+with the stopped statistic \(M'\) in place of \(\bar M\), so that every
+segment contributes a supermartingale, and with an alarm counted as bad
+when its segment's band failed before it, an event of conditional
+probability at most \(\delta\) given the segment's start. \(\square\)
+
+Validity is free in these constructions, power is not: a chain that
+starts shortly after a restart bets against a wide band, and one that
+starts after a change bets against a band that already contains
+post-change returns (companion note, Section 1).
 
 \hypertarget{s2.-proofs-for-section-4}{%
 \subsection{S2. Proofs for Section 4}\label{s2.-proofs-for-section-4}}
@@ -2534,22 +2873,23 @@ and monotone convergence as \(n \to \infty\) gives
 \emph{Part 3.} The same proof with one statistic at level \(A\) and only
 \(\Omega^{\uparrow}\) (or \(\Omega^{\downarrow}\)).
 
-\emph{Part 4.} Let \(\rho\) be the first \(t > T_0\) with
+\emph{Part 4.} Let \(T_{\mathcal{O}}\) be the first \(t > T_0\) with
 \(\mu_t > m^{\uparrow}\) or, when the decrease side is on,
 \(\mu_t < m^{\downarrow}\). Since \(\mu_t\) is known at time \(t - 1\),
-\(\lbrace \rho = t\rbrace \in \mathcal{F}_{t-1}\). Let
-\(\bar M'_t = \bar M_t\) for \(T_0 < t < \rho\) and
-\(\bar M'_t = \bar M'_{t-1} + 1\) for \(t \ge \rho\). On \(\Omega_G\)
-the computation of Step 2 holds for every \(t < \rho\) with no
-hypothesis, and trivially for \(t \ge \rho\), so Step 3 applies to
-\(\bar M'\) and gives
+\(\lbrace T_{\mathcal{O}} = t\rbrace \in \mathcal{F}_{t-1}\). Let
+\(\bar M'_t = \bar M_t\) for \(T_0 < t < T_{\mathcal{O}}\) and
+\(\bar M'_t = \bar M'_{t-1} + 1\) for \(t \ge T_{\mathcal{O}}\). On
+\(\Omega_G\) the computation of Step 2 holds for every
+\(t < T_{\mathcal{O}}\) with no hypothesis, and trivially for
+\(t \ge T_{\mathcal{O}}\), so Step 3 applies to \(\bar M'\) and gives
 \(\mathbb{P}(\Omega_G \cap \lbrace \bar M' \ge A \text{ within } m\rbrace) \le m\,\mathbb{P}(\Omega_G)/A\).
-On \(\Omega_G \cap \lbrace \rho > T_0 + m\rbrace\), \(\bar M' = \bar M\)
-at the times \(T_0 + 1, \dots, T_0 + m\). On \(\Omega_G\),
-\(\rho \le T_0 + m\) implies \(V_m\), because
-\(\mu_\rho > m^{\uparrow} \ge (1+b)\tau^2\bar\eta^{\uparrow}_{T_0} \ge (1+b)\min_i\mu_i\),
+On \(\Omega_G \cap \lbrace T_{\mathcal{O}} > T_0 + m\rbrace\),
+\(\bar M' = \bar M\) at the times \(T_0 + 1, \dots, T_0 + m\). On
+\(\Omega_G\), \(T_{\mathcal{O}} \le T_0 + m\) implies \(\mathcal{O}_m\),
+because
+\(\mu_{T_{\mathcal{O}}} > m^{\uparrow} \ge (1+b)\tau^2\bar\eta^{\uparrow}_{T_0} \ge (1+b)\min_i\mu_i\),
 and likewise on the decrease side. Hence
-\(\mathbb{P}(\text{alarm within } m) \le \mathbb{P}(\Omega_G^c) + \mathbb{P}(V_m) + m/A\).
+\(\mathbb{P}(\text{alarm within } m) \le \mathbb{P}(\Omega_G^c) + \mathbb{P}(\mathcal{O}_m) + m/A\).
 \(\square\)
 
 \textbf{A weaker condition that depends on the bets.} The same proof
@@ -2681,9 +3021,9 @@ with \(Y_t = 1 + d\) for \(t \le h\), then i.i.d. on
 \(\beta\) equals \(S_h = \sum_{j=1}^{h}(1 + \beta\lvert d\rvert)^j\). In
 the bold phase, optional stopping for the normalised product of the
 factors gives
-\(\mathbb{P}(T \le m \mid W) \ge \big(S_h - \sqrt{K S_h}\,\rho^{m-h}\big)/(F_\beta K)\),
+\(\mathbb{P}(T \le m \mid W) \ge \big(S_h - \sqrt{K S_h}\,\varrho^{m-h}\big)/(F_\beta K)\),
 where \(F_\beta\) is the bet's largest factor and
-\(\rho = \mathbb{E}\sqrt f/\sqrt{\mathbb{E}f} < 1\) for its factor
+\(\varrho = \mathbb{E}\sqrt f/\sqrt{\mathbb{E}f} < 1\) for its factor
 \(f\). On the event \(\lvert d\rvert \ge z_0/\sqrt n\), whose
 probability stays bounded away from 0, a bold phase of length of order
 \(\log A\) and \(S_h \ge h(1 + \beta\lvert d\rvert(h+1)/2)\) give a
@@ -2840,7 +3180,7 @@ function of the first \(n\) observations with
 \(\varphi \le 1\lbrace N_A \le n\rbrace\), so
 \(Q(T \le n) = \mathbb{E}_Q\varphi \le \beta_n\); for a randomised rule
 the same holds with \(\varphi = \mathbb{P}_U(T \le n \mid y)\) and the
-cap \(\min\lbrace 1, (n/A)W_n\rbrace\) of Theorem 12(b). The supremum
+cap \(\min\lbrace 1, (n/A)\Pi_n\rbrace\) of Theorem 12(b). The supremum
 \(\beta_n\) is attained by the test that fills the cap in decreasing
 order of the likelihood ratio \(dQ/dP^\circ\) until the budget \(n/A\)
 is spent (the Neyman-Pearson lemma with a cap), and
@@ -2974,12 +3314,12 @@ interior, every rule valid at levels \(n/A\) over a class that contains
 \(P^\ast\), deterministic or randomised, has
 \(\mathbb{E}_Q T \ge (\log A/\mathrm{KL}_{\inf}(Q))(1 - o(1))\).
 
-\emph{Proof.} (a) \(\log W_n\) is a sum of i.i.d. bounded nonnegative
+\emph{Proof.} (a) \(\log \Pi_n\) is a sum of i.i.d. bounded nonnegative
 increments. The definition of \(N_A\) gives
-\(\log W_{N_A} \ge \log A - \log N_A\) and
-\(\log W_{N_A - 1} < \log A - \log(N_A - 1)\), and the strong law of
+\(\log \Pi_{N_A} \ge \log A - \log N_A\) and
+\(\log \Pi_{N_A - 1} < \log A - \log(N_A - 1)\), and the strong law of
 large numbers gives the limit; convergence in \(L^1\) follows from
-\(N_A \le \min\lbrace n : \log W_n \ge \log A\rbrace\) and the
+\(N_A \le \min\lbrace n : \log \Pi_n \ge \log A\rbrace\) and the
 elementary renewal theorem. (b) Every bet factor is an e-variable for
 the two-point law of Supplement S1.6 at \(y\), so
 \(\pi(y) f_\lambda(y) \le 1\), that is
@@ -3089,22 +3429,64 @@ and
 \(\mathcal{V}_n = \sum_{j=0}^{n-1} e^{-S_j} \uparrow \mathcal{V}_\infty < \infty\),
 so \(\log M_n\) is a random walk plus a slowly changing term. Nonlinear
 renewal theory (Woodroofe 1982; Pollak 1987 for the Shiryaev-Roberts
-statistic) suggests \[
+statistic) gives, for one bet, \[
 \mathbb{E}[T_A] \approx \frac{\log A + \gamma_{\mathrm{ov}} - \zeta}{g}, \qquad \gamma_{\mathrm{ov}} = \frac{\mathbb{E}[J^2]}{2\,\mathbb{E}[J]}, \quad \zeta = \mathbb{E}[\log \mathcal{V}_\infty],
 \] with \(J\) the first ascending ladder height of \(S\) (so
-\(\gamma_{\mathrm{ov}}\) is the limiting mean overshoot). We have not
-checked the regularity conditions of those theorems for our law of \(Y\)
-(a continuous part and an atom at the cap), so we call the formula
-heuristic. Approximating \(S\) by a Brownian motion with drift \(g\) and
-variance \(s^2\) per step, Dufresne's (1990) identity for exponential
-functionals gives \(\zeta \approx \log(2/s^2) - \psi(2g/s^2)\), with
-\(\psi\) the digamma function. For a growth-optimal bet and a small
-change \(s^2 \approx 2g\), so \(\zeta \approx \log(1/g) + \gamma_E\)
-with Euler's constant \(\gamma_E = 0.5772\), and \[
+\(\gamma_{\mathrm{ov}}\) is the limiting mean overshoot); Proposition
+S20 below states the conditions and checks them. The value of \(\zeta\)
+is a further, heuristic step. Approximating \(S\) by a Brownian motion
+with drift \(g\) and variance \(s^2\) per step, Dufresne's (1990)
+identity for exponential functionals gives
+\(\zeta \approx \log(2/s^2) - \psi(2g/s^2)\), with \(\psi\) the digamma
+function. For a growth-optimal bet and a small change
+\(s^2 \approx 2g\), so \(\zeta \approx \log(1/g) + \gamma_E\) with
+Euler's constant \(\gamma_E = 0.5772\), and \[
 \mathbb{E}[\text{delay}] \approx \frac{\log(A g) - \gamma_E + \gamma_{\mathrm{ov}}}{g}.
 \] The memory term \(\zeta\) is the reason the first-order formula
 fails: for a 25\% increase in standard deviation \(g \approx 0.05\), so
 \(\zeta \approx 3.6\) while \(\log A = 8.96\).
+
+\textbf{Proposition S20 (second-order expansion for one bet).} Let the
+returns be i.i.d. from the first monitored step, take one side with one
+fixed bet whose factor \(f = f(Y)\) has \(g = \mathbb{E}\log f > 0\),
+and suppose that the law of \(Y\) has a part with no atoms, as for
+Gaussian or Student \(t\) returns. Let \(T_A\) be the first \(n\) with
+\(M_n \ge A\). Then \(\zeta\) and \(\gamma_{\mathrm{ov}}\) are finite
+and
+\(\mathbb{E}[T_A] = (\log A + \gamma_{\mathrm{ov}} - \zeta)/g + o(1)\)
+as \(A \to \infty\).
+
+\emph{Proof.} Write \(\log M_n = S_n + \xi_n\) with
+\(\xi_n = \log\mathcal{V}_n\), so that \(T_A\) is the first passage of
+\(S_n + \xi_n\) over \(\log A\). The increments \(\log f(Y_i)\) are
+i.i.d. and bounded, because \(f\) takes values in a compact subset of
+\((0, \infty)\), and they are not concentrated on a lattice, because
+\(f\) is continuous and strictly monotone in \(y\) and the law of \(Y\)
+has a part with no atoms. The term \(\xi_n\) is nonnegative (the term
+\(j = 0\) of \(\mathcal{V}_n\) is 1), nondecreasing, and converges
+almost surely to \(\xi_\infty = \log\mathcal{V}_\infty\), since
+\(S_j/j \to g > 0\). Its tail is exponential: for \(u \in (0, 1)\),
+\((\sum_j x_j)^u \le \sum_j x_j^u\) for \(x_j \ge 0\), so
+\(\mathbb{E}[\mathcal{V}_\infty^u] \le \sum_{j \ge 0}(\mathbb{E}f^{-u})^j\),
+and \(\mathbb{E}f^{-u} < 1\) for small \(u > 0\) because \(f\) is
+bounded away from 0 and the derivative of \(u \mapsto \mathbb{E}f^{-u}\)
+at 0 is \(-g < 0\); hence \(\mathbb{P}(\xi_\infty > x) \le C e^{-u x}\)
+for some constant \(C\), and \(\zeta = \mathbb{E}\xi_\infty\) is finite.
+So \(\xi_n\) changes slowly (it converges),
+\(\max_{k \le n}\xi_{n+k} \le \xi_\infty\) is uniformly integrable,
+\(\xi_n \ge 0\) excludes large negative values, and an early stop is
+rare: with \(o_{\max}\) the largest log factor and
+\(\varepsilon\,o_{\max}/g \le 1/2\), \(T_A \le \varepsilon\log A/g\)
+forces \(\xi_\infty \ge (\log A)/2\), whose probability is
+\(O(A^{-u/2}) = o(1/\log A)\). These are the conditions under which the
+nonlinear renewal theorem gives
+\(\mathbb{E}[T_A] = (\log A + \mathbb{E}R_A - \mathbb{E}\xi_\infty)/g + o(1)\),
+where the mean overshoot \(\mathbb{E}R_A\) tends to
+\(\gamma_{\mathrm{ov}}\), finite because the increments are bounded and
+not lattice (Woodroofe 1982; Pollak 1987 for the Shiryaev-Roberts
+statistic). We could not read Woodroofe (1982) in full and use the
+conditions as secondary accounts state them, so Proposition S20 is
+subject to the caveat of footnote 1 of the main text. \(\square\)
 
 Table S2 compares the predictions with simulation for all 20 cases (true
 baseline, \(c = 3\), one side at \(A = 7800\), change at the first
@@ -3491,20 +3873,24 @@ asymptotic critical values for open-ended monitoring spend almost none
 of their 5\% in the first day for \(\gamma \le 0.25\). A second
 boundary, that of OLS-CUSUM monitoring in the R package strucchange
 (Zeileis, Leisch, Hornik and Kleiber 2002), is a check of the type of
-Chu, Stinchcombe and White (1996). The papers of Horváth, Kokoszka and
-Zhang (2006), Chu, Stinchcombe and White (1996) and Knoblauch, Jewson
-and Damoulas (2018) could not be read, so these rules are of the type of
-the published procedures, not reproductions, and no \(\beta\)-divergence
-BOCPD was run.
+Chu, Stinchcombe and White (1996). The papers of Horváth, Hušková,
+Kokoszka and Steinebach (2004), Horváth, Kokoszka and Zhang (2006), Chu,
+Stinchcombe and White (1996) and Knoblauch, Jewson and Damoulas (2018)
+could not be read in full (footnote 1 of the main text), so these rules
+are of the type of the published procedures, not reproductions, and no
+\(\beta\)-divergence BOCPD was run.
 
 \textbf{False alarms of the calibrated competitors.} On 4000 fresh paths
 per law (bootstrap rules on 2000), calibrated on Gaussian data, the
-CUSUMs on \(X\) had 5.0\% to 8.2\% false alarms per day under Student
-\(t_3\) and \(t_5\) returns (target 1.3\%) and 14\% to 22\% (target
-5\%), and the training-sample rule on \(r_t^2\) 10\% to 15\% under
-Student \(t_3\) returns and jumps (targets 1.3\% and 5\%). Per-path
-bootstrap thresholds held 1.4\% to 2.2\% (target 1.3\%) and 4.9\% to
-6.3\% (target 5\%) under all six i.i.d.-type laws, and the
+CUSUMs on \(X\) had 5.0\% to 8.2\% false alarms in the first day under
+Student \(t_3\) and \(t_5\) returns (target 1.3\%) and 14\% to 22\%
+(target 5\%), and the training-sample rule on \(r_t^2\) 10\% to 15\%
+under Student \(t_3\) returns and jumps (targets 1.3\% and 5\%).
+Per-path bootstrap thresholds gave 1.4\% to 2.2\% (target 1.3\%) and
+4.9\% to 6.3\% (target 5\%) under the six i.i.d.-type laws,
+significantly above target in 5 of these 24 cells (the CUSUM on \(X\) at
+the 1.3\% target under Student \(t_3\) returns, jumps and price noise,
+and both rules at the 5\% target under price noise), and the
 training-sample rule on \(X\) held its rate under every i.i.d.-type law
 (1.1\% to 1.6\% at a 1.3\% target). Under GARCH and slow stochastic
 volatility every rule alarmed on most paths, the e-detector included;
@@ -3517,10 +3903,14 @@ e-detector's Gaussian rate the calibrated betting rule detected
 increases of the standard deviation by 25\%, 50\% and 100\% in 106, 41
 and 20 steps (e-detector 100, 39 and 19; here each side of the
 e-detector alarms at \(2A\), against \(A\) in Table S5) and a fall to
-0.8 times in 144 steps (e-detector 162); Page's CUSUM on \(X\) was as
+0.8 times in 144 steps (e-detector 162). The calibrated rule is slower
+for increases although its false alarm rate before the change is higher
+(3.2\% against 2.6\%), because it splits its target first-day rate
+equally between the two sides, while the e-detector's realised first-day
+rate falls mostly on the increase side; Page's CUSUM on \(X\) was as
 fast for increases and 15\% to 40\% faster for decreases. Against
-thresholds that spend the full 5\% per day, at 4.5\% to 4.9\% false
-alarms per day, the e-detector took 1.1 to 1.3 times as long for
+thresholds that spend the full 5\% in the first day, at 4.5\% to 4.9\%
+first-day false alarms, the e-detector took 1.1 to 1.3 times as long for
 increases and 1.4 to 2.1 times for decreases, and such thresholds hold
 only if the law is known. With bootstrap thresholds under Student
 \(t_3\) returns the e-detector detected increases 16\% to 24\% faster
@@ -3537,12 +3927,13 @@ plus the growth of the boundary meanwhile, while Page's CUSUM and the
 e-detector restart their evidence whenever it turns against a change.
 
 \textbf{The Student \(t\) BOCPD.} On the paths of the online comparison
-of Section 6.2 it had 0.7\% false alarms per day under jumps and 3.3\%
-under Student \(t_5\) returns, against 73.2\% and 53.2\% for the
-Gaussian BOCPD, but 4.9\% under Student \(t_3\) and 0.5\% under Gaussian
-data with the same threshold; within 1500 steps it found only 56\% of
-25\% increases and 77\% of 20\% decreases (e-detector 98\%), while it
-was faster for halvings of the standard deviation (27 against 81 steps).
+of Section 6.2 it had 0.7\% false alarms in the first day under jumps
+and 3.3\% under Student \(t_5\) returns, against 73.2\% and 53.2\% for
+the Gaussian BOCPD, but 4.9\% under Student \(t_3\) and 0.5\% under
+Gaussian data with the same threshold; within 1500 steps it found only
+56\% of 25\% increases and 77\% of 20\% decreases (e-detector 98\%),
+while it was faster for halvings of the standard deviation (27 against
+81 steps).
 
 \textbf{Width of the confidence-sequence baseline.} From 292
 observations its median upper bound sits 37\% above the true mean for
@@ -3604,12 +3995,14 @@ and 0.9999 (Figure 1, right). A band \(b = 0.5\) absorbs short-lived
 clustering (3.6\% at persistence 0.95), but no reasonable static band
 absorbs persistent clustering: even \(b = 1\) on the increase side
 leaves 12\% to 20\% of days with an alarm at persistence 0.99 or more.
-For slow log-normal stochastic volatility, a band of 0.5 brought the
-daily rates to 1.7\% (increase) and 0.0\% (decrease) while a doubling or
-halving of volatility was still detected on 97\% and 100\% of paths; the
-band is a design choice, not a guarantee. These alarms are not errors of
-the proof: persistent GARCH clusters are changes in conditional
-volatility, and the monitor reports them.
+For slow log-normal stochastic volatility (log-sd 0.15, half-life 390
+steps), whose first-day alarm rates at band 0 were 24.7\% (increase) and
+26.7\% (decrease), a band of 0.25 brought them to 8.3\% and 5.0\% while
+90\% of doublings and 94\% of halvings of volatility were still
+detected, and a band of 0.5 to 1.7\% and 0.0\% with 97\% and 100\%
+detected; the band is a design choice, not a guarantee. These alarms are
+not errors of the proof: persistent GARCH clusters are changes in
+conditional volatility, and the monitor reports them.
 
 \textbf{Forecast-relative monitoring.} Monitoring \(r_t/\hat\sigma_t\)
 with a GARCH(1,1) forecast fitted on a separate path and then frozen
@@ -3684,28 +4077,30 @@ Dividing and simplifying gives \(\rho(\theta)\). Its derivative in
 \(\rho(\theta) \to (1-\beta)/\alpha\) as \(\theta \to \infty\).
 \(\square\)
 
-Two exact facts sit behind this. A scale break
-(\(r_t \mapsto \sqrt{\theta}\, r_t\)) and an intercept break
-(\(\omega \mapsto \theta\omega\)) lead to the same post-break model and
-differ only in the transient right after the break. And the filter
-absorbs most of the break through its \(\alpha r^2\) term: at
-persistence \(\alpha + \beta = 0.99\) with \(\alpha = 0.05\), a doubling
-of the long-run variance appears after standardisation as an increase of
-the ratio of means to \(\rho(2) = 1.091\), and no break can push it
-above \((1 - \beta)/\alpha = 1.2\). Here \((1-\beta)/\alpha\) bounds the
-post-break ratio of the mean squared return to the mean forecast; it is
-not a fraction of the shift. The monitor sees the mean of the ratio,
-\(\mathbb{E}[r_t^2/s_t]\), which is a little larger by Jensen's
-inequality (1.116 for \(\theta = 2\) in simulation) and which stayed
-below 1.28 for \(\theta\) up to 1000 at this persistence. At persistence
-0.95 and \(\theta = 1000\) the mean of the ratio, 2.20, exceeds the
-bound 2.0 on the ratio of means, so the bound does not cover the
-quantity the monitor sees; we have a proof only for the ratio of means.
-Figure S2 compares the closed form with simulation: the simulated ratio
-of means, pooled over paths, agrees with \(\rho(\theta)\) within two
-standard errors at every point. (An average of per-path ratios is biased
-upward when the path means are noisy; at persistence 0.999 it exceeded
-the bound, which is why we pool.)
+Proposition S13 is the mirror image of the finding that unmodelled
+shifts make GARCH fits look nearly integrated (Diebold 1986; Lamoureux
+and Lastrapes 1990; Mikosch and Starica 2004). Two exact facts sit
+behind it. A scale break (\(r_t \mapsto \sqrt{\theta}\, r_t\)) and an
+intercept break (\(\omega \mapsto \theta\omega\)) lead to the same
+post-break model and differ only in the transient right after the break.
+And the filter absorbs most of the break through its \(\alpha r^2\)
+term: at persistence \(\alpha + \beta = 0.99\) with \(\alpha = 0.05\), a
+doubling of the long-run variance appears after standardisation as an
+increase of the ratio of means to \(\rho(2) = 1.091\), and no break can
+push it above \((1 - \beta)/\alpha = 1.2\). Here \((1-\beta)/\alpha\)
+bounds the post-break ratio of the mean squared return to the mean
+forecast; it is not a fraction of the shift. The monitor sees the mean
+of the ratio, \(\mathbb{E}[r_t^2/s_t]\), which is a little larger by
+Jensen's inequality (1.116 for \(\theta = 2\) in simulation) and which
+stayed below 1.28 for \(\theta\) up to 1000 at this persistence. At
+persistence 0.95 and \(\theta = 1000\) the mean of the ratio, 2.20,
+exceeds the bound 2.0 on the ratio of means, so the bound does not cover
+the quantity the monitor sees; we have a proof only for the ratio of
+means. Figure S2 compares the closed form with simulation: the simulated
+ratio of means, pooled over paths, agrees with \(\rho(\theta)\) within
+two standard errors at every point. (An average of per-path ratios is
+biased upward when the path means are noisy; at persistence 0.999 it
+exceeded the bound, which is why we pool.)
 
 \begin{figure}
 \centering
@@ -3885,16 +4280,57 @@ short volatility regime; the share of release alarms classed as ``jump
 only'' did not separate the two monitors, so this reading rests on the
 delays and the return sizes.
 
+\textbf{The rerun with proved monitors (pre-registered).} The rerun was
+pre-registered before any of its real-data runs and keeps everything of
+the design above except the monitor (Table S12). Primary: the
+confidence-sequence baseline (\(\delta = 0.01\), \(A = 36{,}000\), band
+0.25) restarted at 00:00 UTC, with a 1440-minute recalibration after
+each alarm, so that each UTC day is one period of Corollary S14 and the
+monitor raises at most one alarm a day; its bound, 5\% for each day of a
+segment, is marginal and needs the tolerance to the end of the day.
+Secondary: the same without the restart (5\% for the first day of each
+segment) and the rank detector restarted without a blind period, with
+payoffs divided by 1.25 (Theorem S16). In the primary family (BTC, Holm
+over FOMC and CPI), 8 of 16 FOMC statements were followed by an up alarm
+within six hours against 10.9\% of matched controls (\(p = 0.00017\),
+Holm 0.00033), and 5 of 22 CPI releases against 5.9\% (Holm 0.0097); the
+plug-in had 9 of 16 against 13.9\% and 5 of 22 against 11.7\%, so for
+CPI the count of releases is unchanged and the matched control rate
+halved. Every FOMC cell held after Holm, on ETH and SOL, without the
+restart and with the rank detector; CPI did not hold on ETH and SOL
+under the primary monitor (Holm 0.075) or without the restart on BTC (3
+of 22, \(p = 0.12\)) and SOL. The rank detector's cells repeat an
+earlier run exactly and add no confirmatory evidence, and the plug-in
+run through the same code reproduced the results above exactly. The
+primary monitor watched 80 of the 114 coin and release pairs (without
+the restart 77, the rank detector 114, the plug-in 55); one BTC FOMC
+statement (29 January 2025) fell in a segment whose increase side could
+not alarm. It alarmed in 48.1\% to 53.5\% of its monitored days and
+raised 0.92 to 1.15 alarms per monitored day, against a long-run bound
+of 0.0404 per monitored day under the tolerance (Corollary 18; scaling
+the statistic down at a boundary only lowers the supermartingale of its
+proof), so on these days the tolerance fails and the rerun does not test
+the bound. The restart at 00:00 UTC falls five hours into the six-hour
+window of FOMC statements made in US Eastern standard time. The data and
+the plug-in results were known when the rerun was designed, and 16
+statements give a wide interval (28\% to 72\% for the primary rate).
+
 \hypertarget{s7.3-forecasts-and-competitors-on-real-data}{%
 \subsubsection{S7.3 Forecasts and competitors on real
 data}\label{s7.3-forecasts-and-competitors-on-real-data}}
 
 Table S8 gives the comparison with forecasts of Section 7.2 for the
 plug-in baseline, with 95\% intervals from the block bootstrap over
-calendar days of Section 7.1. With the hindsight-tuned ratio rule, the
+calendar days of Section 7.1. The ratio rules alarm when the robust
+volatility of the last 60 or 240 minutes, divided by that of the
+preceding day, crosses thresholds chosen on the same data to give the
+e-detector's numbers of up and down alarms, with the same dead time;
+this hindsight favours them. With the hindsight-tuned ratio rule, the
 one comparison that holds after Holm adjustment (band 0.5, out of
 sample) has the e-detector's decrease alarms confirmed 10.5 points more
-often than the 60-minute rule's (Holm \(p = 0.0096\)).
+often than the 60-minute rule's (Holm \(p = 0.0096\)). Out of sample the
+intervals of the differences lie within plus or minus 5 points in 7 of 8
+cells at band 0.25, but in July to December 2025 they reach 9.7 points.
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
@@ -4146,16 +4582,16 @@ the three rules.}
 
 After an e-detector down alarm, next-day realised variance was on
 average about 6\% below the HAR-I forecast; the coefficient is fragile,
-with Holm \(p = 0.060\) under standard errors clustered by day. Against
-the EWMA and HAR forecasts, in all 32 blocks (two forecasts, two
-periods, two horizons, two measures, two bands) every alarm coefficient
-had the sign of its alarm with Holm \(p \le 0.002\), from \(+0.16\) to
-\(+0.60\) for up alarms and from \(-0.15\) to \(-0.49\) for down alarms.
-The scaling factors did not transfer between periods: at the
-e-detector's up alarms realised variance was 54\% above the HAR-I
-forecast on average in July to December 2025 but 15\% above it in the
-held-out period. Over all 72 loss comparisons none showed a significant
-gain.
+with Holm \(p = 0.060\) under standard errors clustered by day, and no
+larger than that of the 240-minute ratio rule (Table S10). Against the
+EWMA and HAR forecasts, in all 32 blocks (two forecasts, two periods,
+two horizons, two measures, two bands) every alarm coefficient had the
+sign of its alarm with Holm \(p \le 0.002\), from \(+0.16\) to \(+0.60\)
+for up alarms and from \(-0.15\) to \(-0.49\) for down alarms. The
+scaling factors did not transfer between periods: at the e-detector's up
+alarms realised variance was 54\% above the HAR-I forecast on average in
+July to December 2025 but 15\% above it in the held-out period. Over all
+72 loss comparisons none showed a significant gain.
 
 \hypertarget{s7.5-landmark-shocks}{%
 \subsubsection{S7.5 Landmark shocks}\label{s7.5-landmark-shocks}}
@@ -4199,8 +4635,9 @@ the 120-minute scan were earlier on 10 October 2025, by 4 to 10 minutes
 on four coins. Streaming from another start date gave identical outcomes
 for the e-detector. In the seven days before each event the methods
 together raised 0.76 to 1.10 times the alarms expected at their average
-rates. The exploratory run of the monitors without a blind period is
-reported in the companion note.
+rates. These are case studies, not evidence. In an exploratory run,
+monitors without a blind period (Section 6.5) flagged 15 and 17 of the
+18 cases within 24 hours (companion note, Section 1).
 
 \hypertarget{s7.6-null-streams-from-real-returns-and-the-confidence-sequence-baseline}{%
 \subsubsection{S7.6 Null streams from real returns and the
@@ -4212,33 +4649,31 @@ real-data run of this study; what was decided later is called post hoc.
 Data: the deseasonalised returns of the five coins of Section 7.2, July
 to December 2025, and of the Nifty 50, sessions of January 2022 to
 October 2026. A day (a session for the Nifty 50) is calm if its robust
-volatility lies within 0.8 to 1.25 times the median of the previous 20;
-the pool of a data set holds the returns of all its calm days (81 to 100
-of 184 days per coin, 639 of 1191 Nifty sessions). Streams are random
-permutations of a pool (primary), i.i.d. draws from it, or stationary
-bootstraps of the calm days with mean blocks of 30, 390 and 1440
-minutes. Four monitors, all with the default two-sided e-detector, run
-on each stream: the known baseline (\(\tau\) and \(m_0\) of the pool,
-restart at 0 after an alarm), the plug-in (1440 or 750 calibration
-returns), the confidence-sequence baseline (\(\delta = 0.01\), \(A\) =
-36,000 or 9,375) and the rank detector of the companion note, with \(A\)
-= 28,800 for crypto and 7,500 for the Nifty 50 otherwise. The endpoints
-are the probability of a first alarm within one and within five days,
-and the alarms per monitored day over 20 monitored days with a restart
-or recalibration after each alarm.
+volatility (\(1.4826\) times the median absolute deseasonalised return)
+lies within 0.8 to 1.25 times the median of the previous 20; the pool of
+a data set holds the returns of all its calm days (81 to 100 of 184 days
+per coin, 639 of 1191 Nifty sessions). Streams are random permutations
+of a pool (primary), i.i.d. draws from it, or stationary bootstraps of
+the calm days with mean blocks of 30, 390 and 1440 minutes. Four
+monitors, all with the default two-sided e-detector, run on each stream:
+the known baseline (\(\tau\) and \(m_0\) of the pool, restart at 0 after
+an alarm), the plug-in (1440 or 750 calibration returns), the
+confidence-sequence baseline (\(\delta = 0.01\), \(A\) = 36,000 or
+9,375) and the rank detector of Section 6.5 (Supplement S1.9), with
+\(A\) = 28,800 for crypto and 7,500 for the Nifty 50 otherwise. The
+endpoints are the probability of a first alarm within one and within
+five days, and the alarms per monitored day over 20 monitored days with
+a restart or recalibration after each alarm.
 
-\textbf{Exactness.} Given the first \(t\) values of a uniformly random
-ordering of a finite pool, the rest is a uniformly random ordering of
-the values not yet drawn, and the same holds at a stopping time, since
-the event that the time equals \(t\) is fixed by the first \(t\) values.
-After every alarm the rest of a permuted stream is therefore
-exchangeable given the past, which is what the restarted rank detector
-needs, so its bounds hold exactly on these streams. For the known and
-confidence-sequence baselines the conditional mean of the next \(X\) is
-the mean of the values not yet drawn, which wanders: its largest
-relative departure from \(m_0\) along a stream had a median of 0.24\% to
-0.31\% for the coins and 0.07\% for the Nifty 50, and a maximum of
-1.19\%. The i.i.d. streams are the exact check for these two baselines.
+\textbf{Exactness.} By Lemma S17, after every alarm the rest of a
+permuted stream is exchangeable given the past, which is what the
+restarted rank detector needs (Theorem S16(b)), so its bounds hold
+exactly on these streams. For the known and confidence-sequence
+baselines the conditional mean of the next \(X\) is the mean of the
+values not yet drawn, which wanders: its largest relative departure from
+\(m_0\) along a stream had a median of 0.24\% to 0.31\% for the coins
+and 0.07\% for the Nifty 50, and a maximum of 1.19\%. The i.i.d. streams
+are the exact check for these two baselines.
 
 \textbf{Results.} Five coins pooled, permuted streams, band 0: within
 five days 15.8\% for the known baseline and 16.7\% for the rank detector
@@ -4265,12 +4700,13 @@ changes within calm days.
 series of Section 7.2, out of sample, 80.8\% of its up alarms and 90.9\%
 of its down alarms were confirmed, against 77.9\% and 84.5\% for the
 plug-in; against the EWMA forecast its shares were 81.4\% and 90.7\% in
-July to December 2025 and 82.1\% and 76.2\% out of sample. Down alarms
-that both monitors raised within six hours came 40.5 to 142 minutes
-later with the confidence-sequence baseline. A ratio rule matched to its
-alarm counts was confirmed about as often (83.4\% of up and 86.4\% of
-down alarms), so this check shows that its alarms are not noise, not
-that they add precision.
+July to December 2025 and 82.1\% and 76.2\% out of sample. In July to
+December 2025 (band 0.25), down alarms that both monitors raised within
+six hours came a median 40.5 to 142 minutes later with the
+confidence-sequence baseline, and up alarms 4 to 9 minutes later. A
+ratio rule matched to its alarm counts was confirmed about as often
+(83.4\% of up and 86.4\% of down alarms), so this check shows that its
+alarms are not noise, not that they add precision.
 
 \textbf{Blind segments (post hoc).} With the confidence-sequence
 baseline, \(\tau\) comes from the first quarter of the calibration
@@ -4378,10 +4814,10 @@ Student \(t_5\); price noise (sd 0.5); ticks of 0.5 sd; slow SV;
 GARCH(1,1) with persistence 0.99 & offline: 500 change-free steps of a
 2000-step window (plug-in or CS); online: plug-in or CS on 2000 steps &
 offline: critical values matched to 5\% on clean Gaussian windows;
-online: \(A = 7800\), competitors matched to the e-detector's rate per
-390-step day on clean Gaussian paths & offline 1000 null, 300 per
-change; online 1000 null, 200 per change & offline at step 1000; online
-at monitored step 500; sd ratio 1.25, 1.5, 2, 0.8, 0.67, 0.5 \\
+online: \(A = 7800\), competitors matched to the e-detector's rate in
+the first 390-step day on clean Gaussian paths & offline 1000 null, 300
+per change; online 1000 null, 200 per change & offline at step 1000;
+online at monitored step 500; sd ratio 1.25, 1.5, 2, 0.8, 0.67, 0.5 \\
 Theorem 9; Corollary 14; Supplement S1 & default detector; constant
 drift (two-point, Gaussian, deterministic and adaptive streams);
 two-state switching drift; GARCH(1,1) designs of Section 6.1; Gaussian
@@ -4435,10 +4871,10 @@ Section 6.2 (calibrated competitors); Supplement S5 & Gaussian, Student
 plug-in, 2000 steps; thresholds simulated on 20,000 Gaussian paths or
 bootstrapped per path (1000 replicates); training sample of 2000 steps &
 e-detector each side at \(2A\), \(A = 7800\); competitors at 1.3\% or
-5\% per 390-step day & 4000 null per law (bootstrap 2000); 1000 per
-change cell (bootstrap 500); the paths of the online comparison for the
-Student \(t\) BOCPD & none (false alarms); sd ratio 1.25, 1.5, 2, 0.8,
-0.67, 0.5 at monitored step 500 (delay) \\
+5\% in the first 390-step day & 4000 null per law (bootstrap 2000); 1000
+per change cell (bootstrap 500); the paths of the online comparison for
+the Student \(t\) BOCPD & none (false alarms); sd ratio 1.25, 1.5, 2,
+0.8, 0.67, 0.5 at monitored step 500 (delay) \\
 Supplement S5 (split clip with the confidence-sequence baseline) &
 Gaussian & plug-in or confidence sequence (\(\delta = 0.01\)), 1440
 steps & \(A = 28{,}800\) (plug-in), \(36{,}000\) (confidence sequence) &
@@ -4479,6 +4915,11 @@ Section 7.3; Supplement S7.2 & Binance BTC, ETH, SOL, 21 January 2024 to
 31 December 2025 & as Table S8 with band 0.25; 16 FOMC statements, 22
 CPI releases; 134 and 299 control windows, matched by weekday;
 stratified permutation tests, Holm correction over the primary family \\
+Section 7.3; Supplement S7.2 (rerun) & as above & pre-registered;
+confidence-sequence baseline, \(\delta = 0.01\), \(A = 36{,}000\), band
+0.25, restart at 00:00 UTC (primary); the same without restart; rank
+detector restarted without a blind period, \(A = 28{,}800\), payoffs
+divided by 1.25; plug-in as above \\
 Section 7.2; Table S9 & Binance five coins, 1 July to 31 December 2025
 and 1 January to 30 June 2025; Nifty 50, 2024 and 2025 & e-detector as
 above; BOCPD with the robust variance of the previous day as prior mean
@@ -4494,7 +4935,7 @@ families; equivalence margin 5 points; hourly grid, next-day realised
 variance, EWMA, HAR and HAR-I forecasts refitted daily, Driscoll and
 Kraay standard errors with bandwidth 5 days; QLIKE with factors fitted
 on July to December 2025 \\
-Section 7.3; Supplement S7.5 & Binance five coins, July to December
+Section 7.4; Supplement S7.5 & Binance five coins, July to December
 2024, January to June 2025, July to December 2025; Nifty 50, 2024 and
 2025 & four events, reference times fixed before any return was loaded;
 e-detector as in Sections 7.2 and 7.4; competitors as Table S9,
@@ -4621,11 +5062,16 @@ confidence-sequence baseline in Supplement S5, come from
 \texttt{e19\_cs\_competitor.csv}, \texttt{e19\_blind.csv},
 \texttt{e19\_fr\_pooled.csv}, \texttt{e19\_fr\_cost.csv},
 \texttt{e19\_split\_c\_cs.csv}). The adjusted p-values of Section 7 are
-in \texttt{e20\_bootstrap.csv} and \texttt{e20\_holm\_existing.csv}, and
-the landmark cases of Section 7.3 in \texttt{e18\_outcomes.csv} and
-\texttt{e18\_awake.csv} (\texttt{e18\_landmark\_events.py}). Numbers in
-the text that are not in a table come from the same scripts and from the
-theory notes and experiment reports of the repository; a tracing script
-checks each number of the paper against these sources.
+in \texttt{e20\_bootstrap.csv} and \texttt{e20\_holm\_existing.csv}, the
+landmark cases of Supplement S7.5 in \texttt{e18\_outcomes.csv} and
+\texttt{e18\_awake.csv} (\texttt{e18\_landmark\_events.py}), and the
+rerun of the event test (Section 7.3, Supplement S7.2) in
+\texttt{e22\_tests.csv}, \texttt{e22\_monitor\_summary.csv},
+\texttt{e22\_watched.csv}, \texttt{e22\_windows.csv},
+\texttt{e22\_alarms.csv} and \texttt{e22\_reproduction.csv}
+(\texttt{e22\_guaranteed\_events.py}). Numbers in the text that are not
+in a table come from the same scripts and from the theory notes and
+experiment reports of the repository; a tracing script checks each
+number of the paper against these sources.
 
 \end{document}
