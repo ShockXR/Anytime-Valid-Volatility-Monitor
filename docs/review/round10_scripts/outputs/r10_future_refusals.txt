@@ -1,0 +1,11 @@
+FUTURE_END 2027-06-01 | primary S2 fomc+cpi
+(a) today, committed file: 12 refusals; first: today is before the end date 2027-06-01
+(b) after the end date, committed file: 11 refusals (rows still 'scheduled')
+(c) after the end date, every row in the period updated: refusals []
+(c') the same file one day before the end date: refusals ['today is before the end date 2027-06-01']
+(d) the FOMC row of 17 March 2027 deleted instead of updated: refusals []  <- not caught
+(e) the CPI row of 11 February 2027 deleted: refusals ['no CPI row for 2027-02 (add the release, or a cancelled row, with its verification)']
+(f) the April FOMC statement moved past the end date (rescheduled): refusals [] (it simply leaves the test)
+(g) data end (exclusive) 2027-05-31 23:59: refusals ['the data end at 2027-05-31 23:59 UTC, before the end date 2027-06-01']
+(g) data end (exclusive) 2027-06-01 00:00: refusals []
+(h) a hypothetical extra FOMC row left 'scheduled': refusals ["2027-02-20 fomc: status 'scheduled'; verify the release and update the event file"]

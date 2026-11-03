@@ -1,0 +1,20 @@
+rho, d_min (closed form), d_min (package), max log growth per step log(1 + 0.5 (rho - 1))
+ 1.000    72000    72000 0.000000
+ 1.001     9854     9854 0.000500
+ 1.005     2703     2703 0.002497
+ 1.010     1503     1503 0.004988
+ 1.020      827      827 0.009950
+ 1.050      371      371 0.024693
+ 1.100      202      202 0.048790
+ 1.250       91       91 0.117783
+ 1.500       51       51 0.223144
+ 2.000       30       30 0.405465
+ 3.000       18       18 0.693147
+ 5.000       12       12 1.098612
+rho* (a_1440(rho*) = 72,000): 1.0105072094
+a_1440(1.0105) = 71701.0  (2A = 72,000; alarm possible within a day: False)
+a_1440(1.0105) = 71701.0  (2A = 72,000; alarm possible within a day: False)
+a_1440(1.0106) = 75968.4  (2A = 72,000; alarm possible within a day: True)
+rho = 1: a_(2A - 1) = 71999 < 2A, a_(2A) = 72000 = 2A -> alarm possible at step 2A, impossible within 2A - 1 steps
+P1's carry is 0 (PeriodicVolatilityMonitor default), so m = 1440 < 2A = 72,000 suffices.
+390-step setting, A = 9750: d_min at 1.01, 1.25: 1217.0 80.0

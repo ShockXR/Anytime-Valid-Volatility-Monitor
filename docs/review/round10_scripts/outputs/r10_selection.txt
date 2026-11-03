@@ -1,0 +1,9 @@
+check against eb_confseq: max |difference| = 1.11e-16
+n_cs =  1080, delta_window =  0.0100: p = 0.000259 (259 of 1000000, s.e. 1.6e-05); delta/2 / p = 19.3  [97 s]
+n_cs =  1080, delta_window =  0.0050: p = 0.00011 (110 of 1000000, s.e. 1e-05); delta/2 / p = 22.7  [99 s]
+n_cs =  1080, delta_window =  0.0025: p = 3.9e-05 (39 of 1000000, s.e. 6.2e-06); delta/2 / p = 32.1  [97 s]
+n_cs =   150, delta_window =  0.3000: p = 0.01398 (27954 of 2000000, s.e. 8.3e-05); delta/2 / p = 10.7  [15 s]
+n_cs =   150, delta_window =  0.1500: p = 0.003951 (7901 of 2000000, s.e. 4.4e-05); delta/2 / p = 19.0  [16 s]
+n_cs =   150, delta_window =  0.0750: p = 0.001251 (2501 of 2000000, s.e. 2.5e-05); delta/2 / p = 30.0  [17 s]
+n_cs = 1080, delta = 0.01: same delta, K = 1..4: 0.000259, 0.000518, 0.000777, 0.00104; halving K = 3: 0.000188; naive guard exceeds delta first at K* = 39 windows (1 - (1 - p)^K* = 0.0101); uncapped naive guard: P(kept window fails) = 1
+n_cs = 150, delta = 0.3: same delta, K = 1..4: 0.014, 0.0278, 0.0413, 0.0547; halving K = 3: 0.00644; naive guard exceeds delta first at K* = 26 windows (1 - (1 - p)^K* = 0.3065); uncapped naive guard: P(kept window fails) = 1
