@@ -398,6 +398,28 @@ NEXT ITERATION: Landmark-event case study (E18) and the final audit (10).
 
 ---
 
+ITERATION NUMBER: 19 (bounds when the null holds only approximately, TH4)
+
+OBJECTIVE: Say how much the false alarm probability can grow when the conditional mean of the clipped squared return drifts above its baseline, the condition that volatility clustering, price ticks and the plug-in baseline break (E16).
+
+PROBLEM IDENTIFIED: Theorem B is all or nothing: it holds when the conditional mean stays at its baseline and says nothing when it drifts by 1%. E16 showed failures outside the class but no theory for how fast the bound degrades.
+
+HYPOTHESIS: Each bet's factor has conditional mean at most 1 plus its bet size times the drift, so an almost-supermartingale argument (in the spirit of Robbins and Siegmund 1971) should give the bound m/A times an explicit inflation factor, and a deterministic stream at the maximal drift should attain it.
+
+CHANGES IMPLEMENTED: `docs/theory_robustness.md` (Lemma 1, Theorem 1 in sup form, Propositions 1 to 5, Lemma 2 and Theorems 2 and 3 in pathwise form, Corollary 1 for the plug-in baseline), `src/avmonitor/robustness.py`, `tests/test_robustness.py`, `experiments/th4_robustness.py`.
+
+EXPERIMENTS PERFORMED: A design table of drifts at which the one-day bound reaches 10% and 25%; constant and switching drifts; every GARCH, plug-in and price-tick cell of E16 against the proved bounds; exact counterexamples.
+
+RESULTS: The one-day 5% bound reaches 10% at a drift of 1.63% and 25% at 2.66% (downward drift only: 6.36% and 10.51%), and 1 at 3.740%, where a deterministic stream alarms within the day from 3.756%. No proved bound is below a measured rate anywhere. For GARCH the proved bound is below 1 in only 22 of 64 one-day cells, all with a small drift. The plug-in baseline is bounded by averaging over calibration windows: 41.8% at one day with 390 calibration steps, 1.29 times the worst stream E16 found. Failed or corrected: an independent review (round 6) found Theorem 3 false as first written (its pathwise term must be the maximum over time, built from bounds that do not respond to the data; two counterexamples), the claim that the mean drift gives a lower estimate false, and "sharp" overclaimed (the bound is attained only where it reaches 1). One test was vacuous (every bound equal to 1) and was replaced. No reported number changed.
+
+IMPROVEMENTS: The guarantee now has a quantitative robustness statement, and the plug-in failure of E10, E14 and E16 has a proved upper bound.
+
+REMAINING ISSUES: The exact worst case below the deterministic alarm step; a bound for price ticks (needs the drift given the whole past); a GARCH bound that is informative where the nominal bound fails.
+
+NEXT ITERATION: The referee-style review of the paper (major revision) and the work that answers it (TH5, TH6, E19 to E21).
+
+---
+
 Further work streams (E13, E14, E16, E17, the alternative prototypes, logs ALT1 to ALT6) keep their own iteration notes in `docs/iterations/`. Their main results are summarised in `docs/experiment_report.md` and `alternatives/ALTERNATIVES.md`.
 
 ---

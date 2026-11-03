@@ -81,7 +81,7 @@ EXPERIMENTS = [
     ("E16 figures", ["experiments/e16_adversarial_null.py", "figures"], False, "full"),
     ("E17 multi-frequency, synthetic", ["experiments/e17_multifrequency.py", "baselines", "levels", "null", "change"], False, "full"),
     ("E17 multi-frequency, real data and figures", ["experiments/e17_multifrequency.py", "real", "ratematch", "figures"], True, "full"),
-    ("TH4 robustness to drift in the conditional mean", ["experiments/th4_robustness.py", "sup", "constant", "switching", "garch", "plugin", "ticks", "figures"], False, "full"),
+    ("TH4 robustness to drift in the conditional mean", ["experiments/th4_robustness.py", "sup", "constant", "switching", "garch", "plugin", "ticks", "counterexamples", "figures"], False, "full"),
 ]
 
 RESULT_DIRS = ["results"] + [str(p.relative_to(ROOT)) for p in sorted((ROOT / "alternatives").glob("*/results"))]

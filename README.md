@@ -22,6 +22,7 @@ Sub-questions (status in [`RESEARCH_STRATEGY_BAPAT.md`](RESEARCH_STRATEGY_BAPAT.
 ## Key results
 
 * **The guarantee holds where classical detectors break [SYNTHETIC].** With jumps or fat tails, Gaussian likelihood-ratio and CUSUM detectors raise a false alarm within a day on 70% to 97% of paths. The robust e-detector stays at 0.3% to 2.3% against its 5% bound, and detects a 50% volatility increase in a median of 36 to 49 steps (E4). Across four very different return laws the measured rate is 1.1% to 1.4% (E9), so the bound is valid but about four times conservative for ordinary returns. An adversarial search over null streams that satisfy the theorem's conditions (E16) found nothing above the bound: the worst stream found, which watches the detector's state, always uses the widest legal spread and, when one draw can reach the threshold, lands exactly on it, reaches 2.62% per day (95% interval 2.50% to 2.75%) against 5%, and 18.1% over five days against 25%. Outside the conditions every failure matched the condition that was broken (clustering, an estimated baseline, coarse price ticks) and disappeared when it was restored (for ticks, the same values drawn independently).
+* **How fast the guarantee degrades when the null holds only approximately [proof and SYNTHETIC].** If the expected clipped squared return can exceed its baseline by at most a relative drift δ, the probability of a false alarm within m steps is at most m/A times a closed-form inflation factor, attained by a deterministic stream where the bound reaches 1. The one-day 5% bound doubles at a drift of 1.63% and reaches 1 at about 3.7% upward drift. A drift that alternates costs far less, but only a pathwise bound shows it, and that bound is proved only when the drift does not respond to the data (or in a looser form). The plug-in baseline's estimation error acts as a persistent drift: its proved bound is 42% for one day with 390 calibration steps, within a factor of 1.3 of the worst stream found in E16 (TH4, [`docs/theory_robustness.md`](docs/theory_robustness.md)).
 * **Why truncation matters for sequential testing.** No nonparametric e-test can detect a *fall* in the variance (a one-sided form of Bahadur and Savage 1956, [`docs/math.md`](docs/math.md) 5.3). A bounded functional can, and the truncated variance is one with a direct volatility meaning.
 * **Estimated baselines need care [SYNTHETIC].** Plugging in an estimated "normal" level roughly triples false alarms with a 390-step calibration window and gives 41% to 44% false alarms over five days, where a known baseline would guarantee at most 25% (E4e, E10, E14); over 30-day streams it raises 0.084 to 0.094 false alarms per day against a nominal 0.05. We proved that at a fixed calibration length no bound of the form C m / A can hold for it, for each of the four simulated return laws of E14 (Proposition A.6 and Lemma A.7 in [`docs/theory_running_tau.md`](docs/theory_running_tau.md)); how often a calibration window makes it drift (77% to 83% of windows at 390 steps) is a numerical estimate. A confidence-sequence baseline restores a proof, P(false alarm within m) ≤ δ + m / A, at a cost of 1.8 to 7.6 times the delay with short calibration (E8).
 * **A monitor with no blind period [SYNTHETIC and REAL].** After each alarm the default monitor spends a day recalibrating, and on real crypto data it is blind about 70% of the time (E12). A rank-based e-detector, restarted with an empty reference set right after each alarm, keeps an exact m / A bound with no baseline at all (at most 3.5% false alarms per day in simulation, against a 5% bound) and catches 98% to 99.6% of changes in streams where volatility moves about once a day, against 56% to 66% for monitors that recalibrate for a day after each alarm (65% to 66% for the default plug-in). Rerun on the FOMC and CPI design of E12, it watches all 114 releases instead of 55; this rerun was done after E12, so it is a check, not a pre-registered test (E14).
@@ -117,6 +118,7 @@ Each experiment is one script in `experiments/` that writes CSV files to `result
 | E15 | Panel of assets with false discovery control | `e15_panel.py synthetic`, `horizon`, `real`, `cs`, `figures` | SYNTHETIC and REAL |
 | E16 | Adversarial search for null streams that push the false alarm rate up | `e16_adversarial_null.py a`, `b`, `figures` | SYNTHETIC |
 | E17 | One monitor for 1, 5 and 15 minutes (certified average of e-detectors) | `e17_multifrequency.py baselines levels null change real ratematch figures` | SYNTHETIC and REAL |
+| TH4 | False alarm bounds when the conditional mean drifts (approximate null), checked against E16 | `th4_robustness.py sup constant switching garch plugin ticks counterexamples figures` | proof and SYNTHETIC |
 
 Then rebuild the report from its parts:
 
@@ -162,6 +164,7 @@ The full list, with what each one affects, is in [`docs/limitations.md`](docs/li
 │   ├── theory_panel.md         many assets at once: e-BH and false discovery control
 │   ├── theory_running_tau.md   running truncation level, rank detector, no blind period
 │   ├── theory_multifreq.md     one monitor for several sampling frequencies (certified average)
+│   ├── theory_robustness.md    false alarm bounds when the null holds only approximately (TH4)
 │   ├── equation_map.md         symbol to code map
 │   ├── literature_review.md    verified references and the gap
 │   ├── limitations.md          what the results do not show
@@ -183,6 +186,7 @@ The full list, with what each one affects, is in [`docs/limitations.md`](docs/li
 │   ├── competitors.py          published change-point methods used as benchmarks
 │   ├── running.py              running truncation level, rank (conformal) monitor, monitors with no blind period
 │   ├── multifreq.py            certified average of e-detectors at several sampling frequencies
+│   ├── robustness.py           drift inflation factors and pathwise bounds for an approximate null (TH4)
 │   ├── design.py               bet grid design from the delay theory
 │   ├── panel.py                panel monitor with e-BH across assets
 │   ├── simulate.py             paper design, stochastic volatility with jumps and noise, GARCH, change points
