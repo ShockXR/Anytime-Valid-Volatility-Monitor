@@ -1,0 +1,451 @@
+design,law,ratio,method,calibration,target,paths,false_alarm_before_change,detected,median_delay,mean_delay,correct_direction,detected_within_390
+E13 change paths,gaussian,1.25,"e-detector, E13 version (common decrease bets)",Ville,,200,0.02,0.98,104.0,115.3061224489796,1.0,0.975
+E13 change paths,gaussian,1.25,"BOCPD-t, matched","Gaussian simulation, matched (E13)",,200,0.01,0.56,185.5,201.50892857142858,0.9732142857142857,0.525
+E13 change paths,gaussian,1.25,"BOCPD-t, p >= 0.5","Gaussian simulation, matched (E13)",,200,0.01,0.35,179.5,207.9857142857143,0.9714285714285714,0.33
+E13 change paths,gaussian,1.25,"e-detector (plug-in, 2A per side)",Ville,,200,0.02,0.98,104.0,115.3061224489796,1.0,0.975
+E13 change paths,gaussian,1.25,SR betting,"Gaussian simulation, matched",0.01305,200,0.015,0.985,112.0,122.55837563451777,1.0,0.98
+E13 change paths,gaussian,1.25,"CUSUM on X, small","Gaussian simulation, matched",0.01305,200,0.02,0.98,102.0,117.28061224489795,1.0,0.965
+E13 change paths,gaussian,1.25,"CUSUM on X, medium","Gaussian simulation, matched",0.01305,200,0.01,0.99,113.0,168.18686868686868,1.0,0.91
+E13 change paths,gaussian,1.25,"HKZ-type on r2, gamma 0.25","Gaussian simulation, matched",0.01305,200,0.005,0.995,187.0,210.89447236180905,1.0,0.92
+E13 change paths,gaussian,1.25,"HKZ-type on X, gamma 0.25","Gaussian simulation, matched",0.01305,200,0.005,0.995,200.0,220.85929648241205,1.0,0.91
+E13 change paths,gaussian,1.25,CSW-type boundary on r2,"Gaussian simulation, matched",0.01305,200,0.01,0.99,367.0,384.54040404040404,1.0,0.58
+E13 change paths,gaussian,1.25,CSW-type boundary on X,"Gaussian simulation, matched",0.01305,200,0.015,0.985,373.0,398.2335025380711,1.0,0.555
+E13 change paths,gaussian,1.25,"HKZ-type on r2, gamma 0.25","asymptotic, 5% open-ended",0.05,200,0.0,1.0,257.5,278.43,1.0,0.815
+E13 change paths,gaussian,1.25,"HKZ-type on X, gamma 0.25","asymptotic, 5% open-ended",0.05,200,0.0,1.0,276.5,297.595,1.0,0.77
+E13 change paths,gaussian,1.25,CSW-type boundary on r2,"asymptotic, 5% open-ended",0.05,200,0.045,0.955,229.0,256.3717277486911,1.0,0.795
+E13 change paths,gaussian,1.25,CSW-type boundary on X,"asymptotic, 5% open-ended",0.05,200,0.04,0.96,249.5,270.0989583333333,1.0,0.795
+E13 change paths,gaussian,2.0,"e-detector, E13 version (common decrease bets)",Ville,,200,0.035,0.965,20.0,20.528497409326423,1.0,0.965
+E13 change paths,gaussian,2.0,"BOCPD-t, matched","Gaussian simulation, matched (E13)",,200,0.01,0.99,33.5,35.101010101010104,1.0,0.99
+E13 change paths,gaussian,2.0,"BOCPD-t, p >= 0.5","Gaussian simulation, matched (E13)",,200,0.0,1.0,37.5,37.92,1.0,1.0
+E13 change paths,gaussian,2.0,"e-detector (plug-in, 2A per side)",Ville,,200,0.035,0.965,20.0,20.528497409326423,1.0,0.965
+E13 change paths,gaussian,2.0,SR betting,"Gaussian simulation, matched",0.01305,200,0.03,0.97,20.0,21.15463917525773,1.0,0.97
+E13 change paths,gaussian,2.0,"CUSUM on X, small","Gaussian simulation, matched",0.01305,200,0.03,0.97,19.0,20.18041237113402,1.0,0.97
+E13 change paths,gaussian,2.0,"CUSUM on X, medium","Gaussian simulation, matched",0.01305,200,0.025,0.975,15.0,16.584615384615386,1.0,0.975
+E13 change paths,gaussian,2.0,"HKZ-type on r2, gamma 0.25","Gaussian simulation, matched",0.01305,200,0.02,0.98,33.5,34.765306122448976,1.0,0.98
+E13 change paths,gaussian,2.0,"HKZ-type on X, gamma 0.25","Gaussian simulation, matched",0.01305,200,0.02,0.98,47.0,46.44897959183673,1.0,0.98
+E13 change paths,gaussian,2.0,CSW-type boundary on r2,"Gaussian simulation, matched",0.01305,200,0.01,0.99,54.0,53.621212121212125,1.0,0.99
+E13 change paths,gaussian,2.0,CSW-type boundary on X,"Gaussian simulation, matched",0.01305,200,0.01,0.99,72.0,71.16161616161617,1.0,0.99
+E13 change paths,gaussian,2.0,"HKZ-type on r2, gamma 0.25","asymptotic, 5% open-ended",0.05,200,0.005,0.995,44.0,44.79396984924623,1.0,0.995
+E13 change paths,gaussian,2.0,"HKZ-type on X, gamma 0.25","asymptotic, 5% open-ended",0.05,200,0.005,0.995,60.0,60.49748743718593,1.0,0.995
+E13 change paths,gaussian,2.0,CSW-type boundary on r2,"asymptotic, 5% open-ended",0.05,200,0.05,0.95,39.5,40.742105263157896,1.0,0.95
+E13 change paths,gaussian,2.0,CSW-type boundary on X,"asymptotic, 5% open-ended",0.05,200,0.045,0.955,54.0,54.3717277486911,1.0,0.955
+E13 change paths,gaussian,0.67,"e-detector, E13 version (common decrease bets)",Ville,,200,0.025,0.975,109.0,104.53333333333333,1.0,0.975
+E13 change paths,gaussian,0.67,"BOCPD-t, matched","Gaussian simulation, matched (E13)",,200,0.025,0.975,64.0,66.11794871794872,1.0,0.975
+E13 change paths,gaussian,0.67,"BOCPD-t, p >= 0.5","Gaussian simulation, matched (E13)",,200,0.005,0.995,71.0,77.17587939698493,1.0,0.995
+E13 change paths,gaussian,0.67,"e-detector (plug-in, 2A per side)",Ville,,200,0.03,0.97,96.5,95.9381443298969,1.0,0.97
+E13 change paths,gaussian,0.67,SR betting,"Gaussian simulation, matched",0.01305,200,0.025,0.975,86.0,85.57435897435897,1.0,0.975
+E13 change paths,gaussian,0.67,"CUSUM on X, small","Gaussian simulation, matched",0.01305,200,0.01,0.99,66.0,67.57070707070707,1.0,0.99
+E13 change paths,gaussian,0.67,"CUSUM on X, medium","Gaussian simulation, matched",0.01305,200,0.01,0.99,55.0,59.31818181818182,1.0,0.99
+E13 change paths,gaussian,0.67,"HKZ-type on r2, gamma 0.25","Gaussian simulation, matched",0.01305,200,0.025,0.975,198.0,200.11282051282052,1.0,0.96
+E13 change paths,gaussian,0.67,"HKZ-type on X, gamma 0.25","Gaussian simulation, matched",0.01305,200,0.02,0.98,192.0,195.3112244897959,1.0,0.965
+E13 change paths,gaussian,0.67,CSW-type boundary on r2,"Gaussian simulation, matched",0.01305,200,0.0,1.0,368.0,374.47,1.0,0.58
+E13 change paths,gaussian,0.67,CSW-type boundary on X,"Gaussian simulation, matched",0.01305,200,0.005,0.995,346.0,353.08040201005025,1.0,0.655
+E13 change paths,gaussian,0.67,"HKZ-type on r2, gamma 0.25","asymptotic, 5% open-ended",0.05,200,0.005,0.995,267.0,272.79899497487435,1.0,0.915
+E13 change paths,gaussian,0.67,"HKZ-type on X, gamma 0.25","asymptotic, 5% open-ended",0.05,200,0.0,1.0,264.5,268.8,1.0,0.92
+E13 change paths,gaussian,0.67,CSW-type boundary on r2,"asymptotic, 5% open-ended",0.05,200,0.06,0.94,240.5,243.55851063829786,1.0,0.895
+E13 change paths,gaussian,0.67,CSW-type boundary on X,"asymptotic, 5% open-ended",0.05,200,0.05,0.95,233.0,239.75263157894736,1.0,0.91
+E13 change paths,jumps,1.25,"e-detector, E13 version (common decrease bets)",Ville,,200,0.01,0.99,104.5,112.64646464646465,0.9949494949494949,0.99
+E13 change paths,jumps,1.25,"BOCPD-t, matched","Gaussian simulation, matched (E13)",,200,0.02,0.465,168.0,202.7741935483871,0.967741935483871,0.445
+E13 change paths,jumps,1.25,"BOCPD-t, p >= 0.5","Gaussian simulation, matched (E13)",,200,0.005,0.32,180.5,193.078125,0.984375,0.31
+E13 change paths,jumps,1.25,"e-detector (plug-in, 2A per side)",Ville,,200,0.01,0.99,104.5,112.65151515151516,0.9949494949494949,0.99
+E13 change paths,jumps,1.25,SR betting,"Gaussian simulation, matched",0.01305,200,0.015,0.985,113.0,125.15228426395939,0.9949238578680203,0.985
+E13 change paths,jumps,1.25,"CUSUM on X, small","Gaussian simulation, matched",0.01305,200,0.01,0.99,106.0,118.33333333333333,1.0,0.99
+E13 change paths,jumps,1.25,"CUSUM on X, medium","Gaussian simulation, matched",0.01305,200,0.025,0.97,132.5,185.2422680412371,1.0,0.845
+E13 change paths,jumps,1.25,"HKZ-type on r2, gamma 0.25","Gaussian simulation, matched",0.01305,200,0.11,0.34,651.0,716.4852941176471,1.0,0.09
+E13 change paths,jumps,1.25,"HKZ-type on X, gamma 0.25","Gaussian simulation, matched",0.01305,200,0.015,0.985,224.0,235.6751269035533,1.0,0.865
+E13 change paths,jumps,1.25,CSW-type boundary on r2,"Gaussian simulation, matched",0.01305,200,0.075,0.195,814.0,754.8461538461538,1.0,0.055
+E13 change paths,jumps,1.25,CSW-type boundary on X,"Gaussian simulation, matched",0.01305,200,0.01,0.99,417.5,439.550505050505,1.0,0.44
+E13 change paths,jumps,1.25,"HKZ-type on r2, gamma 0.25","asymptotic, 5% open-ended",0.05,200,0.06,0.305,669.0,687.6229508196722,1.0,0.085
+E13 change paths,jumps,1.25,"HKZ-type on X, gamma 0.25","asymptotic, 5% open-ended",0.05,200,0.0,1.0,301.5,318.19,1.0,0.725
+E13 change paths,jumps,1.25,CSW-type boundary on r2,"asymptotic, 5% open-ended",0.05,200,0.15,0.23,681.0,699.7608695652174,1.0,0.06
+E13 change paths,jumps,1.25,CSW-type boundary on X,"asymptotic, 5% open-ended",0.05,200,0.05,0.95,268.0,297.7421052631579,1.0,0.715
+E13 change paths,jumps,2.0,"e-detector, E13 version (common decrease bets)",Ville,,200,0.015,0.985,18.0,19.487309644670052,1.0,0.985
+E13 change paths,jumps,2.0,"BOCPD-t, matched","Gaussian simulation, matched (E13)",,200,0.025,0.975,29.0,30.661538461538463,1.0,0.975
+E13 change paths,jumps,2.0,"BOCPD-t, p >= 0.5","Gaussian simulation, matched (E13)",,200,0.01,0.99,33.0,33.91919191919192,1.0,0.99
+E13 change paths,jumps,2.0,"e-detector (plug-in, 2A per side)",Ville,,200,0.02,0.98,18.5,19.520408163265305,1.0,0.98
+E13 change paths,jumps,2.0,SR betting,"Gaussian simulation, matched",0.01305,200,0.025,0.975,19.0,20.394871794871793,1.0,0.975
+E13 change paths,jumps,2.0,"CUSUM on X, small","Gaussian simulation, matched",0.01305,200,0.025,0.975,18.0,19.553846153846155,0.9948717948717949,0.975
+E13 change paths,jumps,2.0,"CUSUM on X, medium","Gaussian simulation, matched",0.01305,200,0.005,0.995,14.0,15.663316582914574,1.0,0.995
+E13 change paths,jumps,2.0,"HKZ-type on r2, gamma 0.25","Gaussian simulation, matched",0.01305,200,0.13,0.87,196.5,242.70689655172413,1.0,0.705
+E13 change paths,jumps,2.0,"HKZ-type on X, gamma 0.25","Gaussian simulation, matched",0.01305,200,0.03,0.97,47.0,49.6958762886598,1.0,0.97
+E13 change paths,jumps,2.0,CSW-type boundary on r2,"Gaussian simulation, matched",0.01305,200,0.1,0.86,321.5,397.79651162790697,1.0,0.51
+E13 change paths,jumps,2.0,CSW-type boundary on X,"Gaussian simulation, matched",0.01305,200,0.02,0.98,73.5,76.58673469387755,1.0,0.98
+E13 change paths,jumps,2.0,"HKZ-type on r2, gamma 0.25","asymptotic, 5% open-ended",0.05,200,0.075,0.925,248.0,315.23243243243246,1.0,0.7
+E13 change paths,jumps,2.0,"HKZ-type on X, gamma 0.25","asymptotic, 5% open-ended",0.05,200,0.005,0.995,62.0,64.61809045226131,1.0,0.995
+E13 change paths,jumps,2.0,CSW-type boundary on r2,"asymptotic, 5% open-ended",0.05,200,0.145,0.855,245.0,311.2046783625731,1.0,0.645
+E13 change paths,jumps,2.0,CSW-type boundary on X,"asymptotic, 5% open-ended",0.05,200,0.065,0.935,54.0,57.13368983957219,1.0,0.935
+E13 change paths,jumps,0.67,"e-detector, E13 version (common decrease bets)",Ville,,200,0.02,0.98,117.0,117.31122448979592,1.0,0.98
+E13 change paths,jumps,0.67,"BOCPD-t, matched","Gaussian simulation, matched (E13)",,200,0.02,0.98,66.0,65.12244897959184,1.0,0.98
+E13 change paths,jumps,0.67,"BOCPD-t, p >= 0.5","Gaussian simulation, matched (E13)",,200,0.005,0.995,75.0,76.30150753768844,1.0,0.995
+E13 change paths,jumps,0.67,"e-detector (plug-in, 2A per side)",Ville,,200,0.025,0.975,111.0,112.43076923076923,1.0,0.975
+E13 change paths,jumps,0.67,SR betting,"Gaussian simulation, matched",0.01305,200,0.025,0.975,101.0,101.6,1.0,0.975
+E13 change paths,jumps,0.67,"CUSUM on X, small","Gaussian simulation, matched",0.01305,200,0.02,0.98,68.5,72.5204081632653,1.0,0.98
+E13 change paths,jumps,0.67,"CUSUM on X, medium","Gaussian simulation, matched",0.01305,200,0.01,0.99,55.5,62.282828282828284,1.0,0.99
+E13 change paths,jumps,0.67,"HKZ-type on r2, gamma 0.25","Gaussian simulation, matched",0.01305,200,0.13,0.47,830.5,824.468085106383,0.9361702127659575,0.07
+E13 change paths,jumps,0.67,"HKZ-type on X, gamma 0.25","Gaussian simulation, matched",0.01305,200,0.015,0.985,212.0,216.08629441624365,1.0,0.955
+E13 change paths,jumps,0.67,CSW-type boundary on r2,"Gaussian simulation, matched",0.01305,200,0.075,0.07,514.0,633.3571428571429,0.5714285714285714,0.03
+E13 change paths,jumps,0.67,CSW-type boundary on X,"Gaussian simulation, matched",0.01305,200,0.01,0.99,396.5,401.64141414141415,1.0,0.475
+E13 change paths,jumps,0.67,"HKZ-type on r2, gamma 0.25","asymptotic, 5% open-ended",0.05,200,0.08,0.245,850.0,817.265306122449,0.8571428571428571,0.045
+E13 change paths,jumps,0.67,"HKZ-type on X, gamma 0.25","asymptotic, 5% open-ended",0.05,200,0.0,1.0,293.5,300.48,1.0,0.84
+E13 change paths,jumps,0.67,CSW-type boundary on r2,"asymptotic, 5% open-ended",0.05,200,0.145,0.195,838.0,812.0,0.9230769230769231,0.04
+E13 change paths,jumps,0.67,CSW-type boundary on X,"asymptotic, 5% open-ended",0.05,200,0.02,0.98,266.0,271.69897959183675,1.0,0.86
+E13 change paths,student t5,1.25,"e-detector, E13 version (common decrease bets)",Ville,,200,0.01,0.99,161.0,175.03535353535352,1.0,0.965
+E13 change paths,student t5,1.25,"BOCPD-t, matched","Gaussian simulation, matched (E13)",,200,0.045,0.565,174.0,228.141592920354,0.9557522123893806,0.505
+E13 change paths,student t5,1.25,"BOCPD-t, p >= 0.5","Gaussian simulation, matched (E13)",,200,0.025,0.395,191.0,220.79746835443038,0.9746835443037974,0.355
+E13 change paths,student t5,1.25,"e-detector (plug-in, 2A per side)",Ville,,200,0.01,0.99,161.0,174.59595959595958,0.9949494949494949,0.965
+E13 change paths,student t5,1.25,SR betting,"Gaussian simulation, matched",0.01305,200,0.02,0.98,176.5,189.03571428571428,0.9948979591836735,0.94
+E13 change paths,student t5,1.25,"CUSUM on X, small","Gaussian simulation, matched",0.01305,200,0.025,0.975,146.0,166.3230769230769,0.9948717948717949,0.945
+E13 change paths,student t5,1.25,"CUSUM on X, medium","Gaussian simulation, matched",0.01305,200,0.065,0.935,202.0,256.5882352941176,1.0,0.73
+E13 change paths,student t5,1.25,"HKZ-type on r2, gamma 0.25","Gaussian simulation, matched",0.01305,200,0.055,0.91,386.0,437.63186813186815,1.0,0.465
+E13 change paths,student t5,1.25,"HKZ-type on X, gamma 0.25","Gaussian simulation, matched",0.01305,200,0.015,0.985,311.0,333.51269035532994,1.0,0.665
+E13 change paths,student t5,1.25,CSW-type boundary on r2,"Gaussian simulation, matched",0.01305,200,0.04,0.8,667.0,703.1375,1.0,0.185
+E13 change paths,student t5,1.25,CSW-type boundary on X,"Gaussian simulation, matched",0.01305,200,0.0,0.995,600.0,635.8894472361809,1.0,0.185
+E13 change paths,student t5,1.25,"HKZ-type on r2, gamma 0.25","asymptotic, 5% open-ended",0.05,200,0.02,0.925,501.0,555.2918918918919,1.0,0.315
+E13 change paths,student t5,1.25,"HKZ-type on X, gamma 0.25","asymptotic, 5% open-ended",0.05,200,0.0,1.0,428.5,452.46,1.0,0.41
+E13 change paths,student t5,1.25,CSW-type boundary on r2,"asymptotic, 5% open-ended",0.05,200,0.085,0.85,469.5,533.6764705882352,1.0,0.32
+E13 change paths,student t5,1.25,CSW-type boundary on X,"asymptotic, 5% open-ended",0.05,200,0.055,0.945,396.0,427.1587301587302,1.0,0.465
+E13 change paths,student t5,2.0,"e-detector, E13 version (common decrease bets)",Ville,,200,0.035,0.965,25.0,25.38860103626943,1.0,0.965
+E13 change paths,student t5,2.0,"BOCPD-t, matched","Gaussian simulation, matched (E13)",,200,0.055,0.945,31.0,32.19047619047619,1.0,0.945
+E13 change paths,student t5,2.0,"BOCPD-t, p >= 0.5","Gaussian simulation, matched (E13)",,200,0.015,0.985,35.0,35.91878172588832,1.0,0.985
+E13 change paths,student t5,2.0,"e-detector (plug-in, 2A per side)",Ville,,200,0.04,0.96,25.0,25.411458333333332,1.0,0.96
+E13 change paths,student t5,2.0,SR betting,"Gaussian simulation, matched",0.01305,200,0.05,0.95,26.0,26.642105263157895,1.0,0.95
+E13 change paths,student t5,2.0,"CUSUM on X, small","Gaussian simulation, matched",0.01305,200,0.105,0.895,25.0,25.932960893854748,1.0,0.895
+E13 change paths,student t5,2.0,"CUSUM on X, medium","Gaussian simulation, matched",0.01305,200,0.085,0.915,21.0,21.6775956284153,1.0,0.915
+E13 change paths,student t5,2.0,"HKZ-type on r2, gamma 0.25","Gaussian simulation, matched",0.01305,200,0.075,0.925,63.0,69.27567567567567,1.0,0.925
+E13 change paths,student t5,2.0,"HKZ-type on X, gamma 0.25","Gaussian simulation, matched",0.01305,200,0.045,0.955,71.0,72.5130890052356,1.0,0.955
+E13 change paths,student t5,2.0,CSW-type boundary on r2,"Gaussian simulation, matched",0.01305,200,0.045,0.955,99.0,106.96335078534031,1.0,0.955
+E13 change paths,student t5,2.0,CSW-type boundary on X,"Gaussian simulation, matched",0.01305,200,0.02,0.98,113.5,113.45408163265306,1.0,0.98
+E13 change paths,student t5,2.0,"HKZ-type on r2, gamma 0.25","asymptotic, 5% open-ended",0.05,200,0.025,0.975,80.0,86.45641025641025,1.0,0.975
+E13 change paths,student t5,2.0,"HKZ-type on X, gamma 0.25","asymptotic, 5% open-ended",0.05,200,0.005,0.995,93.0,93.12562814070351,1.0,0.995
+E13 change paths,student t5,2.0,CSW-type boundary on r2,"asymptotic, 5% open-ended",0.05,200,0.105,0.895,75.0,81.50837988826815,1.0,0.895
+E13 change paths,student t5,2.0,CSW-type boundary on X,"asymptotic, 5% open-ended",0.05,200,0.075,0.925,85.0,84.86486486486487,1.0,0.925
+E13 change paths,student t5,0.67,"e-detector, E13 version (common decrease bets)",Ville,,200,0.035,0.965,107.0,109.61139896373057,1.0,0.965
+E13 change paths,student t5,0.67,"BOCPD-t, matched","Gaussian simulation, matched (E13)",,200,0.065,0.935,62.0,67.39572192513369,1.0,0.935
+E13 change paths,student t5,0.67,"BOCPD-t, p >= 0.5","Gaussian simulation, matched (E13)",,200,0.035,0.96,76.5,80.578125,1.0,0.96
+E13 change paths,student t5,0.67,"e-detector (plug-in, 2A per side)",Ville,,200,0.035,0.965,103.0,106.05699481865285,1.0,0.965
+E13 change paths,student t5,0.67,SR betting,"Gaussian simulation, matched",0.01305,200,0.03,0.97,92.5,94.50515463917526,1.0,0.97
+E13 change paths,student t5,0.67,"CUSUM on X, small","Gaussian simulation, matched",0.01305,200,0.08,0.92,71.5,72.96195652173913,1.0,0.92
+E13 change paths,student t5,0.67,"CUSUM on X, medium","Gaussian simulation, matched",0.01305,200,0.095,0.905,56.0,65.56353591160222,1.0,0.905
+E13 change paths,student t5,0.67,"HKZ-type on r2, gamma 0.25","Gaussian simulation, matched",0.01305,200,0.04,0.95,346.5,367.2421052631579,1.0,0.57
+E13 change paths,student t5,0.67,"HKZ-type on X, gamma 0.25","Gaussian simulation, matched",0.01305,200,0.015,0.985,224.0,232.5989847715736,1.0,0.925
+E13 change paths,student t5,0.67,CSW-type boundary on r2,"Gaussian simulation, matched",0.01305,200,0.045,0.885,777.0,824.0451977401129,1.0,0.03
+E13 change paths,student t5,0.67,CSW-type boundary on X,"Gaussian simulation, matched",0.01305,200,0.015,0.985,438.0,446.005076142132,1.0,0.36
+E13 change paths,student t5,0.67,"HKZ-type on r2, gamma 0.25","asymptotic, 5% open-ended",0.05,200,0.02,0.965,513.0,536.6062176165804,1.0,0.23
+E13 change paths,student t5,0.67,"HKZ-type on X, gamma 0.25","asymptotic, 5% open-ended",0.05,200,0.005,0.995,315.0,323.5427135678392,1.0,0.735
+E13 change paths,student t5,0.67,CSW-type boundary on r2,"asymptotic, 5% open-ended",0.05,200,0.105,0.88,460.5,494.33522727272725,1.0,0.34
+E13 change paths,student t5,0.67,CSW-type boundary on X,"asymptotic, 5% open-ended",0.05,200,0.05,0.95,281.5,287.07894736842104,1.0,0.77
+E13 change paths,price noise,1.25,"e-detector, E13 version (common decrease bets)",Ville,,200,0.03,0.97,184.0,198.43814432989691,1.0,0.895
+E13 change paths,price noise,1.25,"BOCPD-t, matched","Gaussian simulation, matched (E13)",,200,0.025,0.205,240.0,296.9756097560976,0.926829268292683,0.175
+E13 change paths,price noise,1.25,"BOCPD-t, p >= 0.5","Gaussian simulation, matched (E13)",,200,0.01,0.085,216.0,282.7647058823529,0.9411764705882353,0.08
+E13 change paths,price noise,1.25,"e-detector (plug-in, 2A per side)",Ville,,200,0.035,0.965,183.0,197.71502590673575,1.0,0.89
+E13 change paths,price noise,1.25,SR betting,"Gaussian simulation, matched",0.01305,200,0.055,0.945,190.0,209.38095238095238,1.0,0.85
+E13 change paths,price noise,1.25,"CUSUM on X, small","Gaussian simulation, matched",0.01305,200,0.035,0.965,189.0,242.1917098445596,1.0,0.83
+E13 change paths,price noise,1.25,"CUSUM on X, medium","Gaussian simulation, matched",0.01305,200,0.01,0.97,263.0,356.87113402061857,1.0,0.655
+E13 change paths,price noise,1.25,"HKZ-type on r2, gamma 0.25","Gaussian simulation, matched",0.01305,200,0.03,0.97,300.5,339.3144329896907,1.0,0.665
+E13 change paths,price noise,1.25,"HKZ-type on X, gamma 0.25","Gaussian simulation, matched",0.01305,200,0.01,0.99,310.5,342.67171717171715,1.0,0.655
+E13 change paths,price noise,1.25,CSW-type boundary on r2,"Gaussian simulation, matched",0.01305,200,0.03,0.935,628.0,656.0748663101605,1.0,0.185
+E13 change paths,price noise,1.25,CSW-type boundary on X,"Gaussian simulation, matched",0.01305,200,0.025,0.945,641.0,662.8253968253969,1.0,0.215
+E13 change paths,price noise,1.25,"HKZ-type on r2, gamma 0.25","asymptotic, 5% open-ended",0.05,200,0.0,1.0,423.0,459.535,1.0,0.435
+E13 change paths,price noise,1.25,"HKZ-type on X, gamma 0.25","asymptotic, 5% open-ended",0.05,200,0.0,1.0,436.5,473.805,1.0,0.4
+E13 change paths,price noise,1.25,CSW-type boundary on r2,"asymptotic, 5% open-ended",0.05,200,0.06,0.935,393.0,431.0534759358289,1.0,0.465
+E13 change paths,price noise,1.25,CSW-type boundary on X,"asymptotic, 5% open-ended",0.05,200,0.06,0.935,404.0,446.2513368983957,1.0,0.45
+E13 change paths,price noise,2.0,"e-detector, E13 version (common decrease bets)",Ville,,200,0.05,0.95,26.0,28.178947368421053,1.0,0.95
+E13 change paths,price noise,2.0,"BOCPD-t, matched","Gaussian simulation, matched (E13)",,200,0.015,0.985,48.0,50.6243654822335,1.0,0.985
+E13 change paths,price noise,2.0,"BOCPD-t, p >= 0.5","Gaussian simulation, matched (E13)",,200,0.01,0.99,53.0,56.13636363636363,1.0,0.99
+E13 change paths,price noise,2.0,"e-detector (plug-in, 2A per side)",Ville,,200,0.06,0.94,26.0,28.095744680851062,1.0,0.94
+E13 change paths,price noise,2.0,SR betting,"Gaussian simulation, matched",0.01305,200,0.04,0.96,27.0,29.359375,1.0,0.96
+E13 change paths,price noise,2.0,"CUSUM on X, small","Gaussian simulation, matched",0.01305,200,0.03,0.97,25.5,27.644329896907216,1.0,0.97
+E13 change paths,price noise,2.0,"CUSUM on X, medium","Gaussian simulation, matched",0.01305,200,0.025,0.975,21.0,23.128205128205128,1.0,0.975
+E13 change paths,price noise,2.0,"HKZ-type on r2, gamma 0.25","Gaussian simulation, matched",0.01305,200,0.05,0.95,51.0,54.06315789473684,1.0,0.95
+E13 change paths,price noise,2.0,"HKZ-type on X, gamma 0.25","Gaussian simulation, matched",0.01305,200,0.04,0.96,62.0,65.36979166666667,1.0,0.96
+E13 change paths,price noise,2.0,CSW-type boundary on r2,"Gaussian simulation, matched",0.01305,200,0.015,0.985,81.0,85.44162436548223,1.0,0.985
+E13 change paths,price noise,2.0,CSW-type boundary on X,"Gaussian simulation, matched",0.01305,200,0.005,0.995,98.0,102.26633165829146,1.0,0.995
+E13 change paths,price noise,2.0,"HKZ-type on r2, gamma 0.25","asymptotic, 5% open-ended",0.05,200,0.0,1.0,65.5,69.575,1.0,1.0
+E13 change paths,price noise,2.0,"HKZ-type on X, gamma 0.25","asymptotic, 5% open-ended",0.05,200,0.0,1.0,83.0,85.605,1.0,1.0
+E13 change paths,price noise,2.0,CSW-type boundary on r2,"asymptotic, 5% open-ended",0.05,200,0.045,0.955,60.0,62.282722513089006,1.0,0.955
+E13 change paths,price noise,2.0,CSW-type boundary on X,"asymptotic, 5% open-ended",0.05,200,0.05,0.95,73.0,76.11052631578947,1.0,0.95
+E13 change paths,price noise,0.67,"e-detector, E13 version (common decrease bets)",Ville,,200,0.0,1.0,166.5,170.685,1.0,0.995
+E13 change paths,price noise,0.67,"BOCPD-t, matched","Gaussian simulation, matched (E13)",,200,0.03,0.775,160.0,189.99354838709678,1.0,0.73
+E13 change paths,price noise,0.67,"BOCPD-t, p >= 0.5","Gaussian simulation, matched (E13)",,200,0.015,0.6,161.0,186.36666666666667,1.0,0.58
+E13 change paths,price noise,0.67,"e-detector (plug-in, 2A per side)",Ville,,200,0.0,1.0,160.5,162.165,1.0,0.995
+E13 change paths,price noise,0.67,SR betting,"Gaussian simulation, matched",0.01305,200,0.005,0.995,144.0,143.41206030150755,1.0,0.99
+E13 change paths,price noise,0.67,"CUSUM on X, small","Gaussian simulation, matched",0.01305,200,0.01,0.99,135.5,150.9848484848485,1.0,0.965
+E13 change paths,price noise,0.67,"CUSUM on X, medium","Gaussian simulation, matched",0.01305,200,0.015,0.985,162.0,225.2030456852792,1.0,0.845
+E13 change paths,price noise,0.67,"HKZ-type on r2, gamma 0.25","Gaussian simulation, matched",0.01305,200,0.01,0.99,304.0,329.77272727272725,1.0,0.695
+E13 change paths,price noise,0.67,"HKZ-type on X, gamma 0.25","Gaussian simulation, matched",0.01305,200,0.01,0.99,304.5,323.5151515151515,1.0,0.705
+E13 change paths,price noise,0.67,CSW-type boundary on r2,"Gaussian simulation, matched",0.01305,200,0.0,0.995,680.0,715.608040201005,1.0,0.045
+E13 change paths,price noise,0.67,CSW-type boundary on X,"Gaussian simulation, matched",0.01305,200,0.0,0.995,631.0,673.713567839196,1.0,0.085
+E13 change paths,price noise,0.67,"HKZ-type on r2, gamma 0.25","asymptotic, 5% open-ended",0.05,200,0.0,1.0,447.5,470.28,1.0,0.33
+E13 change paths,price noise,0.67,"HKZ-type on X, gamma 0.25","asymptotic, 5% open-ended",0.05,200,0.0,1.0,445.0,464.41,1.0,0.35
+E13 change paths,price noise,0.67,CSW-type boundary on r2,"asymptotic, 5% open-ended",0.05,200,0.045,0.955,404.0,433.0785340314136,1.0,0.46
+E13 change paths,price noise,0.67,CSW-type boundary on X,"asymptotic, 5% open-ended",0.05,200,0.045,0.955,396.0,427.3874345549738,1.0,0.47
+E13 change paths,ticks,1.25,"e-detector, E13 version (common decrease bets)",Ville,,200,0.02,0.98,114.0,132.12244897959184,1.0,0.98
+E13 change paths,ticks,1.25,"BOCPD-t, matched","Gaussian simulation, matched (E13)",,200,0.02,0.5,171.5,239.31,0.95,0.445
+E13 change paths,ticks,1.25,"BOCPD-t, p >= 0.5","Gaussian simulation, matched (E13)",,200,0.005,0.31,165.5,214.40322580645162,0.9516129032258065,0.29
+E13 change paths,ticks,1.25,"e-detector (plug-in, 2A per side)",Ville,,200,0.02,0.98,114.0,132.12244897959184,1.0,0.98
+E13 change paths,ticks,1.25,SR betting,"Gaussian simulation, matched",0.01305,200,0.025,0.975,125.0,141.5076923076923,1.0,0.975
+E13 change paths,ticks,1.25,"CUSUM on X, small","Gaussian simulation, matched",0.01305,200,0.01,0.99,167.0,196.28787878787878,1.0,0.925
+E13 change paths,ticks,1.25,"CUSUM on X, medium","Gaussian simulation, matched",0.01305,200,0.01,0.955,352.0,441.72774869109946,1.0,0.52
+E13 change paths,ticks,1.25,"HKZ-type on r2, gamma 0.25","Gaussian simulation, matched",0.01305,200,0.02,0.98,203.0,209.1887755102041,1.0,0.935
+E13 change paths,ticks,1.25,"HKZ-type on X, gamma 0.25","Gaussian simulation, matched",0.01305,200,0.02,0.98,249.0,253.97448979591837,1.0,0.86
+E13 change paths,ticks,1.25,CSW-type boundary on r2,"Gaussian simulation, matched",0.01305,200,0.005,0.995,370.0,387.7386934673367,1.0,0.54
+E13 change paths,ticks,1.25,CSW-type boundary on X,"Gaussian simulation, matched",0.01305,200,0.0,1.0,457.5,471.48,1.0,0.325
+E13 change paths,ticks,1.25,"HKZ-type on r2, gamma 0.25","asymptotic, 5% open-ended",0.05,200,0.005,0.995,275.0,281.83417085427135,1.0,0.805
+E13 change paths,ticks,1.25,"HKZ-type on X, gamma 0.25","asymptotic, 5% open-ended",0.05,200,0.0,1.0,329.5,344.235,1.0,0.635
+E13 change paths,ticks,1.25,CSW-type boundary on r2,"asymptotic, 5% open-ended",0.05,200,0.02,0.98,252.5,254.76530612244898,1.0,0.84
+E13 change paths,ticks,1.25,CSW-type boundary on X,"asymptotic, 5% open-ended",0.05,200,0.03,0.97,307.0,318.62371134020617,1.0,0.72
+E13 change paths,ticks,2.0,"e-detector, E13 version (common decrease bets)",Ville,,200,0.045,0.955,24.0,25.853403141361255,1.0,0.955
+E13 change paths,ticks,2.0,"BOCPD-t, matched","Gaussian simulation, matched (E13)",,200,0.025,0.975,33.0,34.94358974358974,1.0,0.975
+E13 change paths,ticks,2.0,"BOCPD-t, p >= 0.5","Gaussian simulation, matched (E13)",,200,0.0,1.0,36.0,37.92,1.0,1.0
+E13 change paths,ticks,2.0,"e-detector (plug-in, 2A per side)",Ville,,200,0.045,0.955,24.0,25.853403141361255,1.0,0.955
+E13 change paths,ticks,2.0,SR betting,"Gaussian simulation, matched",0.01305,200,0.04,0.96,25.0,26.927083333333332,1.0,0.96
+E13 change paths,ticks,2.0,"CUSUM on X, small","Gaussian simulation, matched",0.01305,200,0.005,0.995,31.0,32.50753768844221,1.0,0.995
+E13 change paths,ticks,2.0,"CUSUM on X, medium","Gaussian simulation, matched",0.01305,200,0.0,1.0,26.0,27.995,1.0,1.0
+E13 change paths,ticks,2.0,"HKZ-type on r2, gamma 0.25","Gaussian simulation, matched",0.01305,200,0.03,0.97,36.0,36.3041237113402,1.0,0.97
+E13 change paths,ticks,2.0,"HKZ-type on X, gamma 0.25","Gaussian simulation, matched",0.01305,200,0.025,0.975,64.0,65.6974358974359,1.0,0.975
+E13 change paths,ticks,2.0,CSW-type boundary on r2,"Gaussian simulation, matched",0.01305,200,0.02,0.98,53.0,55.63265306122449,1.0,0.98
+E13 change paths,ticks,2.0,CSW-type boundary on X,"Gaussian simulation, matched",0.01305,200,0.005,0.995,104.0,104.37185929648241,1.0,0.995
+E13 change paths,ticks,2.0,"HKZ-type on r2, gamma 0.25","asymptotic, 5% open-ended",0.05,200,0.0,1.0,46.0,46.55,1.0,1.0
+E13 change paths,ticks,2.0,"HKZ-type on X, gamma 0.25","asymptotic, 5% open-ended",0.05,200,0.0,1.0,84.5,86.2,1.0,1.0
+E13 change paths,ticks,2.0,CSW-type boundary on r2,"asymptotic, 5% open-ended",0.05,200,0.055,0.945,40.0,41.216931216931215,1.0,0.945
+E13 change paths,ticks,2.0,CSW-type boundary on X,"asymptotic, 5% open-ended",0.05,200,0.04,0.96,74.0,76.515625,1.0,0.96
+E13 change paths,ticks,0.67,"e-detector, E13 version (common decrease bets)",Ville,,200,0.01,0.99,72.0,72.12626262626263,1.0,0.99
+E13 change paths,ticks,0.67,"BOCPD-t, matched","Gaussian simulation, matched (E13)",,200,0.035,0.965,71.0,74.79792746113989,1.0,0.965
+E13 change paths,ticks,0.67,"BOCPD-t, p >= 0.5","Gaussian simulation, matched (E13)",,200,0.03,0.965,80.0,87.39896373056995,1.0,0.965
+E13 change paths,ticks,0.67,"e-detector (plug-in, 2A per side)",Ville,,200,0.01,0.99,70.0,69.12626262626263,1.0,0.99
+E13 change paths,ticks,0.67,SR betting,"Gaussian simulation, matched",0.01305,200,0.015,0.985,63.0,63.111675126903556,1.0,0.985
+E13 change paths,ticks,0.67,"CUSUM on X, small","Gaussian simulation, matched",0.01305,200,0.0,1.0,75.0,77.5,1.0,1.0
+E13 change paths,ticks,0.67,"CUSUM on X, medium","Gaussian simulation, matched",0.01305,200,0.005,0.995,67.0,73.14070351758794,1.0,0.995
+E13 change paths,ticks,0.67,"HKZ-type on r2, gamma 0.25","Gaussian simulation, matched",0.01305,200,0.015,0.985,183.0,196.44670050761422,1.0,0.975
+E13 change paths,ticks,0.67,"HKZ-type on X, gamma 0.25","Gaussian simulation, matched",0.01305,200,0.01,0.99,167.0,179.2929292929293,1.0,0.99
+E13 change paths,ticks,0.67,CSW-type boundary on r2,"Gaussian simulation, matched",0.01305,200,0.01,0.99,359.5,374.8131313131313,1.0,0.615
+E13 change paths,ticks,0.67,CSW-type boundary on X,"Gaussian simulation, matched",0.01305,200,0.0,1.0,310.0,326.01,1.0,0.75
+E13 change paths,ticks,0.67,"HKZ-type on r2, gamma 0.25","asymptotic, 5% open-ended",0.05,200,0.0,1.0,257.5,269.705,1.0,0.895
+E13 change paths,ticks,0.67,"HKZ-type on X, gamma 0.25","asymptotic, 5% open-ended",0.05,200,0.0,1.0,236.5,246.64,1.0,0.935
+E13 change paths,ticks,0.67,CSW-type boundary on r2,"asymptotic, 5% open-ended",0.05,200,0.02,0.98,229.0,241.3622448979592,1.0,0.92
+E13 change paths,ticks,0.67,CSW-type boundary on X,"asymptotic, 5% open-ended",0.05,200,0.01,0.99,210.0,221.46464646464648,1.0,0.945
+E13 change paths,gaussian,1.5,"e-detector, E13 version (common decrease bets)",Ville,,200,0.015,0.985,37.0,40.20812182741117,1.0,0.985
+E13 change paths,gaussian,1.5,"BOCPD-t, matched","Gaussian simulation, matched (E13)",,200,0.02,0.975,72.0,76.02564102564102,1.0,0.975
+E13 change paths,gaussian,1.5,"BOCPD-t, p >= 0.5","Gaussian simulation, matched (E13)",,200,0.0,0.985,86.0,88.31979695431473,1.0,0.985
+E13 change paths,gaussian,1.5,"e-detector (plug-in, 2A per side)",Ville,,200,0.015,0.985,37.0,40.20812182741117,1.0,0.985
+E13 change paths,gaussian,1.5,SR betting,"Gaussian simulation, matched",0.01305,200,0.015,0.985,40.0,42.055837563451774,1.0,0.985
+E13 change paths,gaussian,1.5,"CUSUM on X, small","Gaussian simulation, matched",0.01305,200,0.0,1.0,40.0,41.37,1.0,1.0
+E13 change paths,gaussian,1.5,"CUSUM on X, medium","Gaussian simulation, matched",0.01305,200,0.005,0.995,31.0,36.63819095477387,1.0,0.995
+E13 change paths,gaussian,1.5,"HKZ-type on r2, gamma 0.25","Gaussian simulation, matched",0.01305,200,0.025,0.975,75.0,81.98461538461538,1.0,0.975
+E13 change paths,gaussian,1.5,"HKZ-type on X, gamma 0.25","Gaussian simulation, matched",0.01305,200,0.025,0.975,84.0,92.0974358974359,1.0,0.975
+E13 change paths,gaussian,1.5,CSW-type boundary on r2,"Gaussian simulation, matched",0.01305,200,0.0,1.0,128.5,137.485,1.0,1.0
+E13 change paths,gaussian,1.5,CSW-type boundary on X,"Gaussian simulation, matched",0.01305,200,0.0,1.0,148.0,153.56,1.0,1.0
+E13 change paths,gaussian,1.5,"HKZ-type on r2, gamma 0.25","asymptotic, 5% open-ended",0.05,200,0.005,0.995,102.0,110.19095477386935,1.0,0.995
+E13 change paths,gaussian,1.5,"HKZ-type on X, gamma 0.25","asymptotic, 5% open-ended",0.05,200,0.0,1.0,121.0,124.76,1.0,1.0
+E13 change paths,gaussian,1.5,CSW-type boundary on r2,"asymptotic, 5% open-ended",0.05,200,0.04,0.96,90.5,96.29166666666667,1.0,0.96
+E13 change paths,gaussian,1.5,CSW-type boundary on X,"asymptotic, 5% open-ended",0.05,200,0.03,0.97,105.0,109.54123711340206,1.0,0.97
+E13 change paths,gaussian,0.8,"e-detector, E13 version (common decrease bets)",Ville,,200,0.015,0.985,169.0,170.0203045685279,1.0,0.985
+E13 change paths,gaussian,0.8,"BOCPD-t, matched","Gaussian simulation, matched (E13)",,200,0.02,0.77,159.0,175.62987012987014,1.0,0.71
+E13 change paths,gaussian,0.8,"BOCPD-t, p >= 0.5","Gaussian simulation, matched (E13)",,200,0.0,0.545,164.0,167.05504587155963,1.0,0.53
+E13 change paths,gaussian,0.8,"e-detector (plug-in, 2A per side)",Ville,,200,0.015,0.985,165.0,163.69035532994923,1.0,0.985
+E13 change paths,gaussian,0.8,SR betting,"Gaussian simulation, matched",0.01305,200,0.025,0.975,144.0,145.75897435897437,1.0,0.975
+E13 change paths,gaussian,0.8,"CUSUM on X, small","Gaussian simulation, matched",0.01305,200,0.025,0.975,140.0,152.05128205128204,1.0,0.955
+E13 change paths,gaussian,0.8,"CUSUM on X, medium","Gaussian simulation, matched",0.01305,200,0.01,0.99,195.5,241.44444444444446,1.0,0.81
+E13 change paths,gaussian,0.8,"HKZ-type on r2, gamma 0.25","Gaussian simulation, matched",0.01305,200,0.015,0.985,302.0,328.6040609137056,1.0,0.675
+E13 change paths,gaussian,0.8,"HKZ-type on X, gamma 0.25","Gaussian simulation, matched",0.01305,200,0.02,0.98,293.5,318.5204081632653,1.0,0.67
+E13 change paths,gaussian,0.8,CSW-type boundary on r2,"Gaussian simulation, matched",0.01305,200,0.01,0.985,657.0,683.3959390862944,1.0,0.075
+E13 change paths,gaussian,0.8,CSW-type boundary on X,"Gaussian simulation, matched",0.01305,200,0.015,0.98,616.5,643.3469387755102,1.0,0.1
+E13 change paths,gaussian,0.8,"HKZ-type on r2, gamma 0.25","asymptotic, 5% open-ended",0.05,200,0.0,1.0,425.0,455.43,1.0,0.41
+E13 change paths,gaussian,0.8,"HKZ-type on X, gamma 0.25","asymptotic, 5% open-ended",0.05,200,0.0,1.0,420.5,448.675,1.0,0.425
+E13 change paths,gaussian,0.8,CSW-type boundary on r2,"asymptotic, 5% open-ended",0.05,200,0.04,0.96,395.5,424.0625,1.0,0.47
+E13 change paths,gaussian,0.8,CSW-type boundary on X,"asymptotic, 5% open-ended",0.05,200,0.055,0.945,398.0,419.84656084656086,1.0,0.465
+E13 change paths,gaussian,0.5,"e-detector, E13 version (common decrease bets)",Ville,,200,0.025,0.975,81.0,78.57435897435897,1.0,0.975
+E13 change paths,gaussian,0.5,"BOCPD-t, matched","Gaussian simulation, matched (E13)",,200,0.01,0.99,27.0,27.717171717171716,1.0,0.99
+E13 change paths,gaussian,0.5,"BOCPD-t, p >= 0.5","Gaussian simulation, matched (E13)",,200,0.0,1.0,31.0,31.89,1.0,1.0
+E13 change paths,gaussian,0.5,"e-detector (plug-in, 2A per side)",Ville,,200,0.025,0.975,76.0,73.55384615384615,1.0,0.975
+E13 change paths,gaussian,0.5,SR betting,"Gaussian simulation, matched",0.01305,200,0.025,0.975,68.0,66.16923076923077,1.0,0.975
+E13 change paths,gaussian,0.5,"CUSUM on X, small","Gaussian simulation, matched",0.01305,200,0.025,0.975,45.0,44.85128205128205,1.0,0.975
+E13 change paths,gaussian,0.5,"CUSUM on X, medium","Gaussian simulation, matched",0.01305,200,0.02,0.98,33.0,32.39795918367347,1.0,0.98
+E13 change paths,gaussian,0.5,"HKZ-type on r2, gamma 0.25","Gaussian simulation, matched",0.01305,200,0.015,0.985,146.0,147.81725888324874,1.0,0.985
+E13 change paths,gaussian,0.5,"HKZ-type on X, gamma 0.25","Gaussian simulation, matched",0.01305,200,0.02,0.98,142.0,143.47448979591837,1.0,0.98
+E13 change paths,gaussian,0.5,CSW-type boundary on r2,"Gaussian simulation, matched",0.01305,200,0.005,0.995,254.0,256.52763819095475,1.0,0.98
+E13 change paths,gaussian,0.5,CSW-type boundary on X,"Gaussian simulation, matched",0.01305,200,0.015,0.985,243.0,243.57868020304568,1.0,0.975
+E13 change paths,gaussian,0.5,"HKZ-type on r2, gamma 0.25","asymptotic, 5% open-ended",0.05,200,0.0,1.0,196.0,197.22,1.0,1.0
+E13 change paths,gaussian,0.5,"HKZ-type on X, gamma 0.25","asymptotic, 5% open-ended",0.05,200,0.0,1.0,194.0,193.415,1.0,1.0
+E13 change paths,gaussian,0.5,CSW-type boundary on r2,"asymptotic, 5% open-ended",0.05,200,0.025,0.975,177.0,176.02564102564102,1.0,0.975
+E13 change paths,gaussian,0.5,CSW-type boundary on X,"asymptotic, 5% open-ended",0.05,200,0.03,0.97,171.5,172.26288659793815,1.0,0.97
+E13 change paths,jumps,1.5,"e-detector, E13 version (common decrease bets)",Ville,,200,0.02,0.98,43.0,45.44897959183673,1.0,0.98
+E13 change paths,jumps,1.5,"BOCPD-t, matched","Gaussian simulation, matched (E13)",,200,0.01,0.99,77.5,84.9949494949495,1.0,0.99
+E13 change paths,jumps,1.5,"BOCPD-t, p >= 0.5","Gaussian simulation, matched (E13)",,200,0.0,1.0,86.0,94.69,1.0,1.0
+E13 change paths,jumps,1.5,"e-detector (plug-in, 2A per side)",Ville,,200,0.02,0.98,43.0,45.44897959183673,1.0,0.98
+E13 change paths,jumps,1.5,SR betting,"Gaussian simulation, matched",0.01305,200,0.02,0.98,44.5,47.91326530612245,1.0,0.98
+E13 change paths,jumps,1.5,"CUSUM on X, small","Gaussian simulation, matched",0.01305,200,0.035,0.965,43.0,45.031088082901555,1.0,0.965
+E13 change paths,jumps,1.5,"CUSUM on X, medium","Gaussian simulation, matched",0.01305,200,0.02,0.98,35.5,41.13775510204081,1.0,0.98
+E13 change paths,jumps,1.5,"HKZ-type on r2, gamma 0.25","Gaussian simulation, matched",0.01305,200,0.085,0.79,456.0,547.1582278481013,1.0,0.34
+E13 change paths,jumps,1.5,"HKZ-type on X, gamma 0.25","Gaussian simulation, matched",0.01305,200,0.02,0.98,101.0,101.64285714285714,1.0,0.98
+E13 change paths,jumps,1.5,CSW-type boundary on r2,"Gaussian simulation, matched",0.01305,200,0.075,0.51,686.5,737.6862745098039,1.0,0.12
+E13 change paths,jumps,1.5,CSW-type boundary on X,"Gaussian simulation, matched",0.01305,200,0.005,0.995,161.0,166.46231155778895,1.0,0.995
+E13 change paths,jumps,1.5,"HKZ-type on r2, gamma 0.25","asymptotic, 5% open-ended",0.05,200,0.06,0.7,547.0,599.05,1.0,0.205
+E13 change paths,jumps,1.5,"HKZ-type on X, gamma 0.25","asymptotic, 5% open-ended",0.05,200,0.0,1.0,135.0,137.2,1.0,1.0
+E13 change paths,jumps,1.5,CSW-type boundary on r2,"asymptotic, 5% open-ended",0.05,200,0.125,0.64,515.0,590.5625,1.0,0.2
+E13 change paths,jumps,1.5,CSW-type boundary on X,"asymptotic, 5% open-ended",0.05,200,0.02,0.98,118.5,121.12244897959184,1.0,0.98
+E13 change paths,jumps,0.8,"e-detector, E13 version (common decrease bets)",Ville,,200,0.02,0.98,188.0,189.9795918367347,1.0,0.975
+E13 change paths,jumps,0.8,"BOCPD-t, matched","Gaussian simulation, matched (E13)",,200,0.015,0.795,144.0,161.9685534591195,1.0,0.78
+E13 change paths,jumps,0.8,"BOCPD-t, p >= 0.5","Gaussian simulation, matched (E13)",,200,0.005,0.585,167.0,168.18803418803418,1.0,0.58
+E13 change paths,jumps,0.8,"e-detector (plug-in, 2A per side)",Ville,,200,0.02,0.98,184.5,186.14795918367346,1.0,0.975
+E13 change paths,jumps,0.8,SR betting,"Gaussian simulation, matched",0.01305,200,0.03,0.97,152.0,161.70618556701032,1.0,0.965
+E13 change paths,jumps,0.8,"CUSUM on X, small","Gaussian simulation, matched",0.01305,200,0.03,0.97,131.0,149.47938144329896,1.0,0.955
+E13 change paths,jumps,0.8,"CUSUM on X, medium","Gaussian simulation, matched",0.01305,200,0.01,0.99,157.0,240.3838383838384,1.0,0.83
+E13 change paths,jumps,0.8,"HKZ-type on r2, gamma 0.25","Gaussian simulation, matched",0.01305,200,0.115,0.225,760.0,726.4444444444445,0.8,0.055
+E13 change paths,jumps,0.8,"HKZ-type on X, gamma 0.25","Gaussian simulation, matched",0.01305,200,0.02,0.98,353.0,355.15816326530614,1.0,0.635
+E13 change paths,jumps,0.8,CSW-type boundary on r2,"Gaussian simulation, matched",0.01305,200,0.095,0.01,89.5,89.5,0.0,0.01
+E13 change paths,jumps,0.8,CSW-type boundary on X,"Gaussian simulation, matched",0.01305,200,0.01,0.985,703.0,724.6142131979695,1.0,0.065
+E13 change paths,jumps,0.8,"HKZ-type on r2, gamma 0.25","asymptotic, 5% open-ended",0.05,200,0.08,0.11,1032.5,850.3181818181819,0.6363636363636364,0.025
+E13 change paths,jumps,0.8,"HKZ-type on X, gamma 0.25","asymptotic, 5% open-ended",0.05,200,0.0,1.0,485.5,492.38,1.0,0.35
+E13 change paths,jumps,0.8,CSW-type boundary on r2,"asymptotic, 5% open-ended",0.05,200,0.13,0.095,925.0,870.8947368421053,0.631578947368421,0.02
+E13 change paths,jumps,0.8,CSW-type boundary on X,"asymptotic, 5% open-ended",0.05,200,0.06,0.94,443.5,458.5691489361702,1.0,0.38
+E13 change paths,jumps,0.5,"e-detector, E13 version (common decrease bets)",Ville,,200,0.02,0.98,81.0,79.16836734693878,1.0,0.98
+E13 change paths,jumps,0.5,"BOCPD-t, matched","Gaussian simulation, matched (E13)",,200,0.02,0.98,26.0,27.505102040816325,1.0,0.98
+E13 change paths,jumps,0.5,"BOCPD-t, p >= 0.5","Gaussian simulation, matched (E13)",,200,0.01,0.99,30.0,31.707070707070706,1.0,0.99
+E13 change paths,jumps,0.5,"e-detector (plug-in, 2A per side)",Ville,,200,0.025,0.975,77.0,76.2051282051282,1.0,0.975
+E13 change paths,jumps,0.5,SR betting,"Gaussian simulation, matched",0.01305,200,0.025,0.975,68.0,67.98461538461538,1.0,0.975
+E13 change paths,jumps,0.5,"CUSUM on X, small","Gaussian simulation, matched",0.01305,200,0.03,0.97,44.0,44.25773195876289,1.0,0.97
+E13 change paths,jumps,0.5,"CUSUM on X, medium","Gaussian simulation, matched",0.01305,200,0.035,0.965,31.0,33.16062176165803,1.0,0.965
+E13 change paths,jumps,0.5,"HKZ-type on r2, gamma 0.25","Gaussian simulation, matched",0.01305,200,0.13,0.645,722.0,731.953488372093,0.937984496124031,0.13
+E13 change paths,jumps,0.5,"HKZ-type on X, gamma 0.25","Gaussian simulation, matched",0.01305,200,0.03,0.97,141.5,142.84536082474227,1.0,0.97
+E13 change paths,jumps,0.5,CSW-type boundary on r2,"Gaussian simulation, matched",0.01305,200,0.1,0.17,767.0,761.1764705882352,0.8823529411764706,0.03
+E13 change paths,jumps,0.5,CSW-type boundary on X,"Gaussian simulation, matched",0.01305,200,0.03,0.97,248.5,251.7319587628866,1.0,0.94
+E13 change paths,jumps,0.5,"HKZ-type on r2, gamma 0.25","asymptotic, 5% open-ended",0.05,200,0.085,0.48,843.0,867.9270833333334,0.9270833333333334,0.065
+E13 change paths,jumps,0.5,"HKZ-type on X, gamma 0.25","asymptotic, 5% open-ended",0.05,200,0.005,0.995,194.0,198.17085427135677,1.0,0.99
+E13 change paths,jumps,0.5,CSW-type boundary on r2,"asymptotic, 5% open-ended",0.05,200,0.16,0.385,707.0,792.6753246753246,0.922077922077922,0.06
+E13 change paths,jumps,0.5,CSW-type boundary on X,"asymptotic, 5% open-ended",0.05,200,0.095,0.905,168.0,172.4364640883978,1.0,0.905
+E13 change paths,student t5,1.5,"e-detector, E13 version (common decrease bets)",Ville,,200,0.03,0.97,50.0,58.48453608247423,1.0,0.97
+E13 change paths,student t5,1.5,"BOCPD-t, matched","Gaussian simulation, matched (E13)",,200,0.025,0.97,76.0,82.31443298969072,1.0,0.97
+E13 change paths,student t5,1.5,"BOCPD-t, p >= 0.5","Gaussian simulation, matched (E13)",,200,0.01,0.975,91.0,93.7897435897436,1.0,0.975
+E13 change paths,student t5,1.5,"e-detector (plug-in, 2A per side)",Ville,,200,0.03,0.97,50.0,58.48453608247423,1.0,0.97
+E13 change paths,student t5,1.5,SR betting,"Gaussian simulation, matched",0.01305,200,0.03,0.97,54.0,61.16494845360825,1.0,0.97
+E13 change paths,student t5,1.5,"CUSUM on X, small","Gaussian simulation, matched",0.01305,200,0.075,0.925,52.0,56.27567567567568,1.0,0.925
+E13 change paths,student t5,1.5,"CUSUM on X, medium","Gaussian simulation, matched",0.01305,200,0.07,0.93,44.5,57.68817204301075,1.0,0.93
+E13 change paths,student t5,1.5,"HKZ-type on r2, gamma 0.25","Gaussian simulation, matched",0.01305,200,0.055,0.945,145.0,170.60846560846562,1.0,0.925
+E13 change paths,student t5,1.5,"HKZ-type on X, gamma 0.25","Gaussian simulation, matched",0.01305,200,0.035,0.965,132.0,137.84455958549222,1.0,0.965
+E13 change paths,student t5,1.5,CSW-type boundary on r2,"Gaussian simulation, matched",0.01305,200,0.06,0.925,247.0,272.9027027027027,1.0,0.79
+E13 change paths,student t5,1.5,CSW-type boundary on X,"Gaussian simulation, matched",0.01305,200,0.005,0.995,224.0,233.14572864321607,1.0,0.965
+E13 change paths,student t5,1.5,"HKZ-type on r2, gamma 0.25","asymptotic, 5% open-ended",0.05,200,0.025,0.975,190.0,221.46153846153845,1.0,0.89
+E13 change paths,student t5,1.5,"HKZ-type on X, gamma 0.25","asymptotic, 5% open-ended",0.05,200,0.005,0.995,176.0,183.6180904522613,1.0,0.98
+E13 change paths,student t5,1.5,CSW-type boundary on r2,"asymptotic, 5% open-ended",0.05,200,0.095,0.905,177.0,207.09944751381215,1.0,0.835
+E13 change paths,student t5,1.5,CSW-type boundary on X,"asymptotic, 5% open-ended",0.05,200,0.05,0.95,156.5,165.5,1.0,0.95
+E13 change paths,student t5,0.8,"e-detector, E13 version (common decrease bets)",Ville,,200,0.04,0.96,206.5,230.53125,1.0,0.875
+E13 change paths,student t5,0.8,"BOCPD-t, matched","Gaussian simulation, matched (E13)",,200,0.045,0.78,168.0,205.67948717948718,1.0,0.725
+E13 change paths,student t5,0.8,"BOCPD-t, p >= 0.5","Gaussian simulation, matched (E13)",,200,0.015,0.56,180.5,204.54464285714286,1.0,0.52
+E13 change paths,student t5,0.8,"e-detector (plug-in, 2A per side)",Ville,,200,0.04,0.96,207.0,228.921875,1.0,0.875
+E13 change paths,student t5,0.8,SR betting,"Gaussian simulation, matched",0.01305,200,0.045,0.955,179.0,200.36125654450262,1.0,0.91
+E13 change paths,student t5,0.8,"CUSUM on X, small","Gaussian simulation, matched",0.01305,200,0.055,0.945,162.0,186.78306878306879,0.9947089947089947,0.89
+E13 change paths,student t5,0.8,"CUSUM on X, medium","Gaussian simulation, matched",0.01305,200,0.095,0.905,201.0,262.43646408839777,1.0,0.715
+E13 change paths,student t5,0.8,"HKZ-type on r2, gamma 0.25","Gaussian simulation, matched",0.01305,200,0.035,0.92,628.5,659.9565217391304,0.9945652173913043,0.175
+E13 change paths,student t5,0.8,"HKZ-type on X, gamma 0.25","Gaussian simulation, matched",0.01305,200,0.03,0.97,428.0,453.37113402061857,1.0,0.39
+E13 change paths,student t5,0.8,CSW-type boundary on r2,"Gaussian simulation, matched",0.01305,200,0.025,0.315,1176.0,1122.8253968253969,1.0,0.0
+E13 change paths,student t5,0.8,CSW-type boundary on X,"Gaussian simulation, matched",0.01305,200,0.005,0.865,903.0,897.5202312138729,1.0,0.02
+E13 change paths,student t5,0.8,"HKZ-type on r2, gamma 0.25","asymptotic, 5% open-ended",0.05,200,0.02,0.805,837.0,869.3291925465838,1.0,0.02
+E13 change paths,student t5,0.8,"HKZ-type on X, gamma 0.25","asymptotic, 5% open-ended",0.05,200,0.0,1.0,603.0,639.895,1.0,0.165
+E13 change paths,student t5,0.8,CSW-type boundary on r2,"asymptotic, 5% open-ended",0.05,200,0.08,0.745,767.0,822.51677852349,1.0,0.055
+E13 change paths,student t5,0.8,CSW-type boundary on X,"asymptotic, 5% open-ended",0.05,200,0.045,0.955,566.0,606.0104712041884,1.0,0.2
+E13 change paths,student t5,0.5,"e-detector, E13 version (common decrease bets)",Ville,,200,0.025,0.975,74.0,75.27179487179487,1.0,0.975
+E13 change paths,student t5,0.5,"BOCPD-t, matched","Gaussian simulation, matched (E13)",,200,0.04,0.96,26.0,28.3125,1.0,0.96
+E13 change paths,student t5,0.5,"BOCPD-t, p >= 0.5","Gaussian simulation, matched (E13)",,200,0.025,0.975,30.0,33.35897435897436,1.0,0.975
+E13 change paths,student t5,0.5,"e-detector (plug-in, 2A per side)",Ville,,200,0.03,0.97,70.0,70.37628865979381,1.0,0.97
+E13 change paths,student t5,0.5,SR betting,"Gaussian simulation, matched",0.01305,200,0.04,0.96,63.0,63.885416666666664,1.0,0.96
+E13 change paths,student t5,0.5,"CUSUM on X, small","Gaussian simulation, matched",0.01305,200,0.075,0.925,46.0,45.108108108108105,1.0,0.925
+E13 change paths,student t5,0.5,"CUSUM on X, medium","Gaussian simulation, matched",0.01305,200,0.105,0.895,32.0,32.687150837988824,1.0,0.895
+E13 change paths,student t5,0.5,"HKZ-type on r2, gamma 0.25","Gaussian simulation, matched",0.01305,200,0.085,0.91,254.5,272.7912087912088,1.0,0.785
+E13 change paths,student t5,0.5,"HKZ-type on X, gamma 0.25","Gaussian simulation, matched",0.01305,200,0.015,0.985,172.0,172.3197969543147,1.0,0.985
+E13 change paths,student t5,0.5,CSW-type boundary on r2,"Gaussian simulation, matched",0.01305,200,0.065,0.905,507.0,544.1491712707183,1.0,0.145
+E13 change paths,student t5,0.5,CSW-type boundary on X,"Gaussian simulation, matched",0.01305,200,0.015,0.985,298.0,300.2791878172589,1.0,0.895
+E13 change paths,student t5,0.5,"HKZ-type on r2, gamma 0.25","asymptotic, 5% open-ended",0.05,200,0.04,0.955,357.0,388.1675392670157,1.0,0.595
+E13 change paths,student t5,0.5,"HKZ-type on X, gamma 0.25","asymptotic, 5% open-ended",0.05,200,0.005,0.995,234.0,233.77386934673368,1.0,0.985
+E13 change paths,student t5,0.5,CSW-type boundary on r2,"asymptotic, 5% open-ended",0.05,200,0.115,0.875,322.0,347.81142857142856,1.0,0.625
+E13 change paths,student t5,0.5,CSW-type boundary on X,"asymptotic, 5% open-ended",0.05,200,0.07,0.93,209.5,211.4731182795699,1.0,0.925
+E13 change paths,price noise,1.5,"e-detector, E13 version (common decrease bets)",Ville,,200,0.02,0.98,56.5,65.36734693877551,1.0,0.98
+E13 change paths,price noise,1.5,"BOCPD-t, matched","Gaussian simulation, matched (E13)",,200,0.03,0.92,127.5,135.3804347826087,1.0,0.92
+E13 change paths,price noise,1.5,"BOCPD-t, p >= 0.5","Gaussian simulation, matched (E13)",,200,0.015,0.805,137.0,141.12422360248448,1.0,0.805
+E13 change paths,price noise,1.5,"e-detector (plug-in, 2A per side)",Ville,,200,0.03,0.97,56.5,65.52577319587628,1.0,0.97
+E13 change paths,price noise,1.5,SR betting,"Gaussian simulation, matched",0.01305,200,0.03,0.97,62.5,69.53092783505154,1.0,0.97
+E13 change paths,price noise,1.5,"CUSUM on X, small","Gaussian simulation, matched",0.01305,200,0.02,0.98,58.5,66.06632653061224,1.0,0.98
+E13 change paths,price noise,1.5,"CUSUM on X, medium","Gaussian simulation, matched",0.01305,200,0.025,0.975,53.0,68.31794871794872,1.0,0.975
+E13 change paths,price noise,1.5,"HKZ-type on r2, gamma 0.25","Gaussian simulation, matched",0.01305,200,0.025,0.975,123.0,133.67179487179487,1.0,0.975
+E13 change paths,price noise,1.5,"HKZ-type on X, gamma 0.25","Gaussian simulation, matched",0.01305,200,0.02,0.98,136.0,142.7091836734694,1.0,0.98
+E13 change paths,price noise,1.5,CSW-type boundary on r2,"Gaussian simulation, matched",0.01305,200,0.02,0.98,216.0,226.89795918367346,1.0,0.925
+E13 change paths,price noise,1.5,CSW-type boundary on X,"Gaussian simulation, matched",0.01305,200,0.025,0.975,232.0,245.76923076923077,1.0,0.895
+E13 change paths,price noise,1.5,"HKZ-type on r2, gamma 0.25","asymptotic, 5% open-ended",0.05,200,0.0,1.0,164.0,176.51,1.0,0.985
+E13 change paths,price noise,1.5,"HKZ-type on X, gamma 0.25","asymptotic, 5% open-ended",0.05,200,0.0,1.0,185.0,192.745,1.0,0.98
+E13 change paths,price noise,1.5,CSW-type boundary on r2,"asymptotic, 5% open-ended",0.05,200,0.055,0.945,147.0,160.64021164021165,1.0,0.94
+E13 change paths,price noise,1.5,CSW-type boundary on X,"asymptotic, 5% open-ended",0.05,200,0.045,0.955,165.0,174.43979057591622,1.0,0.945
+E13 change paths,price noise,0.8,"e-detector, E13 version (common decrease bets)",Ville,,200,0.015,0.985,286.0,313.005076142132,1.0,0.72
+E13 change paths,price noise,0.8,"BOCPD-t, matched","Gaussian simulation, matched (E13)",,200,0.01,0.455,268.0,385.1758241758242,1.0,0.3
+E13 change paths,price noise,0.8,"BOCPD-t, p >= 0.5","Gaussian simulation, matched (E13)",,200,0.0,0.25,272.5,389.14,1.0,0.16
+E13 change paths,price noise,0.8,"e-detector (plug-in, 2A per side)",Ville,,200,0.015,0.985,272.0,299.8527918781726,1.0,0.74
+E13 change paths,price noise,0.8,SR betting,"Gaussian simulation, matched",0.01305,200,0.015,0.985,239.0,263.53299492385787,1.0,0.82
+E13 change paths,price noise,0.8,"CUSUM on X, small","Gaussian simulation, matched",0.01305,200,0.025,0.95,313.5,389.5,1.0,0.605
+E13 change paths,price noise,0.8,"CUSUM on X, medium","Gaussian simulation, matched",0.01305,200,0.03,0.685,464.0,592.8540145985402,1.0,0.295
+E13 change paths,price noise,0.8,"HKZ-type on r2, gamma 0.25","Gaussian simulation, matched",0.01305,200,0.015,0.955,570.0,614.4816753926701,1.0,0.235
+E13 change paths,price noise,0.8,"HKZ-type on X, gamma 0.25","Gaussian simulation, matched",0.01305,200,0.015,0.955,556.0,602.1151832460733,1.0,0.265
+E13 change paths,price noise,0.8,CSW-type boundary on r2,"Gaussian simulation, matched",0.01305,200,0.015,0.455,1085.0,1052.7142857142858,1.0,0.005
+E13 change paths,price noise,0.8,CSW-type boundary on X,"Gaussian simulation, matched",0.01305,200,0.01,0.5,1046.5,1022.35,1.0,0.01
+E13 change paths,price noise,0.8,"HKZ-type on r2, gamma 0.25","asymptotic, 5% open-ended",0.05,200,0.0,0.885,802.0,824.9717514124294,1.0,0.075
+E13 change paths,price noise,0.8,"HKZ-type on X, gamma 0.25","asymptotic, 5% open-ended",0.05,200,0.0,0.88,786.0,812.125,1.0,0.08
+E13 change paths,price noise,0.8,CSW-type boundary on r2,"asymptotic, 5% open-ended",0.05,200,0.055,0.825,789.0,792.7515151515152,1.0,0.12
+E13 change paths,price noise,0.8,CSW-type boundary on X,"asymptotic, 5% open-ended",0.05,200,0.035,0.84,763.5,783.5,1.0,0.12
+E13 change paths,price noise,0.5,"e-detector, E13 version (common decrease bets)",Ville,,200,0.035,0.965,122.0,122.02590673575129,1.0,0.965
+E13 change paths,price noise,0.5,"BOCPD-t, matched","Gaussian simulation, matched (E13)",,200,0.0,1.0,81.0,92.405,1.0,0.99
+E13 change paths,price noise,0.5,"BOCPD-t, p >= 0.5","Gaussian simulation, matched (E13)",,200,0.0,0.98,96.5,103.87244897959184,1.0,0.975
+E13 change paths,price noise,0.5,"e-detector (plug-in, 2A per side)",Ville,,200,0.035,0.965,113.0,112.93264248704664,1.0,0.965
+E13 change paths,price noise,0.5,SR betting,"Gaussian simulation, matched",0.01305,200,0.035,0.965,99.0,100.96891191709845,1.0,0.965
+E13 change paths,price noise,0.5,"CUSUM on X, small","Gaussian simulation, matched",0.01305,200,0.02,0.98,77.0,79.87244897959184,1.0,0.98
+E13 change paths,price noise,0.5,"CUSUM on X, medium","Gaussian simulation, matched",0.01305,200,0.015,0.985,71.0,79.78680203045685,1.0,0.985
+E13 change paths,price noise,0.5,"HKZ-type on r2, gamma 0.25","Gaussian simulation, matched",0.01305,200,0.02,0.98,237.0,238.78061224489795,1.0,0.935
+E13 change paths,price noise,0.5,"HKZ-type on X, gamma 0.25","Gaussian simulation, matched",0.01305,200,0.025,0.975,232.0,233.52307692307693,1.0,0.94
+E13 change paths,price noise,0.5,CSW-type boundary on r2,"Gaussian simulation, matched",0.01305,200,0.015,0.985,449.0,452.6700507614213,1.0,0.345
+E13 change paths,price noise,0.5,CSW-type boundary on X,"Gaussian simulation, matched",0.01305,200,0.01,0.99,428.0,429.9343434343434,1.0,0.4
+E13 change paths,price noise,0.5,"HKZ-type on r2, gamma 0.25","asymptotic, 5% open-ended",0.05,200,0.0,1.0,325.5,326.1,1.0,0.745
+E13 change paths,price noise,0.5,"HKZ-type on X, gamma 0.25","asymptotic, 5% open-ended",0.05,200,0.0,1.0,321.0,321.9,1.0,0.74
+E13 change paths,price noise,0.5,CSW-type boundary on r2,"asymptotic, 5% open-ended",0.05,200,0.05,0.95,293.5,295.7368421052632,1.0,0.775
+E13 change paths,price noise,0.5,CSW-type boundary on X,"asymptotic, 5% open-ended",0.05,200,0.05,0.95,287.5,290.72105263157897,1.0,0.8
+E13 change paths,ticks,1.5,"e-detector, E13 version (common decrease bets)",Ville,,200,0.03,0.97,50.0,54.83505154639175,1.0,0.97
+E13 change paths,ticks,1.5,"BOCPD-t, matched","Gaussian simulation, matched (E13)",,200,0.03,0.97,79.0,89.80412371134021,0.9948453608247423,0.965
+E13 change paths,ticks,1.5,"BOCPD-t, p >= 0.5","Gaussian simulation, matched (E13)",,200,0.005,0.98,89.0,99.51020408163265,0.9948979591836735,0.975
+E13 change paths,ticks,1.5,"e-detector (plug-in, 2A per side)",Ville,,200,0.025,0.975,50.0,54.738461538461536,1.0,0.975
+E13 change paths,ticks,1.5,SR betting,"Gaussian simulation, matched",0.01305,200,0.03,0.97,54.0,57.29896907216495,1.0,0.97
+E13 change paths,ticks,1.5,"CUSUM on X, small","Gaussian simulation, matched",0.01305,200,0.01,0.99,62.0,66.87878787878788,1.0,0.99
+E13 change paths,ticks,1.5,"CUSUM on X, medium","Gaussian simulation, matched",0.01305,200,0.0,1.0,63.0,71.58,1.0,1.0
+E13 change paths,ticks,1.5,"HKZ-type on r2, gamma 0.25","Gaussian simulation, matched",0.01305,200,0.04,0.96,88.0,87.05729166666667,1.0,0.96
+E13 change paths,ticks,1.5,"HKZ-type on X, gamma 0.25","Gaussian simulation, matched",0.01305,200,0.025,0.975,110.0,115.08205128205128,1.0,0.975
+E13 change paths,ticks,1.5,CSW-type boundary on r2,"Gaussian simulation, matched",0.01305,200,0.02,0.98,136.0,138.6377551020408,1.0,0.98
+E13 change paths,ticks,1.5,CSW-type boundary on X,"Gaussian simulation, matched",0.01305,200,0.005,0.995,188.0,196.72361809045225,1.0,0.99
+E13 change paths,ticks,1.5,"HKZ-type on r2, gamma 0.25","asymptotic, 5% open-ended",0.05,200,0.0,1.0,109.5,111.505,1.0,1.0
+E13 change paths,ticks,1.5,"HKZ-type on X, gamma 0.25","asymptotic, 5% open-ended",0.05,200,0.0,1.0,148.5,155.76,1.0,1.0
+E13 change paths,ticks,1.5,CSW-type boundary on r2,"asymptotic, 5% open-ended",0.05,200,0.065,0.935,99.0,100.38502673796792,1.0,0.935
+E13 change paths,ticks,1.5,CSW-type boundary on X,"asymptotic, 5% open-ended",0.05,200,0.03,0.97,135.0,137.91237113402062,1.0,0.97
+E13 change paths,ticks,0.8,"e-detector, E13 version (common decrease bets)",Ville,,200,0.025,0.975,132.0,144.37948717948717,1.0,0.975
+E13 change paths,ticks,0.8,"BOCPD-t, matched","Gaussian simulation, matched (E13)",,200,0.015,0.76,162.0,186.86184210526315,1.0,0.735
+E13 change paths,ticks,0.8,"BOCPD-t, p >= 0.5","Gaussian simulation, matched (E13)",,200,0.005,0.545,169.0,187.14678899082568,1.0,0.53
+E13 change paths,ticks,0.8,"e-detector (plug-in, 2A per side)",Ville,,200,0.025,0.975,129.0,141.68205128205128,1.0,0.975
+E13 change paths,ticks,0.8,SR betting,"Gaussian simulation, matched",0.01305,200,0.03,0.97,117.0,128.4020618556701,1.0,0.97
+E13 change paths,ticks,0.8,"CUSUM on X, small","Gaussian simulation, matched",0.01305,200,0.005,0.995,163.0,189.9145728643216,1.0,0.965
+E13 change paths,ticks,0.8,"CUSUM on X, medium","Gaussian simulation, matched",0.01305,200,0.005,0.985,260.0,365.4010152284264,1.0,0.645
+E13 change paths,ticks,0.8,"HKZ-type on r2, gamma 0.25","Gaussian simulation, matched",0.01305,200,0.025,0.975,340.0,349.0,1.0,0.61
+E13 change paths,ticks,0.8,"HKZ-type on X, gamma 0.25","Gaussian simulation, matched",0.01305,200,0.035,0.965,315.0,331.3160621761658,1.0,0.66
+E13 change paths,ticks,0.8,CSW-type boundary on r2,"Gaussian simulation, matched",0.01305,200,0.015,0.96,749.0,747.8854166666666,1.0,0.045
+E13 change paths,ticks,0.8,CSW-type boundary on X,"Gaussian simulation, matched",0.01305,200,0.0,0.99,658.0,679.6464646464647,1.0,0.075
+E13 change paths,ticks,0.8,"HKZ-type on r2, gamma 0.25","asymptotic, 5% open-ended",0.05,200,0.0,1.0,479.5,498.945,1.0,0.28
+E13 change paths,ticks,0.8,"HKZ-type on X, gamma 0.25","asymptotic, 5% open-ended",0.05,200,0.005,0.995,458.0,468.4572864321608,1.0,0.305
+E13 change paths,ticks,0.8,CSW-type boundary on r2,"asymptotic, 5% open-ended",0.05,200,0.055,0.945,442.0,455.6984126984127,1.0,0.35
+E13 change paths,ticks,0.8,CSW-type boundary on X,"asymptotic, 5% open-ended",0.05,200,0.015,0.985,413.0,437.02030456852793,1.0,0.42
+E13 change paths,ticks,0.5,"e-detector, E13 version (common decrease bets)",Ville,,200,0.035,0.965,53.0,51.16580310880829,1.0,0.965
+E13 change paths,ticks,0.5,"BOCPD-t, matched","Gaussian simulation, matched (E13)",,200,0.02,0.98,29.0,29.663265306122447,1.0,0.98
+E13 change paths,ticks,0.5,"BOCPD-t, p >= 0.5","Gaussian simulation, matched (E13)",,200,0.01,0.99,33.0,33.803030303030305,1.0,0.99
+E13 change paths,ticks,0.5,"e-detector (plug-in, 2A per side)",Ville,,200,0.04,0.96,49.0,48.276041666666664,1.0,0.96
+E13 change paths,ticks,0.5,SR betting,"Gaussian simulation, matched",0.01305,200,0.035,0.965,46.0,44.347150259067355,1.0,0.965
+E13 change paths,ticks,0.5,"CUSUM on X, small","Gaussian simulation, matched",0.01305,200,0.01,0.99,47.5,47.464646464646464,1.0,0.99
+E13 change paths,ticks,0.5,"CUSUM on X, medium","Gaussian simulation, matched",0.01305,200,0.0,1.0,34.0,35.03,1.0,1.0
+E13 change paths,ticks,0.5,"HKZ-type on r2, gamma 0.25","Gaussian simulation, matched",0.01305,200,0.03,0.97,150.0,150.2164948453608,1.0,0.97
+E13 change paths,ticks,0.5,"HKZ-type on X, gamma 0.25","Gaussian simulation, matched",0.01305,200,0.035,0.965,135.0,135.53886010362694,1.0,0.965
+E13 change paths,ticks,0.5,CSW-type boundary on r2,"Gaussian simulation, matched",0.01305,200,0.005,0.995,261.0,260.40201005025125,1.0,0.955
+E13 change paths,ticks,0.5,CSW-type boundary on X,"Gaussian simulation, matched",0.01305,200,0.0,1.0,226.0,226.71,1.0,0.995
+E13 change paths,ticks,0.5,"HKZ-type on r2, gamma 0.25","asymptotic, 5% open-ended",0.05,200,0.005,0.995,200.0,199.4572864321608,1.0,0.995
+E13 change paths,ticks,0.5,"HKZ-type on X, gamma 0.25","asymptotic, 5% open-ended",0.05,200,0.0,1.0,179.5,180.425,1.0,1.0
+E13 change paths,ticks,0.5,CSW-type boundary on r2,"asymptotic, 5% open-ended",0.05,200,0.04,0.96,178.0,178.05208333333334,1.0,0.96
+E13 change paths,ticks,0.5,CSW-type boundary on X,"asymptotic, 5% open-ended",0.05,200,0.03,0.97,160.0,160.10309278350516,1.0,0.97

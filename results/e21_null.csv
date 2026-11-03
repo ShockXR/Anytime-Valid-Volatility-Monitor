@@ -1,0 +1,281 @@
+law,method,calibration,target,paths,fa_one_day,fa_one_day_lo,fa_one_day_hi,fa_two_days,design
+gaussian,"e-detector (plug-in, 2A per side)",Ville,,4000,0.01275,0.00971099785967146,0.016723979640878454,0.04625,E21 null
+gaussian,SR betting,"Gaussian simulation, matched",0.01305,4000,0.0155,0.012110378753896534,0.019819321808476856,0.056,E21 null
+gaussian,SR betting,"Gaussian simulation, 5%",0.05,4000,0.049,0.04273223614268208,0.05613318171826817,0.1675,E21 null
+gaussian,"CUSUM on X, small","Gaussian simulation, matched",0.01305,4000,0.012,0.009063156370618466,0.015873260294888683,0.028,E21 null
+gaussian,"CUSUM on X, small","Gaussian simulation, 5%",0.05,4000,0.04475,0.03876771145897341,0.05160586167006784,0.1045,E21 null
+gaussian,"CUSUM on X, medium","Gaussian simulation, matched",0.01305,4000,0.0105,0.007777634833514484,0.014161660161907133,0.02425,E21 null
+gaussian,"CUSUM on X, medium","Gaussian simulation, 5%",0.05,4000,0.04375,0.037837090002125616,0.05053840201352527,0.0895,E21 null
+gaussian,"HKZ-type on r2, gamma 0.25","Gaussian simulation, matched",0.01305,4000,0.00825,0.0058805554135913434,0.011563057076701976,0.02675,E21 null
+gaussian,"HKZ-type on r2, gamma 0.25","Gaussian simulation, 5%",0.05,4000,0.04775,0.04156468596449393,0.054803130504718384,0.10225,E21 null
+gaussian,"HKZ-type on X, gamma 0.25","Gaussian simulation, matched",0.01305,4000,0.01075,0.007990865645598422,0.014447949628170781,0.0315,E21 null
+gaussian,"HKZ-type on X, gamma 0.25","Gaussian simulation, 5%",0.05,4000,0.0465,0.04039837471884334,0.05347184035863103,0.10175,E21 null
+gaussian,"HKZ-type on r2, gamma 0","Gaussian simulation, matched",0.01305,4000,0.008,0.005672587302339802,0.011271504909605927,0.05775,E21 null
+gaussian,"HKZ-type on r2, gamma 0","Gaussian simulation, 5%",0.05,4000,0.049,0.04273223614268208,0.05613318171826817,0.1715,E21 null
+gaussian,"HKZ-type on X, gamma 0","Gaussian simulation, matched",0.01305,4000,0.009,0.006508115606538885,0.012434057718797199,0.06175,E21 null
+gaussian,"HKZ-type on X, gamma 0","Gaussian simulation, 5%",0.05,4000,0.04875,0.04249862917095946,0.05586726841164321,0.175,E21 null
+gaussian,"HKZ-type on r2, gamma 0.45","Gaussian simulation, matched",0.01305,4000,0.011,0.008204523520513868,0.014733812031602922,0.01175,E21 null
+gaussian,"HKZ-type on r2, gamma 0.45","Gaussian simulation, 5%",0.05,4000,0.04675,0.04063153561781627,0.053738199738005685,0.054,E21 null
+gaussian,"HKZ-type on X, gamma 0.45","Gaussian simulation, matched",0.01305,4000,0.01125,0.008418594443342576,0.015019261387121806,0.012,E21 null
+gaussian,"HKZ-type on X, gamma 0.45","Gaussian simulation, 5%",0.05,4000,0.0485,0.04226507031346011,0.05560130699079498,0.056,E21 null
+gaussian,CSW-type boundary on r2,"Gaussian simulation, matched",0.01305,4000,0.011,0.008204523520513868,0.014733812031602922,0.01125,E21 null
+gaussian,CSW-type boundary on r2,"Gaussian simulation, 5%",0.05,4000,0.04825,0.042031559921744815,0.05533529710416267,0.055,E21 null
+gaussian,CSW-type boundary on X,"Gaussian simulation, matched",0.01305,4000,0.01075,0.007990865645598422,0.014447949628170781,0.011,E21 null
+gaussian,CSW-type boundary on X,"Gaussian simulation, 5%",0.05,4000,0.0475,0.041331323124910384,0.054536973065954335,0.0545,E21 null
+gaussian,"HKZ-type on r2, gamma 0.25","asymptotic, 5% open-ended",0.05,4000,0.00075,0.00025509972639003716,0.0022029044134756256,0.00325,E21 null
+gaussian,"HKZ-type on X, gamma 0.25","asymptotic, 5% open-ended",0.05,4000,0.0005,0.00013712874372127763,0.0018213551177967968,0.003,E21 null
+gaussian,"HKZ-type on r2, gamma 0","asymptotic, 5% open-ended",0.05,4000,0.0,5.421010862427522e-20,0.0009594433048228969,0.0,E21 null
+gaussian,"HKZ-type on X, gamma 0","asymptotic, 5% open-ended",0.05,4000,0.0,5.421010862427522e-20,0.0009594433048228969,0.0,E21 null
+gaussian,"HKZ-type on r2, gamma 0.45","asymptotic, 5% open-ended",0.05,4000,0.04175,0.03597857050212051,0.04840075928674968,0.0475,E21 null
+gaussian,"HKZ-type on X, gamma 0.45","asymptotic, 5% open-ended",0.05,4000,0.04025,0.03458718665404399,0.04679502146474067,0.046,E21 null
+gaussian,CSW-type boundary on r2,"asymptotic, 5% open-ended",0.05,4000,0.045,0.03900050373854336,0.051872589668845476,0.05025,E21 null
+gaussian,CSW-type boundary on X,"asymptotic, 5% open-ended",0.05,4000,0.0425,0.036675079175733157,0.049202811448179805,0.04775,E21 null
+gaussian,SR betting,"bootstrap, matched",0.01305,2000,0.0165,0.011772823576138425,0.023080961174021933,0.058,E21 null
+gaussian,SR betting,"bootstrap, 5%",0.05,2000,0.0505,0.04173547319885384,0.06098795233412876,0.1685,E21 null
+gaussian,"CUSUM on X, small","bootstrap, matched",0.01305,2000,0.0135,0.00929449397056005,0.019570793063468934,0.033,E21 null
+gaussian,"CUSUM on X, small","bootstrap, 5%",0.05,2000,0.0485,0.03992009338151942,0.05881100034070892,0.1095,E21 null
+student t3,"e-detector (plug-in, 2A per side)",Ville,,4000,0.0215,0.017442978549837847,0.026475208692877665,0.06075,E21 null
+student t3,SR betting,"Gaussian simulation, matched",0.01305,4000,0.0245,0.020145956720785393,0.02976647386210118,0.07675,E21 null
+student t3,SR betting,"Gaussian simulation, 5%",0.05,4000,0.075,0.06723906398137479,0.08357646282772464,0.20075,E21 null
+student t3,"CUSUM on X, small","Gaussian simulation, matched",0.01305,4000,0.062,0.05493865991168465,0.0699018124233402,0.133,E21 null
+student t3,"CUSUM on X, small","Gaussian simulation, 5%",0.05,4000,0.177,0.16548369607189126,0.18913610430302433,0.33125,E21 null
+student t3,"CUSUM on X, medium","Gaussian simulation, matched",0.01305,4000,0.08175,0.07365519971068459,0.09064737461379975,0.16075,E21 null
+student t3,"CUSUM on X, medium","Gaussian simulation, 5%",0.05,4000,0.21625,0.20376738948182888,0.22927709459365814,0.39875,E21 null
+student t3,"HKZ-type on r2, gamma 0.25","Gaussian simulation, matched",0.01305,4000,0.09975,0.09084394624629094,0.10942408811921978,0.14975,E21 null
+student t3,"HKZ-type on r2, gamma 0.25","Gaussian simulation, 5%",0.05,4000,0.125,0.11510949557523688,0.13561008690338033,0.19025,E21 null
+student t3,"HKZ-type on X, gamma 0.25","Gaussian simulation, matched",0.01305,4000,0.01375,0.010579415026973038,0.017853643586967227,0.03775,E21 null
+student t3,"HKZ-type on X, gamma 0.25","Gaussian simulation, 5%",0.05,4000,0.051,0.04460278326501581,0.05825879682271515,0.10575,E21 null
+student t3,"HKZ-type on r2, gamma 0","Gaussian simulation, matched",0.01305,4000,0.08325,0.07508339880534097,0.0922162971892289,0.154,E21 null
+student t3,"HKZ-type on r2, gamma 0","Gaussian simulation, 5%",0.05,4000,0.10675,0.09755496945408688,0.1166996327051563,0.2065,E21 null
+student t3,"HKZ-type on X, gamma 0","Gaussian simulation, matched",0.01305,4000,0.0125,0.009494704230600752,0.01644075299160157,0.0705,E21 null
+student t3,"HKZ-type on X, gamma 0","Gaussian simulation, 5%",0.05,4000,0.052,0.04553915055431501,0.059320510646806296,0.176,E21 null
+student t3,"HKZ-type on r2, gamma 0.45","Gaussian simulation, matched",0.01305,4000,0.094,0.08534178474037869,0.10343728322313749,0.123,E21 null
+student t3,"HKZ-type on r2, gamma 0.45","Gaussian simulation, 5%",0.05,4000,0.131,0.12089710353537303,0.1418109656235863,0.16825,E21 null
+student t3,"HKZ-type on X, gamma 0.45","Gaussian simulation, matched",0.01305,4000,0.0065,0.004439706807151584,0.009507263734708615,0.007,E21 null
+student t3,"HKZ-type on X, gamma 0.45","Gaussian simulation, 5%",0.05,4000,0.04025,0.03458718665404399,0.04679502146474067,0.0485,E21 null
+student t3,CSW-type boundary on r2,"Gaussian simulation, matched",0.01305,4000,0.08825,0.07984989686813182,0.09744020469338982,0.11425,E21 null
+student t3,CSW-type boundary on r2,"Gaussian simulation, 5%",0.05,4000,0.12925,0.11920828415258572,0.14000314305794048,0.1665,E21 null
+student t3,CSW-type boundary on X,"Gaussian simulation, matched",0.01305,4000,0.00525,0.0034364629642830136,0.008012906185839243,0.0055,E21 null
+student t3,CSW-type boundary on X,"Gaussian simulation, 5%",0.05,4000,0.039,0.03342943317642955,0.04545517355061716,0.04675,E21 null
+student t3,"HKZ-type on r2, gamma 0.25","asymptotic, 5% open-ended",0.05,4000,0.068,0.06060567216284872,0.07622328685251827,0.1065,E21 null
+student t3,"HKZ-type on X, gamma 0.25","asymptotic, 5% open-ended",0.05,4000,0.001,0.00038894703469092196,0.002568577383522329,0.0035,E21 null
+student t3,"HKZ-type on r2, gamma 0","asymptotic, 5% open-ended",0.05,4000,0.02475,0.020372093305628662,0.030039857555605502,0.051,E21 null
+student t3,"HKZ-type on X, gamma 0","asymptotic, 5% open-ended",0.05,4000,0.0,5.421010862427522e-20,0.0009594433048228969,0.00025,E21 null
+student t3,"HKZ-type on r2, gamma 0.45","asymptotic, 5% open-ended",0.05,4000,0.1275,0.11752009121173895,0.13819469405035412,0.16475,E21 null
+student t3,"HKZ-type on X, gamma 0.45","asymptotic, 5% open-ended",0.05,4000,0.03275,0.027667144660405152,0.03872945510795185,0.0395,E21 null
+student t3,CSW-type boundary on r2,"asymptotic, 5% open-ended",0.05,4000,0.127,0.11703786696171944,0.13767787774367843,0.16425,E21 null
+student t3,CSW-type boundary on X,"asymptotic, 5% open-ended",0.05,4000,0.0325,0.02743767018395775,0.038459409306051656,0.03875,E21 null
+student t3,SR betting,"bootstrap, matched",0.01305,2000,0.018,0.013029991411288699,0.024818042196937343,0.05,E21 null
+student t3,SR betting,"bootstrap, 5%",0.05,2000,0.0545,0.04537835608789881,0.06532973306659227,0.1415,E21 null
+student t3,"CUSUM on X, small","bootstrap, matched",0.01305,2000,0.0185,0.013451349780506838,0.02539476678040777,0.0405,E21 null
+student t3,"CUSUM on X, small","bootstrap, 5%",0.05,2000,0.051,0.04218996985412967,0.061531538631541476,0.1145,E21 null
+student t5,"e-detector (plug-in, 2A per side)",Ville,,4000,0.01875,0.01498497751962869,0.023438486661263344,0.05425,E21 null
+student t5,SR betting,"Gaussian simulation, matched",0.01305,4000,0.02,0.016099663696122094,0.02482140187650789,0.06325,E21 null
+student t5,SR betting,"Gaussian simulation, 5%",0.05,4000,0.069,0.061551924978000716,0.07727511515075661,0.18275,E21 null
+student t5,"CUSUM on X, small","Gaussian simulation, matched",0.01305,4000,0.0495,0.04319959304458136,0.056664865373064074,0.10525,E21 null
+student t5,"CUSUM on X, small","Gaussian simulation, 5%",0.05,4000,0.13975,0.12935023667679976,0.15084104222432518,0.27775,E21 null
+student t5,"CUSUM on X, medium","Gaussian simulation, matched",0.01305,4000,0.05275,0.04624188825718045,0.06011633377898362,0.11325,E21 null
+student t5,"CUSUM on X, medium","Gaussian simulation, 5%",0.05,4000,0.15475,0.14387378385861888,0.16628871174336135,0.301,E21 null
+student t5,"HKZ-type on r2, gamma 0.25","Gaussian simulation, matched",0.01305,4000,0.0495,0.04319959304458136,0.056664865373064074,0.07775,E21 null
+student t5,"HKZ-type on r2, gamma 0.25","Gaussian simulation, 5%",0.05,4000,0.0785,0.07056369113818244,0.08724511956778326,0.13,E21 null
+student t5,"HKZ-type on X, gamma 0.25","Gaussian simulation, matched",0.01305,4000,0.016,0.012550150917294736,0.02037859020177383,0.035,E21 null
+student t5,"HKZ-type on X, gamma 0.25","Gaussian simulation, 5%",0.05,4000,0.04825,0.042031559921744815,0.05533529710416267,0.10325,E21 null
+student t5,"HKZ-type on r2, gamma 0","Gaussian simulation, matched",0.01305,4000,0.03825,0.03273556961257185,0.04465047627943209,0.09325,E21 null
+student t5,"HKZ-type on r2, gamma 0","Gaussian simulation, 5%",0.05,4000,0.07,0.06249865100508559,0.0783264702370621,0.175,E21 null
+student t5,"HKZ-type on X, gamma 0","Gaussian simulation, matched",0.01305,4000,0.01525,0.011890866206994333,0.019539314077031463,0.07025,E21 null
+student t5,"HKZ-type on X, gamma 0","Gaussian simulation, 5%",0.05,4000,0.051,0.04460278326501581,0.05825879682271515,0.168,E21 null
+student t5,"HKZ-type on r2, gamma 0.45","Gaussian simulation, matched",0.01305,4000,0.0485,0.04226507031346011,0.05560130699079498,0.05575,E21 null
+student t5,"HKZ-type on r2, gamma 0.45","Gaussian simulation, 5%",0.05,4000,0.09275,0.08414699279440951,0.10213447377736873,0.10725,E21 null
+student t5,"HKZ-type on X, gamma 0.45","Gaussian simulation, matched",0.01305,4000,0.00775,0.005465274344894502,0.01097929758870364,0.0095,E21 null
+student t5,"HKZ-type on X, gamma 0.45","Gaussian simulation, 5%",0.05,4000,0.0555,0.04882185032025879,0.06303109477772877,0.0645,E21 null
+student t5,CSW-type boundary on r2,"Gaussian simulation, matched",0.01305,4000,0.044,0.03806966233588606,0.05080534995811242,0.04875,E21 null
+student t5,CSW-type boundary on r2,"Gaussian simulation, 5%",0.05,4000,0.09125,0.08271389511680942,0.10057044978488329,0.1065,E21 null
+student t5,CSW-type boundary on X,"Gaussian simulation, matched",0.01305,4000,0.0065,0.004439706807151584,0.009507263734708615,0.00675,E21 null
+student t5,CSW-type boundary on X,"Gaussian simulation, 5%",0.05,4000,0.0595,0.05258309612332792,0.06726217342822104,0.068,E21 null
+student t5,"HKZ-type on r2, gamma 0.25","asymptotic, 5% open-ended",0.05,4000,0.0225,0.018341680657161723,0.02757458769894414,0.036,E21 null
+student t5,"HKZ-type on X, gamma 0.25","asymptotic, 5% open-ended",0.05,4000,0.002,0.0010137862633557563,0.003941819268247849,0.0055,E21 null
+student t5,"HKZ-type on r2, gamma 0","asymptotic, 5% open-ended",0.05,4000,0.0045,0.0028484167909137827,0.007102391524165708,0.00975,E21 null
+student t5,"HKZ-type on X, gamma 0","asymptotic, 5% open-ended",0.05,4000,0.0,5.421010862427522e-20,0.0009594433048228969,0.00025,E21 null
+student t5,"HKZ-type on r2, gamma 0.45","asymptotic, 5% open-ended",0.05,4000,0.0875,0.07913436719080913,0.09665717353566974,0.10275,E21 null
+student t5,"HKZ-type on X, gamma 0.45","asymptotic, 5% open-ended",0.05,4000,0.0485,0.04226507031346011,0.05560130699079498,0.05625,E21 null
+student t5,CSW-type boundary on r2,"asymptotic, 5% open-ended",0.05,4000,0.0875,0.07913436719080913,0.09665717353566974,0.10225,E21 null
+student t5,CSW-type boundary on X,"asymptotic, 5% open-ended",0.05,4000,0.05125,0.04483680814911041,0.05852429221696813,0.05775,E21 null
+student t5,SR betting,"bootstrap, matched",0.01305,2000,0.0165,0.011772823576138425,0.023080961174021933,0.0435,E21 null
+student t5,SR betting,"bootstrap, 5%",0.05,2000,0.0545,0.04537835608789881,0.06532973306659227,0.1435,E21 null
+student t5,"CUSUM on X, small","bootstrap, matched",0.01305,2000,0.0175,0.012609752927205314,0.02424019772833217,0.0385,E21 null
+student t5,"CUSUM on X, small","bootstrap, 5%",0.05,2000,0.059,0.04949422078144261,0.07019661494724552,0.1185,E21 null
+jumps,"e-detector (plug-in, 2A per side)",Ville,,4000,0.01225,0.009278753661266577,0.01615718328258816,0.0525,E21 null
+jumps,SR betting,"Gaussian simulation, matched",0.01305,4000,0.014,0.010797286689622685,0.01813529220266517,0.057,E21 null
+jumps,SR betting,"Gaussian simulation, 5%",0.05,4000,0.05425,0.047648518213510925,0.06170682549273868,0.1765,E21 null
+jumps,"CUSUM on X, small","Gaussian simulation, matched",0.01305,4000,0.01925,0.015430305784693892,0.023992198952893326,0.04225,E21 null
+jumps,"CUSUM on X, small","Gaussian simulation, 5%",0.05,4000,0.068,0.06060567216284872,0.07622328685251827,0.14175,E21 null
+jumps,"CUSUM on X, medium","Gaussian simulation, matched",0.01305,4000,0.0225,0.018341680657161723,0.02757458769894414,0.04275,E21 null
+jumps,"CUSUM on X, medium","Gaussian simulation, 5%",0.05,4000,0.07475,0.06700178451713454,0.08331422201361732,0.13525,E21 null
+jumps,"HKZ-type on r2, gamma 0.25","Gaussian simulation, matched",0.01305,4000,0.1175,0.10788585718343033,0.12784811694475917,0.161,E21 null
+jumps,"HKZ-type on r2, gamma 0.25","Gaussian simulation, 5%",0.05,4000,0.148,0.13733336034091262,0.15934208774568268,0.2035,E21 null
+jumps,"HKZ-type on X, gamma 0.25","Gaussian simulation, matched",0.01305,4000,0.013,0.009927624817760673,0.017006872961136826,0.0415,E21 null
+jumps,"HKZ-type on X, gamma 0.25","Gaussian simulation, 5%",0.05,4000,0.0515,0.04507087786270406,0.058789742781722075,0.10925,E21 null
+jumps,"HKZ-type on r2, gamma 0","Gaussian simulation, matched",0.01305,4000,0.0905,0.08199761785492009,0.09978816621172985,0.15325,E21 null
+jumps,"HKZ-type on r2, gamma 0","Gaussian simulation, 5%",0.05,4000,0.1175,0.10788585718343033,0.12784811694475917,0.19875,E21 null
+jumps,"HKZ-type on X, gamma 0","Gaussian simulation, matched",0.01305,4000,0.01275,0.00971099785967146,0.016723979640878454,0.07375,E21 null
+jumps,"HKZ-type on X, gamma 0","Gaussian simulation, 5%",0.05,4000,0.053,0.046476220628004994,0.06038152168650668,0.18325,E21 null
+jumps,"HKZ-type on r2, gamma 0.45","Gaussian simulation, matched",0.01305,4000,0.112,0.1025967346656137,0.12214779333892886,0.13425,E21 null
+jumps,"HKZ-type on r2, gamma 0.45","Gaussian simulation, 5%",0.05,4000,0.149,0.13830182635802488,0.1603717028419608,0.18125,E21 null
+jumps,"HKZ-type on X, gamma 0.45","Gaussian simulation, matched",0.01305,4000,0.01775,0.014096635471233548,0.022328747596268135,0.01825,E21 null
+jumps,"HKZ-type on X, gamma 0.45","Gaussian simulation, 5%",0.05,4000,0.056,0.049291465460016747,0.06356052019466597,0.0645,E21 null
+jumps,CSW-type boundary on r2,"Gaussian simulation, matched",0.01305,4000,0.10275,0.0937184514714485,0.11254382623423326,0.12125,E21 null
+jumps,CSW-type boundary on r2,"Gaussian simulation, 5%",0.05,4000,0.148,0.13733336034091262,0.15934208774568268,0.17975,E21 null
+jumps,CSW-type boundary on X,"Gaussian simulation, matched",0.01305,4000,0.0165,0.012990881801985963,0.020936899873777778,0.01675,E21 null
+jumps,CSW-type boundary on X,"Gaussian simulation, 5%",0.05,4000,0.0555,0.04882185032025879,0.06303109477772877,0.06375,E21 null
+jumps,"HKZ-type on r2, gamma 0.25","asymptotic, 5% open-ended",0.05,4000,0.07975,0.07175225019290443,0.0885541619047992,0.10975,E21 null
+jumps,"HKZ-type on X, gamma 0.25","asymptotic, 5% open-ended",0.05,4000,0.001,0.00038894703469092196,0.002568577383522329,0.00425,E21 null
+jumps,"HKZ-type on r2, gamma 0","asymptotic, 5% open-ended",0.05,4000,0.021,0.01699455345935237,0.025924593226667965,0.04675,E21 null
+jumps,"HKZ-type on X, gamma 0","asymptotic, 5% open-ended",0.05,4000,0.0,5.421010862427522e-20,0.0009594433048228969,0.0,E21 null
+jumps,"HKZ-type on r2, gamma 0.45","asymptotic, 5% open-ended",0.05,4000,0.1475,0.1368491919418856,0.15882721558801455,0.1795,E21 null
+jumps,"HKZ-type on X, gamma 0.45","asymptotic, 5% open-ended",0.05,4000,0.049,0.04273223614268208,0.05613318171826817,0.05475,E21 null
+jumps,CSW-type boundary on r2,"asymptotic, 5% open-ended",0.05,4000,0.14675,0.13612302061386533,0.15805482608099203,0.177,E21 null
+jumps,CSW-type boundary on X,"asymptotic, 5% open-ended",0.05,4000,0.04925,0.042965890881488215,0.056399047257809636,0.05375,E21 null
+jumps,SR betting,"bootstrap, matched",0.01305,2000,0.018,0.013029991411288699,0.024818042196937343,0.0625,E21 null
+jumps,SR betting,"bootstrap, 5%",0.05,2000,0.0535,0.044466187471550546,0.0642457357775634,0.1665,E21 null
+jumps,"CUSUM on X, small","bootstrap, matched",0.01305,2000,0.0185,0.013451349780506838,0.02539476678040777,0.0415,E21 null
+jumps,"CUSUM on X, small","bootstrap, 5%",0.05,2000,0.056,0.046748333872064965,0.06695400414049181,0.118,E21 null
+price noise,"e-detector (plug-in, 2A per side)",Ville,,4000,0.01675,0.013211593534676956,0.021215708419434376,0.06475,E21 null
+price noise,SR betting,"Gaussian simulation, matched",0.01305,4000,0.018,0.014318422063252387,0.02260648128259688,0.07275,E21 null
+price noise,SR betting,"Gaussian simulation, 5%",0.05,4000,0.061,0.053996011518855455,0.06884637970277904,0.195,E21 null
+price noise,"CUSUM on X, small","Gaussian simulation, matched",0.01305,4000,0.01975,0.015876366822980492,0.0245451784713019,0.0415,E21 null
+price noise,"CUSUM on X, small","Gaussian simulation, 5%",0.05,4000,0.065,0.057769851419476034,0.07306486425571988,0.136,E21 null
+price noise,"CUSUM on X, medium","Gaussian simulation, matched",0.01305,4000,0.0235,0.01924272101916858,0.02867162845032764,0.041,E21 null
+price noise,"CUSUM on X, medium","Gaussian simulation, 5%",0.05,4000,0.0675,0.06013272621560794,0.07569719224306384,0.129,E21 null
+price noise,"HKZ-type on r2, gamma 0.25","Gaussian simulation, matched",0.01305,4000,0.01425,0.011015449315953912,0.018416649854681534,0.0395,E21 null
+price noise,"HKZ-type on r2, gamma 0.25","Gaussian simulation, 5%",0.05,4000,0.0495,0.04319959304458136,0.056664865373064074,0.101,E21 null
+price noise,"HKZ-type on X, gamma 0.25","Gaussian simulation, matched",0.01305,4000,0.01225,0.009278753661266577,0.01615718328258816,0.03825,E21 null
+price noise,"HKZ-type on X, gamma 0.25","Gaussian simulation, 5%",0.05,4000,0.047,0.04086474757421077,0.05400450805995878,0.10325,E21 null
+price noise,"HKZ-type on r2, gamma 0","Gaussian simulation, matched",0.01305,4000,0.01425,0.011015449315953912,0.018416649854681534,0.0695,E21 null
+price noise,"HKZ-type on r2, gamma 0","Gaussian simulation, 5%",0.05,4000,0.05025,0.043900980715182836,0.05746203853750537,0.1705,E21 null
+price noise,"HKZ-type on X, gamma 0","Gaussian simulation, matched",0.01305,4000,0.012,0.009063156370618466,0.015873260294888683,0.0695,E21 null
+price noise,"HKZ-type on X, gamma 0","Gaussian simulation, 5%",0.05,4000,0.048,0.04179809835187497,0.05506923839568493,0.1735,E21 null
+price noise,"HKZ-type on r2, gamma 0.45","Gaussian simulation, matched",0.01305,4000,0.01175,0.008847923100887976,0.015588973286271582,0.013,E21 null
+price noise,"HKZ-type on r2, gamma 0.45","Gaussian simulation, 5%",0.05,4000,0.05,0.043667138293704756,0.05719636068063586,0.057,E21 null
+price noise,"HKZ-type on X, gamma 0.45","Gaussian simulation, matched",0.01305,4000,0.0125,0.009494704230600752,0.01644075299160157,0.01375,E21 null
+price noise,"HKZ-type on X, gamma 0.45","Gaussian simulation, 5%",0.05,4000,0.04775,0.04156468596449393,0.054803130504718384,0.0555,E21 null
+price noise,CSW-type boundary on r2,"Gaussian simulation, matched",0.01305,4000,0.01125,0.008418594443342576,0.015019261387121806,0.01175,E21 null
+price noise,CSW-type boundary on r2,"Gaussian simulation, 5%",0.05,4000,0.052,0.04553915055431501,0.059320510646806296,0.059,E21 null
+price noise,CSW-type boundary on X,"Gaussian simulation, matched",0.01305,4000,0.01125,0.008418594443342576,0.015019261387121806,0.01175,E21 null
+price noise,CSW-type boundary on X,"Gaussian simulation, 5%",0.05,4000,0.047,0.04086474757421077,0.05400450805995878,0.05425,E21 null
+price noise,"HKZ-type on r2, gamma 0.25","asymptotic, 5% open-ended",0.05,4000,0.0015,0.0006876391023148934,0.003268925872593535,0.0045,E21 null
+price noise,"HKZ-type on X, gamma 0.25","asymptotic, 5% open-ended",0.05,4000,0.0015,0.0006876391023148934,0.003268925872593535,0.0045,E21 null
+price noise,"HKZ-type on r2, gamma 0","asymptotic, 5% open-ended",0.05,4000,0.0,5.421010862427522e-20,0.0009594433048228969,0.001,E21 null
+price noise,"HKZ-type on X, gamma 0","asymptotic, 5% open-ended",0.05,4000,0.0,5.421010862427522e-20,0.0009594433048228969,0.00075,E21 null
+price noise,"HKZ-type on r2, gamma 0.45","asymptotic, 5% open-ended",0.05,4000,0.047,0.04086474757421077,0.05400450805995878,0.054,E21 null
+price noise,"HKZ-type on X, gamma 0.45","asymptotic, 5% open-ended",0.05,4000,0.04,0.03435550730056523,0.04652718053987183,0.04575,E21 null
+price noise,CSW-type boundary on r2,"asymptotic, 5% open-ended",0.05,4000,0.04775,0.04156468596449393,0.054803130504718384,0.05425,E21 null
+price noise,CSW-type boundary on X,"asymptotic, 5% open-ended",0.05,4000,0.0395,0.033892340419754315,0.04599130686398758,0.045,E21 null
+price noise,SR betting,"bootstrap, matched",0.01305,2000,0.015,0.010527098007952776,0.021332437884141894,0.063,E21 null
+price noise,SR betting,"bootstrap, 5%",0.05,2000,0.0605,0.050869989240924715,0.07181509534582911,0.191,E21 null
+price noise,"CUSUM on X, small","bootstrap, matched",0.01305,2000,0.022,0.01642890807665307,0.029403789153081474,0.0435,E21 null
+price noise,"CUSUM on X, small","bootstrap, 5%",0.05,2000,0.063,0.05316689945781889,0.07450859989237776,0.129,E21 null
+ticks,"e-detector (plug-in, 2A per side)",Ville,,4000,0.0205,0.016546774179035363,0.025373331950289797,0.064,E21 null
+ticks,SR betting,"Gaussian simulation, matched",0.01305,4000,0.0225,0.018341680657161723,0.02757458769894414,0.07525,E21 null
+ticks,SR betting,"Gaussian simulation, 5%",0.05,4000,0.07625,0.06842585434845634,0.08488727385238105,0.201,E21 null
+ticks,"CUSUM on X, small","Gaussian simulation, matched",0.01305,4000,0.004,0.0024636990981918147,0.0064880686601925,0.00975,E21 null
+ticks,"CUSUM on X, small","Gaussian simulation, 5%",0.05,4000,0.0185,0.014762597027321016,0.023161346875223435,0.04275,E21 null
+ticks,"CUSUM on X, medium","Gaussian simulation, matched",0.01305,4000,0.00425,0.0026552475990753704,0.006796040437656532,0.00875,E21 null
+ticks,"CUSUM on X, medium","Gaussian simulation, 5%",0.05,4000,0.01425,0.011015449315953912,0.018416649854681534,0.03175,E21 null
+ticks,"HKZ-type on r2, gamma 0.25","Gaussian simulation, matched",0.01305,4000,0.013,0.009927624817760673,0.017006872961136826,0.036,E21 null
+ticks,"HKZ-type on r2, gamma 0.25","Gaussian simulation, 5%",0.05,4000,0.04525,0.03923334991812911,0.05213926376760731,0.103,E21 null
+ticks,"HKZ-type on X, gamma 0.25","Gaussian simulation, matched",0.01305,4000,0.011,0.008204523520513868,0.014733812031602922,0.0365,E21 null
+ticks,"HKZ-type on X, gamma 0.25","Gaussian simulation, 5%",0.05,4000,0.04825,0.042031559921744815,0.05533529710416267,0.10975,E21 null
+ticks,"HKZ-type on r2, gamma 0","Gaussian simulation, matched",0.01305,4000,0.0125,0.009494704230600752,0.01644075299160157,0.0715,E21 null
+ticks,"HKZ-type on r2, gamma 0","Gaussian simulation, 5%",0.05,4000,0.04325,0.037372114104697235,0.05000433735425848,0.16975,E21 null
+ticks,"HKZ-type on X, gamma 0","Gaussian simulation, matched",0.01305,4000,0.011,0.008204523520513868,0.014733812031602922,0.0715,E21 null
+ticks,"HKZ-type on X, gamma 0","Gaussian simulation, 5%",0.05,4000,0.04775,0.04156468596449393,0.054803130504718384,0.18275,E21 null
+ticks,"HKZ-type on r2, gamma 0.45","Gaussian simulation, matched",0.01305,4000,0.01325,0.010144575830294633,0.017289442226950454,0.01375,E21 null
+ticks,"HKZ-type on r2, gamma 0.45","Gaussian simulation, 5%",0.05,4000,0.04575,0.039699202292151466,0.052672451950280134,0.05225,E21 null
+ticks,"HKZ-type on X, gamma 0.45","Gaussian simulation, matched",0.01305,4000,0.00325,0.0019003484191195458,0.005552858504222002,0.00375,E21 null
+ticks,"HKZ-type on X, gamma 0.45","Gaussian simulation, 5%",0.05,4000,0.03575,0.03042720952629112,0.04196363358223694,0.04475,E21 null
+ticks,CSW-type boundary on r2,"Gaussian simulation, matched",0.01305,4000,0.01175,0.008847923100887976,0.015588973286271582,0.012,E21 null
+ticks,CSW-type boundary on r2,"Gaussian simulation, 5%",0.05,4000,0.04775,0.04156468596449393,0.054803130504718384,0.0535,E21 null
+ticks,CSW-type boundary on X,"Gaussian simulation, matched",0.01305,4000,0.00275,0.0015362781495951606,0.004917888217051211,0.003,E21 null
+ticks,CSW-type boundary on X,"Gaussian simulation, 5%",0.05,4000,0.03325,0.0281263474447756,0.03926929288027657,0.04125,E21 null
+ticks,"HKZ-type on r2, gamma 0.25","asymptotic, 5% open-ended",0.05,4000,0.00175,0.0008479657297876706,0.003608119523468346,0.0035,E21 null
+ticks,"HKZ-type on X, gamma 0.25","asymptotic, 5% open-ended",0.05,4000,0.00075,0.00025509972639003716,0.0022029044134756256,0.0025,E21 null
+ticks,"HKZ-type on r2, gamma 0","asymptotic, 5% open-ended",0.05,4000,0.0,5.421010862427522e-20,0.0009594433048228969,0.00025,E21 null
+ticks,"HKZ-type on X, gamma 0","asymptotic, 5% open-ended",0.05,4000,0.0,5.421010862427522e-20,0.0009594433048228969,0.0,E21 null
+ticks,"HKZ-type on r2, gamma 0.45","asymptotic, 5% open-ended",0.05,4000,0.041,0.035282601613752816,0.04759816734007461,0.0465,E21 null
+ticks,"HKZ-type on X, gamma 0.45","asymptotic, 5% open-ended",0.05,4000,0.0285,0.02377845523603762,0.034126299800410376,0.03525,E21 null
+ticks,CSW-type boundary on r2,"asymptotic, 5% open-ended",0.05,4000,0.0435,0.037604573771891844,0.050271397965411455,0.0475,E21 null
+ticks,CSW-type boundary on X,"asymptotic, 5% open-ended",0.05,4000,0.02775,0.023095160395771714,0.03331103380563351,0.0335,E21 null
+ticks,SR betting,"bootstrap, matched",0.01305,2000,0.015,0.010527098007952776,0.021332437884141894,0.0505,E21 null
+ticks,SR betting,"bootstrap, 5%",0.05,2000,0.0545,0.04537835608789881,0.06532973306659227,0.15,E21 null
+ticks,"CUSUM on X, small","bootstrap, matched",0.01305,2000,0.0145,0.010114677318310235,0.020746775621095875,0.038,E21 null
+ticks,"CUSUM on X, small","bootstrap, 5%",0.05,2000,0.052,0.043099720145654614,0.06261795424539364,0.111,E21 null
+slow SV,"e-detector (plug-in, 2A per side)",Ville,,4000,0.4875,0.4720293880595126,0.5029945980231079,0.781,E21 null
+slow SV,SR betting,"Gaussian simulation, matched",0.01305,4000,0.4935,0.47802010295126224,0.5089923698117004,0.791,E21 null
+slow SV,SR betting,"Gaussian simulation, 5%",0.05,4000,0.5955,0.5802057793435338,0.6106109669852451,0.86925,E21 null
+slow SV,"CUSUM on X, small","Gaussian simulation, matched",0.01305,4000,0.48025,0.4647935833418542,0.49574431466868635,0.72375,E21 null
+slow SV,"CUSUM on X, small","Gaussian simulation, 5%",0.05,4000,0.57875,0.5633801152399337,0.5939687724395567,0.81275,E21 null
+slow SV,"CUSUM on X, medium","Gaussian simulation, matched",0.01305,4000,0.37125,0.35640784045138474,0.3863392161996072,0.586,E21 null
+slow SV,"CUSUM on X, medium","Gaussian simulation, 5%",0.05,4000,0.473,0.45756103952836913,0.48849077041009126,0.70075,E21 null
+slow SV,"HKZ-type on r2, gamma 0.25","Gaussian simulation, matched",0.01305,4000,0.39575,0.38070262810297223,0.41099741582608335,0.62025,E21 null
+slow SV,"HKZ-type on r2, gamma 0.25","Gaussian simulation, 5%",0.05,4000,0.5145,0.4990051547412817,0.5299670214028784,0.72825,E21 null
+slow SV,"HKZ-type on X, gamma 0.25","Gaussian simulation, matched",0.01305,4000,0.4035,0.38839604645863296,0.4187891260991979,0.62475,E21 null
+slow SV,"HKZ-type on X, gamma 0.25","Gaussian simulation, 5%",0.05,4000,0.52,0.5045057532310595,0.5354558690367477,0.73125,E21 null
+slow SV,"HKZ-type on r2, gamma 0","Gaussian simulation, matched",0.01305,4000,0.405,0.3898855508357427,0.4202967433921737,0.6815,E21 null
+slow SV,"HKZ-type on r2, gamma 0","Gaussian simulation, 5%",0.05,4000,0.52,0.5045057532310595,0.5354558690367477,0.777,E21 null
+slow SV,"HKZ-type on X, gamma 0","Gaussian simulation, matched",0.01305,4000,0.41125,0.39609339998277215,0.42657690120383396,0.68525,E21 null
+slow SV,"HKZ-type on X, gamma 0","Gaussian simulation, 5%",0.05,4000,0.52375,0.5082572371564394,0.5391971892865816,0.77975,E21 null
+slow SV,"HKZ-type on r2, gamma 0.45","Gaussian simulation, matched",0.01305,4000,0.2445,0.23143017550647157,0.2580601000222929,0.42425,E21 null
+slow SV,"HKZ-type on r2, gamma 0.45","Gaussian simulation, 5%",0.05,4000,0.41075,0.39559667847610547,0.42607458215380545,0.586,E21 null
+slow SV,"HKZ-type on X, gamma 0.45","Gaussian simulation, matched",0.01305,4000,0.25625,0.24295940149769082,0.2700083271134103,0.43825,E21 null
+slow SV,"HKZ-type on X, gamma 0.45","Gaussian simulation, 5%",0.05,4000,0.424,0.4087652595206052,0.4393805758617278,0.59575,E21 null
+slow SV,CSW-type boundary on r2,"Gaussian simulation, matched",0.01305,4000,0.19775,0.18569920901099055,0.21038077446677492,0.35825,E21 null
+slow SV,CSW-type boundary on r2,"Gaussian simulation, 5%",0.05,4000,0.4035,0.38839604645863296,0.4187891260991979,0.58125,E21 null
+slow SV,CSW-type boundary on X,"Gaussian simulation, matched",0.01305,4000,0.207,0.19472832418569597,0.21983390959093024,0.37425,E21 null
+slow SV,CSW-type boundary on X,"Gaussian simulation, 5%",0.05,4000,0.41425,0.3990740696056219,0.42959047492115526,0.589,E21 null
+slow SV,"HKZ-type on r2, gamma 0.25","asymptotic, 5% open-ended",0.05,4000,0.23325,0.2204041530307705,0.24660770997235254,0.4745,E21 null
+slow SV,"HKZ-type on X, gamma 0.25","asymptotic, 5% open-ended",0.05,4000,0.238,0.2250580429156295,0.25144470537609764,0.476,E21 null
+slow SV,"HKZ-type on r2, gamma 0","asymptotic, 5% open-ended",0.05,4000,0.07625,0.06842585434845634,0.08488727385238105,0.29975,E21 null
+slow SV,"HKZ-type on X, gamma 0","asymptotic, 5% open-ended",0.05,4000,0.07075,0.06320900044986255,0.07911468162732788,0.30325,E21 null
+slow SV,"HKZ-type on r2, gamma 0.45","asymptotic, 5% open-ended",0.05,4000,0.4005,0.38541748018669103,0.41577344903096874,0.5785,E21 null
+slow SV,"HKZ-type on X, gamma 0.45","asymptotic, 5% open-ended",0.05,4000,0.402,0.3869066894862302,0.41728136140151517,0.578,E21 null
+slow SV,CSW-type boundary on r2,"asymptotic, 5% open-ended",0.05,4000,0.39475,0.37971021754744333,0.40999174526822185,0.572,E21 null
+slow SV,CSW-type boundary on X,"asymptotic, 5% open-ended",0.05,4000,0.39575,0.38070262810297223,0.41099741582608335,0.573,E21 null
+slow SV,SR betting,"bootstrap, matched",0.01305,2000,0.4775,0.4556732185403829,0.4994130485886318,0.791,E21 null
+slow SV,SR betting,"bootstrap, 5%",0.05,2000,0.5795,0.5577335058855646,0.6009616835919169,0.8715,E21 null
+slow SV,"CUSUM on X, small","bootstrap, matched",0.01305,2000,0.4555,0.4337799681475921,0.4773906490631259,0.719,E21 null
+slow SV,"CUSUM on X, small","bootstrap, 5%",0.05,2000,0.555,0.5331351075142969,0.5766540172814449,0.803,E21 null
+GARCH 0.99,"e-detector (plug-in, 2A per side)",Ville,,4000,0.83,0.8180438950528575,0.8413228723659594,0.98175,E21 null
+GARCH 0.99,SR betting,"Gaussian simulation, matched",0.01305,4000,0.83925,0.8275427734441593,0.8503062442735184,0.98,E21 null
+GARCH 0.99,SR betting,"Gaussian simulation, 5%",0.05,4000,0.9075,0.8981261470855999,0.9160919066209694,0.9955,E21 null
+GARCH 0.99,"CUSUM on X, small","Gaussian simulation, matched",0.01305,4000,0.8605,0.8494167575603494,0.8708914838168734,0.9805,E21 null
+GARCH 0.99,"CUSUM on X, small","Gaussian simulation, 5%",0.05,4000,0.922,0.913278669973746,0.9299115598769835,0.99325,E21 null
+GARCH 0.99,"CUSUM on X, medium","Gaussian simulation, matched",0.01305,4000,0.83925,0.8275427734441593,0.8503062442735184,0.971,E21 null
+GARCH 0.99,"CUSUM on X, medium","Gaussian simulation, 5%",0.05,4000,0.89775,0.8879759551714759,0.9067608076795377,0.9895,E21 null
+GARCH 0.99,"HKZ-type on r2, gamma 0.25","Gaussian simulation, matched",0.01305,4000,0.3525,0.3378426339728669,0.3674404018020558,0.58775,E21 null
+GARCH 0.99,"HKZ-type on r2, gamma 0.25","Gaussian simulation, 5%",0.05,4000,0.48275,0.4672883203375675,0.49824478045644893,0.709,E21 null
+GARCH 0.99,"HKZ-type on X, gamma 0.25","Gaussian simulation, matched",0.01305,4000,0.3835,0.36855018440914056,0.3986733658808832,0.61875,E21 null
+GARCH 0.99,"HKZ-type on X, gamma 0.25","Gaussian simulation, 5%",0.05,4000,0.5195,0.5040056213087754,0.5349569604023365,0.73675,E21 null
+GARCH 0.99,"HKZ-type on r2, gamma 0","Gaussian simulation, matched",0.01305,4000,0.33925,0.3247382133773164,0.3540702476451842,0.63625,E21 null
+GARCH 0.99,"HKZ-type on r2, gamma 0","Gaussian simulation, 5%",0.05,4000,0.48,0.46454413096325237,0.49549424676894055,0.76375,E21 null
+GARCH 0.99,"HKZ-type on X, gamma 0","Gaussian simulation, matched",0.01305,4000,0.36925,0.354426389040236,0.3843245053839753,0.65875,E21 null
+GARCH 0.99,"HKZ-type on X, gamma 0","Gaussian simulation, 5%",0.05,4000,0.51825,0.5027553593463056,0.5337096209730684,0.787,E21 null
+GARCH 0.99,"HKZ-type on r2, gamma 0.45","Gaussian simulation, matched",0.01305,4000,0.2255,0.21281593904094454,0.23871079533340328,0.35175,E21 null
+GARCH 0.99,"HKZ-type on r2, gamma 0.45","Gaussian simulation, 5%",0.05,4000,0.368,0.35318812164252283,0.3830651713899504,0.539,E21 null
+GARCH 0.99,"HKZ-type on X, gamma 0.45","Gaussian simulation, matched",0.01305,4000,0.25225,0.23903308805722545,0.26594231610031427,0.3865,E21 null
+GARCH 0.99,"HKZ-type on X, gamma 0.45","Gaussian simulation, 5%",0.05,4000,0.4065,0.3913752023543307,0.4218042135436711,0.58,E21 null
+GARCH 0.99,CSW-type boundary on r2,"Gaussian simulation, matched",0.01305,4000,0.192,0.1800917582195215,0.20449925885624942,0.292,E21 null
+GARCH 0.99,CSW-type boundary on r2,"Gaussian simulation, 5%",0.05,4000,0.36025,0.3455132780361632,0.37525488636753485,0.52975,E21 null
+GARCH 0.99,CSW-type boundary on X,"Gaussian simulation, matched",0.01305,4000,0.2105,0.19814736719835743,0.22340815047513504,0.32525,E21 null
+GARCH 0.99,CSW-type boundary on X,"Gaussian simulation, 5%",0.05,4000,0.39925,0.3841765854396312,0.41451674238629066,0.57375,E21 null
+GARCH 0.99,"HKZ-type on r2, gamma 0.25","asymptotic, 5% open-ended",0.05,4000,0.20575,0.19350758110496413,0.21855705127992414,0.3895,E21 null
+GARCH 0.99,"HKZ-type on X, gamma 0.25","asymptotic, 5% open-ended",0.05,4000,0.21725,0.20474516163092887,0.23029740355794848,0.41075,E21 null
+GARCH 0.99,"HKZ-type on r2, gamma 0","asymptotic, 5% open-ended",0.05,4000,0.0875,0.07913436719080913,0.09665717353566974,0.20125,E21 null
+GARCH 0.99,"HKZ-type on X, gamma 0","asymptotic, 5% open-ended",0.05,4000,0.08075,0.07270353432722797,0.08960095888386603,0.2065,E21 null
+GARCH 0.99,"HKZ-type on r2, gamma 0.45","asymptotic, 5% open-ended",0.05,4000,0.357,0.3422960416098959,0.37197835917528344,0.526,E21 null
+GARCH 0.99,"HKZ-type on X, gamma 0.45","asymptotic, 5% open-ended",0.05,4000,0.38825,0.3732611675143501,0.4034532680642777,0.55675,E21 null
+GARCH 0.99,CSW-type boundary on r2,"asymptotic, 5% open-ended",0.05,4000,0.34975,0.33512181345878034,0.36466649925431893,0.516,E21 null
+GARCH 0.99,CSW-type boundary on X,"asymptotic, 5% open-ended",0.05,4000,0.3795,0.36458421790959233,0.39464700792686996,0.548,E21 null
+GARCH 0.99,SR betting,"bootstrap, matched",0.01305,2000,0.8255,0.808246522437889,0.8415054797623651,0.9735,E21 null
+GARCH 0.99,SR betting,"bootstrap, 5%",0.05,2000,0.895,0.8807992576944136,0.9076862749295506,0.9935,E21 null
+GARCH 0.99,"CUSUM on X, small","bootstrap, matched",0.01305,2000,0.8245,0.807211087238879,0.8405447490559977,0.967,E21 null
+GARCH 0.99,"CUSUM on X, small","bootstrap, 5%",0.05,2000,0.8945,0.8802721537452716,0.9072152959260038,0.9865,E21 null

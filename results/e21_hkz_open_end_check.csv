@@ -1,0 +1,8 @@
+rule,critical_value,paths,monitored_steps,m,rate_within_10m
+"HKZ-type on r2, gamma 0.25",2.374693855955703,2000,20000.0,2000.0,0.046
+"HKZ-type on r2, gamma 0",2.2343633967137237,2000,20000.0,2000.0,0.0415
+"HKZ-type on r2, gamma 0.45",2.796978098451304,2000,20000.0,2000.0,0.064
+CSW-type boundary on r2,2.7954834829151074,2000,20000.0,2000.0,0.063
+"limit sup over t <= 10/11, gamma 0.0",2.2343633967137237,20000,,,0.03835
+"limit sup over t <= 10/11, gamma 0.25",2.374693855955703,20000,,,0.0428
+"limit sup over t <= 10/11, gamma 0.45",2.796978098451304,20000,,,0.04595

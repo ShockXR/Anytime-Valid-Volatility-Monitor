@@ -1,8 +1,9 @@
 """E13. Benchmarks against strong published competitors (tracker B67).
 
 Competitors (``avmonitor.competitors``):
-  * BJV: the adjacent-window volatility jump test in the spirit of Bibinger, Jirak and Vetter (2017,
-    Annals of Statistics 45(4)). Local realised variances over two adjacent windows of k returns,
+  * VR scan (labelled "BJV" in the code and in the CSV files): a two-window local variance-ratio scan test, inspired
+    by Bibinger, Jirak and Vetter (2017, Annals of Statistics 45(4)). It is not their published procedure, because their
+    paper could not be obtained here. Local realised variances over two adjacent windows of k returns,
     standardised difference, maximum over the sample, Gumbel-type critical value; jump-robust variant
     with truncation; change point at the maximum. Offline (a posteriori) by design.
   * BOCPD: Bayesian online change-point detection (Adams and MacKay 2007, arXiv:0710.3742) with a
@@ -13,13 +14,13 @@ with the default plug-in baseline and with the confidence-sequence baseline (``c
 
 Research questions
   Q13a. Offline power at matched size. On a fixed window of 2000 steps with at most one change at step
-        1000, what is the power of BJV (non-overlapping blocks and overlapping windows, plain and
+        1000, what is the power of the VR scan (non-overlapping blocks and overlapping windows, plain and
         truncated), BOCPD (maximum posterior short-run mass over the window) and the e-detector (maximum
         of its statistic over the window) when every critical value gives exactly 5% size on clean
         Gaussian data? What size do these critical values give under jumps, Student t5, price noise,
-        ticks, slow stochastic volatility and GARCH? Do the asymptotic (Gumbel) critical values of BJV
-        hold their nominal 5%? How accurate is the BJV change-point estimate?
-  Q13b. Online false alarms. Used online (BJV as a rolling test, BOCPD with its posterior-mass rule),
+        ticks, slow stochastic volatility and GARCH? Do the asymptotic (Gumbel) critical values of the VR scan
+        hold their nominal 5%? How accurate is the VR scan change-point estimate?
+  Q13b. Online false alarms. Used online (the VR scan as a rolling test, BOCPD with its posterior-mass rule),
         with thresholds matched to the e-detector's false alarm rate per 390-step day on clean Gaussian
         data, what are the competitors' false alarm rates per day under the same contaminations?
   Q13c. Online detection. Detection probability, median delay and direction for sd ratios 1.25, 1.5, 2,
@@ -31,14 +32,14 @@ Research questions
         same numbers of up and down alarms?
   Q13e. Cost. Time per step of each method in a one-series streaming loop.
   Review round 3 (docs/review/independent_review_round3.md):
-  M3.   Is BJV's low power the lack of accumulated evidence, or its short windows? Offline rows with k = 250 and 500 on
-        the same windows as Q13a; rolling BJV with k = 250 and 500 on the clean Gaussian cells of Q13b and Q13c.
+  M3.   Is the VR scan's low power the lack of accumulated evidence, or its short windows? Offline rows with k = 250 and 500 on
+        the same windows as Q13a; rolling VR scan with k = 250 and 500 on the clean Gaussian cells of Q13b and Q13c.
   M4.   The real-data outcome (next day beyond a one-day forecast) is on the e-detector's time scale. Do the
-        competitors' alarms score as well with windows of half a day to a day (crypto: BJV k = 480 and 1440, BOCPD
+        competitors' alarms score as well with windows of half a day to a day (crypto: VR scan k = 480 and 1440, BOCPD
         w = 720 and 1440; Nifty: k = w = 375)? Every alarm is also scored on a four-hour outcome, and the comparison is
         tested with standard errors clustered by calendar day and by calendar week.
   m9.   How far is the capped BOCPD filter from the exact recursion in the E13 setting?
-  m16.  Nominal rolling BJV level with the correct series length (day + 2k - 1).
+  m16.  Nominal rolling VR scan level with the correct series length (day + 2k - 1).
 
 Fixed in advance (not tuned on the reported data):
   * e-detector: c = 3, plug-in baseline from the calibration window, A = 7800 for 390-step days
@@ -49,13 +50,13 @@ Fixed in advance (not tuned on the reported data):
     variance of the previous day (real data, predictable), hazard 1 / A (one change per 20 days a
     priori), short-run window w = 250 and run-length cap 512, chosen on a Gaussian pilot with seed 999
     (docs/iterations/E13.md, iteration 1) to give the competitor its best detection.
-  * BJV online: k = 120, truncation at 4 times the larger bipower scale of the two windows (pilot as
-    above). BJV offline: k = 50 (about sqrt(n)) and k = 125 (the value used in the paper's
-    simulations, as reported by later work), truncation constant 4.
+  * VR scan online: k = 120, truncation at 4 times the larger bipower scale of the two windows (pilot as
+    above). VR scan offline: k = 50 (about sqrt(n)) and k = 125 (the value used in the simulations of
+    Bibinger, Jirak and Vetter, as reported by later work), truncation constant 4.
   * Thresholds of the competitors come from simulated Gaussian data only. On real data the only
     adjustment is the explicit matching of alarm counts to the e-detector, as in E6b.
-  * Added after the first runs (review round 3), lengths fixed before these runs: BJV offline k = 250 and 500, BJV online
-    k = 250 and 500 (Gaussian cells), real data BJV k = 480 and 1440 and BOCPD w = 720 and 1440 with run-length cap 2w
+  * Added after the first runs (review round 3), lengths fixed before these runs: VR scan offline k = 250 and 500, VR scan online
+    k = 250 and 500 (Gaussian cells), real data VR scan k = 480 and 1440 and BOCPD w = 720 and 1440 with run-length cap 2w
     (crypto), k = w = 375 (Nifty). No other setting was changed.
 
 All simulated results are [SYNTHETIC]; Binance and Nifty results are [REAL]. Seeds are fixed below.
@@ -72,9 +73,9 @@ Usage
   python experiments/e13_benchmarks.py cost         # Q13e
   python experiments/e13_benchmarks.py figures      # tables and figures from the saved CSV files
   Review round 3 (after the commands above):
-  python experiments/e13_benchmarks.py offline-long  # M3: Q13a rows for BJV k = 250 and 500 (appended to e13a_*.csv)
-  python experiments/e13_benchmarks.py online-long   # M3: rolling BJV k = 250 and 500, Gaussian cells (appended)
-  python experiments/e13_benchmarks.py fix-nominal   # m16: nominal rolling BJV rows of Q13b and Q13c rerun in place
+  python experiments/e13_benchmarks.py offline-long  # M3: Q13a rows for VR scan k = 250 and 500 (appended to e13a_*.csv)
+  python experiments/e13_benchmarks.py online-long   # M3: rolling VR scan k = 250 and 500, Gaussian cells (appended)
+  python experiments/e13_benchmarks.py fix-nominal   # m16: nominal rolling VR scan rows of Q13b and Q13c rerun in place
   python experiments/e13_benchmarks.py cap-check     # m9: capped BOCPD against the exact recursion
   python experiments/e13_benchmarks.py real-long nifty   # M4 (and m16 for the real nominal rows), Nifty 50
   python experiments/e13_benchmarks.py real-long crypto  # M4, both half-years (about 20 minutes with 2 processes)
@@ -388,7 +389,7 @@ def matched_thresholds(day, a_level, cal_len, k, hazard, reps, seed):
 
 
 def bjv_nominal_crit(day, k):
-    """Nominal 5% per day for the rolling BJV: ``day`` window positions span ``day + 2k - 1`` returns, the series length
+    """Nominal 5% per day for the rolling VR scan: ``day`` window positions span ``day + 2k - 1`` returns, the series length
     that the MOSUM formula expects (review round 3, m16; the first runs used ``day``)."""
     return C.mosum_crit(day + 2 * k - 1, k, 0.05)
 
@@ -828,7 +829,7 @@ K_ONLINE_LONG = (250, 500)
 
 
 def offline_long_job(args):
-    """Regenerate one offline set of windows (same seed as Q13a) and compute the long-window BJV statistics on it."""
+    """Regenerate one offline set of windows (same seed as Q13a) and compute the long-window VR scan statistics on it."""
     kind, name, ratio, reps, seed = args
     rng = np.random.default_rng(seed)
     nu = None if kind == "null" else NU_OFF
@@ -851,7 +852,7 @@ def _replace_rows(fname, new, key="method"):
 
 
 def offline_long():
-    """Q13a rows for BJV with windows of 250 and 500 returns, on exactly the windows of Q13a (same seeds)."""
+    """Q13a rows for the VR scan with windows of 250 and 500 returns, on exactly the windows of Q13a (same seeds)."""
     jobs = [("calib", "gaussian", 1.0, 1000, 13100), ("calib", "gaussian", 1.0, 1000, 13101)]
     jobs += [("null", nm, 1.0, 1000, 13110 + i) for i, nm in enumerate(NULL_SCEN)]
     jobs += [("change", nm, ratio, 300, 13200 + 10 * i + j) for i, nm in enumerate(("gaussian", "jumps", "student t5"))
@@ -892,7 +893,7 @@ def offline_long():
 
 
 def bjv_rolling(r_full, k, norm="gaussian", method="windows"):
-    """Rolling BJV statistic on the monitored part of r_full = [calibration CAL | monitored] (same as online_paths)."""
+    """Rolling VR scan statistic on the monitored part of r_full = [calibration CAL | monitored] (same as online_paths)."""
     hist = r_full[:, CAL - 2 * k :]
     return C.bjv_online_statistic(hist, k, TRUNC, norm=norm, method=method)[:, 2 * k :]
 
@@ -908,7 +909,7 @@ def rolling_alarms(Z, thresholds):
 
 
 def online_long():
-    """Q13b and Q13c rows for the rolling BJV with k = 250 and 500 on the clean Gaussian cells (same paths as Q13b, Q13c).
+    """Q13b and Q13c rows for the rolling VR scan with k = 250 and 500 on the clean Gaussian cells (same paths as Q13b, Q13c).
 
     Thresholds are matched, as for k = 120, to the e-detector's false alarm rate per 390-step day on the same 4000 Gaussian
     calibration paths (seeds 13300 and 13301). As a reproduction check, the k = 120 threshold is recomputed on the
@@ -949,7 +950,7 @@ def online_long():
 
 
 def nominal_fix_job(args):
-    """Regenerate one Q13b or Q13c set of paths and recompute the rolling BJV (k = 120) alarms at the matched threshold
+    """Regenerate one Q13b or Q13c set of paths and recompute the rolling VR scan (k = 120) alarms at the matched threshold
     (a reproduction check) and at the corrected nominal threshold."""
     kind, name, ratio, reps, seed, h_matched, h_nominal = args
     rng = np.random.default_rng(seed)
@@ -975,7 +976,7 @@ def _in_place(old, new, key, method="BJV rolling, nominal 5% per day"):
 
 
 def fix_nominal_sim():
-    """m16: rerun the 'BJV rolling, nominal 5% per day' rows of Q13b and Q13c with the corrected critical value."""
+    """m16: rerun the rows labelled 'BJV rolling, nominal 5% per day' (rolling VR scan) of Q13b and Q13c with the corrected critical value."""
     th = _read(OUT / "e13b_thresholds.csv")
     h_old, h_new = float(th.bjv_nominal.iloc[0]), bjv_nominal_crit(DAY, K_ONLINE)
     print(f"nominal critical value: {h_old:.6f} (series length {DAY}) -> {h_new:.6f} (length {DAY + 2 * K_ONLINE - 1})")
@@ -1055,7 +1056,7 @@ def run_real_series_long(label, u, i0, day, a_level, cal_len, bocpd, ks, th, old
     """Longer-window competitors on one deseasonalised series, rate-matched to the e-detector as in run_real_series.
 
     ``bocpd`` maps (w, truncated) to the (S, L) arrays of this series; ``old_events`` are the saved events of the first
-    run (positions in u), used for two reproduction checks and for the corrected nominal BJV row (m16).
+    run (positions in u), used for two reproduction checks and for the corrected nominal VR scan row (m16).
     """
     from avmonitor.monitor import VolatilityMonitor
 
@@ -1099,7 +1100,7 @@ def run_real_series_long(label, u, i0, day, a_level, cal_len, bocpd, ks, th, old
 def real_long(market):
     """M4: rerun the rate-matched real-data comparison with longer competitor windows, and score every alarm one by one.
 
-    crypto: both half-years (Jul to Dec 2025 and the held-out Jan to Jun 2025), BJV k = 480 and 1440, BOCPD w = 720 and
+    crypto: both half-years (Jul to Dec 2025 and the held-out Jan to Jun 2025), VR scan k = 480 and 1440, BOCPD w = 720 and
     1440 (plain and on truncated returns). nifty: k = 375 and w = 375. Everything else as in real_crypto / real_nifty:
     Gaussian-matched hazard 1 / A, predictable prior, pause after each alarm, matching per series and direction to the
     e-detector's alarm counts. Also writes the per-alarm outcomes of the first-run methods, which the clustered test needs.
