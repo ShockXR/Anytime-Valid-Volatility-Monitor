@@ -133,7 +133,11 @@ CAUSALITY_CUTS = ("2026-04-01", "2026-07-01", "2026-08-12 14:37", "2026-09-15") 
 # refusals of the status part only (they change no rule, e-value or threshold): M1 (i) the event file must be complete around each stratum, as F24a's refusals require
 # for its own period: FOMC_SCHEDULED is F24a's list of scheduled meetings, known to the end of the last listed year;
 # M1 (ii) strata already reported are frozen in LEDGER and a later look that recomputes any of them differently refuses.
-FOMC_SCHEDULED = E24.FUTURE_FOMC_SCHEDULED
+# F24a's list ends with the meeting of December 2027. Strata whose event-file range reaches into 2028 wait until the
+# Federal Reserve's 2028 schedule (second day of each meeting) is added here from its official announcement; adding
+# dates only lets such strata enter, and changes no rule, e-value or threshold.
+FOMC_SCHEDULED_LATER: tuple = ()
+FOMC_SCHEDULED = tuple(E24.FUTURE_FOMC_SCHEDULED) + FOMC_SCHEDULED_LATER
 INTEGRITY_DAYS = COMPLETE_DAYS + STATUS_DAYS  # 30 days of the windows, which lie within 28 days of the release day
 LEDGER = "e25_status_ledger.csv"
 LEDGER_EXACT = ("date", "event_type", "release_utc", "controls", "n", "Z", "K", "S")
