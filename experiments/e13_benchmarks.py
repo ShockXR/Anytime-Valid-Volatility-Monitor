@@ -1464,7 +1464,7 @@ def figures():
         ax.errorbar(x, sub.fa_one_day, yerr=np.clip([sub.fa_one_day - sub.fa_one_day_lo, sub.fa_one_day_hi - sub.fa_one_day], 0, None),
                     fmt="none", ecolor="#0b0b0b", elinewidth=0.6, capsize=1.5)
     ax.axhline(0.05, color="#0b0b0b", ls="--", lw=0.8)
-    ax.text(len(scen) - 0.5, 0.06, "e-detector bound (5% per day)", ha="right", fontsize=8)
+    ax.text(len(scen) - 0.5, 0.06, "5% per day: proved for the CS-baseline e-detector, not for the plug-in", ha="right", fontsize=8)
     ax.set_xticks(np.arange(len(scen)))
     ax.set_xticklabels(scen)
     ax.set_ylabel("false alarm within one 390-step day")
