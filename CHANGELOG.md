@@ -11,7 +11,6 @@ overlapped in time, so some 0.3.0 work (the first paper drafts, E17) has commits
 ## [0.3.0] - Unreleased
 
 Round 3: theory TH4 to TH6, experiments E16 to E21, the paper, and the preparation of a release.
-E21 and Part 1 of E19 had no commit when this entry was written; they belong here when they land.
 
 ### Added
 
@@ -34,10 +33,19 @@ E21 and Part 1 of E19 had no commit when this entry was written; they belong her
 - E18: pre-registered case studies of four landmark market shocks (4 June 2024, 5 August 2024, 7 April
   2025, 10 October 2025), and an exploratory, not pre-registered run of the no-blind-period monitors on
   the same events.
-- E19: pre-registration of real-data null streams; Parts 2 to 4 (confidence-sequence baseline on the five
-  coins, forecast-relative null on real data, the Gaussian row of Table S2 with that baseline).
+- E19: pre-registered checks of the guarantee on real data: streams that permute calm real days (the
+  proved monitors stay below every bound; the plug-in does not over five days), block-bootstrapped calm
+  days (no monitor holds its bound), the confidence-sequence baseline as the primary configuration on the
+  five coins, a forecast-relative null on real data, and the Gaussian row of Table S2 with that baseline;
+  a post hoc diagnostic of confidence-sequence segments whose increase side cannot alarm.
 - E20: pre-registered re-analysis of the real-data inference (claim classification, Holm correction
   within families, day-block bootstrap, forecast regressions on realised variance, QLIKE).
+- E21: `avmonitor.benchmarks_robust`, benchmarks not calibrated on Gaussian data only: CUSUM and
+  Shiryaev-Roberts rules on the truncated statistic with simulated or per-path bootstrap thresholds, a
+  Student t BOCPD with an exact run-length recursion, and CUSUM monitoring with a training sample; on
+  synthetic paths, E13's paths and the five coins at matched alarm counts.
+- `docs/demo/replay.html` and `scripts/build_replay.py`: a minute-by-minute replay of two landmark days
+  of E18, rebuilt from the data and checked against E18's saved alarm lists.
 - TH4: `avmonitor.robustness`, false alarm bounds when the null holds only approximately (mean drift,
   plug-in baseline, GARCH), checked against E16.
 - TH5: `avmonitor.limits`, limits for every valid procedure (pathwise and mean delay floors after a
@@ -59,6 +67,8 @@ E21 and Part 1 of E19 had no commit when this entry was written; they belong her
 ### Changed
 
 - `import avmonitor` now loads the top-level API, so it imports numpy and scipy.
+- E13's "BJV-type" test is renamed the two-window variance-ratio scan (inspired by Bibinger, Jirak and
+  Vetter 2017, not their procedure) everywhere; its real-data tables show the scored count of every share.
 - Building the package needs setuptools 77 or later (SPDX license expression in `pyproject.toml`).
 - `scripts/build_report.py --committed` builds the experiment report from the report parts as committed
   at HEAD, so unfinished parts of running work never enter it.

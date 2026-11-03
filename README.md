@@ -2,7 +2,7 @@
 
 **An online monitor that watches one-minute returns and raises an alarm when volatility shifts up or down, with a proven limit on false alarms that holds however often you look at it.** It puts the MAD-based truncation used by Bapat (2026), an idea for jump robustness that goes back to Mancini (2009), inside e-detectors, a nonparametric framework for sequential change detection (Shin, Ramdas and Rinaldo 2024).
 
-> Status: research prototype, round 2 (November 2026). About 240 tests, 17 experiments on simulated and real data, eight alternative directions, proofs in [`docs/math.md`](docs/math.md). For the short version read [`PITCH_BAPAT.md`](PITCH_BAPAT.md); for every number read the [experiment report](docs/experiment_report.md).
+> Status: research prototype, round 3 (November 2026). About 480 tests, 21 experiments (E1 to E21) on simulated and real data, three theory work streams (TH4 to TH6), eight alternative directions, eight rounds of independent review and a referee report, proofs in [`docs/math.md`](docs/math.md) and the theory notes, and a short paper draft in [`paper/`](paper/). For the short version read [`PITCH_BAPAT.md`](PITCH_BAPAT.md); for every number read the [experiment report](docs/experiment_report.md).
 
 Every result in this repository carries a label: **[PUBLISHED]** (taken from a paper), **[SYNTHETIC]** (our simulation) or **[REAL]** (our run on market data). Nothing is reported that was not run.
 

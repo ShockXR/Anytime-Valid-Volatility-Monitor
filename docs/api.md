@@ -75,6 +75,7 @@ Core modules:
 
 Research modules (used by the experiments and the theory notes):
 
+- [`avmonitor.benchmarks_robust`](#avmonitorbenchmarks_robust)
 - [`avmonitor.competitors`](#avmonitorcompetitors)
 - [`avmonitor.design`](#avmonitordesign)
 - [`avmonitor.limits`](#avmonitorlimits)
@@ -1541,6 +1542,287 @@ main(argv=None) -> int
 ```
 
 Entry point of ``python -m avmonitor`` and of the ``avmonitor`` command; returns the exit code.
+
+## avmonitor.benchmarks_robust
+
+Robust and econometric benchmarks for the volatility monitor (experiment E21).
+
+### class `TruncatedInputs`
+
+```python
+TruncatedInputs(
+    y: np.ndarray,
+    ycal: np.ndarray,
+    B: np.ndarray,
+    tau2: np.ndarray,
+    m0: np.ndarray,
+)
+```
+
+### `truncated_inputs`
+
+```python
+truncated_inputs(r: np.ndarray, cal: np.ndarray, c: float = 3.0) -> TruncatedInputs
+```
+
+``Y = min(r^2, tau^2) / m0`` with ``tau = c x`` scaled MAD and ``m0`` from each path's calibration window.
+
+### `gaussian_reference_value`
+
+```python
+gaussian_reference_value(ratio: float) -> float
+```
+
+Reference value k of Page's CUSUM on ``Y = X / m0`` for a change of the sd by ``ratio``.
+
+### `page_cusum_paths`
+
+```python
+page_cusum_paths(y: np.ndarray, k_up: float, k_dn: float)
+```
+
+Two-sided Page CUSUM on rows of ``y``: ``(G_up, G_dn)``, both ``(reps, n)``.
+
+### `sr_log_paths`
+
+```python
+sr_log_paths(y: np.ndarray, lam: np.ndarray, side: str, chunk: int = 256) -> np.ndarray
+```
+
+``log M_t`` with ``M_t = mean_k S^k_t``, ``S^k_t = f^k_t (S^k_{t-1} + 1)``, ``S_0 = 0``.
+
+### `down_bets`
+
+```python
+down_bets(B: np.ndarray, fractions=(0.1, 0.25, 0.5, 0.75, 0.95)) -> np.ndarray
+```
+
+Per-path decrease bets ``fractions / (B - 1)`` (``(reps, K)``); zero bets where ``B <= 1``.
+
+### `first_alarm`
+
+```python
+first_alarm(up: np.ndarray, dn: np.ndarray, h_up, h_dn)
+```
+
+First alarm per path (index, -1 if none) and its direction (+1 up, -1 down, 0 none).
+
+### `side_maxima`
+
+```python
+side_maxima(up: np.ndarray, dn: np.ndarray, horizon: int)
+```
+
+Maximum of each side's statistic over the first ``horizon`` steps (``-inf`` if all missing).
+
+### `calibrate_two_sided`
+
+```python
+calibrate_two_sided(max_up: np.ndarray, max_dn: np.ndarray, alpha: float)
+```
+
+Per-side thresholds at level ``alpha / 2`` each, from simulated maxima over the target horizon.
+
+### `bootstrap_max_stats`
+
+```python
+bootstrap_max_stats(
+    xcal: np.ndarray,
+    tau2,
+    rules: dict,
+    horizon: int,
+    n_boot: int,
+    rng: np.random.Generator,
+    chunk: int = 20,
+)
+```
+
+Bootstrap distribution of each side's maximum over ``horizon`` steps, per path and rule.
+
+### `bootstrap_thresholds`
+
+```python
+bootstrap_thresholds(max_u: np.ndarray, max_d: np.ndarray, alpha: float)
+```
+
+Per-path thresholds: the ``1 - alpha / 2`` quantile of each side's bootstrap maxima.
+
+### `bartlett_lrv`
+
+```python
+bartlett_lrv(z: np.ndarray, q: int | None = None) -> np.ndarray
+```
+
+Bartlett-kernel long-run variance of each row of ``z`` (NaN dropped), bandwidth ``floor(n^(1/3))``.
+
+### `hkz_paths`
+
+```python
+hkz_paths(
+    zcal: np.ndarray,
+    zmon: np.ndarray,
+    gamma: float = 0.25,
+    boundary: str = 'hhks',
+    q: int | None = None,
+) -> np.ndarray
+```
+
+Standardised CUSUM monitoring process ``D_k`` (``(reps, n)``); alarm when ``|D_k| >= c``.
+
+### `wiener_sup_samples`
+
+```python
+wiener_sup_samples(
+    gamma: float,
+    n_paths: int = 20000,
+    t_max: float = 1.0,
+    rng: np.random.Generator | None = None,
+    n_geom: int = 4000,
+    n_lin: int = 20000,
+    t_min: float = 1e-08,
+    t_switch: float = 0.01,
+    chunk: int = 500,
+) -> np.ndarray
+```
+
+Samples of ``sup_{0<t<=t_max} |W(t)| / t^gamma`` for a standard Wiener process W.
+
+### `sup_abs_bm_cdf`
+
+```python
+sup_abs_bm_cdf(x: float, terms: int = 50) -> float
+```
+
+Exact ``P(sup_{0<=t<=1} |W(t)| <= x)`` (series of Feller): ``(4/pi) sum_k (-1)^k / (2k+1) exp(-(2k+1)^2 pi^2 / (8 x^2))``.
+
+### `wiener_sup_crit`
+
+```python
+wiener_sup_crit(
+    gamma: float,
+    alpha: float = 0.05,
+    n_paths: int = 20000,
+    rng: np.random.Generator | None = None,
+) -> float
+```
+
+Simulated ``1 - alpha`` quantile of ``sup_{0<t<1} |W(t)| / t^gamma`` (the limit of the HHKS boundary).
+
+### `csw_crit`
+
+```python
+csw_crit(alpha: float = 0.05) -> float
+```
+
+``c`` with ``2 (1 - Phi(c) + c phi(c)) = alpha``: the critical value of strucchange's OLS-CUSUM monitoring.
+
+### `log_variance_grid`
+
+```python
+log_variance_grid(lo: float, hi: float, step: float = 0.1) -> np.ndarray
+```
+
+Equally spaced log-variances from ``log(lo)`` to ``log(hi)`` (inclusive, step in log variance).
+
+### class `GridBOCPD`
+
+```python
+GridBOCPD(
+    reps: int,
+    hazard: float,
+    log_var_grid: np.ndarray,
+    short: int,
+    nu: float | None = 3.0,
+    alpha0: float = 2.0,
+    prior_var=1.0,
+)
+```
+
+Adams and MacKay (2007) run-length filter with a variance grid and a Student t (or Gaussian) likelihood.
+
+Members:
+
+- `set_prior(prior_var)`: Prior of FUTURE new runs (mean of V); may change at every step (a predictable prior).
+- `loglik(x: np.ndarray) -> np.ndarray`: ``log f(x | V_j)``, shape ``(reps, G)``.
+- `warm_start(xcal: np.ndarray)`: All mass on the lumped bucket (a run of at least w steps) with the posterior given ``xcal``.
+- `update(x)`
+- `short_log_odds() -> np.ndarray`
+- `direction() -> np.ndarray`
+
+### `grid_bocpd_paths`
+
+```python
+grid_bocpd_paths(
+    r,
+    hazard: float,
+    log_var_grid,
+    short: int = 250,
+    nu: float | None = 3.0,
+    cal=None,
+    alpha0: float = 2.0,
+    prior_var=None,
+    prior_var_path=None,
+    chunk: int = 250,
+)
+```
+
+Run ``GridBOCPD`` over rows of ``r``; returns ``(L, S)``: short-run log-odds and direction, ``(reps, n)``.
+
+### `calibrate_window`
+
+```python
+calibrate_window(
+    u: np.ndarray,
+    s: int,
+    cal_len: int,
+    c: float = 3.0,
+    cal_max: int | None = None,
+)
+```
+
+Calibration window starting at ``s`` with the extension and fallback rules of ``VolatilityMonitor``.
+
+### `restart_events`
+
+```python
+restart_events(
+    u: np.ndarray,
+    cal_len: int,
+    kind: str,
+    h_up: float,
+    h_dn: float,
+    params: dict | None = None,
+    c: float = 3.0,
+    block: int = 2880,
+)
+```
+
+Alarm times and directions of a calibrate, monitor, alarm, recalibrate loop on one series.
+
+### `match_restart_counts`
+
+```python
+match_restart_counts(
+    u,
+    cal_len,
+    kind,
+    params,
+    n_up,
+    n_dn,
+    lo_hi,
+    iters: int = 30,
+    rounds: int = 3,
+    c: float = 3.0,
+    refine: int = 0,
+    refine_points: int = 41,
+    refine_span: float = 0.5,
+    grid_points: int = 0,
+    grid_span: float = 2.0,
+    grid_if_error_above: int = 2,
+)
+```
+
+Thresholds ``(h_up, h_dn)`` whose numbers of up and down alarms are as close as possible to the targets.
 
 ## avmonitor.competitors
 
