@@ -2,7 +2,7 @@
 
 **An online monitor that watches one-minute returns and raises an alarm when volatility shifts up or down, with a proven limit on false alarms that holds however often you look at it.** It puts the MAD-based truncation used by Bapat (2026), an idea for jump robustness that goes back to Mancini (2009), inside e-detectors, a nonparametric framework for sequential change detection (Shin, Ramdas and Rinaldo 2024).
 
-> Status: research prototype, round 3 (November 2026). 581 tests, 25 experiments (E1 to E25) on simulated and real data, three theory work streams (TH4 to TH6), eight alternative directions, eleven rounds of review by separate AI agents, not people (the ninth an audit of the package code, the tenth of the blind-segment guard, the eleventh of the anytime-valid release test) and three AI referee passes on the paper, proofs in [`docs/math.md`](docs/math.md) and the theory notes, and a short paper draft in [`paper/`](paper/). For the short version read [`PITCH_BAPAT.md`](PITCH_BAPAT.md); for every number read the [experiment report](docs/experiment_report.md).
+> Status: research prototype, round 3 (November 2026). 637 tests, 25 experiments (E1 to E25) on simulated and real data, three theory work streams (TH4 to TH6), eight alternative directions, eleven rounds of review by separate AI agents, not people (the ninth an audit of the package code, the tenth of the blind-segment guard, the eleventh of the anytime-valid release test) and three AI referee passes on the paper, proofs in [`docs/math.md`](docs/math.md) and the theory notes, and a short paper draft in [`paper/`](paper/). For the short version read [`PITCH_BAPAT.md`](PITCH_BAPAT.md); for every number read the [experiment report](docs/experiment_report.md).
 
 Every result in this repository carries a label: **[PUBLISHED]** (taken from a paper), **[SYNTHETIC]** (our simulation) or **[REAL]** (our run on market data). Nothing is reported that was not run.
 
@@ -86,7 +86,7 @@ Or install the package alone from GitHub: `pip install "git+https://github.com/S
 
 ```bash
 python -m avmonitor simulate --ratio 2                       # synthetic stream, sd doubles at step 3000
-python -m avmonitor estimators                               # all quarticity estimators on one simulated day
+python -m avmonitor estimators --source binance --symbol BTCUSDT --day 2025-10-10 --download   # all quarticity estimators on one real day
 python -m avmonitor run --source binance --symbol ETHUSDT --download \
     --start 2025-03-01 --end 2025-03-31 --plot eth.png       # real data, alarms printed and plotted
 ```

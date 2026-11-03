@@ -19,7 +19,7 @@ Bapat (2026) estimates integrated quarticity (the quantity behind confidence int
 * Your estimators exactly as printed, normalised versions, and all the benchmark estimators of your Tables 3 and 4 (`src/avmonitor/robust.py`).
 * A streaming monitor (`src/avmonitor/monitor.py`) that clips each squared return at c × MAD from past data only, X_t = min(r_t², τ²), and runs **betting e-detectors** on X_t, one for increases and one for decreases. An e-detector keeps a running "wealth" from bets against "nothing has changed"; it alarms when the wealth reaches A.
 * Three ways to set the "normal" level: plug-in, plug-in with a margin, and a confidence sequence with a proof (`confseq.py`); forecast-relative monitoring for clustered volatility (`forecast.py`).
-* Real-data pipelines for Binance BTC, ETH, XRP, SOL and DOGE (your five coins), Bitstamp BTC/USD and the Nifty 50 index, with a command line and an executed notebook. 581 tests, and one command (`scripts/reproduce.py`) that checks the data hashes, runs the tests and reruns the experiments.
+* Real-data pipelines for Binance BTC, ETH, XRP, SOL and DOGE (your five coins), Bitstamp BTC/USD and the Nifty 50 index, with a command line and an executed notebook. 637 tests, and one command (`scripts/reproduce.py`) that checks the data hashes, runs the tests and reruns the experiments.
 
 ## 5. What did we check ourselves?
 
@@ -83,7 +83,7 @@ Bapat (2026) estimates integrated quarticity (the quantity behind confidence int
 
 ```bash
 pip install -e ".[dev]"
-python -m pytest -q                                   # 581 tests, no data needed
+python -m pytest -q                                   # 637 tests, no data needed
 python -m avmonitor simulate --ratio 2                # synthetic stream with a known change
 python -m avmonitor run --source binance --symbol BTCUSDT --download \
     --start 2025-10-08 --end 2025-10-14 --plot btc.png  # real data around the 10 October 2025 crash

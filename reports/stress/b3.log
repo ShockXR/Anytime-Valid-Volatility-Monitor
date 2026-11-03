@@ -1,0 +1,44 @@
+cal_len 100 done
+cal_len 200 done
+cal_len 390 done
+cal_len 500 done
+cal_len 1000 done
+cal_len 2000 done
+cal_len 4000 done
+c 1.0 done
+c 1.5 done
+c 2.0 done
+c 3.0 done
+c 4.0 done
+c 6.0 done
+c 10.0 done
+c 1000000.0 done
+null_band 0.0 done
+null_band 0.1 done
+null_band 0.25 done
+null_band 0.5 done
+delta (cs baseline, band 0) 0.001 done
+delta (cs baseline, band 0) 0.01 done
+delta (cs baseline, band 0) 0.05 done
+delta (cs baseline, band 0) 0.2 done
+MAD scaling constant 0.5 done
+MAD scaling constant 1.0 done
+MAD scaling constant 1.4826 done
+MAD scaling constant 2.0 done
+up bet grid default 6 bets done
+up bet grid single 0.05 done
+up bet grid single 0.5 done
+up bet grid single 0.9 done
+up bet grid wide 9 bets done
+down bet fractions default 5 fractions done
+down bet fractions single 0.1 done
+down bet fractions single 0.5 done
+down bet fractions single 0.95 done
+threshold A 1950.0 done
+threshold A 3900.0 done
+threshold A 7800.0 done
+threshold A 15600.0 done
+threshold A 31200.0 done
+threshold A 78000.0 done
+EXIT
+EXIT
