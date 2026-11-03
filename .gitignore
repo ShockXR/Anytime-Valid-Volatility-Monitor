@@ -9,3 +9,5 @@ data/processed/
 *.pdf
 paper/build/
 !paper/short_paper.pdf
+dist/
+build/

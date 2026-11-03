@@ -390,6 +390,8 @@ def calibrate_panel(windows, cal_len, c: float = 3.0, null_band: float = 0.0, ba
 
 @dataclass
 class PanelDiscovery:
+    """One discovery of ``PanelMonitor``: the asset, the step, the direction and the level it cleared."""
+
     index: int  # step of the panel clock at which the asset was discovered
     asset: int
     name: str
@@ -567,12 +569,15 @@ class PanelMonitor:
 
     @property
     def path(self) -> np.ndarray:
+        """Stopped e-values at every step, shape (steps, K); NaN before the first block. Needs ``record=True``."""
         return np.asarray(self._path)
 
     @property
     def path_live(self) -> np.ndarray:
+        """Live (not stopped) e-values, shape (steps, K); NaN before the first block. Needs ``record=True``."""
         return np.asarray(self._path_live)
 
     @property
     def path_dir(self) -> np.ndarray:
+        """+1 (increase) or -1 (decrease) per step and asset; 0 before the first block. Needs ``record=True``."""
         return np.asarray(self._path_dir)

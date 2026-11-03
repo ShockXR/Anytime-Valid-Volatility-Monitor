@@ -82,6 +82,8 @@ from .robust import MAD_NORMAL_SCALE
 
 @dataclass
 class Event:
+    """One alarm of a streaming monitor, returned by ``update`` and collected in ``events``."""
+
     index: int  # position in the stream of the alarm
     direction: str  # "up" or "down"
     monitored_since: int  # first monitored index of this segment
@@ -95,6 +97,17 @@ def _usable(scale: float, tau2: float, m0: float | None = None) -> bool:
 
 
 class VolatilityMonitor:
+    """Calibrate, monitor, alarm, recalibrate loop on a stream of returns (details in the module docstring).
+
+    ``threshold`` is A; each side alarms when its statistic reaches 2 A, so with the true baseline
+    P(any false alarm within the first m monitored steps of a segment) <= m / A. Each segment starts
+    with a calibration window of ``cal_len`` returns (longer if it is degenerate) that sets ``scale``,
+    ``tau = c * scale`` and the null mean ``m0``. With ``baseline="cs"`` the null values are confidence
+    bounds instead, and the bound is ``delta + m / A``. Feed returns with ``update`` (one at a time) or
+    ``run`` (an array). Alarms are ``Event`` objects in ``events``; calibration details are in
+    ``segments``.
+    """
+
     def __init__(
         self,
         threshold: float = 28800.0,
@@ -351,6 +364,7 @@ class VolatilityMonitor:
         return ev
 
     def run(self, returns) -> list[Event]:
+        """Feed ``returns`` in order through ``update``; returns ``self.events`` (all alarms so far)."""
         for r in np.asarray(returns, float):
             self.update(r)
         return self.events

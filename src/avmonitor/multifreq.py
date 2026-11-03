@@ -306,6 +306,8 @@ def first_alarm(up, dn, threshold: float):
 
 @dataclass
 class MFEvent:
+    """One alarm of ``MultiFrequencyMonitor``; ``shares`` splits the combined statistic by frequency."""
+
     index: int  # position in the stream of the alarm
     direction: str  # "up" or "down"
     monitored_since: int  # first monitored index of this segment
@@ -541,6 +543,7 @@ class MultiFrequencyMonitor:
         return MFEvent(self.t, direction, self.start, self.scale1, float(stat), shares)
 
     def run(self, returns) -> list[MFEvent]:
+        """Feed one-minute ``returns`` in order through ``update``; returns ``self.events`` (all alarms so far)."""
         for r in np.asarray(returns, float):
             self.update(float(r))
         return self.events

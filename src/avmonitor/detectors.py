@@ -118,6 +118,8 @@ DEFAULT_DOWN_FRACTIONS = (0.1, 0.25, 0.5, 0.75, 0.95)
 
 @dataclass
 class DetectorResult:
+    """Output of the array detectors: first alarm index per path (-1 if none) and optional paths."""
+
     alarm: np.ndarray  # index of the first alarm per path, -1 if none
     stat_path: np.ndarray | None = None  # statistic for path 0 (if requested)
     lam_path: np.ndarray | None = None  # adaptive bet for path 0 (if requested)

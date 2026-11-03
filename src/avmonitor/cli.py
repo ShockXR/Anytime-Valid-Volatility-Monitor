@@ -159,6 +159,7 @@ def cmd_estimators(a) -> int:
 
 
 def main(argv=None) -> int:
+    """Entry point of ``python -m avmonitor`` and of the ``avmonitor`` command; returns the exit code."""
     p = argparse.ArgumentParser(prog="python -m avmonitor", description=__doc__.split("\n\n")[0])
     sub = p.add_subparsers(dest="cmd", required=True)
 

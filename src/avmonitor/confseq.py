@@ -108,6 +108,7 @@ class ConfSeq:
     lam_lower: np.ndarray | None = None  # bets of the lower sequence
 
     def rel_width(self) -> np.ndarray:
+        """Relative width ``(upper - lower) / mean``; ``inf`` where the mean is not positive."""
         with np.errstate(divide="ignore", invalid="ignore"):
             return np.where(self.mean > 0, (self.upper - self.lower) / self.mean, np.inf)
 
@@ -203,6 +204,7 @@ class StreamingEBConfSeq:
         self.sl_l = self.slz_l = self.spe_l = 0.0
 
     def update(self, x: float) -> None:
+        """Add one observation ``x`` in ``[0, bound]``."""
         z = float(x) / self.bound
         if not (0.0 <= z <= 1.0 + 1e-12):
             raise ValueError("x must lie in [0, bound]")
@@ -229,22 +231,26 @@ class StreamingEBConfSeq:
 
     @property
     def upper(self) -> float:
+        """Current upper bound ``U_t`` in the units of ``x`` (``bound`` before any observation)."""
         if self.t == 0:
             return self.bound
         return min((self.slz_u + self.log_u + self.spe_u) / self.sl_u, 1.0) * self.bound
 
     @property
     def lower(self) -> float:
+        """Current lower bound ``L_t`` in the units of ``x`` (0 before any observation)."""
         if self.t == 0:
             return 0.0
         return max((self.slz_l - self.log_l - self.spe_l) / self.sl_l, 0.0) * self.bound
 
     @property
     def mean(self) -> float:
+        """Running sample mean (NaN before any observation)."""
         return self.sum_z / self.t * self.bound if self.t else float("nan")
 
     @property
     def rel_width(self) -> float:
+        """Relative width ``(upper - lower) / mean``; ``inf`` before any observation or when the mean is 0."""
         m = self.mean
         return (self.upper - self.lower) / m if self.t and m > 0 else float("inf")
 
