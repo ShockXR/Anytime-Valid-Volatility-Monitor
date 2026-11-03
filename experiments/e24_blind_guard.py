@@ -719,9 +719,11 @@ def part_e19blind(procs: int):
 FUTURE_EVENTS = ROOT / "data/events/us_macro_events_e24_future.csv"
 FUTURE_MONITOR_START = "2026-10-25"  # E23's stream ended at 2026-10-25 00:00 UTC (exclusive): the first unseen minute
 FUTURE_LOAD_START = "2026-10-05"  # 20 days of intraday-profile warm-up (known data), as E12 and E23
-FUTURE_END = None  # fixed by the power part's decision rule; written here and in the pre-registration, section 5
-FUTURE_PRIMARY_ARM = None  # fixed by the power part's decision rule (pre-registration, section 6)
-FUTURE_PRIMARY_DESIGN = None
+# Fixed by the power part's decision rule (first run 08:39 UTC, 3 November 2026; results/e24_future_candidates.csv)
+# and by nothing else; pre-registration, sections 5 and 6.
+FUTURE_END = "2027-06-01"  # exclusive, 00:00 UTC
+FUTURE_PRIMARY_ARM = "S2"
+FUTURE_PRIMARY_DESIGN = "fomc+cpi"
 FUTURE_ARMS = ("G1", "S2")  # the two candidate primary monitors
 FUTURE_DESIGNS = ("fomc", "fomc+cpi")  # the two candidate primary designs (E23's)
 FUTURE_COIN = "BTC"
@@ -906,6 +908,16 @@ def part_power(procs: int):
         print(table.round(4).to_string(index=False))
         print(cal_rows.to_string(index=False))
     print(f"CHOICE: arm {choice.arm}, design {choice.design}, end {end}")
+    # Sensitivity, descriptive only (added after the first run; it does not enter the choice): the chosen
+    # candidate's power on the same grid under the other planning scenarios.
+    jobs = [(choice.arm, sc, scen[choice.arm][sc], e, POWER_REPS_GRID) for sc in scen[choice.arm] if sc != primary
+            for e in GRID_ENDS]
+    with Pool(min(procs, 2)) as pool:
+        sens = pd.DataFrame([r for rows in pool.map(_power_job, jobs, chunksize=1) for r in rows])
+    sens = sens[sens.design == choice.design]
+    sens.to_csv(OUT / "e24_future_power_sensitivity.csv", index=False)
+    with pd.option_context("display.width", 200):
+        print(sens.pivot_table(index="end", columns="scenario", values="power").round(3).to_string())
 
 
 def _month_complete(path: Path, month: pd.Period) -> bool:
@@ -1151,7 +1163,7 @@ def fig_real(plt):
     arms = ["P1", "G0", "G1", "S2"]
     periods = [PERIOD_E22, PERIOD_E23]
     cells = ("fomc+cpi", "fomc", "cpi")
-    fig, axes = plt.subplots(2, 3, figsize=(14.0, 6.2), sharex=True, sharey=True)
+    fig, axes = plt.subplots(2, 3, figsize=(16.0, 6.4), sharex=True, sharey=True)
     ys = np.arange(len(arms))[::-1].astype(float)
     for r, per in enumerate(periods):
         for k, cell in enumerate(cells):
@@ -1180,7 +1192,7 @@ def fig_real(plt):
     fig.suptitle("E24 [REAL, post hoc, exploratory]: E22's and E23's release designs rerun with the guarded P1 "
                  "(filled: release windows; open: matched controls; raw one-sided p)", x=0.01, ha="left", fontsize=10,
                  color=INK)
-    fig.subplots_adjust(left=0.12, right=0.9, top=0.89, bottom=0.1, wspace=0.55, hspace=0.35)
+    fig.subplots_adjust(left=0.11, right=0.87, top=0.89, bottom=0.1, wspace=0.62, hspace=0.35)
     fig.savefig(FIG / "e24_real_release_rates.png", dpi=130)
     plt.close(fig)
 
@@ -1198,6 +1210,14 @@ def fig_power(plt):
             ax.plot(x, h.power, color=SERIES[i], marker=MARKERS[i], ms=3.5, lw=2.2 if chosen else 1.3,
                     label=f"{arm}, {'FOMC and CPI pooled' if d == 'fomc+cpi' else 'FOMC alone'}" + (" (chosen)" if chosen else ""))
             i += 1
+    sens_path = OUT / "e24_future_power_sensitivity.csv"
+    if sens_path.exists():
+        sens = pd.read_csv(sens_path)
+        ch0 = cand[cand.chosen].iloc[0]
+        c0 = SERIES[list(FUTURE_ARMS).index(ch0.arm) * 2 + list(FUTURE_DESIGNS).index(ch0.design)]
+        for sc, ls in (("2026 only (E23 design)", "--"), ("half of the pooled excess", ":")):
+            h = sens[sens.scenario == sc].sort_values("end")
+            ax.plot(pd.to_datetime(h.end), h.power, color=c0, ls=ls, lw=1.3, label=f"{ch0.arm}, pooled: {sc} (sensitivity)")
     ax.axhline(POWER_TARGET, color=MUTED, ls="--", lw=1)
     ch = cand[cand.chosen].iloc[0]
     if isinstance(ch.end_star, str):

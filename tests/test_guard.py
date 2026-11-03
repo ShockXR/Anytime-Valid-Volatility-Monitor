@@ -368,3 +368,13 @@ def test_event_file_and_planning_calendar():
     pe28 = E24.planning_events("2029-01-01")
     ph = pe28[pe28.kind != "event file"]
     assert (ph.date.dt.year == 2028).all() and (ph.event_type == "fomc").sum() == 6 and (ph.event_type == "cpi").sum() == 12
+
+
+def test_future_choice_and_families():
+    E24 = _e24()
+    assert (E24.FUTURE_END, E24.FUTURE_PRIMARY_ARM, E24.FUTURE_PRIMARY_DESIGN) == ("2027-06-01", "S2", "fomc+cpi")
+    fam = E24.future_families()
+    assert [f[0] for f in fam] == ["F24a", "F24b", "F24c", "F24d"]
+    assert fam[0][2:] == ("S2", ("BTC",), ("fomc+cpi",))
+    assert sum(len(f[3]) * len(f[4]) for f in fam) == 12  # 1 + 2 + 3 + 6 tests
+    assert fam[2][2] == "G1" and fam[3][4] == ("fomc", "cpi")
