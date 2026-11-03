@@ -4889,11 +4889,14 @@ the \(n_i + 1\) outcomes of stratum \(i\) are exchangeable, then
 nonnegative martingale with mean 1, and by Ville's inequality
 \(\mathbb{P}(M_j \ge 20 \text{ for some } j) \le 0.05\) for any number
 of looks and any stopping rule. No independence between strata is
-needed, and the disjoint windows are what make the null coherent. The
-null concerns the monitor's outcomes, not the returns, and no property
-of the detector implies it; a volatility drift over the eight weeks
-around a release can break it in either direction, since most strata
-have unbalanced controls.
+assumed, and the disjoint windows are what make the null coherent, but
+the earlier strata must carry no information that separates a release
+window from its controls, which releases on consecutive days could
+violate. The null concerns the monitor's outcomes, not the returns, and
+no property of the detector implies it. Most strata are unbalanced, with
+controls only after the release, so a falling alarm rate favours
+rejection; in simulation a rate halving every 91 days raised the chance
+of ever reaching 20 over 41 strata from 0.023 to 0.026.
 
 \textbf{Results.} Under each of eight null laws, \(M\) reached 20 within
 200 releases in at most 4.4\% of 20,000 simulated sequences. Under the

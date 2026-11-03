@@ -79,7 +79,7 @@ Round 3: theory TH4 to TH6, experiments E16 to E25, the paper, and the preparati
 - `scripts/trace_numbers.py`, which traces every number of a Markdown file to `docs/` or `results/`.
 - Independent reviews, rounds 4 (E17), 5 (E16), 6 (TH4), 7 (TH5), 8 (TH6), 9 (the package code, with
   Monte Carlo checks of every documented guarantee and reproduction scripts in `docs/review/round9_scripts/`)
-  and 10 (E24), and three referee passes on the paper draft.
+  10 (E24) and 11 (E25), and three referee passes on the paper draft.
 - `avmonitor.detectors.check_bets`, which rejects bets that could make a factor negative.
 
 ### Changed
