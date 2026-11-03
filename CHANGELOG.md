@@ -68,8 +68,10 @@ Round 3: theory TH4 to TH6, experiments E16 to E23, the paper, and the preparati
   main text of about 10,000 words and a supplement (S1 to S9); `scripts/build_paper_pdf.py` builds the
   PDF without LaTeX.
 - `scripts/trace_numbers.py`, which traces every number of a Markdown file to `docs/` or `results/`.
-- Independent reviews, rounds 4 (E17), 5 (E16), 6 (TH4), 7 (TH5) and 8 (TH6), and a referee report on the
-  paper draft.
+- Independent reviews, rounds 4 (E17), 5 (E16), 6 (TH4), 7 (TH5), 8 (TH6) and 9 (the package code, with
+  Monte Carlo checks of every documented guarantee and reproduction scripts in `docs/review/round9_scripts/`),
+  and three referee passes on the paper draft.
+- `avmonitor.detectors.check_bets`, which rejects bets that could make a factor negative.
 
 ### Changed
 
@@ -96,6 +98,14 @@ Round 3: theory TH4 to TH6, experiments E16 to E23, the paper, and the preparati
 - TH6, after review round 8: the e-CUSUM window bounds of Theorem 2 are stated as unconditional (given
   the past only Lemma 2 holds).
 - Paper Table S1: two cells corrected to their source files, found by `scripts/trace_numbers.py`.
+- After review round 9: `betting_edetector` now leaves the statistic unchanged at a missing value (it
+  used to add 1, as for an observation with Y = 1, so a stream of missing values alarmed at step 2A; no
+  committed experiment passed missing values to it); `running.two_sided_sr` skips missing values instead
+  of stopping; `calibrate` raises on a degenerate window; the monitors reject bets outside [0, 1); the
+  known-baseline `PeriodicVolatilityMonitor` uses `c_down`; `two_sided_alarm` works with mixed integer
+  types; `sr_steps_constant_factor` is exact at integer boundaries; `load_bitstamp_csv` marks the
+  provider's filled minutes as missing returns instead of zero returns (0.30% of minutes in July to
+  December 2025).
 
 ## [0.2.0] - 2026-11-03
 
