@@ -118,7 +118,7 @@ cd paper
 pandoc -s --shift-heading-level-by=-1 short_paper.md -o short_paper.tex
 ```
 
-`--shift-heading-level-by=-1` turns the Markdown `##` headings into LaTeX `\section`. The section numbers are written in the headings, and the pandoc template switches LaTeX numbering off, so they are not doubled. The `.tex` was produced with pandoc 3.1.3. The PDF was not rebuilt in this round; it is older than the Markdown source (referee m10 and k16) and is to be rebuilt from this version.
+`--shift-heading-level-by=-1` turns the Markdown `##` headings into LaTeX `\section`. The section numbers are written in the headings, and the pandoc template switches LaTeX numbering off, so they are not doubled. The `.tex` was produced with pandoc 3.1.3. The PDF was rebuilt from this version with `python scripts/build_paper_pdf.py` on 3 November 2026 (referee m10 and k16).
 
 ## Compiling the LaTeX elsewhere
 
