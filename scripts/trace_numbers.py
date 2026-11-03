@@ -208,7 +208,7 @@ NUM_RE = re.compile(
     r"(?P<pct>\s?\\?%)?")
 
 INDEX_NAME_RE = re.compile(r"\b(?:Nifty|NIFTY|S&P|FTSE|DAX|Stoxx|STOXX|Russell|Nikkei|Sensex)\s+([0-9]+)\b")
-LABEL_RE = re.compile(r"(?<![A-Za-z0-9_])(?:(?P<eq>[EQ])(?P<n>[0-9]{1,2})[a-z]?|ALT(?P<alt>[0-9]))(?![0-9])")
+LABEL_RE = re.compile(r"(?<![A-Za-z0-9_])(?:(?P<eq>[EQ])(?P<n>[0-9]{1,2})[a-z]?|ALT(?P<alt>[0-9])|TH(?P<th>[0-9]))(?![0-9])")
 SENTENCE_BREAK_RE = re.compile(r"(?<=[.!?])\s+(?=[A-Z(\[*$\\])")
 YEAR_CONNECTORS = {"and", "or", "to", "through", "until"}
 
@@ -520,6 +520,8 @@ def labels_in(text: str) -> set[str]:
     for m in LABEL_RE.finditer(text):
         if m.group("alt"):
             out.add(f"ALT{int(m.group('alt'))}")
+        elif m.group("th"):
+            out.add(f"TH{int(m.group('th'))}")
         else:
             out.add(f"E{int(m.group('n'))}")
     return out
@@ -593,7 +595,8 @@ def line_scopes(text: str) -> dict[tuple[int, int], tuple[set[str], set[str]]]:
 
 
 THEORY_SCOPE = {"theory_running_tau": {"E14"}, "theory_panel": {"E15"}, "theory_multifreq": {"E17"},
-                "theory_delay": {"E11"}}
+                "theory_delay": {"E11"}, "theory_robustness": {"TH4"}, "theory_limits": {"TH5"},
+                "theory_per_period": {"TH6"}}
 SRC_NUM_RE = re.compile(r"(?<![A-Za-z0-9_.])(-?)([0-9]{1,3}(?:,[0-9]{3})+(?![0-9])|[0-9]+)(\.[0-9]+)?(?![0-9])(?!\.[0-9])")
 COMMON_HITS = 5000   # a value matching more cells than this in one file says nothing about co-occurrence
 COMMON_SEGMENTS = 5  # a number in this many sentences of the cited experiment's reports is one of its settings
@@ -629,6 +632,9 @@ def _md_labels(path: Path) -> frozenset:
     m = re.fullmatch(r"ALT(\d+)", stem)
     if m:
         return frozenset({f"ALT{int(m.group(1))}"})
+    m = re.fullmatch(r"TH(\d+)", stem)
+    if m:
+        return frozenset({f"TH{int(m.group(1))}"})
     return frozenset()
 
 
@@ -747,7 +753,10 @@ def data_source(path: Path, rel: str, tier: str, labels: frozenset) -> Source:
 
 def _data_labels(path: Path) -> frozenset:
     m = re.match(r"e(\d{2})", path.name)
-    return frozenset({f"E{int(m.group(1))}"}) if m else frozenset()
+    if m:
+        return frozenset({f"E{int(m.group(1))}"})
+    m = re.match(r"th(\d)_", path.name)
+    return frozenset({f"TH{int(m.group(1))}"}) if m else frozenset()
 
 
 DATA_SUFFIXES = (".csv", ".csv.gz", ".json", ".txt")

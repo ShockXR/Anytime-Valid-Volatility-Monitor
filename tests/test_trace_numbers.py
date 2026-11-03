@@ -124,3 +124,11 @@ def test_end_to_end(tmp_path):
     assert rows["1.11"]["row_check"] == ""
     assert tn.main(["--root", str(tmp_path), "--target", str(target), "--out", str(out), "--quiet",
                     "--fail-on-untraced"]) == 1
+
+
+def test_theory_labels_scope():
+    assert tn.labels_in("TH5 and E14 (Q-TH5c, ALT3)") == {"TH5", "E14", "ALT3"}
+    assert tn._md_labels(Path("docs/theory_limits.md")) == frozenset({"TH5"})
+    assert tn._md_labels(Path("docs/report_parts/TH4.md")) == frozenset({"TH4"})
+    assert tn._data_labels(Path("results/th5_floors.csv")) == frozenset({"TH5"})
+    assert tn._data_labels(Path("results/e10c_events.csv")) == frozenset({"E10"})
