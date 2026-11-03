@@ -73,7 +73,7 @@ Round 3: theory TH4 to TH6, experiments E16 to E24, the paper, and the preparati
   main text of about 10,000 words and a supplement (S1 to S9); `scripts/build_paper_pdf.py` builds the
   PDF without LaTeX.
 - `scripts/trace_numbers.py`, which traces every number of a Markdown file to `docs/` or `results/`.
-- Independent reviews, rounds 4 (E17), 5 (E16), 6 (TH4), 7 (TH5), 8 (TH6) and 9 (the package code, with
+- Independent reviews, rounds 4 (E17), 5 (E16), 6 (TH4), 7 (TH5), 8 (TH6), 10 (E24) and 9 (the package code, with
   Monte Carlo checks of every documented guarantee and reproduction scripts in `docs/review/round9_scripts/`),
   and three referee passes on the paper draft.
 - `avmonitor.detectors.check_bets`, which rejects bets that could make a factor negative.
