@@ -420,6 +420,28 @@ NEXT ITERATION: The referee-style review of the paper (major revision) and the w
 
 ---
 
+ITERATION NUMBER: 20 (landmark shocks as pre-registered case studies, E18)
+
+OBJECTIVE: See how fast the monitor and published methods flag four well-known market shocks: the Indian election results of 4 June 2024, the global sell-off of 5 August 2024, the tariff sell-off of 7 April 2025 and the crypto liquidation cascade of 10 October 2025.
+
+PROBLEM IDENTIFIED: Event studies on scheduled releases (E7, E12) say nothing about large unscheduled shocks, and case studies invite cherry-picking of dates, reference times and competitor settings.
+
+HYPOTHESIS: With dates and reference times verified from news sources and every setting committed before any run, the comparison is honest even with four events; the e-detector should be competitive in speed with BOCPD and slower than nothing it is calibrated against.
+
+CHANGES IMPLEMENTED: `docs/preregistration_e18_events.md` (committed before the script existed), `experiments/e18_landmark_events.py`, thresholds matched to the e-detector's alarm rate outside the event windows.
+
+EXPERIMENTS PERFORMED: The primary streaming design on Nifty 50 and the five coins; three pre-registered sensitivity designs (fresh calibration just before each reference time, other start dates, whole-sample matching); a descriptive look at the hours before each crypto alarm (added after the run).
+
+RESULTS: On Nifty the e-detector flagged all three shocks, 11, 104 and 172 minutes after the open. On crypto it flagged none of the fifteen coin and event pairs within 24 hours: on each event it had raised an up alarm 4.5 to 6.9 hours earlier, as the turbulence began, and was still recalibrating. Competitors were mostly paused for the same reason (1 to 5 of 45 configurations watching), and 22 of their 35 crypto catches came in the first minute after a pause ended; the day-long two-window variance-ratio scan flagged 10 October 2025 on all five coins within 17 to 73 minutes. With a fresh calibration the e-detector flagged all 18 cases in 15 to 207 minutes, earlier than the short-window competitors on 5 August 2024 and later than plain BOCPD on 10 October 2025 and on two Nifty events. A container restart killed the crypto BOCPD runs midway; only the lost jobs were rerun, with no setting changed.
+
+IMPROVEMENTS: A concrete, pre-registered demonstration of the cost of the blind period after an alarm, the problem E14's monitors address.
+
+REMAINING ISSUES: Four events are case studies, not evidence. Rate matching uses data from after the events, which favours the competitors.
+
+NEXT ITERATION: E14's monitors without a blind period on the same events (exploratory, added after this result).
+
+---
+
 Further work streams (E13, E14, E16, E17, the alternative prototypes, logs ALT1 to ALT6) keep their own iteration notes in `docs/iterations/`. Their main results are summarised in `docs/experiment_report.md` and `alternatives/ALTERNATIVES.md`.
 
 ---
