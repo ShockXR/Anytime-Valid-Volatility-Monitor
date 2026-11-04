@@ -69,22 +69,25 @@ The robust monitor flags the rise after 10 steps and the fall after 98, then rai
 ## Validation and reproducibility
 
 ```bash
-python -m pytest -q                               # software tests, no data needed
-python scripts/trace_numbers.py --target README.md  # every number here against a committed result
-python scripts/reproduce.py                       # data hashes, tests and experiment reruns
+# software tests, no data needed
+python -m pytest -q
+# check every number in this README against a committed result
+python scripts/trace_numbers.py --target README.md
+# data hashes, tests and experiment reruns
+python scripts/reproduce.py
 ```
 
 The tests run on every push (GitHub Actions). Raw market data are not committed: `python scripts/download_data.py` fetches them from public sources and records their hashes ([data/README.md](data/README.md)).
 
-| If you want | Read |
-| --- | --- |
-| The pitch as answers to ten questions | [PITCH_BAPAT.md](PITCH_BAPAT.md) |
-| Every experiment, with tables and caveats | [docs/experiment_report.md](docs/experiment_report.md) |
-| The replication of the paper's estimator tables, with questions | [docs/estimator_issues.md](docs/estimator_issues.md) |
-| Definitions, proofs and later-day statements | [docs/math.md](docs/math.md), [docs/theory_per_period.md](docs/theory_per_period.md) and the other `docs/theory_*.md` notes |
-| The fourth round of backtests | [reports/round4/ROUND4_SUMMARY.md](reports/round4/ROUND4_SUMMARY.md) |
-| What the results do not show | [docs/limitations.md](docs/limitations.md) |
-| The previous, fuller README | [README_FULL.md](README_FULL.md) |
+**Further reading**
+
+* The pitch as answers to ten questions: [PITCH_BAPAT.md](PITCH_BAPAT.md)
+* Every experiment, with tables and caveats: [docs/experiment_report.md](docs/experiment_report.md)
+* The replication of the paper's estimator tables, with questions: [docs/estimator_issues.md](docs/estimator_issues.md)
+* Definitions, proofs and later-day statements: [docs/math.md](docs/math.md), [docs/theory_per_period.md](docs/theory_per_period.md) and the other `docs/theory_*.md` notes
+* The fourth round of backtests: [reports/round4/ROUND4_SUMMARY.md](reports/round4/ROUND4_SUMMARY.md)
+* What the results do not show: [docs/limitations.md](docs/limitations.md)
+* The previous, fuller README: [README_FULL.md](README_FULL.md)
 
 ## How this was built
 
