@@ -1,6 +1,7 @@
 line,number,context,status,source,how,tier,in_scope,weak,cooccur,row_check,scope,hint
 4,3.10,![Python 3.10+](https://img.shields.io/badge/python-3.10%2...,traced_md,docs/report_parts/E18.md,rounded,primary,yes,,single,,E18,
-14,"15,000","...and crosses the dashed alarm threshold 2A = 15,000 at 09:26. Hatched areas mark minutes when th...",traced_md,docs/review/independent_review_round8_th6.md,literal,review,no,,single,,E18,
+14,560,"...s/figures/nifty_2024-06-04_alarm.png"" width=""560"" alt=""The Nifty 50 monitor's evidence of a r...",traced_csv,results/e18_awake.csv,rounded,results,yes,,single,,E18,
+14,"15,000","...and crosses the dashed alarm threshold 2A = 15,000 at 09:26, after which a hatched area marks t...",traced_md,docs/review/independent_review_round8_th6.md,literal,review,no,,single,,E18,
 16,11,"...the monitor raised an up alarm at 09:26 IST, 11 minutes after the Nifty open, then paused to...",traced_md,docs/report_parts/E18.md,literal,primary,yes,yes,single,,E18,
 16,"15,000","...does not cover. The evidence must reach 2A = 15,000 to raise an alarm. The 11 minutes are time s...",traced_md,docs/review/independent_review_round8_th6.md,literal,review,no,,single,,E18,
 16,11,"...ust reach 2A = 15,000 to raise an alarm. The 11 minutes are time since the open; the minute...",traced_md,docs/report_parts/E18.md,literal,primary,yes,yes,single,,E18,

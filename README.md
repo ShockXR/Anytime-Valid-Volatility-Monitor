@@ -11,12 +11,9 @@ Sudeep R. Bapat's work on quarticity ([Bapat 2026, *International Review of Econ
 
 The estimator is Bapat's and the detection framework is Shin, Ramdas and Rinaldo's; the combination, implementation, calibration comparisons and market replays are this project's. Research prototype by Shreyan Thanki, November 2026, built with extensive AI assistance ([how](#how-this-was-built)).
 
-<a href="docs/figures/nifty_2024-06-04_alarm.png"><picture>
-  <source media="(max-width: 600px)" srcset="docs/figures/nifty_2024-06-04_alarm_phone.png">
-  <img src="docs/figures/nifty_2024-06-04_alarm.png" width="100%" alt="Two panels for the Nifty 50 from 3 June 2024, 14:50, to 4 June 2024, 10:05 IST. Top: each minute's capped squared return relative to the baseline, mostly small, with large bars after the 09:15 open. Bottom: the evidence of a rise on a log scale, which climbs after the open and crosses the dashed alarm threshold 2A = 15,000 at 09:26. Hatched areas mark minutes when the monitor was recalibrating and not monitoring.">
-</picture></a>
+<p align="center"><a href="docs/figures/nifty_2024-06-04_alarm.png"><img src="docs/figures/nifty_2024-06-04_alarm.png" width="560" alt="The Nifty 50 monitor's evidence of a rise, on a log scale, from 15:19 IST on 3 June 2024 to 09:48 on 4 June. It stays below 10 on 3 June, climbs steeply after the 09:15 open on 4 June and crosses the dashed alarm threshold 2A = 15,000 at 09:26, after which a hatched area marks the monitor recalibrating and not monitoring."></a></p>
 
-**On 4 June 2024 the monitor raised an up alarm at 09:26 IST, 11 minutes after the Nifty open, then paused to recalibrate.** Real data, single historical case (experiment E18), default plug-in baseline, which the guarantee below does not cover. The evidence must reach 2A = 15,000 to raise an alarm. The 11 minutes are time since the open; the minute at which volatility itself changed cannot be observed. Inspect the run in the executed [notebook](notebooks/demo.ipynb), or download [docs/demo/replay.html](docs/demo/replay.html) and open it in a browser for a minute-by-minute replay.
+**On 4 June 2024 the monitor raised an up alarm at 09:26 IST, 11 minutes after the Nifty open, then paused to recalibrate.** Real data, single historical case (experiment E18), default plug-in baseline, which the guarantee below does not cover. The evidence must reach 2A = 15,000 to raise an alarm. The 11 minutes are time since the open; the minute at which volatility itself changed cannot be observed. A [two-panel version](docs/figures/nifty_2024-06-04_alarm_detail.png) adds each minute's capped return. Inspect the run in the executed [notebook](notebooks/demo.ipynb), or download [docs/demo/replay.html](docs/demo/replay.html) and open it in a browser for a minute-by-minute replay.
 
 <details>
 <summary><b>How the monitor works, in one diagram</b></summary>

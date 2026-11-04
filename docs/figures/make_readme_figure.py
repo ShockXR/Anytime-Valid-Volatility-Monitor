@@ -8,8 +8,9 @@ it runs no experiment. Run from the repository root:
 
     python docs/figures/make_readme_figure.py
 
-It writes docs/figures/nifty_2024-06-04_alarm.png (two panels, for desktop width) and
-docs/figures/nifty_2024-06-04_alarm_phone.png (the evidence panel only, readable at phone width).
+It writes docs/figures/nifty_2024-06-04_alarm.png (the evidence panel alone, sized so its type
+stays readable from a 375 px phone screen to a desktop README column) and
+docs/figures/nifty_2024-06-04_alarm_detail.png (two panels, adding each minute's clipped return).
 """
 
 import datetime as dt
@@ -25,8 +26,8 @@ from matplotlib.ticker import FixedLocator, FuncFormatter  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[2]
 SRC = ROOT / "docs" / "demo" / "replay.html"
-OUT = ROOT / "docs" / "figures" / "nifty_2024-06-04_alarm.png"
-OUT_PHONE = ROOT / "docs" / "figures" / "nifty_2024-06-04_alarm_phone.png"
+OUT = ROOT / "docs" / "figures" / "nifty_2024-06-04_alarm_detail.png"
+OUT_PHONE = ROOT / "docs" / "figures" / "nifty_2024-06-04_alarm.png"
 
 INK = "#1d2433"
 INK2 = "#5b6475"
@@ -172,7 +173,7 @@ def phone(d: dict, idx, alarm_i: int, open_i: int) -> None:
 
     plt.rcParams.update({"font.family": "Inter", "font.size": 13, "axes.edgecolor": GRID,
                          "axes.labelcolor": INK2, "xtick.color": INK2, "ytick.color": INK2})
-    fig, ax = plt.subplots(figsize=(4.6, 5.0), dpi=200)
+    fig, ax = plt.subplots(figsize=(5.4, 4.6), dpi=200)
     fig.patch.set_facecolor("white")
     ax.set_facecolor("white")
     for s in ("top", "right"):
@@ -202,7 +203,7 @@ def phone(d: dict, idx, alarm_i: int, open_i: int) -> None:
             fontsize=13, va="bottom")
     ax.plot([xpos[alarm_i]], [d["wu"][alarm_i]], "o", ms=9, mfc=THRESH, mec="white", mew=1.5, zorder=5)
     ax.annotate("up alarm\n09:26 IST,\n11 min after\nthe open", xy=(xpos[alarm_i], d["wu"][alarm_i]),
-                xytext=(xpos[alarm_i] + 2.5, 40), color=INK, fontsize=13, fontweight="semibold",
+                xytext=(xpos[alarm_i] + 3, 60), color=INK, fontsize=13, fontweight="semibold",
                 arrowprops={"arrowstyle": "-", "color": INK2, "lw": 1})
     ax.text((xpos[alarm_i + 1] + xpos[hi]) / 2, 1.0, "recalibrating", ha="center", va="center",
             color=INK2, fontsize=12, bbox={"boxstyle": "round,pad=0.25", "fc": "white", "ec": "#b8bcc6", "lw": 0.8})
@@ -214,12 +215,12 @@ def phone(d: dict, idx, alarm_i: int, open_i: int) -> None:
     ax.yaxis.grid(True, color=GRID, lw=0.8)
     ax.set_axisbelow(True)
     ticks = ["2024-06-03 15:19", "2024-06-04 09:15", "2024-06-04 09:45"]
-    ax.set_xticks([xpos[idx(s)] for s in ticks], ["3 Jun\n15:19", "4 Jun\n09:15", "09:45"])
+    ax.set_xticks([xpos[idx(s)] for s in ticks], ["3 Jun\n15:19", "4 Jun\n09:15 open", "09:45"])
     ax.set_xlim(xpos[lo] - 1, xpos[hi] + 1)
     ax.set_xlabel("India time (IST), one point per minute", fontsize=12)
     ax.set_title("Nifty 50, 4 June 2024", loc="left", color=INK, fontsize=15, fontweight="semibold", pad=8)
     fig.text(0.02, 0.008, "Real data, single historical case (E18)", color=INK2, fontsize=11)
-    fig.subplots_adjust(left=0.235, right=0.96, top=0.93, bottom=0.215)
+    fig.subplots_adjust(left=0.2, right=0.97, top=0.92, bottom=0.225)
     fig.savefig(OUT_PHONE, facecolor="white")
     print("wrote", OUT_PHONE.relative_to(ROOT))
 
