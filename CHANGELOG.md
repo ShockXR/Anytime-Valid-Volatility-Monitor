@@ -22,6 +22,28 @@ Round 3: theory TH4 to TH6, experiments E16 to E25, the paper, and the preparati
 - The command line prints a short `error:` line and exits with status 2 instead of a traceback.
 - No stored result changed (465 of 465 result files identical after the quick tier and an E4 rerun).
 
+### Fixed and added (4 November 2026, round 4, on top of the entries above)
+
+- `VolatilityMonitor` and its subclasses: `threshold` must be a finite number above 1 (was: positive, and
+  infinity was accepted, which alarmed once a statistic overflowed to inf, R5-B-002); `c` and `c_down` must
+  be finite and positive, with an error that names the argument (a non-number `c` gave a `TypeError`, and
+  `c_down = inf` was accepted).
+- New `VolatilityMonitor.status()` and the attributes `cal_steps` and `restarts_in_a_row`: they show at any
+  moment whether the monitor is blind (steps spent calibrating, calibration restarts in a row, whether the
+  increase side can gain at all). Nothing about the alarms changes.
+- `update` of `GaussianLRMonitor`, of `PeriodicVolatilityMonitor` with a period or the CUSUM statistic, and
+  of the guard's rank fallback rejects a non-number at once, as `VolatilityMonitor.update` already does.
+- `repeated_window_ztest` skips missing values (NaN or infinite) like the other two benchmarks: the window
+  holds the last observed returns. Without missing values the output is unchanged.
+- The Bitstamp, Nifty and Binance loaders also mask bars whose close is infinite or missing and report them
+  as `nonfinite_prices` in `df.attrs["checks"]`.
+- A calibration window of huge returns (median above about 1e153) gave an `OverflowError` from
+  `(c * scale) ** 2`; it now gives `tau^2 = inf`, which the degenerate-window rule rejects (R5-B-001). The
+  same holds for `detectors.calibrate` and `GaussianLRMonitor.update`. Finite squares are computed exactly
+  as before.
+- No stored result changed: quick tier 465 of 465 identical, and the loaders and seven monitor
+  configurations give byte-identical output on the real files (`reports/round4/M/REPORT.md`).
+
 ### Added
 
 - Release preparation: complete package metadata in `pyproject.toml` (license, author, keywords,
