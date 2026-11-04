@@ -8,7 +8,7 @@
 
 Every result in this repository carries a label: **[PUBLISHED]** (taken from a paper), **[SYNTHETIC]** (our simulation) or **[REAL]** (our run on market data). Nothing is reported that was not run.
 
-**How this work was done.** Shreyan Thanki directed the project; the code, experiments, proofs and write-ups were produced with extensive AI assistance (Claude, by Anthropic). Every review and referee report in `docs/review/` was written by a separate AI agent instructed to act as a sceptical referee, not by a human expert, so "independent" there means "not the agent that wrote the files". The proofs have therefore not been checked by a human statistician. "Pre-registered" means a plan committed to git before the data it tests were read; there is no external registry. Every number is produced by code in this repository, and `scripts/trace_numbers.py` checks that the numbers printed in this file, the pitch and the short paper appear in a committed result or report.
+**How this work was done.** The project is the joint work of Shreyan Thanki, Atharva Bhardwaj and Arjun Bino Nair; the code, experiments, proofs and write-ups were produced with extensive AI assistance (Claude, by Anthropic). Every review and referee report in `docs/review/` was written by a separate AI agent instructed to act as a sceptical referee, not by a human expert, so "independent" there means "not the agent that wrote the files". The proofs have therefore not been checked by a human statistician. "Pre-registered" means a plan committed to git before the data it tests were read; there is no external registry. Every number is produced by code in this repository, and `scripts/trace_numbers.py` checks that the numbers printed in this file, the pitch and the short paper appear in a committed result or report.
 
 ## What the project does
 
@@ -265,4 +265,4 @@ The full, verified list is in [`docs/literature_review.md`](docs/literature_revi
 
 ## Author
 
-Shreyan Thanki ([@ShockXR](https://github.com/ShockXR))
+Shreyan Thanki, Atharva Bhardwaj and Arjun Bino Nair. Repository: [@ShockXR](https://github.com/ShockXR)

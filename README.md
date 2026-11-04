@@ -9,7 +9,7 @@
 
 Sudeep R. Bapat's work on quarticity ([Bapat 2026, *International Review of Economics and Finance*](https://doi.org/10.1016/j.iref.2026.105482)) uses a robust threshold to limit the influence of price jumps. This prototype takes that clipping idea into a different task. It squares each one-minute return and caps it at a cutoff set during calibration, so a single extreme return can contribute only so much. Two e-detectors, the framework of Shin, Ramdas and Rinaldo (2024), then accumulate evidence as each return arrives that the average of this capped quantity has shifted up or down. The experiments ask how quickly an alarm can fire for a specified false-alarm budget, and what happens when the monitor has to learn its baseline from data.
 
-The estimator is Bapat's and the detection framework is Shin, Ramdas and Rinaldo's; the combination, implementation, calibration comparisons and market replays are this project's. Research prototype by Shreyan Thanki, November 2026, built with extensive AI assistance ([how](#how-this-was-built)).
+The estimator is Bapat's and the detection framework is Shin, Ramdas and Rinaldo's; the combination, implementation, calibration comparisons and market replays are this project's. Research prototype by Shreyan Thanki, Atharva Bhardwaj and Arjun Bino Nair, November 2026, built with extensive AI assistance ([how](#how-this-was-built)).
 
 <p align="center"><a href="docs/figures/nifty_2024-06-04_alarm.png"><img src="docs/figures/nifty_2024-06-04_alarm.png" width="560" alt="The Nifty 50 monitor's evidence of a rise, on a log scale, from 15:19 IST on 3 June 2024 to 09:48 on 4 June. It stays below 10 on 3 June, climbs steeply after the 09:15 open on 4 June and crosses the dashed alarm threshold 2A = 15,000 at 09:26, after which a hatched area marks the monitor recalibrating and not monitoring."></a></p>
 
@@ -41,7 +41,7 @@ flowchart LR
 
 **3. On real markets an alarm summarises a burst that is under way; it is not a forecast** [real]. Over 27 asset-years of crypto and Nifty data, 91.4% of up alarms were followed by an hour above the calibrated level, against 74.6% of control minutes with an equally volatile previous hour; matching on the last 10 minutes as well (a later check) narrows the gap to 83.5% ([W1](reports/round4/W1/REPORT.md)). On fresh 2026 data the alarms did not improve a HAR forecast that already sees the last hour, for BTC, ETH or the Nifty 50. The contribution is the guarantee, not prediction.
 
-A question for Prof. Bapat: **which calibration assumption would you relax first for one-minute market data?**
+One question we would value your view on, Prof. Bapat: **which calibration assumption would you relax first for one-minute market data?** It is the part of the design where your experience with jump-robust estimation would help us most.
 
 ## See it run
 
@@ -91,7 +91,7 @@ The tests run on every push (GitHub Actions). Raw market data are not committed:
 
 ## How this was built
 
-Shreyan Thanki directed the project. The code, experiments, proofs and write-ups were produced with extensive AI assistance (Claude, by Anthropic). The reviews in `docs/review/` were written by separate AI agents asked to act as sceptical referees, not by human experts, and **no statistician has yet checked the proofs**. The code is released under the MIT license.
+The project is the joint work of Shreyan Thanki, Atharva Bhardwaj and Arjun Bino Nair. The code, experiments, proofs and write-ups were produced with extensive AI assistance (Claude, by Anthropic). The reviews in `docs/review/` were written by separate AI agents asked to act as sceptical referees, not by human experts, and **no statistician has yet checked the proofs**. The code is released under the MIT license.
 
 ## References
 
