@@ -1,0 +1,4 @@
+design,horizon,bound_total,up_at_A,down_at_A,up_at_2A,down_at_2A,both_at_2A,two_sided,paths,two_sided_over_bound
+default grids,390,0.05,0.0164,0.00655,0.007925,0.002375,0.0,0.0103,40000,0.206
+"E11 recommended grids (up 0.25/0.5, down 0.9/0.99 x max)",390,0.05,0.030525,0.021625,0.014525,0.009525,5e-05,0.024,40000,0.48
+"single bets (up 0.5, down 0.95 x max)",390,0.05,0.0309,0.021925,0.0157,0.0097,0.000125,0.025275,40000,0.5055

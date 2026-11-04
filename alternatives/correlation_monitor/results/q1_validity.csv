@@ -1,0 +1,55 @@
+scenario,detector,band,baseline,fa_1day,bound_1day,fa_5days,bound_5days,share_up,paths
+gaussian rho 0.3,sign,0.0,estimated (2000 steps),0.029,0.05,0.2295,0.25,0.5315904139433552,2000
+gaussian rho 0.3,sign,0.05,estimated (2000 steps),0.0045,0.05,0.0355,0.25,0.5633802816901409,2000
+gaussian rho 0.3,product c3,0.0,estimated (2000 steps),0.0,0.05,0.1125,0.25,0.4622222222222222,2000
+gaussian rho 0.3,product c3,0.05,estimated (2000 steps),0.0,0.05,0.004,0.25,0.75,2000
+gaussian rho 0.3,gaussian LR,0.0,estimated (2000 steps),0.0495,0.05,0.3195,0.25,0.49139280125195617,2000
+gaussian rho 0.3,naive CUSUM,0.0,estimated (2000 steps),0.0315,0.05,0.1835,0.25,0.8256130790190735,2000
+student t4 rho 0.3,sign,0.0,estimated (2000 steps),0.0235,0.05,0.231,0.25,0.47619047619047616,2000
+student t4 rho 0.3,sign,0.05,estimated (2000 steps),0.0035,0.05,0.033,0.25,0.5,2000
+student t4 rho 0.3,product c3,0.0,estimated (2000 steps),0.0015,0.05,0.1565,0.25,0.46006389776357826,2000
+student t4 rho 0.3,product c3,0.05,estimated (2000 steps),0.0,0.05,0.025,0.25,0.42,2000
+student t4 rho 0.3,gaussian LR,0.0,estimated (2000 steps),0.7975,0.05,1.0,0.25,0.174,2000
+student t4 rho 0.3,naive CUSUM,0.0,estimated (2000 steps),0.962,0.05,1.0,0.25,0.5565,2000
+jumps rho 0.3,sign,0.0,estimated (2000 steps),0.0305,0.05,0.241,0.25,0.49377593360995853,2000
+jumps rho 0.3,sign,0.05,estimated (2000 steps),0.0065,0.05,0.042,0.25,0.5119047619047619,2000
+jumps rho 0.3,product c3,0.0,estimated (2000 steps),0.0,0.05,0.1235,0.25,0.46558704453441296,2000
+jumps rho 0.3,product c3,0.05,estimated (2000 steps),0.0,0.05,0.0045,0.25,0.3333333333333333,2000
+jumps rho 0.3,gaussian LR,0.0,estimated (2000 steps),0.5695,0.05,0.9825,0.25,0.02748091603053435,2000
+jumps rho 0.3,naive CUSUM,0.0,estimated (2000 steps),0.2235,0.05,0.74,0.25,0.6081081081081081,2000
+cojumps rho 0.3,sign,0.0,estimated (2000 steps),0.0225,0.05,0.215,0.25,0.5116279069767442,2000
+cojumps rho 0.3,sign,0.05,estimated (2000 steps),0.0045,0.05,0.0295,0.25,0.4576271186440678,2000
+cojumps rho 0.3,product c3,0.0,estimated (2000 steps),0.0,0.05,0.1205,0.25,0.44813278008298757,2000
+cojumps rho 0.3,product c3,0.05,estimated (2000 steps),0.0,0.05,0.0055,0.25,0.45454545454545453,2000
+cojumps rho 0.3,gaussian LR,0.0,estimated (2000 steps),0.7145,0.05,0.996,0.25,0.07981927710843373,2000
+cojumps rho 0.3,naive CUSUM,0.0,estimated (2000 steps),0.565,0.05,0.977,0.25,0.5015353121801432,2000
+gaussian rho 0.6,sign,0.0,estimated (2000 steps),0.023,0.05,0.22,0.25,0.49318181818181817,2000
+gaussian rho 0.6,sign,0.05,estimated (2000 steps),0.003,0.05,0.026,0.25,0.28846153846153844,2000
+gaussian rho 0.6,product c3,0.0,estimated (2000 steps),0.0,0.05,0.136,0.25,0.47058823529411764,2000
+gaussian rho 0.6,product c3,0.05,estimated (2000 steps),0.0,0.05,0.008,0.25,0.5625,2000
+gaussian rho 0.6,gaussian LR,0.0,estimated (2000 steps),0.0655,0.05,0.278,0.25,0.5053956834532374,2000
+gaussian rho 0.6,naive CUSUM,0.0,estimated (2000 steps),0.11,0.05,0.443,0.25,0.8656884875846501,2000
+vol x2 asset 1 (rho 0.3 fixed),sign,0.0,estimated (2000 steps),0.0255,0.05,0.236,0.25,0.4766949152542373,2000
+vol x2 asset 1 (rho 0.3 fixed),sign,0.05,estimated (2000 steps),0.004,0.05,0.0365,0.25,0.3561643835616438,2000
+vol x2 asset 1 (rho 0.3 fixed),product c3,0.0,estimated (2000 steps),0.0,0.05,0.9825,0.25,0.9994910941475827,2000
+vol x2 asset 1 (rho 0.3 fixed),product c3,0.05,estimated (2000 steps),0.0,0.05,0.894,0.25,1.0,2000
+vol x2 asset 1 (rho 0.3 fixed),gaussian LR,0.0,estimated (2000 steps),0.0505,0.05,0.9985,0.25,0.03204807210816224,2000
+vol x2 asset 1 (rho 0.3 fixed),naive CUSUM,0.0,estimated (2000 steps),0.038,0.05,1.0,0.25,0.9805,2000
+vol x0.5 asset 1 (rho 0.3 fixed),sign,0.0,estimated (2000 steps),0.0305,0.05,0.2375,0.25,0.5221052631578947,2000
+vol x0.5 asset 1 (rho 0.3 fixed),sign,0.05,estimated (2000 steps),0.0055,0.05,0.04,0.25,0.55,2000
+vol x0.5 asset 1 (rho 0.3 fixed),product c3,0.0,estimated (2000 steps),0.0,0.05,1.0,0.25,0.0,2000
+vol x0.5 asset 1 (rho 0.3 fixed),product c3,0.05,estimated (2000 steps),0.0,0.05,0.969,0.25,0.0,2000
+vol x0.5 asset 1 (rho 0.3 fixed),gaussian LR,0.0,estimated (2000 steps),0.046,0.05,0.7955,0.25,0.9509742300439975,2000
+vol x0.5 asset 1 (rho 0.3 fixed),naive CUSUM,0.0,estimated (2000 steps),0.027,0.05,0.482,0.25,0.06846473029045644,2000
+vol x2 both (rho 0.3 fixed),sign,0.0,estimated (2000 steps),0.0295,0.05,0.2365,0.25,0.5221987315010571,2000
+vol x2 both (rho 0.3 fixed),sign,0.05,estimated (2000 steps),0.005,0.05,0.045,0.25,0.5111111111111111,2000
+vol x2 both (rho 0.3 fixed),product c3,0.0,estimated (2000 steps),0.0,0.05,1.0,0.25,0.9995,2000
+vol x2 both (rho 0.3 fixed),product c3,0.05,estimated (2000 steps),0.0,0.05,1.0,0.25,1.0,2000
+vol x2 both (rho 0.3 fixed),gaussian LR,0.0,estimated (2000 steps),0.049,0.05,1.0,0.25,0.0545,2000
+vol x2 both (rho 0.3 fixed),naive CUSUM,0.0,estimated (2000 steps),0.036,0.05,1.0,0.25,0.9415,2000
+"garch(0.05, 0.94) each asset (rho 0.3 fixed)",sign,0.0,estimated (2000 steps),0.0285,0.05,0.239,0.25,0.5083682008368201,2000
+"garch(0.05, 0.94) each asset (rho 0.3 fixed)",sign,0.05,estimated (2000 steps),0.0055,0.05,0.044,0.25,0.3977272727272727,2000
+"garch(0.05, 0.94) each asset (rho 0.3 fixed)",product c3,0.0,estimated (2000 steps),0.0205,0.05,0.636,0.25,0.4473270440251572,2000
+"garch(0.05, 0.94) each asset (rho 0.3 fixed)",product c3,0.05,estimated (2000 steps),0.0085,0.05,0.269,0.25,0.5539033457249071,2000
+"garch(0.05, 0.94) each asset (rho 0.3 fixed)",gaussian LR,0.0,estimated (2000 steps),0.2535,0.05,0.8365,0.25,0.39988045427375973,2000
+"garch(0.05, 0.94) each asset (rho 0.3 fixed)",naive CUSUM,0.0,estimated (2000 steps),0.3325,0.05,0.872,0.25,0.8245412844036697,2000

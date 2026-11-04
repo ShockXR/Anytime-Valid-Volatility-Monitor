@@ -1,0 +1,32 @@
+example,quantity,horizon,value
+burst then calm,alarm step,390,7.0
+burst then calm,D*_m (windows ending at m),390,17.524085528762466
+burst then calm,D*_m m / A,390,0.8762042764381233
+burst then calm,max over t <= m of D*_t,390,80628.39805410233
+responding drift,alarm step after Y_1 = B (0: none),7,7.0
+responding drift,alarm step after Y_1 = 0 (0: none),7,0.0
+responding drift,Theorem 3 per-path bound after Y_1 = B,7,0.47419864205928414
+responding drift,Theorem 3 per-path bound after Y_1 = 0,7,0.0008974358974358974
+responding drift,expected Theorem 3 bound,7,0.053223896434494156
+responding drift,P(T <= m) = 1 / B,7,0.11055636422605039
+responding drift,alarm step after Y_1 = B (0: none),390,7.0
+responding drift,alarm step after Y_1 = 0 (0: none),390,0.0
+responding drift,Theorem 3 per-path bound after Y_1 = B,390,0.5233012061618483
+responding drift,Theorem 3 per-path bound after Y_1 = 0,390,0.05
+responding drift,expected Theorem 3 bound,390,0.10232646053705827
+responding drift,P(T <= m) = 1 / B,390,0.11055636422605039
+alternating +6% / -6%,expected first term of Theorem 3 (uncapped),390,0.3632146219612702
+alternating +6% / -6%,"sup form at the mean parts (3%, 3%)",390,0.3726129160068567
+alternating +6% / -6%,expected D* term of Theorem 3,390,0.0515
+"Proposition 5, p = 0.1",s*,390,7.0
+"Proposition 5, p = 0.1",mean absolute drift,390,0.014440030713335593
+"Proposition 5, p = 0.1",sup form at the mean absolute drift (both sides),390,0.08906482961699883
+"Proposition 5, p = 0.1",P(T <= m),390,0.1
+"switching eps = 0.01, stay 0.5","sup form at the mean parts (eps / 2, eps / 2)",390,0.05800599217551726
+"switching eps = 0.01, stay 0.5","sup form at the mean parts (eps / 2, eps / 2)",1950,1.0
+"switching eps = 0.02, stay 0.5","sup form at the mean parts (eps / 2, eps / 2)",390,0.07060908713881314
+"switching eps = 0.02, stay 0.5","sup form at the mean parts (eps / 2, eps / 2)",1950,1.0
+"switching eps = 0.05, stay 0.5","sup form at the mean parts (eps / 2, eps / 2)",390,0.21018482015699058
+"switching eps = 0.05, stay 0.5","sup form at the mean parts (eps / 2, eps / 2)",1950,1.0
+"switching eps = 0.1, stay 0.5","sup form at the mean parts (eps / 2, eps / 2)",390,1.0
+"switching eps = 0.1, stay 0.5","sup form at the mean parts (eps / 2, eps / 2)",1950,1.0

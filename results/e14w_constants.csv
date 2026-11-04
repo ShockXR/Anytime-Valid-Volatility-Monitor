@@ -1,0 +1,23 @@
+name,value
+Howard-Ramdas C for alpha = 0.01 (A = 0.85),9.283543354029137
+closed form 0.8 log(1612 / 0.01),9.592320887243732
+"Howard-Ramdas radius at t = t_min = 390, alpha = 0.01",0.13114251470164784
+"Howard-Ramdas radius at t = 390, t_min = 1, alpha = 0.01",0.14420229326524087
+"Massart fixed-n DKW radius, n = 390, alpha = 0.01",0.08241792628122527
+"Howard-Ramdas radius at t = t_min = 1440, alpha = 0.01",0.06824872848472695
+"Howard-Ramdas radius at t = 1440, t_min = 1, alpha = 0.01",0.07561758691294951
+"Massart fixed-n DKW radius, n = 1440, alpha = 0.01",0.04289164872153321
+"log(2K / delta), K = 13, delta = 0.01",7.8632667240095735
+"log(2 / delta), delta = 0.01",5.298317366548036
+rank LR bet rho = 1.250: largest factor,4.064752058300219
+rank LR bet rho = 1.250: smallest factor,0.804409144435058
+rank LR bet rho = 1.500: largest factor,8.317740318547154
+rank LR bet rho = 1.500: smallest factor,0.6827617026018901
+rank LR bet rho = 2.000: largest factor,16.131122586627743
+rank LR bet rho = 2.000: smallest factor,0.5519766611692156
+rank LR bet rho = 0.800: largest factor,1.2373911655185643
+rank LR bet rho = 0.800: smallest factor,0.14446825778502081
+rank LR bet rho = 0.667: largest factor,1.4749888706499825
+rank LR bet rho = 0.667: smallest factor,0.05513931233011893
+rank LR bet rho = 0.500: largest factor,1.9499999896840552
+rank LR bet rho = 0.500: smallest factor,0.05000260482225005

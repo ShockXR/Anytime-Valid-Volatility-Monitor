@@ -1,0 +1,17 @@
+monitor,freqs,weights,combine,certified,gap,A,proved_bound_per_day,handicap_1,handicap_5,handicap_15
+1 min,1,1.0000,average,True,False,28800.0,0.05,1.0,,
+5 min,5,1.0000,average,True,False,5760.0,0.05,,1.0,
+15 min,15,1.0000,average,True,False,1920.0,0.05,,,1.0
+"average, equal",1 5 15,0.3333 0.3333 0.3333,average,True,False,12160.0,0.05,1.2666666666666666,6.333333333333333,19.0
+"average, balanced",1 5 15,0.0476 0.2381 0.7143,average,True,False,4114.285714285714,0.05000000000000001,3.0,3.0,3.0
+"average, sqrt",1 5 15,0.1407 0.3145 0.5448,average,True,False,6908.92178697962,0.05,1.705412485247119,3.813418246689416,6.605034153776295
+"average, balanced, plain every minute (no proof at this level)",1 5 15,0.0476 0.2381 0.7143,average,False,False,4114.285714285714,0.15,3.0,3.0,3.0
+"max, balanced",1 5 15,0.0476 0.2381 0.7143,max,False,False,4114.285714285714,0.05000000000000001,3.0,3.0,3.0
+"average 5 and 15, balanced",5 15,0.2500 0.7500,average,True,False,2880.0,0.05,,2.0,2.0
+"5 min, gap",5,1.0000,average,True,True,5760.0,0.05,,1.0,
+"15 min, gap",15,1.0000,average,True,True,1920.0,0.05,,,1.0
+"average, equal, gap",1 5 15,0.3333 0.3333 0.3333,average,True,True,12160.0,0.05,1.2666666666666666,6.333333333333333,19.0
+"average, balanced, gap",1 5 15,0.0476 0.2381 0.7143,average,True,True,4114.285714285714,0.05000000000000001,3.0,3.0,3.0
+"average, sqrt, gap",1 5 15,0.1407 0.3145 0.5448,average,True,True,6908.92178697962,0.05,1.705412485247119,3.813418246689416,6.605034153776295
+"max, balanced, gap",1 5 15,0.0476 0.2381 0.7143,max,False,True,4114.285714285714,0.05000000000000001,3.0,3.0,3.0
+"average 5 and 15, balanced, gap",5 15,0.2500 0.7500,average,True,True,2880.0,0.05,,2.0,2.0

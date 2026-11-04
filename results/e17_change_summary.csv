@@ -1,0 +1,551 @@
+law,change,kind,monitor,best_single,detected,best_single_detected,median_delay,best_single_median_delay,delay_ratio_to_best_single,metric
+gaussian,sd x1.25,shift,1 min,1 min,0.9995,0.9995,134.0,134.0,1.0,median_delay
+gaussian,sd x1.25,shift,5 min,1 min,0.984,0.9995,508.0,134.0,3.791044776119403,median_delay
+gaussian,sd x1.25,shift,15 min,1 min,0.572,0.9995,893.0,134.0,6.664179104477612,median_delay
+gaussian,sd x1.25,shift,"average, equal",1 min,0.9995,0.9995,138.0,134.0,1.0298507462686568,median_delay
+gaussian,sd x1.25,shift,"average, balanced",1 min,0.9995,0.9995,153.0,134.0,1.1417910447761195,median_delay
+gaussian,sd x1.25,shift,"average, sqrt",1 min,0.9995,0.9995,143.0,134.0,1.0671641791044777,median_delay
+gaussian,sd x1.25,shift,"average, balanced, plain every minute (no proof at this level)",1 min,0.9995,0.9995,153.0,134.0,1.1417910447761195,median_delay
+gaussian,sd x1.25,shift,"max, balanced",1 min,0.9995,0.9995,153.0,134.0,1.1417910447761195,median_delay
+gaussian,sd x1.25,shift,"average 5 and 15, balanced",1 min,0.9755,0.9995,563.0,134.0,4.201492537313433,median_delay
+gaussian,sd x1.5,shift,1 min,1 min,0.999,0.999,48.0,48.0,1.0,median_delay
+gaussian,sd x1.5,shift,5 min,1 min,0.9995,0.999,198.0,48.0,4.125,median_delay
+gaussian,sd x1.5,shift,15 min,1 min,0.9895,0.999,518.0,48.0,10.791666666666666,median_delay
+gaussian,sd x1.5,shift,"average, equal",1 min,0.999,0.999,49.0,48.0,1.0208333333333333,median_delay
+gaussian,sd x1.5,shift,"average, balanced",1 min,0.9995,0.999,55.0,48.0,1.1458333333333333,median_delay
+gaussian,sd x1.5,shift,"average, sqrt",1 min,0.999,0.999,52.0,48.0,1.0833333333333333,median_delay
+gaussian,sd x1.5,shift,"average, balanced, plain every minute (no proof at this level)",1 min,0.9995,0.999,55.0,48.0,1.1458333333333333,median_delay
+gaussian,sd x1.5,shift,"max, balanced",1 min,0.9995,0.999,55.0,48.0,1.1458333333333333,median_delay
+gaussian,sd x1.5,shift,"average 5 and 15, balanced",1 min,1.0,0.999,218.0,48.0,4.541666666666667,median_delay
+gaussian,sd x2,shift,1 min,1 min,0.9995,0.9995,23.0,23.0,1.0,median_delay
+gaussian,sd x2,shift,5 min,1 min,1.0,0.9995,93.0,23.0,4.043478260869565,median_delay
+gaussian,sd x2,shift,15 min,1 min,1.0,0.9995,248.0,23.0,10.782608695652174,median_delay
+gaussian,sd x2,shift,"average, equal",1 min,0.9995,0.9995,23.0,23.0,1.0,median_delay
+gaussian,sd x2,shift,"average, balanced",1 min,1.0,0.9995,26.0,23.0,1.1304347826086956,median_delay
+gaussian,sd x2,shift,"average, sqrt",1 min,0.9995,0.9995,24.0,23.0,1.0434782608695652,median_delay
+gaussian,sd x2,shift,"average, balanced, plain every minute (no proof at this level)",1 min,1.0,0.9995,26.0,23.0,1.1304347826086956,median_delay
+gaussian,sd x2,shift,"max, balanced",1 min,1.0,0.9995,26.0,23.0,1.1304347826086956,median_delay
+gaussian,sd x2,shift,"average 5 and 15, balanced",1 min,1.0,0.9995,103.0,23.0,4.478260869565218,median_delay
+gaussian,sd x0.8,shift,1 min,1 min,0.9985,0.9985,209.0,209.0,1.0,median_delay
+gaussian,sd x0.8,shift,5 min,1 min,0.9785,0.9985,868.0,209.0,4.15311004784689,median_delay
+gaussian,sd x0.8,shift,15 min,1 min,0.006,0.9985,1395.5,209.0,6.677033492822966,median_delay
+gaussian,sd x0.8,shift,"average, equal",1 min,0.999,0.9985,216.0,209.0,1.0334928229665072,median_delay
+gaussian,sd x0.8,shift,"average, balanced",1 min,1.0,0.9985,243.0,209.0,1.1626794258373205,median_delay
+gaussian,sd x0.8,shift,"average, sqrt",1 min,1.0,0.9985,225.0,209.0,1.076555023923445,median_delay
+gaussian,sd x0.8,shift,"average, balanced, plain every minute (no proof at this level)",1 min,1.0,0.9985,243.0,209.0,1.1626794258373205,median_delay
+gaussian,sd x0.8,shift,"max, balanced",1 min,1.0,0.9985,243.0,209.0,1.1626794258373205,median_delay
+gaussian,sd x0.8,shift,"average 5 and 15, balanced",1 min,0.943,0.9985,958.0,209.0,4.583732057416268,median_delay
+gaussian,sd x0.667,shift,1 min,1 min,0.9985,0.9985,126.0,126.0,1.0,median_delay
+gaussian,sd x0.667,shift,5 min,1 min,1.0,0.9985,538.0,126.0,4.26984126984127,median_delay
+gaussian,sd x0.667,shift,15 min,1 min,0.4235,0.9985,1343.0,126.0,10.658730158730158,median_delay
+gaussian,sd x0.667,shift,"average, equal",1 min,0.9985,0.9985,131.0,126.0,1.0396825396825398,median_delay
+gaussian,sd x0.667,shift,"average, balanced",1 min,1.0,0.9985,146.0,126.0,1.1587301587301588,median_delay
+gaussian,sd x0.667,shift,"average, sqrt",1 min,0.9985,0.9985,136.0,126.0,1.0793650793650793,median_delay
+gaussian,sd x0.667,shift,"average, balanced, plain every minute (no proof at this level)",1 min,1.0,0.9985,146.0,126.0,1.1587301587301588,median_delay
+gaussian,sd x0.667,shift,"max, balanced",1 min,1.0,0.9985,146.0,126.0,1.1587301587301588,median_delay
+gaussian,sd x0.667,shift,"average 5 and 15, balanced",1 min,1.0,0.9985,598.0,126.0,4.746031746031746,median_delay
+gaussian,sd x0.5,shift,1 min,1 min,0.9975,0.9975,93.0,93.0,1.0,median_delay
+gaussian,sd x0.5,shift,5 min,1 min,1.0,0.9975,403.0,93.0,4.333333333333333,median_delay
+gaussian,sd x0.5,shift,15 min,1 min,1.0,0.9975,1103.0,93.0,11.86021505376344,median_delay
+gaussian,sd x0.5,shift,"average, equal",1 min,0.998,0.9975,96.0,93.0,1.032258064516129,median_delay
+gaussian,sd x0.5,shift,"average, balanced",1 min,0.999,0.9975,107.0,93.0,1.1505376344086022,median_delay
+gaussian,sd x0.5,shift,"average, sqrt",1 min,0.9985,0.9975,100.0,93.0,1.075268817204301,median_delay
+gaussian,sd x0.5,shift,"average, balanced, plain every minute (no proof at this level)",1 min,0.999,0.9975,107.0,93.0,1.1505376344086022,median_delay
+gaussian,sd x0.5,shift,"max, balanced",1 min,0.999,0.9975,107.0,93.0,1.1505376344086022,median_delay
+gaussian,sd x0.5,shift,"average 5 and 15, balanced",1 min,1.0,0.9975,448.0,93.0,4.817204301075269,median_delay
+gaussian,burst x2 for 15 min,burst,1 min,1 min,0.2135,0.2135,14.0,14.0,1.0,detected
+gaussian,burst x2 for 15 min,burst,5 min,1 min,0.0035,0.2135,18.0,14.0,1.2857142857142858,detected
+gaussian,burst x2 for 15 min,burst,15 min,1 min,0.0,0.2135,,14.0,,detected
+gaussian,burst x2 for 15 min,burst,"average, equal",1 min,0.192,0.2135,14.0,14.0,1.0,detected
+gaussian,burst x2 for 15 min,burst,"average, balanced",1 min,0.131,0.2135,14.0,14.0,1.0,detected
+gaussian,burst x2 for 15 min,burst,"average, sqrt",1 min,0.1675,0.2135,14.0,14.0,1.0,detected
+gaussian,burst x2 for 15 min,burst,"average, balanced, plain every minute (no proof at this level)",1 min,0.1315,0.2135,14.0,14.0,1.0,detected
+gaussian,burst x2 for 15 min,burst,"max, balanced",1 min,0.129,0.2135,14.0,14.0,1.0,detected
+gaussian,burst x2 for 15 min,burst,"average 5 and 15, balanced",1 min,0.0025,0.2135,28.0,14.0,2.0,detected
+gaussian,burst x2 for 60 min,burst,1 min,1 min,0.999,0.999,23.0,23.0,1.0,detected
+gaussian,burst x2 for 60 min,burst,5 min,1 min,0.1825,0.999,53.0,23.0,2.3043478260869565,detected
+gaussian,burst x2 for 60 min,burst,15 min,1 min,0.003,0.999,60.5,23.0,2.630434782608696,detected
+gaussian,burst x2 for 60 min,burst,"average, equal",1 min,0.999,0.999,23.0,23.0,1.0,detected
+gaussian,burst x2 for 60 min,burst,"average, balanced",1 min,0.998,0.999,25.0,23.0,1.0869565217391304,detected
+gaussian,burst x2 for 60 min,burst,"average, sqrt",1 min,0.998,0.999,24.0,23.0,1.0434782608695652,detected
+gaussian,burst x2 for 60 min,burst,"average, balanced, plain every minute (no proof at this level)",1 min,0.998,0.999,25.0,23.0,1.0869565217391304,detected
+gaussian,burst x2 for 60 min,burst,"max, balanced",1 min,0.998,0.999,25.0,23.0,1.0869565217391304,detected
+gaussian,burst x2 for 60 min,burst,"average 5 and 15, balanced",1 min,0.1245,0.999,53.0,23.0,2.3043478260869565,detected
+gaussian,burst x3 for 15 min,burst,1 min,1 min,0.732,0.732,12.0,12.0,1.0,detected
+gaussian,burst x3 for 15 min,burst,5 min,1 min,0.0075,0.732,18.0,12.0,1.5,detected
+gaussian,burst x3 for 15 min,burst,15 min,1 min,0.0,0.732,,12.0,,detected
+gaussian,burst x3 for 15 min,burst,"average, equal",1 min,0.7035,0.732,12.0,12.0,1.0,detected
+gaussian,burst x3 for 15 min,burst,"average, balanced",1 min,0.627,0.732,13.0,12.0,1.0833333333333333,detected
+gaussian,burst x3 for 15 min,burst,"average, sqrt",1 min,0.6825,0.732,12.0,12.0,1.0,detected
+gaussian,burst x3 for 15 min,burst,"average, balanced, plain every minute (no proof at this level)",1 min,0.627,0.732,13.0,12.0,1.0833333333333333,detected
+gaussian,burst x3 for 15 min,burst,"max, balanced",1 min,0.626,0.732,13.0,12.0,1.0833333333333333,detected
+gaussian,burst x3 for 15 min,burst,"average 5 and 15, balanced",1 min,0.0045,0.732,18.0,12.0,1.5,detected
+gaussian,burst x3 for 60 min,burst,1 min,1 min,0.9995,0.9995,13.0,13.0,1.0,detected
+gaussian,burst x3 for 60 min,burst,5 min,1 min,0.7065,0.9995,48.0,13.0,3.6923076923076925,detected
+gaussian,burst x3 for 60 min,burst,15 min,1 min,0.0215,0.9995,68.0,13.0,5.230769230769231,detected
+gaussian,burst x3 for 60 min,burst,"average, equal",1 min,0.9995,0.9995,14.0,13.0,1.0769230769230769,detected
+gaussian,burst x3 for 60 min,burst,"average, balanced",1 min,0.9995,0.9995,15.0,13.0,1.1538461538461537,detected
+gaussian,burst x3 for 60 min,burst,"average, sqrt",1 min,0.9995,0.9995,14.0,13.0,1.0769230769230769,detected
+gaussian,burst x3 for 60 min,burst,"average, balanced, plain every minute (no proof at this level)",1 min,0.9995,0.9995,15.0,13.0,1.1538461538461537,detected
+gaussian,burst x3 for 60 min,burst,"max, balanced",1 min,0.9995,0.9995,15.0,13.0,1.1538461538461537,detected
+gaussian,burst x3 for 60 min,burst,"average 5 and 15, balanced",1 min,0.626,0.9995,53.0,13.0,4.076923076923077,detected
+gaussian,"trend, lag-one autocorrelation 0.3",trend,1 min,5 min,0.0375,0.992,707.0,448.0,1.578125,median_delay
+gaussian,"trend, lag-one autocorrelation 0.3",trend,5 min,5 min,0.992,0.992,448.0,448.0,1.0,median_delay
+gaussian,"trend, lag-one autocorrelation 0.3",trend,15 min,5 min,0.816,0.992,758.0,448.0,1.6919642857142858,median_delay
+gaussian,"trend, lag-one autocorrelation 0.3",trend,"average, equal",5 min,0.955,0.992,593.0,448.0,1.3236607142857142,median_delay
+gaussian,"trend, lag-one autocorrelation 0.3",trend,"average, balanced",5 min,0.973,0.992,525.5,448.0,1.1729910714285714,median_delay
+gaussian,"trend, lag-one autocorrelation 0.3",trend,"average, sqrt",5 min,0.966,0.992,550.5,448.0,1.2287946428571428,median_delay
+gaussian,"trend, lag-one autocorrelation 0.3",trend,"average, balanced, plain every minute (no proof at this level)",5 min,0.973,0.992,523.0,448.0,1.1674107142857142,median_delay
+gaussian,"trend, lag-one autocorrelation 0.3",trend,"max, balanced",5 min,0.97,0.992,533.0,448.0,1.1897321428571428,median_delay
+gaussian,"trend, lag-one autocorrelation 0.3",trend,"average 5 and 15, balanced",5 min,0.9845,0.992,493.0,448.0,1.1004464285714286,median_delay
+student_t3,sd x1.25,shift,1 min,1 min,0.9985,0.9985,250.0,250.0,1.0,median_delay
+student_t3,sd x1.25,shift,5 min,1 min,0.8875,0.9985,683.0,250.0,2.732,median_delay
+student_t3,sd x1.25,shift,15 min,1 min,0.4235,0.9985,968.0,250.0,3.872,median_delay
+student_t3,sd x1.25,shift,"average, equal",1 min,0.999,0.9985,259.0,250.0,1.036,median_delay
+student_t3,sd x1.25,shift,"average, balanced",1 min,0.9995,0.9985,296.0,250.0,1.184,median_delay
+student_t3,sd x1.25,shift,"average, sqrt",1 min,0.999,0.9985,272.5,250.0,1.09,median_delay
+student_t3,sd x1.25,shift,"average, balanced, plain every minute (no proof at this level)",1 min,0.9995,0.9985,295.0,250.0,1.18,median_delay
+student_t3,sd x1.25,shift,"max, balanced",1 min,0.9995,0.9985,296.0,250.0,1.184,median_delay
+student_t3,sd x1.25,shift,"average 5 and 15, balanced",1 min,0.861,0.9985,753.0,250.0,3.012,median_delay
+student_t3,sd x1.5,shift,1 min,1 min,0.9975,0.9975,87.0,87.0,1.0,median_delay
+student_t3,sd x1.5,shift,5 min,1 min,1.0,0.9975,263.0,87.0,3.0229885057471266,median_delay
+student_t3,sd x1.5,shift,15 min,1 min,0.963,0.9975,593.0,87.0,6.816091954022989,median_delay
+student_t3,sd x1.5,shift,"average, equal",1 min,0.998,0.9975,90.0,87.0,1.0344827586206897,median_delay
+student_t3,sd x1.5,shift,"average, balanced",1 min,0.9985,0.9975,100.0,87.0,1.1494252873563218,median_delay
+student_t3,sd x1.5,shift,"average, sqrt",1 min,0.998,0.9975,94.0,87.0,1.0804597701149425,median_delay
+student_t3,sd x1.5,shift,"average, balanced, plain every minute (no proof at this level)",1 min,0.9985,0.9975,100.0,87.0,1.1494252873563218,median_delay
+student_t3,sd x1.5,shift,"max, balanced",1 min,0.9985,0.9975,101.0,87.0,1.160919540229885,median_delay
+student_t3,sd x1.5,shift,"average 5 and 15, balanced",1 min,1.0,0.9975,288.0,87.0,3.310344827586207,median_delay
+student_t3,sd x2,shift,1 min,1 min,0.998,0.998,36.0,36.0,1.0,median_delay
+student_t3,sd x2,shift,5 min,1 min,0.9985,0.998,118.0,36.0,3.2777777777777777,median_delay
+student_t3,sd x2,shift,15 min,1 min,1.0,0.998,293.0,36.0,8.13888888888889,median_delay
+student_t3,sd x2,shift,"average, equal",1 min,0.998,0.998,36.0,36.0,1.0,median_delay
+student_t3,sd x2,shift,"average, balanced",1 min,0.9995,0.998,40.0,36.0,1.1111111111111112,median_delay
+student_t3,sd x2,shift,"average, sqrt",1 min,0.999,0.998,38.0,36.0,1.0555555555555556,median_delay
+student_t3,sd x2,shift,"average, balanced, plain every minute (no proof at this level)",1 min,0.9995,0.998,40.0,36.0,1.1111111111111112,median_delay
+student_t3,sd x2,shift,"max, balanced",1 min,0.9995,0.998,40.0,36.0,1.1111111111111112,median_delay
+student_t3,sd x2,shift,"average 5 and 15, balanced",1 min,0.999,0.998,128.0,36.0,3.5555555555555554,median_delay
+student_t3,sd x0.8,shift,1 min,1 min,0.999,0.999,340.0,340.0,1.0,median_delay
+student_t3,sd x0.8,shift,5 min,1 min,0.741,0.999,908.0,340.0,2.6705882352941175,median_delay
+student_t3,sd x0.8,shift,15 min,1 min,0.054,0.999,1313.0,340.0,3.861764705882353,median_delay
+student_t3,sd x0.8,shift,"average, equal",1 min,0.999,0.999,351.0,340.0,1.0323529411764707,median_delay
+student_t3,sd x0.8,shift,"average, balanced",1 min,0.9995,0.999,399.0,340.0,1.173529411764706,median_delay
+student_t3,sd x0.8,shift,"average, sqrt",1 min,0.9995,0.999,367.0,340.0,1.0794117647058823,median_delay
+student_t3,sd x0.8,shift,"average, balanced, plain every minute (no proof at this level)",1 min,0.9995,0.999,398.0,340.0,1.1705882352941177,median_delay
+student_t3,sd x0.8,shift,"max, balanced",1 min,0.9995,0.999,400.0,340.0,1.1764705882352942,median_delay
+student_t3,sd x0.8,shift,"average 5 and 15, balanced",1 min,0.6535,0.999,973.0,340.0,2.861764705882353,median_delay
+student_t3,sd x0.667,shift,1 min,1 min,0.999,0.999,146.0,146.0,1.0,median_delay
+student_t3,sd x0.667,shift,5 min,1 min,0.998,0.999,528.0,146.0,3.6164383561643834,median_delay
+student_t3,sd x0.667,shift,15 min,1 min,0.5905,0.999,1238.0,146.0,8.479452054794521,median_delay
+student_t3,sd x0.667,shift,"average, equal",1 min,0.999,0.999,153.0,146.0,1.047945205479452,median_delay
+student_t3,sd x0.667,shift,"average, balanced",1 min,1.0,0.999,172.5,146.0,1.1815068493150684,median_delay
+student_t3,sd x0.667,shift,"average, sqrt",1 min,1.0,0.999,160.0,146.0,1.095890410958904,median_delay
+student_t3,sd x0.667,shift,"average, balanced, plain every minute (no proof at this level)",1 min,1.0,0.999,172.0,146.0,1.178082191780822,median_delay
+student_t3,sd x0.667,shift,"max, balanced",1 min,1.0,0.999,173.0,146.0,1.1849315068493151,median_delay
+student_t3,sd x0.667,shift,"average 5 and 15, balanced",1 min,0.998,0.999,593.0,146.0,4.061643835616438,median_delay
+student_t3,sd x0.5,shift,1 min,1 min,0.999,0.999,84.0,84.0,1.0,median_delay
+student_t3,sd x0.5,shift,5 min,1 min,0.9995,0.999,358.0,84.0,4.261904761904762,median_delay
+student_t3,sd x0.5,shift,15 min,1 min,0.9865,0.999,998.0,84.0,11.880952380952381,median_delay
+student_t3,sd x0.5,shift,"average, equal",1 min,0.999,0.999,87.0,84.0,1.0357142857142858,median_delay
+student_t3,sd x0.5,shift,"average, balanced",1 min,0.9995,0.999,97.0,84.0,1.1547619047619047,median_delay
+student_t3,sd x0.5,shift,"average, sqrt",1 min,0.999,0.999,90.0,84.0,1.0714285714285714,median_delay
+student_t3,sd x0.5,shift,"average, balanced, plain every minute (no proof at this level)",1 min,0.9995,0.999,97.0,84.0,1.1547619047619047,median_delay
+student_t3,sd x0.5,shift,"max, balanced",1 min,0.9995,0.999,97.0,84.0,1.1547619047619047,median_delay
+student_t3,sd x0.5,shift,"average 5 and 15, balanced",1 min,1.0,0.999,398.0,84.0,4.738095238095238,median_delay
+student_t3,burst x2 for 15 min,burst,1 min,1 min,0.0515,0.0515,14.0,14.0,1.0,detected
+student_t3,burst x2 for 15 min,burst,5 min,1 min,0.0005,0.0515,13.0,14.0,0.9285714285714286,detected
+student_t3,burst x2 for 15 min,burst,15 min,1 min,0.0,0.0515,,14.0,,detected
+student_t3,burst x2 for 15 min,burst,"average, equal",1 min,0.0425,0.0515,14.0,14.0,1.0,detected
+student_t3,burst x2 for 15 min,burst,"average, balanced",1 min,0.027,0.0515,15.0,14.0,1.0714285714285714,detected
+student_t3,burst x2 for 15 min,burst,"average, sqrt",1 min,0.037,0.0515,14.0,14.0,1.0,detected
+student_t3,burst x2 for 15 min,burst,"average, balanced, plain every minute (no proof at this level)",1 min,0.027,0.0515,15.0,14.0,1.0714285714285714,detected
+student_t3,burst x2 for 15 min,burst,"max, balanced",1 min,0.0265,0.0515,15.0,14.0,1.0714285714285714,detected
+student_t3,burst x2 for 15 min,burst,"average 5 and 15, balanced",1 min,0.0005,0.0515,13.0,14.0,0.9285714285714286,detected
+student_t3,burst x2 for 60 min,burst,1 min,1 min,0.9285,0.9285,34.0,34.0,1.0,detected
+student_t3,burst x2 for 60 min,burst,5 min,1 min,0.09,0.9285,53.0,34.0,1.5588235294117647,detected
+student_t3,burst x2 for 60 min,burst,15 min,1 min,0.002,0.9285,68.0,34.0,2.0,detected
+student_t3,burst x2 for 60 min,burst,"average, equal",1 min,0.924,0.9285,35.0,34.0,1.0294117647058822,detected
+student_t3,burst x2 for 60 min,burst,"average, balanced",1 min,0.8855,0.9285,38.0,34.0,1.1176470588235294,detected
+student_t3,burst x2 for 60 min,burst,"average, sqrt",1 min,0.91,0.9285,36.0,34.0,1.0588235294117647,detected
+student_t3,burst x2 for 60 min,burst,"average, balanced, plain every minute (no proof at this level)",1 min,0.886,0.9285,38.0,34.0,1.1176470588235294,detected
+student_t3,burst x2 for 60 min,burst,"max, balanced",1 min,0.8845,0.9285,38.0,34.0,1.1176470588235294,detected
+student_t3,burst x2 for 60 min,burst,"average 5 and 15, balanced",1 min,0.0625,0.9285,58.0,34.0,1.7058823529411764,detected
+student_t3,burst x3 for 15 min,burst,1 min,1 min,0.332,0.332,14.0,14.0,1.0,detected
+student_t3,burst x3 for 15 min,burst,5 min,1 min,0.004,0.332,15.5,14.0,1.1071428571428572,detected
+student_t3,burst x3 for 15 min,burst,15 min,1 min,0.0005,0.332,23.0,14.0,1.6428571428571428,detected
+student_t3,burst x3 for 15 min,burst,"average, equal",1 min,0.2985,0.332,14.0,14.0,1.0,detected
+student_t3,burst x3 for 15 min,burst,"average, balanced",1 min,0.209,0.332,14.0,14.0,1.0,detected
+student_t3,burst x3 for 15 min,burst,"average, sqrt",1 min,0.2645,0.332,14.0,14.0,1.0,detected
+student_t3,burst x3 for 15 min,burst,"average, balanced, plain every minute (no proof at this level)",1 min,0.209,0.332,14.0,14.0,1.0,detected
+student_t3,burst x3 for 15 min,burst,"max, balanced",1 min,0.2075,0.332,14.0,14.0,1.0,detected
+student_t3,burst x3 for 15 min,burst,"average 5 and 15, balanced",1 min,0.0015,0.332,18.0,14.0,1.2857142857142858,detected
+student_t3,burst x3 for 60 min,burst,1 min,1 min,0.999,0.999,19.0,19.0,1.0,detected
+student_t3,burst x3 for 60 min,burst,5 min,1 min,0.478,0.999,53.0,19.0,2.789473684210526,detected
+student_t3,burst x3 for 60 min,burst,15 min,1 min,0.0125,0.999,68.0,19.0,3.5789473684210527,detected
+student_t3,burst x3 for 60 min,burst,"average, equal",1 min,0.9995,0.999,20.0,19.0,1.0526315789473684,detected
+student_t3,burst x3 for 60 min,burst,"average, balanced",1 min,1.0,0.999,21.0,19.0,1.105263157894737,detected
+student_t3,burst x3 for 60 min,burst,"average, sqrt",1 min,1.0,0.999,20.0,19.0,1.0526315789473684,detected
+student_t3,burst x3 for 60 min,burst,"average, balanced, plain every minute (no proof at this level)",1 min,1.0,0.999,21.0,19.0,1.105263157894737,detected
+student_t3,burst x3 for 60 min,burst,"max, balanced",1 min,1.0,0.999,21.0,19.0,1.105263157894737,detected
+student_t3,burst x3 for 60 min,burst,"average 5 and 15, balanced",1 min,0.372,0.999,53.0,19.0,2.789473684210526,detected
+student_t3,"trend, lag-one autocorrelation 0.3",trend,1 min,5 min,0.175,0.9375,817.5,633.0,1.2914691943127963,median_delay
+student_t3,"trend, lag-one autocorrelation 0.3",trend,5 min,5 min,0.9375,0.9375,633.0,633.0,1.0,median_delay
+student_t3,"trend, lag-one autocorrelation 0.3",trend,15 min,5 min,0.671,0.9375,833.0,633.0,1.315955766192733,median_delay
+student_t3,"trend, lag-one autocorrelation 0.3",trend,"average, equal",5 min,0.839,0.9375,773.0,633.0,1.221169036334913,median_delay
+student_t3,"trend, lag-one autocorrelation 0.3",trend,"average, balanced",5 min,0.8905,0.9375,693.0,633.0,1.09478672985782,median_delay
+student_t3,"trend, lag-one autocorrelation 0.3",trend,"average, sqrt",5 min,0.8775,0.9375,723.0,633.0,1.1421800947867298,median_delay
+student_t3,"trend, lag-one autocorrelation 0.3",trend,"average, balanced, plain every minute (no proof at this level)",5 min,0.8905,0.9375,693.0,633.0,1.09478672985782,median_delay
+student_t3,"trend, lag-one autocorrelation 0.3",trend,"max, balanced",5 min,0.8865,0.9375,703.0,633.0,1.1105845181674565,median_delay
+student_t3,"trend, lag-one autocorrelation 0.3",trend,"average 5 and 15, balanced",5 min,0.9175,0.9375,663.0,633.0,1.04739336492891,median_delay
+noise_1,sd x1.25,shift,1 min,1 min,0.921,0.921,600.5,600.5,1.0,median_delay
+noise_1,sd x1.25,shift,5 min,1 min,0.8435,0.921,728.0,600.5,1.212323064113239,median_delay
+noise_1,sd x1.25,shift,15 min,1 min,0.4645,0.921,923.0,600.5,1.537052456286428,median_delay
+noise_1,sd x1.25,shift,"average, equal",1 min,0.959,0.921,577.0,600.5,0.9608659450457951,median_delay
+noise_1,sd x1.25,shift,"average, balanced",1 min,0.956,0.921,613.0,600.5,1.0208159866777686,median_delay
+noise_1,sd x1.25,shift,"average, sqrt",1 min,0.9595,0.921,583.0,600.5,0.9708576186511241,median_delay
+noise_1,sd x1.25,shift,"average, balanced, plain every minute (no proof at this level)",1 min,0.957,0.921,608.5,600.5,1.0133222314737718,median_delay
+noise_1,sd x1.25,shift,"max, balanced",1 min,0.949,0.921,622.5,600.5,1.0366361365528727,median_delay
+noise_1,sd x1.25,shift,"average 5 and 15, balanced",1 min,0.8155,0.921,768.0,600.5,1.2789342214820982,median_delay
+noise_1,sd x1.25,shift,"5 min, gap",1 min,0.7925,0.921,763.0,600.5,1.2706078268109908,median_delay
+noise_1,sd x1.25,shift,"15 min, gap",1 min,0.466,0.921,908.0,600.5,1.5120732722731058,median_delay
+noise_1,sd x1.25,shift,"average, equal, gap",1 min,0.954,0.921,584.0,600.5,0.9725228975853455,median_delay
+noise_1,sd x1.25,shift,"average, balanced, gap",1 min,0.9545,0.921,633.0,600.5,1.0541215653621983,median_delay
+noise_1,sd x1.25,shift,"average, sqrt, gap",1 min,0.96,0.921,605.5,600.5,1.0083263946711074,median_delay
+noise_1,sd x1.25,shift,"max, balanced, gap",1 min,0.948,0.921,638.0,600.5,1.0624479600333057,median_delay
+noise_1,sd x1.25,shift,"average 5 and 15, balanced, gap",1 min,0.787,0.921,803.0,600.5,1.33721898417985,median_delay
+noise_1,sd x1.5,shift,1 min,1 min,0.9945,0.9945,193.0,193.0,1.0,median_delay
+noise_1,sd x1.5,shift,5 min,1 min,1.0,0.9945,288.0,193.0,1.4922279792746114,median_delay
+noise_1,sd x1.5,shift,15 min,1 min,0.9725,0.9945,563.0,193.0,2.917098445595855,median_delay
+noise_1,sd x1.5,shift,"average, equal",1 min,0.995,0.9945,188.0,193.0,0.9740932642487047,median_delay
+noise_1,sd x1.5,shift,"average, balanced",1 min,0.9975,0.9945,203.0,193.0,1.0518134715025906,median_delay
+noise_1,sd x1.5,shift,"average, sqrt",1 min,0.995,0.9945,192.0,193.0,0.9948186528497409,median_delay
+noise_1,sd x1.5,shift,"average, balanced, plain every minute (no proof at this level)",1 min,0.9975,0.9945,203.0,193.0,1.0518134715025906,median_delay
+noise_1,sd x1.5,shift,"max, balanced",1 min,0.9975,0.9945,206.0,193.0,1.067357512953368,median_delay
+noise_1,sd x1.5,shift,"average 5 and 15, balanced",1 min,1.0,0.9945,313.0,193.0,1.621761658031088,median_delay
+noise_1,sd x1.5,shift,"5 min, gap",1 min,0.9995,0.9945,303.0,193.0,1.5699481865284974,median_delay
+noise_1,sd x1.5,shift,"15 min, gap",1 min,0.9755,0.9945,563.0,193.0,2.917098445595855,median_delay
+noise_1,sd x1.5,shift,"average, equal, gap",1 min,0.9945,0.9945,191.0,193.0,0.9896373056994818,median_delay
+noise_1,sd x1.5,shift,"average, balanced, gap",1 min,0.997,0.9945,208.0,193.0,1.077720207253886,median_delay
+noise_1,sd x1.5,shift,"average, sqrt, gap",1 min,0.9945,0.9945,194.0,193.0,1.005181347150259,median_delay
+noise_1,sd x1.5,shift,"max, balanced, gap",1 min,0.997,0.9945,211.0,193.0,1.0932642487046633,median_delay
+noise_1,sd x1.5,shift,"average 5 and 15, balanced, gap",1 min,0.9995,0.9945,328.0,193.0,1.6994818652849741,median_delay
+noise_1,sd x2,shift,1 min,1 min,0.996,0.996,62.0,62.0,1.0,median_delay
+noise_1,sd x2,shift,5 min,1 min,0.9995,0.996,123.0,62.0,1.9838709677419355,median_delay
+noise_1,sd x2,shift,15 min,1 min,1.0,0.996,278.0,62.0,4.483870967741935,median_delay
+noise_1,sd x2,shift,"average, equal",1 min,0.9975,0.996,63.0,62.0,1.0161290322580645,median_delay
+noise_1,sd x2,shift,"average, balanced",1 min,0.998,0.996,69.5,62.0,1.1209677419354838,median_delay
+noise_1,sd x2,shift,"average, sqrt",1 min,0.9975,0.996,65.0,62.0,1.0483870967741935,median_delay
+noise_1,sd x2,shift,"average, balanced, plain every minute (no proof at this level)",1 min,0.998,0.996,69.0,62.0,1.1129032258064515,median_delay
+noise_1,sd x2,shift,"max, balanced",1 min,0.998,0.996,70.0,62.0,1.1290322580645162,median_delay
+noise_1,sd x2,shift,"average 5 and 15, balanced",1 min,0.9995,0.996,133.0,62.0,2.1451612903225805,median_delay
+noise_1,sd x2,shift,"5 min, gap",1 min,1.0,0.996,128.0,62.0,2.064516129032258,median_delay
+noise_1,sd x2,shift,"15 min, gap",1 min,1.0,0.996,278.0,62.0,4.483870967741935,median_delay
+noise_1,sd x2,shift,"average, equal, gap",1 min,0.9975,0.996,63.0,62.0,1.0161290322580645,median_delay
+noise_1,sd x2,shift,"average, balanced, gap",1 min,0.998,0.996,69.0,62.0,1.1129032258064515,median_delay
+noise_1,sd x2,shift,"average, sqrt, gap",1 min,0.9975,0.996,65.0,62.0,1.0483870967741935,median_delay
+noise_1,sd x2,shift,"max, balanced, gap",1 min,0.998,0.996,70.0,62.0,1.1290322580645162,median_delay
+noise_1,sd x2,shift,"average 5 and 15, balanced, gap",1 min,1.0,0.996,138.0,62.0,2.225806451612903,median_delay
+noise_1,sd x0.8,shift,1 min,1 min,0.6975,0.6975,783.0,783.0,1.0,median_delay
+noise_1,sd x0.8,shift,5 min,1 min,0.5915,0.6975,1088.0,783.0,1.3895274584929758,median_delay
+noise_1,sd x0.8,shift,15 min,1 min,0.002,0.6975,1410.5,783.0,1.801404853128991,median_delay
+noise_1,sd x0.8,shift,"average, equal",1 min,0.7505,0.6975,861.0,783.0,1.0996168582375478,median_delay
+noise_1,sd x0.8,shift,"average, balanced",1 min,0.7255,0.6975,963.0,783.0,1.2298850574712643,median_delay
+noise_1,sd x0.8,shift,"average, sqrt",1 min,0.7515,0.6975,893.0,783.0,1.140485312899106,median_delay
+noise_1,sd x0.8,shift,"average, balanced, plain every minute (no proof at this level)",1 min,0.7295,0.6975,961.0,783.0,1.227330779054917,median_delay
+noise_1,sd x0.8,shift,"max, balanced",1 min,0.703,0.6975,961.0,783.0,1.227330779054917,median_delay
+noise_1,sd x0.8,shift,"average 5 and 15, balanced",1 min,0.466,0.6975,1155.5,783.0,1.4757343550447,median_delay
+noise_1,sd x0.8,shift,"5 min, gap",1 min,0.4885,0.6975,1138.0,783.0,1.4533844189016603,median_delay
+noise_1,sd x0.8,shift,"15 min, gap",1 min,0.0015,0.6975,1343.0,783.0,1.7151979565772668,median_delay
+noise_1,sd x0.8,shift,"average, equal, gap",1 min,0.7205,0.6975,840.0,783.0,1.0727969348659003,median_delay
+noise_1,sd x0.8,shift,"average, balanced, gap",1 min,0.6735,0.6975,947.0,783.0,1.2094508301404854,median_delay
+noise_1,sd x0.8,shift,"average, sqrt, gap",1 min,0.712,0.6975,880.0,783.0,1.123882503192848,median_delay
+noise_1,sd x0.8,shift,"max, balanced, gap",1 min,0.6535,0.6975,941.0,783.0,1.2017879948914432,median_delay
+noise_1,sd x0.8,shift,"average 5 and 15, balanced, gap",1 min,0.3615,0.6975,1193.0,783.0,1.5236270753512133,median_delay
+noise_1,sd x0.667,shift,1 min,1 min,0.9845,0.9845,500.0,500.0,1.0,median_delay
+noise_1,sd x0.667,shift,5 min,1 min,0.9935,0.9845,783.0,500.0,1.566,median_delay
+noise_1,sd x0.667,shift,15 min,1 min,0.1435,0.9845,1343.0,500.0,2.686,median_delay
+noise_1,sd x0.667,shift,"average, equal",1 min,0.997,0.9845,527.0,500.0,1.054,median_delay
+noise_1,sd x0.667,shift,"average, balanced",1 min,0.999,0.9845,603.0,500.0,1.206,median_delay
+noise_1,sd x0.667,shift,"average, sqrt",1 min,0.997,0.9845,551.5,500.0,1.103,median_delay
+noise_1,sd x0.667,shift,"average, balanced, plain every minute (no proof at this level)",1 min,0.999,0.9845,598.0,500.0,1.196,median_delay
+noise_1,sd x0.667,shift,"max, balanced",1 min,0.9975,0.9845,608.0,500.0,1.216,median_delay
+noise_1,sd x0.667,shift,"average 5 and 15, balanced",1 min,0.9855,0.9845,873.0,500.0,1.746,median_delay
+noise_1,sd x0.667,shift,"5 min, gap",1 min,0.984,0.9845,843.0,500.0,1.686,median_delay
+noise_1,sd x0.667,shift,"15 min, gap",1 min,0.1285,0.9845,1358.0,500.0,2.716,median_delay
+noise_1,sd x0.667,shift,"average, equal, gap",1 min,0.996,0.9845,527.0,500.0,1.054,median_delay
+noise_1,sd x0.667,shift,"average, balanced, gap",1 min,0.997,0.9845,603.0,500.0,1.206,median_delay
+noise_1,sd x0.667,shift,"average, sqrt, gap",1 min,0.9965,0.9845,551.0,500.0,1.102,median_delay
+noise_1,sd x0.667,shift,"max, balanced, gap",1 min,0.9935,0.9845,606.0,500.0,1.212,median_delay
+noise_1,sd x0.667,shift,"average 5 and 15, balanced, gap",1 min,0.9685,0.9845,938.0,500.0,1.876,median_delay
+noise_1,sd x0.5,shift,1 min,1 min,0.999,0.999,320.0,320.0,1.0,median_delay
+noise_1,sd x0.5,shift,5 min,1 min,1.0,0.999,558.0,320.0,1.74375,median_delay
+noise_1,sd x0.5,shift,15 min,1 min,0.944,0.999,1238.0,320.0,3.86875,median_delay
+noise_1,sd x0.5,shift,"average, equal",1 min,0.9995,0.999,332.0,320.0,1.0375,median_delay
+noise_1,sd x0.5,shift,"average, balanced",1 min,1.0,0.999,375.0,320.0,1.171875,median_delay
+noise_1,sd x0.5,shift,"average, sqrt",1 min,0.9995,0.999,348.0,320.0,1.0875,median_delay
+noise_1,sd x0.5,shift,"average, balanced, plain every minute (no proof at this level)",1 min,1.0,0.999,374.0,320.0,1.16875,median_delay
+noise_1,sd x0.5,shift,"max, balanced",1 min,1.0,0.999,376.0,320.0,1.175,median_delay
+noise_1,sd x0.5,shift,"average 5 and 15, balanced",1 min,1.0,0.999,623.0,320.0,1.946875,median_delay
+noise_1,sd x0.5,shift,"5 min, gap",1 min,1.0,0.999,598.0,320.0,1.86875,median_delay
+noise_1,sd x0.5,shift,"15 min, gap",1 min,0.933,0.999,1253.0,320.0,3.915625,median_delay
+noise_1,sd x0.5,shift,"average, equal, gap",1 min,0.9995,0.999,332.0,320.0,1.0375,median_delay
+noise_1,sd x0.5,shift,"average, balanced, gap",1 min,1.0,0.999,375.0,320.0,1.171875,median_delay
+noise_1,sd x0.5,shift,"average, sqrt, gap",1 min,0.9995,0.999,348.0,320.0,1.0875,median_delay
+noise_1,sd x0.5,shift,"max, balanced, gap",1 min,1.0,0.999,376.0,320.0,1.175,median_delay
+noise_1,sd x0.5,shift,"average 5 and 15, balanced, gap",1 min,1.0,0.999,668.0,320.0,2.0875,median_delay
+noise_1,burst x2 for 15 min,burst,1 min,1 min,0.0155,0.0155,17.0,17.0,1.0,detected
+noise_1,burst x2 for 15 min,burst,5 min,1 min,0.002,0.0155,15.5,17.0,0.9117647058823529,detected
+noise_1,burst x2 for 15 min,burst,15 min,1 min,0.0,0.0155,,17.0,,detected
+noise_1,burst x2 for 15 min,burst,"average, equal",1 min,0.0125,0.0155,15.0,17.0,0.8823529411764706,detected
+noise_1,burst x2 for 15 min,burst,"average, balanced",1 min,0.007,0.0155,13.5,17.0,0.7941176470588235,detected
+noise_1,burst x2 for 15 min,burst,"average, sqrt",1 min,0.009,0.0155,15.0,17.0,0.8823529411764706,detected
+noise_1,burst x2 for 15 min,burst,"average, balanced, plain every minute (no proof at this level)",1 min,0.007,0.0155,13.5,17.0,0.7941176470588235,detected
+noise_1,burst x2 for 15 min,burst,"max, balanced",1 min,0.007,0.0155,13.5,17.0,0.7941176470588235,detected
+noise_1,burst x2 for 15 min,burst,"average 5 and 15, balanced",1 min,0.0005,0.0155,18.0,17.0,1.0588235294117647,detected
+noise_1,burst x2 for 15 min,burst,"5 min, gap",1 min,0.0015,0.0155,13.0,17.0,0.7647058823529411,detected
+noise_1,burst x2 for 15 min,burst,"15 min, gap",1 min,0.0005,0.0155,23.0,17.0,1.3529411764705883,detected
+noise_1,burst x2 for 15 min,burst,"average, equal, gap",1 min,0.0125,0.0155,15.0,17.0,0.8823529411764706,detected
+noise_1,burst x2 for 15 min,burst,"average, balanced, gap",1 min,0.007,0.0155,13.5,17.0,0.7941176470588235,detected
+noise_1,burst x2 for 15 min,burst,"average, sqrt, gap",1 min,0.009,0.0155,15.0,17.0,0.8823529411764706,detected
+noise_1,burst x2 for 15 min,burst,"max, balanced, gap",1 min,0.007,0.0155,13.5,17.0,0.7941176470588235,detected
+noise_1,burst x2 for 15 min,burst,"average 5 and 15, balanced, gap",1 min,0.0005,0.0155,23.0,17.0,1.3529411764705883,detected
+noise_1,burst x2 for 60 min,burst,1 min,1 min,0.499,0.499,44.0,44.0,1.0,detected
+noise_1,burst x2 for 60 min,burst,5 min,1 min,0.098,0.499,58.0,44.0,1.3181818181818181,detected
+noise_1,burst x2 for 60 min,burst,15 min,1 min,0.0035,0.499,68.0,44.0,1.5454545454545454,detected
+noise_1,burst x2 for 60 min,burst,"average, equal",1 min,0.485,0.499,44.0,44.0,1.0,detected
+noise_1,burst x2 for 60 min,burst,"average, balanced",1 min,0.413,0.499,47.0,44.0,1.0681818181818181,detected
+noise_1,burst x2 for 60 min,burst,"average, sqrt",1 min,0.4645,0.499,45.0,44.0,1.0227272727272727,detected
+noise_1,burst x2 for 60 min,burst,"average, balanced, plain every minute (no proof at this level)",1 min,0.415,0.499,47.0,44.0,1.0681818181818181,detected
+noise_1,burst x2 for 60 min,burst,"max, balanced",1 min,0.407,0.499,47.0,44.0,1.0681818181818181,detected
+noise_1,burst x2 for 60 min,burst,"average 5 and 15, balanced",1 min,0.061,0.499,58.0,44.0,1.3181818181818181,detected
+noise_1,burst x2 for 60 min,burst,"5 min, gap",1 min,0.0785,0.499,53.0,44.0,1.2045454545454546,detected
+noise_1,burst x2 for 60 min,burst,"15 min, gap",1 min,0.0025,0.499,68.0,44.0,1.5454545454545454,detected
+noise_1,burst x2 for 60 min,burst,"average, equal, gap",1 min,0.4845,0.499,44.0,44.0,1.0,detected
+noise_1,burst x2 for 60 min,burst,"average, balanced, gap",1 min,0.405,0.499,46.0,44.0,1.0454545454545454,detected
+noise_1,burst x2 for 60 min,burst,"average, sqrt, gap",1 min,0.46,0.499,45.0,44.0,1.0227272727272727,detected
+noise_1,burst x2 for 60 min,burst,"max, balanced, gap",1 min,0.399,0.499,46.0,44.0,1.0454545454545454,detected
+noise_1,burst x2 for 60 min,burst,"average 5 and 15, balanced, gap",1 min,0.0475,0.499,53.0,44.0,1.2045454545454546,detected
+noise_1,burst x3 for 15 min,burst,1 min,1 min,0.1735,0.1735,14.0,14.0,1.0,detected
+noise_1,burst x3 for 15 min,burst,5 min,1 min,0.003,0.1735,18.0,14.0,1.2857142857142858,detected
+noise_1,burst x3 for 15 min,burst,15 min,1 min,0.0005,0.1735,23.0,14.0,1.6428571428571428,detected
+noise_1,burst x3 for 15 min,burst,"average, equal",1 min,0.1575,0.1735,14.0,14.0,1.0,detected
+noise_1,burst x3 for 15 min,burst,"average, balanced",1 min,0.105,0.1735,14.0,14.0,1.0,detected
+noise_1,burst x3 for 15 min,burst,"average, sqrt",1 min,0.135,0.1735,14.0,14.0,1.0,detected
+noise_1,burst x3 for 15 min,burst,"average, balanced, plain every minute (no proof at this level)",1 min,0.105,0.1735,14.0,14.0,1.0,detected
+noise_1,burst x3 for 15 min,burst,"max, balanced",1 min,0.105,0.1735,14.0,14.0,1.0,detected
+noise_1,burst x3 for 15 min,burst,"average 5 and 15, balanced",1 min,0.001,0.1735,15.5,14.0,1.1071428571428572,detected
+noise_1,burst x3 for 15 min,burst,"5 min, gap",1 min,0.002,0.1735,23.0,14.0,1.6428571428571428,detected
+noise_1,burst x3 for 15 min,burst,"15 min, gap",1 min,0.0,0.1735,,14.0,,detected
+noise_1,burst x3 for 15 min,burst,"average, equal, gap",1 min,0.1565,0.1735,14.0,14.0,1.0,detected
+noise_1,burst x3 for 15 min,burst,"average, balanced, gap",1 min,0.104,0.1735,14.0,14.0,1.0,detected
+noise_1,burst x3 for 15 min,burst,"average, sqrt, gap",1 min,0.133,0.1735,14.0,14.0,1.0,detected
+noise_1,burst x3 for 15 min,burst,"max, balanced, gap",1 min,0.104,0.1735,14.0,14.0,1.0,detected
+noise_1,burst x3 for 15 min,burst,"average 5 and 15, balanced, gap",1 min,0.0,0.1735,,14.0,,detected
+noise_1,burst x3 for 60 min,burst,1 min,1 min,0.989,0.989,25.0,25.0,1.0,detected
+noise_1,burst x3 for 60 min,burst,5 min,1 min,0.506,0.989,53.0,25.0,2.12,detected
+noise_1,burst x3 for 60 min,burst,15 min,1 min,0.0115,0.989,68.0,25.0,2.72,detected
+noise_1,burst x3 for 60 min,burst,"average, equal",1 min,0.988,0.989,25.0,25.0,1.0,detected
+noise_1,burst x3 for 60 min,burst,"average, balanced",1 min,0.984,0.989,27.0,25.0,1.08,detected
+noise_1,burst x3 for 60 min,burst,"average, sqrt",1 min,0.9865,0.989,26.0,25.0,1.04,detected
+noise_1,burst x3 for 60 min,burst,"average, balanced, plain every minute (no proof at this level)",1 min,0.984,0.989,27.0,25.0,1.08,detected
+noise_1,burst x3 for 60 min,burst,"max, balanced",1 min,0.984,0.989,27.0,25.0,1.08,detected
+noise_1,burst x3 for 60 min,burst,"average 5 and 15, balanced",1 min,0.4075,0.989,53.0,25.0,2.12,detected
+noise_1,burst x3 for 60 min,burst,"5 min, gap",1 min,0.4785,0.989,53.0,25.0,2.12,detected
+noise_1,burst x3 for 60 min,burst,"15 min, gap",1 min,0.0135,0.989,68.0,25.0,2.72,detected
+noise_1,burst x3 for 60 min,burst,"average, equal, gap",1 min,0.988,0.989,25.0,25.0,1.0,detected
+noise_1,burst x3 for 60 min,burst,"average, balanced, gap",1 min,0.984,0.989,27.0,25.0,1.08,detected
+noise_1,burst x3 for 60 min,burst,"average, sqrt, gap",1 min,0.986,0.989,26.0,25.0,1.04,detected
+noise_1,burst x3 for 60 min,burst,"max, balanced, gap",1 min,0.984,0.989,27.0,25.0,1.08,detected
+noise_1,burst x3 for 60 min,burst,"average 5 and 15, balanced, gap",1 min,0.3825,0.989,53.0,25.0,2.12,detected
+noise_1,"trend, lag-one autocorrelation 0.3",trend,1 min,5 min,0.022,0.9055,841.0,708.0,1.1878531073446328,median_delay
+noise_1,"trend, lag-one autocorrelation 0.3",trend,5 min,5 min,0.9055,0.9055,708.0,708.0,1.0,median_delay
+noise_1,"trend, lag-one autocorrelation 0.3",trend,15 min,5 min,0.7195,0.9055,848.0,708.0,1.1977401129943503,median_delay
+noise_1,"trend, lag-one autocorrelation 0.3",trend,"average, equal",5 min,0.787,0.9055,853.0,708.0,1.2048022598870056,median_delay
+noise_1,"trend, lag-one autocorrelation 0.3",trend,"average, balanced",5 min,0.875,0.9055,755.5,708.0,1.067090395480226,median_delay
+noise_1,"trend, lag-one autocorrelation 0.3",trend,"average, sqrt",5 min,0.852,0.9055,803.0,708.0,1.134180790960452,median_delay
+noise_1,"trend, lag-one autocorrelation 0.3",trend,"average, balanced, plain every minute (no proof at this level)",5 min,0.875,0.9055,753.0,708.0,1.0635593220338984,median_delay
+noise_1,"trend, lag-one autocorrelation 0.3",trend,"max, balanced",5 min,0.868,0.9055,768.0,708.0,1.0847457627118644,median_delay
+noise_1,"trend, lag-one autocorrelation 0.3",trend,"average 5 and 15, balanced",5 min,0.906,0.9055,708.0,708.0,1.0,median_delay
+noise_1,"trend, lag-one autocorrelation 0.3",trend,"5 min, gap",5 min,0.7635,0.9055,778.0,708.0,1.0988700564971752,median_delay
+noise_1,"trend, lag-one autocorrelation 0.3",trend,"15 min, gap",5 min,0.712,0.9055,863.0,708.0,1.2189265536723164,median_delay
+noise_1,"trend, lag-one autocorrelation 0.3",trend,"average, equal, gap",5 min,0.667,0.9055,923.0,708.0,1.3036723163841808,median_delay
+noise_1,"trend, lag-one autocorrelation 0.3",trend,"average, balanced, gap",5 min,0.7945,0.9055,818.0,708.0,1.155367231638418,median_delay
+noise_1,"trend, lag-one autocorrelation 0.3",trend,"average, sqrt, gap",5 min,0.748,0.9055,860.5,708.0,1.2153954802259888,median_delay
+noise_1,"trend, lag-one autocorrelation 0.3",trend,"max, balanced, gap",5 min,0.7835,0.9055,818.0,708.0,1.155367231638418,median_delay
+noise_1,"trend, lag-one autocorrelation 0.3",trend,"average 5 and 15, balanced, gap",5 min,0.8345,0.9055,773.0,708.0,1.0918079096045197,median_delay
+noise_2,sd x1.25,shift,1 min,5 min,0.2895,0.374,860.0,893.0,0.9630459126539753,median_delay
+noise_2,sd x1.25,shift,5 min,5 min,0.374,0.374,893.0,893.0,1.0,median_delay
+noise_2,sd x1.25,shift,15 min,5 min,0.27,0.374,968.0,893.0,1.083986562150056,median_delay
+noise_2,sd x1.25,shift,"average, equal",5 min,0.4075,0.374,888.0,893.0,0.9944008958566629,median_delay
+noise_2,sd x1.25,shift,"average, balanced",5 min,0.4415,0.374,888.0,893.0,0.9944008958566629,median_delay
+noise_2,sd x1.25,shift,"average, sqrt",5 min,0.4285,0.374,892.0,893.0,0.9988801791713325,median_delay
+noise_2,sd x1.25,shift,"average, balanced, plain every minute (no proof at this level)",5 min,0.4435,0.374,888.0,893.0,0.9944008958566629,median_delay
+noise_2,sd x1.25,shift,"max, balanced",5 min,0.429,0.374,884.0,893.0,0.9899216125419933,median_delay
+noise_2,sd x1.25,shift,"average 5 and 15, balanced",5 min,0.3955,0.374,908.0,893.0,1.0167973124300111,median_delay
+noise_2,sd x1.25,shift,"5 min, gap",5 min,0.214,0.374,968.0,893.0,1.083986562150056,median_delay
+noise_2,sd x1.25,shift,"15 min, gap",5 min,0.253,0.374,1013.0,893.0,1.1343784994400896,median_delay
+noise_2,sd x1.25,shift,"average, equal, gap",5 min,0.348,0.374,908.5,893.0,1.0173572228443448,median_delay
+noise_2,sd x1.25,shift,"average, balanced, gap",5 min,0.3595,0.374,913.0,893.0,1.0223964165733483,median_delay
+noise_2,sd x1.25,shift,"average, sqrt, gap",5 min,0.354,0.374,902.5,893.0,1.0106382978723405,median_delay
+noise_2,sd x1.25,shift,"max, balanced, gap",5 min,0.346,0.374,908.0,893.0,1.0167973124300111,median_delay
+noise_2,sd x1.25,shift,"average 5 and 15, balanced, gap",5 min,0.2815,0.374,998.0,893.0,1.1175811870100785,median_delay
+noise_2,sd x1.5,shift,1 min,5 min,0.7555,0.9385,724.0,598.0,1.2107023411371238,median_delay
+noise_2,sd x1.5,shift,5 min,5 min,0.9385,0.9385,598.0,598.0,1.0,median_delay
+noise_2,sd x1.5,shift,15 min,5 min,0.8595,0.9385,758.0,598.0,1.2675585284280937,median_delay
+noise_2,sd x1.5,shift,"average, equal",5 min,0.956,0.9385,603.0,598.0,1.008361204013378,median_delay
+noise_2,sd x1.5,shift,"average, balanced",5 min,0.973,0.9385,563.0,598.0,0.9414715719063546,median_delay
+noise_2,sd x1.5,shift,"average, sqrt",5 min,0.9665,0.9385,573.0,598.0,0.9581939799331104,median_delay
+noise_2,sd x1.5,shift,"average, balanced, plain every minute (no proof at this level)",5 min,0.9735,0.9385,563.0,598.0,0.9414715719063546,median_delay
+noise_2,sd x1.5,shift,"max, balanced",5 min,0.97,0.9385,578.0,598.0,0.9665551839464883,median_delay
+noise_2,sd x1.5,shift,"average 5 and 15, balanced",5 min,0.9665,0.9385,598.0,598.0,1.0,median_delay
+noise_2,sd x1.5,shift,"5 min, gap",5 min,0.855,0.9385,733.0,598.0,1.225752508361204,median_delay
+noise_2,sd x1.5,shift,"15 min, gap",5 min,0.828,0.9385,758.0,598.0,1.2675585284280937,median_delay
+noise_2,sd x1.5,shift,"average, equal, gap",5 min,0.932,0.9385,653.0,598.0,1.0919732441471572,median_delay
+noise_2,sd x1.5,shift,"average, balanced, gap",5 min,0.9515,0.9385,623.0,598.0,1.0418060200668897,median_delay
+noise_2,sd x1.5,shift,"average, sqrt, gap",5 min,0.948,0.9385,627.0,598.0,1.048494983277592,median_delay
+noise_2,sd x1.5,shift,"max, balanced, gap",5 min,0.944,0.9385,633.0,598.0,1.0585284280936456,median_delay
+noise_2,sd x1.5,shift,"average 5 and 15, balanced, gap",5 min,0.933,0.9385,680.5,598.0,1.1379598662207357,median_delay
+noise_2,sd x2,shift,1 min,5 min,0.99,0.999,261.0,213.0,1.2253521126760563,median_delay
+noise_2,sd x2,shift,5 min,5 min,0.999,0.999,213.0,213.0,1.0,median_delay
+noise_2,sd x2,shift,15 min,5 min,1.0,0.999,338.0,213.0,1.5868544600938967,median_delay
+noise_2,sd x2,shift,"average, equal",5 min,0.993,0.999,203.0,213.0,0.9530516431924883,median_delay
+noise_2,sd x2,shift,"average, balanced",5 min,0.995,0.999,203.0,213.0,0.9530516431924883,median_delay
+noise_2,sd x2,shift,"average, sqrt",5 min,0.994,0.999,199.5,213.0,0.9366197183098591,median_delay
+noise_2,sd x2,shift,"average, balanced, plain every minute (no proof at this level)",5 min,0.995,0.999,202.5,213.0,0.9507042253521126,median_delay
+noise_2,sd x2,shift,"max, balanced",5 min,0.995,0.999,203.0,213.0,0.9530516431924883,median_delay
+noise_2,sd x2,shift,"average 5 and 15, balanced",5 min,0.9995,0.999,223.0,213.0,1.0469483568075117,median_delay
+noise_2,sd x2,shift,"5 min, gap",5 min,1.0,0.999,253.0,213.0,1.187793427230047,median_delay
+noise_2,sd x2,shift,"15 min, gap",5 min,1.0,0.999,353.0,213.0,1.6572769953051643,median_delay
+noise_2,sd x2,shift,"average, equal, gap",5 min,0.9935,0.999,218.0,213.0,1.0234741784037558,median_delay
+noise_2,sd x2,shift,"average, balanced, gap",5 min,0.995,0.999,218.0,213.0,1.0234741784037558,median_delay
+noise_2,sd x2,shift,"average, sqrt, gap",5 min,0.994,0.999,218.0,213.0,1.0234741784037558,median_delay
+noise_2,sd x2,shift,"max, balanced, gap",5 min,0.995,0.999,223.0,213.0,1.0469483568075117,median_delay
+noise_2,sd x2,shift,"average 5 and 15, balanced, gap",5 min,1.0,0.999,258.0,213.0,1.2112676056338028,median_delay
+noise_2,sd x0.8,shift,1 min,1 min,0.1575,0.1575,846.0,846.0,1.0,median_delay
+noise_2,sd x0.8,shift,5 min,1 min,0.1035,0.1575,1178.0,846.0,1.392434988179669,median_delay
+noise_2,sd x0.8,shift,15 min,1 min,0.0015,0.1575,1388.0,846.0,1.6406619385342789,median_delay
+noise_2,sd x0.8,shift,"average, equal",1 min,0.1515,0.1575,941.0,846.0,1.112293144208038,median_delay
+noise_2,sd x0.8,shift,"average, balanced",1 min,0.1215,0.1575,1078.0,846.0,1.2742316784869976,median_delay
+noise_2,sd x0.8,shift,"average, sqrt",1 min,0.1425,0.1575,996.0,846.0,1.177304964539007,median_delay
+noise_2,sd x0.8,shift,"average, balanced, plain every minute (no proof at this level)",1 min,0.1245,0.1575,1083.0,846.0,1.2801418439716312,median_delay
+noise_2,sd x0.8,shift,"max, balanced",1 min,0.118,0.1575,1080.5,846.0,1.2771867612293144,median_delay
+noise_2,sd x0.8,shift,"average 5 and 15, balanced",1 min,0.0575,0.1575,1223.0,846.0,1.4456264775413712,median_delay
+noise_2,sd x0.8,shift,"5 min, gap",1 min,0.045,0.1575,1263.0,846.0,1.4929078014184398,median_delay
+noise_2,sd x0.8,shift,"15 min, gap",1 min,0.0,0.1575,,846.0,,median_delay
+noise_2,sd x0.8,shift,"average, equal, gap",1 min,0.1395,0.1575,868.0,846.0,1.0260047281323876,median_delay
+noise_2,sd x0.8,shift,"average, balanced, gap",1 min,0.097,0.1575,984.0,846.0,1.1631205673758864,median_delay
+noise_2,sd x0.8,shift,"average, sqrt, gap",1 min,0.126,0.1575,934.5,846.0,1.1046099290780143,median_delay
+noise_2,sd x0.8,shift,"max, balanced, gap",1 min,0.095,0.1575,981.5,846.0,1.1601654846335698,median_delay
+noise_2,sd x0.8,shift,"average 5 and 15, balanced, gap",1 min,0.016,0.1575,1243.0,846.0,1.4692671394799055,median_delay
+noise_2,sd x0.667,shift,1 min,5 min,0.293,0.3955,848.0,1128.0,0.75177304964539,median_delay
+noise_2,sd x0.667,shift,5 min,5 min,0.3955,0.3955,1128.0,1128.0,1.0,median_delay
+noise_2,sd x0.667,shift,15 min,5 min,0.013,0.3955,1380.5,1128.0,1.2238475177304964,median_delay
+noise_2,sd x0.667,shift,"average, equal",5 min,0.341,0.3955,992.5,1128.0,0.8798758865248227,median_delay
+noise_2,sd x0.667,shift,"average, balanced",5 min,0.3405,0.3955,1088.0,1128.0,0.9645390070921985,median_delay
+noise_2,sd x0.667,shift,"average, sqrt",5 min,0.3475,0.3955,1037.0,1128.0,0.9193262411347518,median_delay
+noise_2,sd x0.667,shift,"average, balanced, plain every minute (no proof at this level)",5 min,0.35,0.3955,1091.0,1128.0,0.9671985815602837,median_delay
+noise_2,sd x0.667,shift,"max, balanced",5 min,0.321,0.3955,1083.0,1128.0,0.9601063829787234,median_delay
+noise_2,sd x0.667,shift,"average 5 and 15, balanced",5 min,0.285,0.3955,1170.5,1128.0,1.037677304964539,median_delay
+noise_2,sd x0.667,shift,"5 min, gap",5 min,0.218,0.3955,1183.0,1128.0,1.048758865248227,median_delay
+noise_2,sd x0.667,shift,"15 min, gap",5 min,0.0085,0.3955,1358.0,1128.0,1.2039007092198581,median_delay
+noise_2,sd x0.667,shift,"average, equal, gap",5 min,0.2845,0.3955,913.0,1128.0,0.8093971631205674,median_delay
+noise_2,sd x0.667,shift,"average, balanced, gap",5 min,0.233,0.3955,1068.0,1128.0,0.9468085106382979,median_delay
+noise_2,sd x0.667,shift,"average, sqrt, gap",5 min,0.263,0.3955,999.0,1128.0,0.8856382978723404,median_delay
+noise_2,sd x0.667,shift,"max, balanced, gap",5 min,0.221,0.3955,1054.5,1128.0,0.9348404255319149,median_delay
+noise_2,sd x0.667,shift,"average 5 and 15, balanced, gap",5 min,0.135,0.3955,1238.0,1128.0,1.0975177304964538,median_delay
+noise_2,sd x0.5,shift,1 min,5 min,0.428,0.7515,845.5,1003.0,0.8429710867397806,median_delay
+noise_2,sd x0.5,shift,5 min,5 min,0.7515,0.7515,1003.0,1003.0,1.0,median_delay
+noise_2,sd x0.5,shift,15 min,5 min,0.1665,0.7515,1373.0,1003.0,1.3688933200398803,median_delay
+noise_2,sd x0.5,shift,"average, equal",5 min,0.634,0.7515,1016.0,1003.0,1.0129611166500498,median_delay
+noise_2,sd x0.5,shift,"average, balanced",5 min,0.6785,0.7515,1043.0,1003.0,1.0398803589232304,median_delay
+noise_2,sd x0.5,shift,"average, sqrt",5 min,0.6665,0.7515,1017.0,1003.0,1.0139581256231307,median_delay
+noise_2,sd x0.5,shift,"average, balanced, plain every minute (no proof at this level)",5 min,0.688,0.7515,1038.0,1003.0,1.0348953140578265,median_delay
+noise_2,sd x0.5,shift,"max, balanced",5 min,0.648,0.7515,1051.0,1003.0,1.0478564307078764,median_delay
+noise_2,sd x0.5,shift,"average 5 and 15, balanced",5 min,0.673,0.7515,1088.0,1003.0,1.0847457627118644,median_delay
+noise_2,sd x0.5,shift,"5 min, gap",5 min,0.565,0.7515,1108.0,1003.0,1.1046859421734796,median_delay
+noise_2,sd x0.5,shift,"15 min, gap",5 min,0.117,0.7515,1388.0,1003.0,1.3838484546360916,median_delay
+noise_2,sd x0.5,shift,"average, equal, gap",5 min,0.5085,0.7515,983.0,1003.0,0.9800598205383848,median_delay
+noise_2,sd x0.5,shift,"average, balanced, gap",5 min,0.525,0.7515,1083.0,1003.0,1.0797607178464605,median_delay
+noise_2,sd x0.5,shift,"average, sqrt, gap",5 min,0.5225,0.7515,1028.0,1003.0,1.024925224327019,median_delay
+noise_2,sd x0.5,shift,"max, balanced, gap",5 min,0.4865,0.7515,1082.0,1003.0,1.07876370887338,median_delay
+noise_2,sd x0.5,shift,"average 5 and 15, balanced, gap",5 min,0.4725,0.7515,1193.0,1003.0,1.189431704885344,median_delay
+noise_2,burst x2 for 15 min,burst,1 min,1 min,0.008,0.008,12.5,12.5,1.0,detected
+noise_2,burst x2 for 15 min,burst,5 min,1 min,0.0,0.008,,12.5,,detected
+noise_2,burst x2 for 15 min,burst,15 min,1 min,0.0,0.008,,12.5,,detected
+noise_2,burst x2 for 15 min,burst,"average, equal",1 min,0.007,0.008,12.5,12.5,1.0,detected
+noise_2,burst x2 for 15 min,burst,"average, balanced",1 min,0.0045,0.008,14.0,12.5,1.12,detected
+noise_2,burst x2 for 15 min,burst,"average, sqrt",1 min,0.006,0.008,12.5,12.5,1.0,detected
+noise_2,burst x2 for 15 min,burst,"average, balanced, plain every minute (no proof at this level)",1 min,0.0045,0.008,14.0,12.5,1.12,detected
+noise_2,burst x2 for 15 min,burst,"max, balanced",1 min,0.0045,0.008,14.0,12.5,1.12,detected
+noise_2,burst x2 for 15 min,burst,"average 5 and 15, balanced",1 min,0.0,0.008,,12.5,,detected
+noise_2,burst x2 for 15 min,burst,"5 min, gap",1 min,0.0,0.008,,12.5,,detected
+noise_2,burst x2 for 15 min,burst,"15 min, gap",1 min,0.0,0.008,,12.5,,detected
+noise_2,burst x2 for 15 min,burst,"average, equal, gap",1 min,0.007,0.008,12.5,12.5,1.0,detected
+noise_2,burst x2 for 15 min,burst,"average, balanced, gap",1 min,0.0045,0.008,14.0,12.5,1.12,detected
+noise_2,burst x2 for 15 min,burst,"average, sqrt, gap",1 min,0.006,0.008,12.5,12.5,1.0,detected
+noise_2,burst x2 for 15 min,burst,"max, balanced, gap",1 min,0.0045,0.008,14.0,12.5,1.12,detected
+noise_2,burst x2 for 15 min,burst,"average 5 and 15, balanced, gap",1 min,0.0,0.008,,12.5,,detected
+noise_2,burst x2 for 60 min,burst,1 min,1 min,0.06,0.06,48.0,48.0,1.0,detected
+noise_2,burst x2 for 60 min,burst,5 min,1 min,0.0295,0.06,53.0,48.0,1.1041666666666667,detected
+noise_2,burst x2 for 60 min,burst,15 min,1 min,0.0005,0.06,68.0,48.0,1.4166666666666667,detected
+noise_2,burst x2 for 60 min,burst,"average, equal",1 min,0.0595,0.06,49.0,48.0,1.0208333333333333,detected
+noise_2,burst x2 for 60 min,burst,"average, balanced",1 min,0.046,0.06,57.0,48.0,1.1875,detected
+noise_2,burst x2 for 60 min,burst,"average, sqrt",1 min,0.053,0.06,52.5,48.0,1.09375,detected
+noise_2,burst x2 for 60 min,burst,"average, balanced, plain every minute (no proof at this level)",1 min,0.0475,0.06,57.0,48.0,1.1875,detected
+noise_2,burst x2 for 60 min,burst,"max, balanced",1 min,0.0455,0.06,57.0,48.0,1.1875,detected
+noise_2,burst x2 for 60 min,burst,"average 5 and 15, balanced",1 min,0.0175,0.06,58.0,48.0,1.2083333333333333,detected
+noise_2,burst x2 for 60 min,burst,"5 min, gap",1 min,0.012,0.06,53.0,48.0,1.1041666666666667,detected
+noise_2,burst x2 for 60 min,burst,"15 min, gap",1 min,0.001,0.06,53.0,48.0,1.1041666666666667,detected
+noise_2,burst x2 for 60 min,burst,"average, equal, gap",1 min,0.054,0.06,48.5,48.0,1.0104166666666667,detected
+noise_2,burst x2 for 60 min,burst,"average, balanced, gap",1 min,0.0375,0.06,57.0,48.0,1.1875,detected
+noise_2,burst x2 for 60 min,burst,"average, sqrt, gap",1 min,0.0465,0.06,52.0,48.0,1.0833333333333333,detected
+noise_2,burst x2 for 60 min,burst,"max, balanced, gap",1 min,0.0365,0.06,57.0,48.0,1.1875,detected
+noise_2,burst x2 for 60 min,burst,"average 5 and 15, balanced, gap",1 min,0.0065,0.06,63.0,48.0,1.3125,detected
+noise_2,burst x3 for 15 min,burst,1 min,1 min,0.018,0.018,15.0,15.0,1.0,detected
+noise_2,burst x3 for 15 min,burst,5 min,1 min,0.0045,0.018,13.0,15.0,0.8666666666666667,detected
+noise_2,burst x3 for 15 min,burst,15 min,1 min,0.0,0.018,,15.0,,detected
+noise_2,burst x3 for 15 min,burst,"average, equal",1 min,0.017,0.018,15.5,15.0,1.0333333333333334,detected
+noise_2,burst x3 for 15 min,burst,"average, balanced",1 min,0.0115,0.018,18.0,15.0,1.2,detected
+noise_2,burst x3 for 15 min,burst,"average, sqrt",1 min,0.016,0.018,17.5,15.0,1.1666666666666667,detected
+noise_2,burst x3 for 15 min,burst,"average, balanced, plain every minute (no proof at this level)",1 min,0.0115,0.018,18.0,15.0,1.2,detected
+noise_2,burst x3 for 15 min,burst,"max, balanced",1 min,0.011,0.018,16.5,15.0,1.1,detected
+noise_2,burst x3 for 15 min,burst,"average 5 and 15, balanced",1 min,0.004,0.018,18.0,15.0,1.2,detected
+noise_2,burst x3 for 15 min,burst,"5 min, gap",1 min,0.0005,0.018,28.0,15.0,1.8666666666666667,detected
+noise_2,burst x3 for 15 min,burst,"15 min, gap",1 min,0.0,0.018,,15.0,,detected
+noise_2,burst x3 for 15 min,burst,"average, equal, gap",1 min,0.015,0.018,14.0,15.0,0.9333333333333333,detected
+noise_2,burst x3 for 15 min,burst,"average, balanced, gap",1 min,0.008,0.018,14.5,15.0,0.9666666666666667,detected
+noise_2,burst x3 for 15 min,burst,"average, sqrt, gap",1 min,0.013,0.018,16.0,15.0,1.0666666666666667,detected
+noise_2,burst x3 for 15 min,burst,"max, balanced, gap",1 min,0.008,0.018,14.5,15.0,0.9666666666666667,detected
+noise_2,burst x3 for 15 min,burst,"average 5 and 15, balanced, gap",1 min,0.0,0.018,,15.0,,detected
+noise_2,burst x3 for 60 min,burst,1 min,1 min,0.4375,0.4375,44.0,44.0,1.0,detected
+noise_2,burst x3 for 60 min,burst,5 min,1 min,0.214,0.4375,53.0,44.0,1.2045454545454546,detected
+noise_2,burst x3 for 60 min,burst,15 min,1 min,0.009,0.4375,53.0,44.0,1.2045454545454546,detected
+noise_2,burst x3 for 60 min,burst,"average, equal",1 min,0.448,0.4375,45.0,44.0,1.0227272727272727,detected
+noise_2,burst x3 for 60 min,burst,"average, balanced",1 min,0.401,0.4375,48.0,44.0,1.0909090909090908,detected
+noise_2,burst x3 for 60 min,burst,"average, sqrt",1 min,0.4345,0.4375,46.0,44.0,1.0454545454545454,detected
+noise_2,burst x3 for 60 min,burst,"average, balanced, plain every minute (no proof at this level)",1 min,0.402,0.4375,48.0,44.0,1.0909090909090908,detected
+noise_2,burst x3 for 60 min,burst,"max, balanced",1 min,0.393,0.4375,48.0,44.0,1.0909090909090908,detected
+noise_2,burst x3 for 60 min,burst,"average 5 and 15, balanced",1 min,0.146,0.4375,53.0,44.0,1.2045454545454546,detected
+noise_2,burst x3 for 60 min,burst,"5 min, gap",1 min,0.1475,0.4375,53.0,44.0,1.2045454545454546,detected
+noise_2,burst x3 for 60 min,burst,"15 min, gap",1 min,0.01,0.4375,68.0,44.0,1.5454545454545454,detected
+noise_2,burst x3 for 60 min,burst,"average, equal, gap",1 min,0.4355,0.4375,44.0,44.0,1.0,detected
+noise_2,burst x3 for 60 min,burst,"average, balanced, gap",1 min,0.374,0.4375,47.0,44.0,1.0681818181818181,detected
+noise_2,burst x3 for 60 min,burst,"average, sqrt, gap",1 min,0.4135,0.4375,45.0,44.0,1.0227272727272727,detected
+noise_2,burst x3 for 60 min,burst,"max, balanced, gap",1 min,0.369,0.4375,47.0,44.0,1.0681818181818181,detected
+noise_2,burst x3 for 60 min,burst,"average 5 and 15, balanced, gap",1 min,0.1095,0.4375,53.0,44.0,1.2045454545454546,detected
+noise_2,"trend, lag-one autocorrelation 0.3",trend,1 min,15 min,0.077,0.479,732.5,923.0,0.7936078006500542,median_delay
+noise_2,"trend, lag-one autocorrelation 0.3",trend,5 min,15 min,0.4005,0.479,908.0,923.0,0.9837486457204767,median_delay
+noise_2,"trend, lag-one autocorrelation 0.3",trend,15 min,15 min,0.479,0.479,923.0,923.0,1.0,median_delay
+noise_2,"trend, lag-one autocorrelation 0.3",trend,"average, equal",15 min,0.332,0.479,953.0,923.0,1.0325027085590466,median_delay
+noise_2,"trend, lag-one autocorrelation 0.3",trend,"average, balanced",15 min,0.4825,0.479,923.0,923.0,1.0,median_delay
+noise_2,"trend, lag-one autocorrelation 0.3",trend,"average, sqrt",15 min,0.414,0.479,943.0,923.0,1.0216684723726976,median_delay
+noise_2,"trend, lag-one autocorrelation 0.3",trend,"average, balanced, plain every minute (no proof at this level)",15 min,0.484,0.479,923.0,923.0,1.0,median_delay
+noise_2,"trend, lag-one autocorrelation 0.3",trend,"max, balanced",15 min,0.466,0.479,923.0,923.0,1.0,median_delay
+noise_2,"trend, lag-one autocorrelation 0.3",trend,"average 5 and 15, balanced",15 min,0.532,0.479,908.0,923.0,0.9837486457204767,median_delay
+noise_2,"trend, lag-one autocorrelation 0.3",trend,"5 min, gap",15 min,0.2235,0.479,978.0,923.0,1.0595882990249188,median_delay
+noise_2,"trend, lag-one autocorrelation 0.3",trend,"15 min, gap",15 min,0.449,0.479,968.0,923.0,1.0487540628385699,median_delay
+noise_2,"trend, lag-one autocorrelation 0.3",trend,"average, equal, gap",15 min,0.249,0.479,998.0,923.0,1.0812567713976164,median_delay
+noise_2,"trend, lag-one autocorrelation 0.3",trend,"average, balanced, gap",15 min,0.3985,0.479,983.0,923.0,1.0650054171180932,median_delay
+noise_2,"trend, lag-one autocorrelation 0.3",trend,"average, sqrt, gap",15 min,0.329,0.479,983.0,923.0,1.0650054171180932,median_delay
+noise_2,"trend, lag-one autocorrelation 0.3",trend,"max, balanced, gap",15 min,0.384,0.479,968.0,923.0,1.0487540628385699,median_delay
+noise_2,"trend, lag-one autocorrelation 0.3",trend,"average 5 and 15, balanced, gap",15 min,0.438,0.479,980.5,923.0,1.062296858071506,median_delay

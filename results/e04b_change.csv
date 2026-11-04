@@ -1,0 +1,181 @@
+scenario,ratio,detector,false_alarm_before_change,detected,median_delay,mean_delay
+gaussian,1.25,e-det up (grid),0.04,0.96,87.0,99.73263888888889
+gaussian,1.25,e-det up (grid + quarticity bet),0.03,0.97,86.0,100.33333333333333
+gaussian,1.25,e-det up CUSUM-type,0.01,0.99,154.0,175.63299663299662
+gaussian,1.25,e-det down (grid),0.016666666666666666,0.0,,
+gaussian,1.25,e-det down (grid + quarticity bet),0.016666666666666666,0.0,,
+gaussian,1.25,e-det up on raw r^2 (no truncation),0.043333333333333335,0.9566666666666667,84.0,97.32752613240419
+gaussian,1.25,Gaussian LR e-det up,0.05,0.95,78.0,98.0982456140351
+gaussian,1.25,Gaussian LR e-det down,0.05333333333333334,0.0,,
+gaussian,1.25,Page CUSUM up (calibrated),0.10333333333333333,0.8966666666666666,64.0,81.46468401486989
+gaussian,1.25,repeated 60-step z-test,0.82,0.18,40.5,45.44444444444444
+gaussian,1.5,e-det up (grid),0.043333333333333335,0.9566666666666667,35.0,39.62020905923345
+gaussian,1.5,e-det up (grid + quarticity bet),0.04,0.96,37.5,41.58680555555556
+gaussian,1.5,e-det up CUSUM-type,0.0033333333333333335,0.9966666666666667,51.0,57.05685618729097
+gaussian,1.5,e-det down (grid),0.006666666666666667,0.0,,
+gaussian,1.5,e-det down (grid + quarticity bet),0.0033333333333333335,0.0,,
+gaussian,1.5,e-det up on raw r^2 (no truncation),0.043333333333333335,0.9566666666666667,33.0,37.44599303135889
+gaussian,1.5,Gaussian LR e-det up,0.05333333333333334,0.9466666666666667,25.5,31.387323943661972
+gaussian,1.5,Gaussian LR e-det down,0.07,0.0,,
+gaussian,1.5,Page CUSUM up (calibrated),0.1,0.9,24.0,29.61111111111111
+gaussian,1.5,repeated 60-step z-test,0.83,0.17,16.0,18.607843137254903
+gaussian,2.0,e-det up (grid),0.03,0.97,17.0,18.010309278350515
+gaussian,2.0,e-det up (grid + quarticity bet),0.03,0.97,18.0,19.27147766323024
+gaussian,2.0,e-det up CUSUM-type,0.0,1.0,23.0,24.14
+gaussian,2.0,e-det down (grid),0.01,0.0033333333333333335,3.0,3.0
+gaussian,2.0,e-det down (grid + quarticity bet),0.0033333333333333335,0.0,,
+gaussian,2.0,e-det up on raw r^2 (no truncation),0.03,0.97,15.0,16.347079037800686
+gaussian,2.0,Gaussian LR e-det up,0.03666666666666667,0.9633333333333334,10.0,11.273356401384083
+gaussian,2.0,Gaussian LR e-det down,0.08,0.0033333333333333335,3.0,3.0
+gaussian,2.0,Page CUSUM up (calibrated),0.06,0.94,10.0,11.585106382978724
+gaussian,2.0,repeated 60-step z-test,0.8366666666666667,0.16333333333333333,9.0,9.775510204081632
+gaussian,0.8,e-det up (grid),0.03333333333333333,0.0,,
+gaussian,0.8,e-det up (grid + quarticity bet),0.03333333333333333,0.0,,
+gaussian,0.8,e-det up CUSUM-type,0.006666666666666667,0.0,,
+gaussian,0.8,e-det down (grid),0.013333333333333334,0.9866666666666667,147.0,151.22635135135135
+gaussian,0.8,e-det down (grid + quarticity bet),0.013333333333333334,0.9866666666666667,155.5,158.04054054054055
+gaussian,0.8,e-det up on raw r^2 (no truncation),0.03666666666666667,0.0,,
+gaussian,0.8,Gaussian LR e-det up,0.056666666666666664,0.0,,
+gaussian,0.8,Gaussian LR e-det down,0.08666666666666667,0.9133333333333333,104.5,123.84306569343066
+gaussian,0.8,Page CUSUM up (calibrated),0.08666666666666667,0.0,,
+gaussian,0.8,repeated 60-step z-test,0.86,0.14,49.0,56.61904761904762
+gaussian,0.67,e-det up (grid),0.02666666666666667,0.0,,
+gaussian,0.67,e-det up (grid + quarticity bet),0.01,0.0,,
+gaussian,0.67,e-det up CUSUM-type,0.0,0.0,,
+gaussian,0.67,e-det down (grid),0.016666666666666666,0.9833333333333333,92.0,90.68474576271187
+gaussian,0.67,e-det down (grid + quarticity bet),0.006666666666666667,0.9933333333333333,96.5,95.22147651006712
+gaussian,0.67,e-det up on raw r^2 (no truncation),0.02666666666666667,0.0,,
+gaussian,0.67,Gaussian LR e-det up,0.03666666666666667,0.0,,
+gaussian,0.67,Gaussian LR e-det down,0.06666666666666667,0.9333333333333333,46.0,48.982142857142854
+gaussian,0.67,Page CUSUM up (calibrated),0.07333333333333333,0.0,,
+gaussian,0.67,repeated 60-step z-test,0.8466666666666667,0.15333333333333332,32.0,32.630434782608695
+gaussian,0.5,e-det up (grid),0.02666666666666667,0.0,,
+gaussian,0.5,e-det up (grid + quarticity bet),0.016666666666666666,0.0,,
+gaussian,0.5,e-det up CUSUM-type,0.0,0.0,,
+gaussian,0.5,e-det down (grid),0.01,0.99,71.0,66.61952861952862
+gaussian,0.5,e-det down (grid + quarticity bet),0.01,0.99,74.0,70.21212121212122
+gaussian,0.5,e-det up on raw r^2 (no truncation),0.02666666666666667,0.0,,
+gaussian,0.5,Gaussian LR e-det up,0.04666666666666667,0.0,,
+gaussian,0.5,Gaussian LR e-det down,0.06333333333333334,0.9366666666666666,23.0,23.95373665480427
+gaussian,0.5,Page CUSUM up (calibrated),0.09,0.0,,
+gaussian,0.5,repeated 60-step z-test,0.84,0.16,27.0,26.5625
+jumps,1.25,e-det up (grid),0.03666666666666667,0.9633333333333334,102.0,113.8961937716263
+jumps,1.25,e-det up (grid + quarticity bet),0.013333333333333334,0.9866666666666667,101.0,117.4054054054054
+jumps,1.25,e-det up CUSUM-type,0.0033333333333333335,0.9966666666666667,171.0,192.19063545150502
+jumps,1.25,e-det down (grid),0.01,0.0,,
+jumps,1.25,e-det down (grid + quarticity bet),0.006666666666666667,0.0,,
+jumps,1.25,e-det up on raw r^2 (no truncation),0.05333333333333334,0.9,246.5,399.14444444444445
+jumps,1.25,Gaussian LR e-det up,0.7366666666666667,0.2633333333333333,61.0,89.32911392405063
+jumps,1.25,Gaussian LR e-det down,0.06666666666666667,0.0,,
+jumps,1.25,Page CUSUM up (calibrated),0.7366666666666667,0.2633333333333333,54.0,69.9113924050633
+jumps,1.25,repeated 60-step z-test,0.95,0.05,31.0,38.0
+jumps,1.5,e-det up (grid),0.02,0.98,36.0,39.08163265306123
+jumps,1.5,e-det up (grid + quarticity bet),0.013333333333333334,0.9866666666666667,37.0,40.40878378378378
+jumps,1.5,e-det up CUSUM-type,0.0,1.0,52.5,57.25333333333333
+jumps,1.5,e-det down (grid),0.016666666666666666,0.0,,
+jumps,1.5,e-det down (grid + quarticity bet),0.0033333333333333335,0.0,,
+jumps,1.5,e-det up on raw r^2 (no truncation),0.03666666666666667,0.9633333333333334,60.0,75.4567474048443
+jumps,1.5,Gaussian LR e-det up,0.7833333333333333,0.21666666666666667,20.0,25.015384615384615
+jumps,1.5,Gaussian LR e-det down,0.056666666666666664,0.0,,
+jumps,1.5,Page CUSUM up (calibrated),0.7866666666666666,0.21333333333333335,20.5,24.609375
+jumps,1.5,repeated 60-step z-test,0.9633333333333334,0.03666666666666667,21.0,20.181818181818183
+jumps,2.0,e-det up (grid),0.02666666666666667,0.9733333333333334,18.0,18.681506849315067
+jumps,2.0,e-det up (grid + quarticity bet),0.02666666666666667,0.9733333333333334,19.0,20.023972602739725
+jumps,2.0,e-det up CUSUM-type,0.0,1.0,23.0,24.993333333333332
+jumps,2.0,e-det down (grid),0.01,0.0,,
+jumps,2.0,e-det down (grid + quarticity bet),0.0,0.0,,
+jumps,2.0,e-det up on raw r^2 (no truncation),0.03333333333333333,0.9666666666666667,23.0,24.679310344827588
+jumps,2.0,Gaussian LR e-det up,0.7833333333333333,0.21666666666666667,9.0,10.123076923076923
+jumps,2.0,Gaussian LR e-det down,0.043333333333333335,0.0,,
+jumps,2.0,Page CUSUM up (calibrated),0.79,0.21,11.0,10.698412698412698
+jumps,2.0,repeated 60-step z-test,0.97,0.03,9.0,11.0
+jumps,0.8,e-det up (grid),0.023333333333333334,0.0,,
+jumps,0.8,e-det up (grid + quarticity bet),0.013333333333333334,0.0,,
+jumps,0.8,e-det up CUSUM-type,0.0033333333333333335,0.0,,
+jumps,0.8,e-det down (grid),0.006666666666666667,0.9933333333333333,159.5,167.11073825503357
+jumps,0.8,e-det down (grid + quarticity bet),0.0033333333333333335,0.9966666666666667,165.0,172.2742474916388
+jumps,0.8,e-det up on raw r^2 (no truncation),0.04666666666666667,0.04,1094.5,1143.25
+jumps,0.8,Gaussian LR e-det up,0.7533333333333333,0.24666666666666667,300.5,467.2837837837838
+jumps,0.8,Gaussian LR e-det down,0.04666666666666667,0.9533333333333334,121.0,147.62937062937064
+jumps,0.8,Page CUSUM up (calibrated),0.75,0.25,302.0,459.84
+jumps,0.8,repeated 60-step z-test,0.9666666666666667,0.03333333333333333,53.5,80.5
+jumps,0.67,e-det up (grid),0.02666666666666667,0.0,,
+jumps,0.67,e-det up (grid + quarticity bet),0.023333333333333334,0.0,,
+jumps,0.67,e-det up CUSUM-type,0.0033333333333333335,0.0,,
+jumps,0.67,e-det down (grid),0.006666666666666667,0.9933333333333333,98.0,98.25167785234899
+jumps,0.67,e-det down (grid + quarticity bet),0.006666666666666667,0.9933333333333333,102.0,102.3993288590604
+jumps,0.67,e-det up on raw r^2 (no truncation),0.04666666666666667,0.01,1479.0,1604.6666666666667
+jumps,0.67,Gaussian LR e-det up,0.7133333333333334,0.2866666666666667,190.5,289.48837209302326
+jumps,0.67,Gaussian LR e-det down,0.02666666666666667,0.9733333333333334,49.0,52.53082191780822
+jumps,0.67,Page CUSUM up (calibrated),0.72,0.28,199.0,282.0952380952381
+jumps,0.67,repeated 60-step z-test,0.9566666666666667,0.043333333333333335,31.0,31.923076923076923
+jumps,0.5,e-det up (grid),0.03666666666666667,0.0,,
+jumps,0.5,e-det up (grid + quarticity bet),0.03,0.0,,
+jumps,0.5,e-det up CUSUM-type,0.01,0.0,,
+jumps,0.5,e-det down (grid),0.013333333333333334,0.9866666666666667,72.0,71.97635135135135
+jumps,0.5,e-det down (grid + quarticity bet),0.006666666666666667,0.9933333333333333,75.0,75.25503355704699
+jumps,0.5,e-det up on raw r^2 (no truncation),0.056666666666666664,0.01,1788.0,1226.3333333333333
+jumps,0.5,Gaussian LR e-det up,0.7833333333333333,0.21666666666666667,256.0,378.89230769230767
+jumps,0.5,Gaussian LR e-det down,0.06666666666666667,0.9333333333333333,23.0,25.103571428571428
+jumps,0.5,Page CUSUM up (calibrated),0.7766666666666666,0.22333333333333333,256.0,377.2238805970149
+jumps,0.5,repeated 60-step z-test,0.9566666666666667,0.043333333333333335,26.0,27.53846153846154
+student t5,1.25,e-det up (grid),0.02666666666666667,0.9733333333333334,122.0,141.0958904109589
+student t5,1.25,e-det up (grid + quarticity bet),0.023333333333333334,0.9766666666666667,121.0,142.3071672354949
+student t5,1.25,e-det up CUSUM-type,0.0,1.0,215.0,251.35666666666665
+student t5,1.25,e-det down (grid),0.006666666666666667,0.0033333333333333335,2.0,2.0
+student t5,1.25,e-det down (grid + quarticity bet),0.0033333333333333335,0.0,,
+student t5,1.25,e-det up on raw r^2 (no truncation),0.023333333333333334,0.9766666666666667,134.0,168.50511945392492
+student t5,1.25,Gaussian LR e-det up,0.9766666666666667,0.023333333333333334,46.0,49.0
+student t5,1.25,Gaussian LR e-det down,0.023333333333333334,0.0,,
+student t5,1.25,Page CUSUM up (calibrated),0.9833333333333333,0.016666666666666666,50.0,48.8
+student t5,1.25,repeated 60-step z-test,1.0,0.0,,
+student t5,1.5,e-det up (grid),0.03,0.97,49.0,53.49484536082474
+student t5,1.5,e-det up (grid + quarticity bet),0.023333333333333334,0.9766666666666667,50.0,54.99317406143345
+student t5,1.5,e-det up CUSUM-type,0.0033333333333333335,0.9966666666666667,72.0,81.79264214046823
+student t5,1.5,e-det down (grid),0.03333333333333333,0.0,,
+student t5,1.5,e-det down (grid + quarticity bet),0.023333333333333334,0.0,,
+student t5,1.5,e-det up on raw r^2 (no truncation),0.023333333333333334,0.9766666666666667,51.0,56.11945392491467
+student t5,1.5,Gaussian LR e-det up,0.98,0.02,9.5,10.5
+student t5,1.5,Gaussian LR e-det down,0.016666666666666666,0.0,,
+student t5,1.5,Page CUSUM up (calibrated),0.99,0.01,9.0,18.666666666666668
+student t5,1.5,repeated 60-step z-test,1.0,0.0,,
+student t5,2.0,e-det up (grid),0.03,0.97,22.0,24.756013745704468
+student t5,2.0,e-det up (grid + quarticity bet),0.016666666666666666,0.9833333333333333,24.0,26.328813559322032
+student t5,2.0,e-det up CUSUM-type,0.0,1.0,32.0,33.25666666666667
+student t5,2.0,e-det down (grid),0.03,0.0,,
+student t5,2.0,e-det down (grid + quarticity bet),0.03,0.0,,
+student t5,2.0,e-det up on raw r^2 (no truncation),0.03666666666666667,0.9633333333333334,21.0,22.46020761245675
+student t5,2.0,Gaussian LR e-det up,0.9566666666666667,0.043333333333333335,7.0,7.846153846153846
+student t5,2.0,Gaussian LR e-det down,0.02,0.0,,
+student t5,2.0,Page CUSUM up (calibrated),0.9666666666666667,0.03333333333333333,6.0,6.3
+student t5,2.0,repeated 60-step z-test,0.9966666666666667,0.0033333333333333335,1.0,1.0
+student t5,0.8,e-det up (grid),0.02,0.0,,
+student t5,0.8,e-det up (grid + quarticity bet),0.013333333333333334,0.0,,
+student t5,0.8,e-det up CUSUM-type,0.0033333333333333335,0.0,,
+student t5,0.8,e-det down (grid),0.016666666666666666,0.9833333333333333,168.0,182.6813559322034
+student t5,0.8,e-det down (grid + quarticity bet),0.016666666666666666,0.9833333333333333,167.0,183.89830508474577
+student t5,0.8,e-det up on raw r^2 (no truncation),0.03333333333333333,0.0,,
+student t5,0.8,Gaussian LR e-det up,0.9866666666666667,0.013333333333333334,329.5,524.25
+student t5,0.8,Gaussian LR e-det down,0.01,0.9833333333333333,282.0,462.19322033898305
+student t5,0.8,Page CUSUM up (calibrated),0.9933333333333333,0.006666666666666667,47.5,47.5
+student t5,0.8,repeated 60-step z-test,1.0,0.0,,
+student t5,0.67,e-det up (grid),0.023333333333333334,0.0,,
+student t5,0.67,e-det up (grid + quarticity bet),0.02,0.0,,
+student t5,0.67,e-det up CUSUM-type,0.006666666666666667,0.0,,
+student t5,0.67,e-det down (grid),0.02666666666666667,0.9733333333333334,96.0,98.32191780821918
+student t5,0.67,e-det down (grid + quarticity bet),0.023333333333333334,0.9766666666666667,100.0,100.35153583617748
+student t5,0.67,e-det up on raw r^2 (no truncation),0.03333333333333333,0.0,,
+student t5,0.67,Gaussian LR e-det up,0.9833333333333333,0.016666666666666666,1123.0,1185.6
+student t5,0.67,Gaussian LR e-det down,0.013333333333333334,0.9866666666666667,81.0,92.18243243243244
+student t5,0.67,Page CUSUM up (calibrated),0.98,0.01,2013.0,1442.3333333333333
+student t5,0.67,repeated 60-step z-test,1.0,0.0,,
+student t5,0.5,e-det up (grid),0.02,0.0,,
+student t5,0.5,e-det up (grid + quarticity bet),0.013333333333333334,0.0,,
+student t5,0.5,e-det up CUSUM-type,0.0033333333333333335,0.0,,
+student t5,0.5,e-det down (grid),0.02666666666666667,0.9733333333333334,68.5,67.02054794520548
+student t5,0.5,e-det down (grid + quarticity bet),0.016666666666666666,0.9833333333333333,71.0,69.64745762711864
+student t5,0.5,e-det up on raw r^2 (no truncation),0.03,0.0,,
+student t5,0.5,Gaussian LR e-det up,0.99,0.0033333333333333335,955.0,955.0
+student t5,0.5,Gaussian LR e-det down,0.016666666666666666,0.9833333333333333,29.0,33.369491525423726
+student t5,0.5,Page CUSUM up (calibrated),0.9933333333333333,0.0,,
+student t5,0.5,repeated 60-step z-test,1.0,0.0,,

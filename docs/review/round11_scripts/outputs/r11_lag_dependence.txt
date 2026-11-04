@@ -1,0 +1,6 @@
+BTC | 14:00 ET, then 08:30 ET next day (FOMC Wed / CPI Thu): pairs 383; P(second = 1 | first = 0) = 0.129 (41/319), P(second = 1 | first = 1) = 0.094 (6/64); odds ratio 0.75 (log OR -0.29 +- 0.87)
+BTC | 08:30 ET, then 14:00 ET next day (CPI Tue / FOMC Wed): pairs 383; P(second = 1 | first = 0) = 0.177 (60/339), P(second = 1 | first = 1) = 0.023 (1/44); odds ratio 0.16 (log OR -1.84 +- 1.65)
+ETH | 14:00 ET, then 08:30 ET next day (FOMC Wed / CPI Thu): pairs 383; P(second = 1 | first = 0) = 0.148 (47/318), P(second = 1 | first = 1) = 0.092 (6/65); odds ratio 0.62 (log OR -0.47 +- 0.87)
+ETH | 08:30 ET, then 14:00 ET next day (CPI Tue / FOMC Wed): pairs 383; P(second = 1 | first = 0) = 0.146 (49/336), P(second = 1 | first = 1) = 0.213 (10/47); odds ratio 1.63 (log OR +0.49 +- 0.75)
+SOL | 14:00 ET, then 08:30 ET next day (FOMC Wed / CPI Thu): pairs 383; P(second = 1 | first = 0) = 0.163 (53/325), P(second = 1 | first = 1) = 0.103 (6/58); odds ratio 0.63 (log OR -0.46 +- 0.87)
+SOL | 08:30 ET, then 14:00 ET next day (CPI Tue / FOMC Wed): pairs 383; P(second = 1 | first = 0) = 0.150 (50/333), P(second = 1 | first = 1) = 0.120 (6/50); odds ratio 0.82 (log OR -0.20 +- 0.88)

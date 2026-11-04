@@ -1,0 +1,51 @@
+amended | 2024 to 2025 (E22 design) | BTC | fomc+cpi: strata 36, Z 21, K 15/119, final M 47667.3 (CSV 47667.3), max M 47667.3, first >= 20 at 8 (CSV 8); MATCH
+amended | 2024 to 2025 (E22 design) | BTC | fomc: strata 15, Z 12, K 7/41, final M 319.279 (CSV 319.279), max M 319.279, first >= 20 at 13 (CSV 13); MATCH
+amended | 2024 to 2025 (E22 design) | BTC | cpi: strata 21, Z 9, K 8/78, final M 115.087 (CSV 115.087), max M 693.425, first >= 20 at 7 (CSV 7); MATCH
+  strata table (n, in_test, before, after) equal to CSV: True; outcomes Z, K, S equal: True
+  BTC strata in the test: 1:2024-01-31 fomc n=4 Z=1 K=0; 2:2024-02-13 cpi n=5 Z=1 K=2; 3:2024-03-12 cpi n=2 Z=1 K=1; 4:2024-03-20 fomc n=4 Z=0 K=0; 5:2024-04-10 cpi n=2 Z=1 K=0; 6:2024-05-01 fomc n=2 Z=0 K=0; 7:2024-05-15 cpi n=1 Z=0 K=0; 8:2024-06-12 cpi n=3 Z=1 K=0; 9:2024-06-12 fomc n=0 Z=1 K=0; 10:2024-07-11 cpi n=6 Z=0 K=0; 11:2024-07-31 fomc n=5 Z=1 K=2; 12:2024-08-14 cpi n=1 Z=1 K=0; 13:2024-09-11 cpi n=2 Z=0 K=0; 14:2024-09-18 fomc n=1 Z=1 K=0; 15:2024-10-10 cpi n=5 Z=1 K=0; 16:2024-11-07 fomc n=3 Z=0 K=1; 17:2024-11-13 cpi n=5 Z=1 K=0; 18:2024-12-11 cpi n=3 Z=0 K=0; 19:2024-12-18 fomc n=0 Z=1 K=0; 20:2025-01-15 cpi n=2 Z=0 K=0; 21:2025-01-29 fomc n=2 Z=1 K=1; 22:2025-02-12 cpi n=1 Z=1 K=0; 23:2025-03-12 cpi n=2 Z=0 K=0; 24:2025-03-19 fomc n=1 Z=1 K=1; 25:2025-04-10 cpi n=5 Z=0 K=0; 26:2025-05-07 fomc n=5 Z=1 K=0; 27:2025-05-13 cpi n=6 Z=0 K=1; 28:2025-06-11 cpi n=3 Z=0 K=0; 29:2025-06-18 fomc n=0 Z=1 K=0; 30:2025-07-15 cpi n=5 Z=0 K=1; 31:2025-07-30 fomc n=4 Z=1 K=0; 32:2025-08-12 cpi n=4 Z=0 K=0; 33:2025-09-11 cpi n=7 Z=1 K=1; 34:2025-09-17 fomc n=5 Z=1 K=2; 35:2025-10-24 cpi n=8 Z=0 K=2; 36:2025-10-29 fomc n=5 Z=1 K=0
+amended | 2024 to 2025 (E22 design) | ETH | fomc+cpi: strata 36, Z 20, K 16/119, final M 784.811 (CSV 784.811), max M 784.811, first >= 20 at 11 (CSV 11); MATCH
+amended | 2024 to 2025 (E22 design) | ETH | fomc: strata 15, Z 10, K 4/41, final M 55.5092 (CSV 55.5092), max M 55.5092, first >= 20 at 15 (CSV 15); MATCH
+amended | 2024 to 2025 (E22 design) | ETH | cpi: strata 21, Z 10, K 12/78, final M 14.472 (CSV 14.472), max M 133.344, first >= 20 at 7 (CSV 7); MATCH
+  strata table (n, in_test, before, after) equal to CSV: True; outcomes Z, K, S equal: True
+amended | 2024 to 2025 (E22 design) | SOL | fomc+cpi: strata 36, Z 20, K 15/119, final M 5308.12 (CSV 5308.12), max M 5308.12, first >= 20 at 12 (CSV 12); MATCH
+amended | 2024 to 2025 (E22 design) | SOL | fomc: strata 15, Z 11, K 7/41, final M 133.044 (CSV 133.044), max M 133.044, first >= 20 at 14 (CSV 14); MATCH
+amended | 2024 to 2025 (E22 design) | SOL | cpi: strata 21, Z 9, K 8/78, final M 35.7355 (CSV 35.7355), max M 539.335, first >= 20 at 8 (CSV 8); MATCH
+  strata table (n, in_test, before, after) equal to CSV: True; outcomes Z, K, S equal: True
+amended | 2026 (E23 design) | BTC | fomc+cpi: strata 15, Z 6, K 7/66, final M 3.82597 (CSV 3.82597), max M 3.82597, first >= 20 at None (CSV None); MATCH
+amended | 2026 (E23 design) | BTC | fomc: strata 6, Z 4, K 2/18, final M 7.65311 (CSV 7.65311), max M 7.65311, first >= 20 at None (CSV None); MATCH
+amended | 2026 (E23 design) | BTC | cpi: strata 9, Z 2, K 5/48, final M 0.664249 (CSV 0.664249), max M 0.664249, first >= 20 at None (CSV None); MATCH
+  strata table (n, in_test, before, after) equal to CSV: True; outcomes Z, K, S equal: True
+  BTC strata in the test: 1:2026-01-13 cpi n=4 Z=0 K=1; 2:2026-01-28 fomc n=6 Z=0 K=1; 3:2026-02-13 cpi n=8 Z=0 K=1; 4:2026-03-11 cpi n=4 Z=0 K=0; 5:2026-03-18 fomc n=1 Z=0 K=0; 6:2026-04-10 cpi n=7 Z=0 K=0; 7:2026-04-29 fomc n=4 Z=1 K=0; 8:2026-05-12 cpi n=6 Z=0 K=0; 9:2026-06-10 cpi n=4 Z=0 K=1; 10:2026-06-17 fomc n=0 Z=1 K=0; 11:2026-07-14 cpi n=5 Z=1 K=0; 12:2026-07-29 fomc n=4 Z=1 K=1; 13:2026-08-12 cpi n=2 Z=0 K=1; 14:2026-09-11 cpi n=8 Z=1 K=1; 15:2026-09-16 fomc n=3 Z=1 K=0
+amended | 2026 (E23 design) | ETH | fomc+cpi: strata 15, Z 7, K 9/66, final M 8.35314 (CSV 8.35314), max M 8.35314, first >= 20 at None (CSV None); MATCH
+amended | 2026 (E23 design) | ETH | fomc: strata 6, Z 4, K 3/18, final M 5.04815 (CSV 5.04815), max M 5.04815, first >= 20 at None (CSV None); MATCH
+amended | 2026 (E23 design) | ETH | cpi: strata 9, Z 3, K 6/48, final M 1.75892 (CSV 1.75892), max M 1.90943, first >= 20 at None (CSV None); MATCH
+  strata table (n, in_test, before, after) equal to CSV: True; outcomes Z, K, S equal: True
+amended | 2026 (E23 design) | SOL | fomc+cpi: strata 15, Z 7, K 9/66, final M 5.00539 (CSV 5.00539), max M 5.00539, first >= 20 at None (CSV None); MATCH
+amended | 2026 (E23 design) | SOL | fomc: strata 6, Z 4, K 4/18, final M 3.82163 (CSV 3.82163), max M 3.82163, first >= 20 at None (CSV None); MATCH
+amended | 2026 (E23 design) | SOL | cpi: strata 9, Z 3, K 5/48, final M 1.38633 (CSV 1.38633), max M 1.38633, first >= 20 at None (CSV None); MATCH
+  strata table (n, in_test, before, after) equal to CSV: True; outcomes Z, K, S equal: True
+original | 2024 to 2025 (E22 design) | BTC | fomc+cpi: strata 36, Z 21, K 26/161, final M 427532 (CSV 427532), max M 427532, first >= 20 at 9 (CSV 9); MATCH
+original | 2024 to 2025 (E22 design) | BTC | fomc: strata 15, Z 12, K 13/67, final M 4870.37 (CSV 4870.37), max M 4870.37, first >= 20 at 9 (CSV 9); MATCH
+original | 2024 to 2025 (E22 design) | BTC | cpi: strata 21, Z 9, K 13/94, final M 74.2142 (CSV 74.2142), max M 972.308, first >= 20 at 7 (CSV 7); MATCH
+  strata table (n, in_test, before, after) equal to CSV: True; outcomes Z, K, S equal: True
+original | 2024 to 2025 (E22 design) | ETH | fomc+cpi: strata 36, Z 20, K 27/161, final M 8472.2 (CSV 8472.2), max M 8472.2, first >= 20 at 11 (CSV 11); MATCH
+original | 2024 to 2025 (E22 design) | ETH | fomc: strata 15, Z 10, K 11/67, final M 382.443 (CSV 382.443), max M 382.443, first >= 20 at 13 (CSV 13); MATCH
+original | 2024 to 2025 (E22 design) | ETH | cpi: strata 21, Z 10, K 16/94, final M 23.1972 (CSV 23.1972), max M 430.028, first >= 20 at 5 (CSV 5); MATCH
+  strata table (n, in_test, before, after) equal to CSV: True; outcomes Z, K, S equal: True
+original | 2024 to 2025 (E22 design) | SOL | fomc+cpi: strata 36, Z 20, K 23/161, final M 84235.3 (CSV 84235.3), max M 596476, first >= 20 at 8 (CSV 8); MATCH
+original | 2024 to 2025 (E22 design) | SOL | fomc: strata 15, Z 11, K 11/67, final M 1849.47 (CSV 1849.47), max M 1849.47, first >= 20 at 9 (CSV 9); MATCH
+original | 2024 to 2025 (E22 design) | SOL | cpi: strata 21, Z 9, K 12/94, final M 43.9554 (CSV 43.9554), max M 1410.74, first >= 20 at 5 (CSV 5); MATCH
+  strata table (n, in_test, before, after) equal to CSV: True; outcomes Z, K, S equal: True
+original | 2026 (E23 design) | BTC | fomc+cpi: strata 15, Z 6, K 10/85, final M 6.68882 (CSV 6.68882), max M 6.68882, first >= 20 at None (CSV None); MATCH
+original | 2026 (E23 design) | BTC | fomc: strata 6, Z 4, K 3/28, final M 19.5502 (CSV 19.5502), max M 19.5502, first >= 20 at None (CSV None); MATCH
+original | 2026 (E23 design) | BTC | cpi: strata 9, Z 2, K 7/57, final M 0.59226 (CSV 0.59226), max M 0.59226, first >= 20 at None (CSV None); MATCH
+  strata table (n, in_test, before, after) equal to CSV: True; outcomes Z, K, S equal: True
+original | 2026 (E23 design) | ETH | fomc+cpi: strata 15, Z 7, K 11/85, final M 13.0882 (CSV 13.0882), max M 13.0882, first >= 20 at None (CSV None); MATCH
+original | 2026 (E23 design) | ETH | fomc: strata 6, Z 4, K 4/28, final M 12.5472 (CSV 12.5472), max M 12.5472, first >= 20 at None (CSV None); MATCH
+original | 2026 (E23 design) | ETH | cpi: strata 9, Z 3, K 7/57, final M 1.34985 (CSV 1.34985), max M 1.90943, first >= 20 at None (CSV None); MATCH
+  strata table (n, in_test, before, after) equal to CSV: True; outcomes Z, K, S equal: True
+original | 2026 (E23 design) | SOL | fomc+cpi: strata 15, Z 7, K 11/85, final M 15.89 (CSV 15.89), max M 15.89, first >= 20 at None (CSV None); MATCH
+original | 2026 (E23 design) | SOL | fomc: strata 6, Z 4, K 5/28, final M 9.34727 (CSV 9.34727), max M 9.34727, first >= 20 at None (CSV None); MATCH
+original | 2026 (E23 design) | SOL | cpi: strata 9, Z 3, K 6/57, final M 1.92678 (CSV 1.92678), max M 1.92678, first >= 20 at None (CSV None); MATCH
+  strata table (n, in_test, before, after) equal to CSV: True; outcomes Z, K, S equal: True
+TOTAL: 60 comparisons, 0 mismatches

@@ -1,0 +1,24 @@
+law,method,calibration,target,paths,fa_one_day,fa_one_day_lo,fa_one_day_hi,fa_two_days,design
+gaussian,"e-detector, E13 version (common decrease bets)",Ville,,1000,0.019,0.012196885708717629,0.029484456012240062,0.061,E13 null paths
+gaussian,"BOCPD-t, matched","Gaussian simulation, matched (E13)",,1000,0.005,0.002137535513789148,0.01165095544644798,0.017,E13 null paths
+gaussian,"BOCPD-t, p >= 0.5","Gaussian simulation, matched (E13)",,1000,0.0,2.168404344971009e-19,0.0038267585456940676,0.007,E13 null paths
+jumps,"e-detector, E13 version (common decrease bets)",Ville,,1000,0.013,0.00761282035790027,0.02211444246560575,0.047,E13 null paths
+jumps,"BOCPD-t, matched","Gaussian simulation, matched (E13)",,1000,0.007,0.0033948683823943875,0.014378315543659962,0.019,E13 null paths
+jumps,"BOCPD-t, p >= 0.5","Gaussian simulation, matched (E13)",,1000,0.002,0.0005486435831903412,0.007262807928320951,0.008,E13 null paths
+student t5,"e-detector, E13 version (common decrease bets)",Ville,,1000,0.012,0.006877647776907175,0.020857268563690235,0.049,E13 null paths
+student t5,"BOCPD-t, matched","Gaussian simulation, matched (E13)",,1000,0.033,0.0235929278963097,0.04598126458536856,0.07,E13 null paths
+student t5,"BOCPD-t, p >= 0.5","Gaussian simulation, matched (E13)",,1000,0.011,0.006153174070610072,0.019589395787078724,0.029,E13 null paths
+price noise,"e-detector, E13 version (common decrease bets)",Ville,,1000,0.019,0.012196885708717629,0.029484456012240062,0.076,E13 null paths
+price noise,"BOCPD-t, matched","Gaussian simulation, matched (E13)",,1000,0.018,0.011415739969152553,0.028273255268896527,0.04,E13 null paths
+price noise,"BOCPD-t, p >= 0.5","Gaussian simulation, matched (E13)",,1000,0.006,0.002752669125748582,0.013028168317397157,0.013,E13 null paths
+ticks,"e-detector, E13 version (common decrease bets)",Ville,,1000,0.019,0.012196885708717629,0.029484456012240062,0.056,E13 null paths
+ticks,"BOCPD-t, matched","Gaussian simulation, matched (E13)",,1000,0.012,0.006877647776907175,0.020857268563690235,0.031,E13 null paths
+ticks,"BOCPD-t, p >= 0.5","Gaussian simulation, matched (E13)",,1000,0.004,0.0015565881296028053,0.01023955634772571,0.01,E13 null paths
+slow SV,"e-detector, E13 version (common decrease bets)",Ville,,1000,0.439,0.4085331919057744,0.4699336726368002,0.751,E13 null paths
+slow SV,"BOCPD-t, matched","Gaussian simulation, matched (E13)",,1000,0.25,0.22415309878784354,0.2777602804850034,0.402,E13 null paths
+slow SV,"BOCPD-t, p >= 0.5","Gaussian simulation, matched (E13)",,1000,0.181,0.15837194027527776,0.206069531676875,0.272,E13 null paths
+GARCH 0.99,"e-detector, E13 version (common decrease bets)",Ville,,1000,0.816,0.7907901790055152,0.8387913095936059,0.978,E13 null paths
+GARCH 0.99,"BOCPD-t, matched","Gaussian simulation, matched (E13)",,1000,0.691,0.6616750357388649,0.7188631424966799,0.899,E13 null paths
+GARCH 0.99,"BOCPD-t, p >= 0.5","Gaussian simulation, matched (E13)",,1000,0.618,0.5874883401195825,0.6476085448636337,0.842,E13 null paths
+student t3,"BOCPD-t, matched","Gaussian simulation, matched (E13)",,1000,0.049,0.037261034566942575,0.06419070164127347,0.108,E13 null paths
+student t3,"BOCPD-t, p >= 0.5","Gaussian simulation, matched (E13)",,1000,0.019,0.012196885708717629,0.029484456012240062,0.054,E13 null paths

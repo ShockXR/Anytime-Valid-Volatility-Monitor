@@ -1,0 +1,169 @@
+law,method,horizon_m,k,paths,rate,ci_low,ci_high,bound,rate_over_bound,verdict,note
+gaussian,"e-detector, KNOWN baseline (theorem)",98,2,3000,0.0006666666666666666,0.0001828392603776389,0.0024276845435406507,0.012564102564102564,0.053061224489795916,within bound,tau=2.9990 m0=0.99508; proved bound only if conditional mean = m0
+gaussian,"e-detector, KNOWN baseline (theorem)",390,23,3000,0.007666666666666666,0.0051141489854345384,0.011478470279176485,0.05,0.15333333333333332,within bound,tau=2.9990 m0=0.99508; proved bound only if conditional mean = m0
+gaussian,"e-detector, KNOWN baseline (theorem)",1950,348,3000,0.116,0.10502879894605174,0.1279533929245183,0.25,0.464,within bound,tau=2.9990 m0=0.99508; proved bound only if conditional mean = m0
+gaussian,monitor plugin band0.25 (README),98,0,3000,0.0,1.0842021724855044e-19,0.0012788956648046956,0.012564102564102564,0.0,within bound,approximate: plug-in baseline
+gaussian,monitor plugin band0.25 (README),390,0,3000,0.0,1.0842021724855044e-19,0.0012788956648046956,0.05,0.0,within bound,approximate: plug-in baseline
+gaussian,monitor plugin band0.25 (README),1950,0,3000,0.0,1.0842021724855044e-19,0.0012788956648046956,0.25,0.0,within bound,approximate: plug-in baseline
+gaussian,monitor plugin band0,98,6,3000,0.002,0.0009169177531076662,0.004356862329037811,0.012564102564102564,0.15918367346938775,within bound,approximate: plug-in baseline
+gaussian,monitor plugin band0,390,55,3000,0.018333333333333333,0.014112390749470047,0.02378627874095848,0.05,0.36666666666666664,within bound,approximate: plug-in baseline
+gaussian,monitor plugin band0,1950,800,3000,0.26666666666666666,0.2511478635065513,0.2827822878036909,0.25,1.0666666666666667,EXCEEDS bound,approximate: plug-in baseline
+gaussian,monitor cs baseline delta0.01,98,0,3000,0.0,1.0842021724855044e-19,0.0012788956648046956,0.022564102564102566,0.0,within bound,proved bound delta+m/A if iid-type null
+gaussian,monitor cs baseline delta0.01,390,0,3000,0.0,1.0842021724855044e-19,0.0012788956648046956,0.060000000000000005,0.0,within bound,proved bound delta+m/A if iid-type null
+gaussian,monitor cs baseline delta0.01,1950,1,3000,0.0003333333333333333,5.884242821930163e-05,0.0018858673061421909,0.26,0.001282051282051282,within bound,proved bound delta+m/A if iid-type null
+gaussian,Gaussian LR monitor (baseline),98,17,3000,0.005666666666666667,0.0035410265162924416,0.009056708330977803,0.012564102564102564,0.45102040816326533,within bound,valid only for exactly normal returns
+gaussian,Gaussian LR monitor (baseline),390,192,3000,0.064,0.055787086437994245,0.07332811058171548,0.05,1.28,EXCEEDS bound,valid only for exactly normal returns
+gaussian,Gaussian LR monitor (baseline),1950,902,3000,0.3006666666666667,0.28452118017133043,0.3173220062337052,0.25,1.2026666666666668,EXCEEDS bound,valid only for exactly normal returns
+gaussian,Page CUSUM up (Gaussian-calibrated),98,42,3000,0.014,0.01037416859545473,0.018868917990735437,,,n/a (no bound),no finite-sample guarantee; threshold set for ARL=A on Gaussian
+gaussian,Page CUSUM up (Gaussian-calibrated),390,251,3000,0.08366666666666667,0.07428286299860758,0.09411536412495315,,,n/a (no bound),no finite-sample guarantee; threshold set for ARL=A on Gaussian
+gaussian,Page CUSUM up (Gaussian-calibrated),1950,901,3000,0.30033333333333334,0.2841934529580079,0.31698391937747084,,,n/a (no bound),no finite-sample guarantee; threshold set for ARL=A on Gaussian
+gaussian,repeated 60-step z-test,98,633,3000,0.211,0.19677350972082977,0.2259656919734274,,,n/a (no bound),not anytime-valid by design
+gaussian,repeated 60-step z-test,390,2309,3000,0.7696666666666667,0.7542605355277446,0.7843830467437042,,,n/a (no bound),not anytime-valid by design
+gaussian,repeated 60-step z-test,1950,2995,3000,0.9983333333333333,0.9961041274235806,0.9992879065638308,,,n/a (no bound),not anytime-valid by design
+student_t3,"e-detector, KNOWN baseline (theorem)",98,3,3000,0.001,0.0003401410630165598,0.002936196810458527,0.012564102564102564,0.07959183673469387,within bound,tau=1.9645 m0=0.60566; proved bound only if conditional mean = m0
+student_t3,"e-detector, KNOWN baseline (theorem)",390,51,3000,0.017,0.012953675419908658,0.022281737792292682,0.05,0.34,within bound,tau=1.9645 m0=0.60566; proved bound only if conditional mean = m0
+student_t3,"e-detector, KNOWN baseline (theorem)",1950,417,3000,0.139,0.12708145096867082,0.15184191170131825,0.25,0.556,within bound,tau=1.9645 m0=0.60566; proved bound only if conditional mean = m0
+student_t3,monitor plugin band0.25 (README),98,0,3000,0.0,1.0842021724855044e-19,0.0012788956648046956,0.012564102564102564,0.0,within bound,approximate: plug-in baseline
+student_t3,monitor plugin band0.25 (README),390,1,3000,0.0003333333333333333,5.884242821930163e-05,0.0018858673061421909,0.05,0.006666666666666666,within bound,approximate: plug-in baseline
+student_t3,monitor plugin band0.25 (README),1950,2,3000,0.0006666666666666666,0.0001828392603776389,0.0024276845435406507,0.25,0.0026666666666666666,within bound,approximate: plug-in baseline
+student_t3,monitor plugin band0,98,2,3000,0.0006666666666666666,0.0001828392603776389,0.0024276845435406507,0.012564102564102564,0.053061224489795916,within bound,approximate: plug-in baseline
+student_t3,monitor plugin band0,390,74,3000,0.024666666666666667,0.019694469784330815,0.030854667027676856,0.05,0.4933333333333333,within bound,approximate: plug-in baseline
+student_t3,monitor plugin band0,1950,817,3000,0.2723333333333333,0.2567021578154648,0.288546832677243,0.25,1.0893333333333333,EXCEEDS bound,approximate: plug-in baseline
+student_t3,monitor cs baseline delta0.01,98,0,3000,0.0,1.0842021724855044e-19,0.0012788956648046956,0.022564102564102566,0.0,within bound,proved bound delta+m/A if iid-type null
+student_t3,monitor cs baseline delta0.01,390,1,3000,0.0003333333333333333,5.884242821930163e-05,0.0018858673061421909,0.060000000000000005,0.005555555555555555,within bound,proved bound delta+m/A if iid-type null
+student_t3,monitor cs baseline delta0.01,1950,7,3000,0.0023333333333333335,0.0011307176584015297,0.004808876493300746,0.26,0.008974358974358975,within bound,proved bound delta+m/A if iid-type null
+student_t3,Gaussian LR monitor (baseline),98,2494,3000,0.8313333333333334,0.8175116810622818,0.8443075040771744,0.012564102564102564,66.16734693877551,EXCEEDS bound,valid only for exactly normal returns
+student_t3,Gaussian LR monitor (baseline),390,3000,3000,1.0,0.9987211043351955,1.0000000000000002,0.05,20.0,EXCEEDS bound,valid only for exactly normal returns
+student_t3,Gaussian LR monitor (baseline),1950,3000,3000,1.0,0.9987211043351955,1.0000000000000002,0.25,4.0,EXCEEDS bound,valid only for exactly normal returns
+student_t3,Page CUSUM up (Gaussian-calibrated),98,2622,3000,0.874,0.8616445770517025,0.8853988089910236,,,n/a (no bound),no finite-sample guarantee; threshold set for ARL=A on Gaussian
+student_t3,Page CUSUM up (Gaussian-calibrated),390,3000,3000,1.0,0.9987211043351955,1.0000000000000002,,,n/a (no bound),no finite-sample guarantee; threshold set for ARL=A on Gaussian
+student_t3,Page CUSUM up (Gaussian-calibrated),1950,3000,3000,1.0,0.9987211043351955,1.0000000000000002,,,n/a (no bound),no finite-sample guarantee; threshold set for ARL=A on Gaussian
+student_t3,repeated 60-step z-test,98,2860,3000,0.9533333333333334,0.9451883326170682,0.9603188019801756,,,n/a (no bound),not anytime-valid by design
+student_t3,repeated 60-step z-test,390,3000,3000,1.0,0.9987211043351955,1.0000000000000002,,,n/a (no bound),not anytime-valid by design
+student_t3,repeated 60-step z-test,1950,3000,3000,1.0,0.9987211043351955,1.0000000000000002,,,n/a (no bound),not anytime-valid by design
+student_t5,"e-detector, KNOWN baseline (theorem)",98,5,3000,0.0016666666666666668,0.0007120934361692268,0.003895872576419453,0.012564102564102564,0.1326530612244898,within bound,tau=2.5025 m0=0.86449; proved bound only if conditional mean = m0
+student_t5,"e-detector, KNOWN baseline (theorem)",390,40,3000,0.013333333333333334,0.009806999344136478,0.018104459102940097,0.05,0.26666666666666666,within bound,tau=2.5025 m0=0.86449; proved bound only if conditional mean = m0
+student_t5,"e-detector, KNOWN baseline (theorem)",1950,402,3000,0.134,0.12227679764023063,0.14665935398640645,0.25,0.536,within bound,tau=2.5025 m0=0.86449; proved bound only if conditional mean = m0
+student_t5,monitor plugin band0.25 (README),98,0,3000,0.0,1.0842021724855044e-19,0.0012788956648046956,0.012564102564102564,0.0,within bound,approximate: plug-in baseline
+student_t5,monitor plugin band0.25 (README),390,0,3000,0.0,1.0842021724855044e-19,0.0012788956648046956,0.05,0.0,within bound,approximate: plug-in baseline
+student_t5,monitor plugin band0.25 (README),1950,3,3000,0.001,0.0003401410630165598,0.002936196810458527,0.25,0.004,within bound,approximate: plug-in baseline
+student_t5,monitor plugin band0,98,6,3000,0.002,0.0009169177531076662,0.004356862329037811,0.012564102564102564,0.15918367346938775,within bound,approximate: plug-in baseline
+student_t5,monitor plugin band0,390,82,3000,0.027333333333333334,0.022075537235048376,0.03380011213341367,0.05,0.5466666666666666,within bound,approximate: plug-in baseline
+student_t5,monitor plugin band0,1950,821,3000,0.27366666666666667,0.2580095250845345,0.28990272168640047,0.25,1.0946666666666667,EXCEEDS bound,approximate: plug-in baseline
+student_t5,monitor cs baseline delta0.01,98,0,3000,0.0,1.0842021724855044e-19,0.0012788956648046956,0.022564102564102566,0.0,within bound,proved bound delta+m/A if iid-type null
+student_t5,monitor cs baseline delta0.01,390,0,3000,0.0,1.0842021724855044e-19,0.0012788956648046956,0.060000000000000005,0.0,within bound,proved bound delta+m/A if iid-type null
+student_t5,monitor cs baseline delta0.01,1950,4,3000,0.0013333333333333333,0.0005186172629797156,0.0034235346800521676,0.26,0.005128205128205128,within bound,proved bound delta+m/A if iid-type null
+student_t5,Gaussian LR monitor (baseline),98,1321,3000,0.44033333333333335,0.4226564233659672,0.45816285818336633,0.012564102564102564,35.046938775510206,EXCEEDS bound,valid only for exactly normal returns
+student_t5,Gaussian LR monitor (baseline),390,2800,3000,0.9333333333333333,0.9238414243207494,0.9417168661030867,0.05,18.666666666666664,EXCEEDS bound,valid only for exactly normal returns
+student_t5,Gaussian LR monitor (baseline),1950,3000,3000,1.0,0.9987211043351955,1.0000000000000002,0.25,4.0,EXCEEDS bound,valid only for exactly normal returns
+student_t5,Page CUSUM up (Gaussian-calibrated),98,1592,3000,0.5306666666666666,0.5127802422631308,0.5484746521360945,,,n/a (no bound),no finite-sample guarantee; threshold set for ARL=A on Gaussian
+student_t5,Page CUSUM up (Gaussian-calibrated),390,2875,3000,0.9583333333333334,0.9505770543735577,0.9649172912670383,,,n/a (no bound),no finite-sample guarantee; threshold set for ARL=A on Gaussian
+student_t5,Page CUSUM up (Gaussian-calibrated),1950,3000,3000,1.0,0.9987211043351955,1.0000000000000002,,,n/a (no bound),no finite-sample guarantee; threshold set for ARL=A on Gaussian
+student_t5,repeated 60-step z-test,98,2317,3000,0.7723333333333333,0.7569852022846011,0.7869848925433021,,,n/a (no bound),not anytime-valid by design
+student_t5,repeated 60-step z-test,390,2996,3000,0.9986666666666667,0.996576465319948,0.9994813827370204,,,n/a (no bound),not anytime-valid by design
+student_t5,repeated 60-step z-test,1950,3000,3000,1.0,0.9987211043351955,1.0000000000000002,,,n/a (no bound),not anytime-valid by design
+jumps_p1pct_sd8,"e-detector, KNOWN baseline (theorem)",98,2,3000,0.0006666666666666666,0.0001828392603776389,0.0024276845435406507,0.012564102564102564,0.053061224489795916,within bound,tau=3.0327 m0=1.05918; proved bound only if conditional mean = m0
+jumps_p1pct_sd8,"e-detector, KNOWN baseline (theorem)",390,32,3000,0.010666666666666666,0.007565855531414626,0.01501909035920757,0.05,0.21333333333333332,within bound,tau=3.0327 m0=1.05918; proved bound only if conditional mean = m0
+jumps_p1pct_sd8,"e-detector, KNOWN baseline (theorem)",1950,388,3000,0.12933333333333333,0.11779753439916263,0.14181722025367927,0.25,0.5173333333333333,within bound,tau=3.0327 m0=1.05918; proved bound only if conditional mean = m0
+jumps_p1pct_sd8,monitor plugin band0.25 (README),98,0,3000,0.0,1.0842021724855044e-19,0.0012788956648046956,0.012564102564102564,0.0,within bound,approximate: plug-in baseline
+jumps_p1pct_sd8,monitor plugin band0.25 (README),390,1,3000,0.0003333333333333333,5.884242821930163e-05,0.0018858673061421909,0.05,0.006666666666666666,within bound,approximate: plug-in baseline
+jumps_p1pct_sd8,monitor plugin band0.25 (README),1950,1,3000,0.0003333333333333333,5.884242821930163e-05,0.0018858673061421909,0.25,0.0013333333333333333,within bound,approximate: plug-in baseline
+jumps_p1pct_sd8,monitor plugin band0,98,2,3000,0.0006666666666666666,0.0001828392603776389,0.0024276845435406507,0.012564102564102564,0.053061224489795916,within bound,approximate: plug-in baseline
+jumps_p1pct_sd8,monitor plugin band0,390,60,3000,0.02,0.015569745484900102,0.02565799435331241,0.05,0.39999999999999997,within bound,approximate: plug-in baseline
+jumps_p1pct_sd8,monitor plugin band0,1950,841,3000,0.2803333333333333,0.26454903089336324,0.2966794972687077,0.25,1.1213333333333333,EXCEEDS bound,approximate: plug-in baseline
+jumps_p1pct_sd8,monitor cs baseline delta0.01,98,0,3000,0.0,1.0842021724855044e-19,0.0012788956648046956,0.022564102564102566,0.0,within bound,proved bound delta+m/A if iid-type null
+jumps_p1pct_sd8,monitor cs baseline delta0.01,390,1,3000,0.0003333333333333333,5.884242821930163e-05,0.0018858673061421909,0.060000000000000005,0.005555555555555555,within bound,proved bound delta+m/A if iid-type null
+jumps_p1pct_sd8,monitor cs baseline delta0.01,1950,2,3000,0.0006666666666666666,0.0001828392603776389,0.0024276845435406507,0.26,0.002564102564102564,within bound,proved bound delta+m/A if iid-type null
+jumps_p1pct_sd8,Gaussian LR monitor (baseline),98,1253,3000,0.4176666666666667,0.40013490897436815,0.4354090158451031,0.012564102564102564,33.24285714285715,EXCEEDS bound,valid only for exactly normal returns
+jumps_p1pct_sd8,Gaussian LR monitor (baseline),390,2662,3000,0.8873333333333333,0.8755198352254042,0.8981561135995938,0.05,17.746666666666666,EXCEEDS bound,valid only for exactly normal returns
+jumps_p1pct_sd8,Gaussian LR monitor (baseline),1950,3000,3000,1.0,0.9987211043351955,1.0000000000000002,0.25,4.0,EXCEEDS bound,valid only for exactly normal returns
+jumps_p1pct_sd8,Page CUSUM up (Gaussian-calibrated),98,1263,3000,0.421,0.40344451736021597,0.4387575481548232,,,n/a (no bound),no finite-sample guarantee; threshold set for ARL=A on Gaussian
+jumps_p1pct_sd8,Page CUSUM up (Gaussian-calibrated),390,2660,3000,0.8866666666666667,0.8748249430247959,0.8975193776610888,,,n/a (no bound),no finite-sample guarantee; threshold set for ARL=A on Gaussian
+jumps_p1pct_sd8,Page CUSUM up (Gaussian-calibrated),1950,3000,3000,1.0,0.9987211043351955,1.0000000000000002,,,n/a (no bound),no finite-sample guarantee; threshold set for ARL=A on Gaussian
+jumps_p1pct_sd8,repeated 60-step z-test,98,1694,3000,0.5646666666666667,0.5468531244302756,0.5823148050637431,,,n/a (no bound),not anytime-valid by design
+jumps_p1pct_sd8,repeated 60-step z-test,390,2927,3000,0.9756666666666667,0.9695146386748765,0.9806020385826728,,,n/a (no bound),not anytime-valid by design
+jumps_p1pct_sd8,repeated 60-step z-test,1950,3000,3000,1.0,0.9987211043351955,1.0000000000000002,,,n/a (no bound),not anytime-valid by design
+pareto_alpha1.5,"e-detector, KNOWN baseline (theorem)",98,6,3000,0.002,0.0009169177531076662,0.004356862329037811,0.012564102564102564,0.15918367346938775,within bound,tau=7.0616 m0=7.62475; proved bound only if conditional mean = m0
+pareto_alpha1.5,"e-detector, KNOWN baseline (theorem)",390,47,3000,0.015666666666666666,0.011802128732170014,0.02077002820180414,0.05,0.3133333333333333,within bound,tau=7.0616 m0=7.62475; proved bound only if conditional mean = m0
+pareto_alpha1.5,"e-detector, KNOWN baseline (theorem)",1950,442,3000,0.14733333333333334,0.13510105110871934,0.16046766330018963,0.25,0.5893333333333334,within bound,tau=7.0616 m0=7.62475; proved bound only if conditional mean = m0
+pareto_alpha1.5,monitor plugin band0.25 (README),98,0,3000,0.0,1.0842021724855044e-19,0.0012788956648046956,0.012564102564102564,0.0,within bound,approximate: plug-in baseline
+pareto_alpha1.5,monitor plugin band0.25 (README),390,0,3000,0.0,1.0842021724855044e-19,0.0012788956648046956,0.05,0.0,within bound,approximate: plug-in baseline
+pareto_alpha1.5,monitor plugin band0.25 (README),1950,0,3000,0.0,1.0842021724855044e-19,0.0012788956648046956,0.25,0.0,within bound,approximate: plug-in baseline
+pareto_alpha1.5,monitor plugin band0,98,11,3000,0.0036666666666666666,0.0020486472682496883,0.006554203161679772,0.012564102564102564,0.29183673469387755,within bound,approximate: plug-in baseline
+pareto_alpha1.5,monitor plugin band0,390,92,3000,0.030666666666666665,0.025071976887149024,0.037461813176880986,0.05,0.6133333333333333,within bound,approximate: plug-in baseline
+pareto_alpha1.5,monitor plugin band0,1950,820,3000,0.2733333333333333,0.2576826664512149,0.2895637662501633,0.25,1.0933333333333333,EXCEEDS bound,approximate: plug-in baseline
+pareto_alpha1.5,monitor cs baseline delta0.01,98,0,3000,0.0,1.0842021724855044e-19,0.0012788956648046956,0.022564102564102566,0.0,within bound,proved bound delta+m/A if iid-type null
+pareto_alpha1.5,monitor cs baseline delta0.01,390,1,3000,0.0003333333333333333,5.884242821930163e-05,0.0018858673061421909,0.060000000000000005,0.005555555555555555,within bound,proved bound delta+m/A if iid-type null
+pareto_alpha1.5,monitor cs baseline delta0.01,1950,3,3000,0.001,0.0003401410630165598,0.002936196810458527,0.26,0.003846153846153846,within bound,proved bound delta+m/A if iid-type null
+pareto_alpha1.5,Gaussian LR monitor (baseline),98,2836,3000,0.9453333333333334,0.9366142325655463,0.9529133643623345,0.012564102564102564,75.24081632653062,EXCEEDS bound,valid only for exactly normal returns
+pareto_alpha1.5,Gaussian LR monitor (baseline),390,3000,3000,1.0,0.9987211043351955,1.0000000000000002,0.05,20.0,EXCEEDS bound,valid only for exactly normal returns
+pareto_alpha1.5,Gaussian LR monitor (baseline),1950,3000,3000,1.0,0.9987211043351955,1.0000000000000002,0.25,4.0,EXCEEDS bound,valid only for exactly normal returns
+pareto_alpha1.5,Page CUSUM up (Gaussian-calibrated),98,2862,3000,0.954,0.9459053827422866,0.9609333799940708,,,n/a (no bound),no finite-sample guarantee; threshold set for ARL=A on Gaussian
+pareto_alpha1.5,Page CUSUM up (Gaussian-calibrated),390,3000,3000,1.0,0.9987211043351955,1.0000000000000002,,,n/a (no bound),no finite-sample guarantee; threshold set for ARL=A on Gaussian
+pareto_alpha1.5,Page CUSUM up (Gaussian-calibrated),1950,3000,3000,1.0,0.9987211043351955,1.0000000000000002,,,n/a (no bound),no finite-sample guarantee; threshold set for ARL=A on Gaussian
+pareto_alpha1.5,repeated 60-step z-test,98,2936,3000,0.9786666666666667,0.9728510594717202,0.9832579444118402,,,n/a (no bound),not anytime-valid by design
+pareto_alpha1.5,repeated 60-step z-test,390,3000,3000,1.0,0.9987211043351955,1.0000000000000002,,,n/a (no bound),not anytime-valid by design
+pareto_alpha1.5,repeated 60-step z-test,1950,3000,3000,1.0,0.9987211043351955,1.0000000000000002,,,n/a (no bound),not anytime-valid by design
+garch_0.05_0.90,"e-detector, KNOWN baseline (theorem)",98,184,3000,0.06133333333333333,0.05329534555759481,0.07049333890566052,0.012564102564102564,4.881632653061224,EXCEEDS bound,tau=2.9452 m0=0.98929; proved bound only if conditional mean = m0
+garch_0.05_0.90,"e-detector, KNOWN baseline (theorem)",390,1136,3000,0.37866666666666665,0.36147478261677723,0.39616889606454875,0.05,7.573333333333332,EXCEEDS bound,tau=2.9452 m0=0.98929; proved bound only if conditional mean = m0
+garch_0.05_0.90,"e-detector, KNOWN baseline (theorem)",1950,2916,3000,0.972,0.9654658634459935,0.9773268590464309,0.25,3.888,EXCEEDS bound,tau=2.9452 m0=0.98929; proved bound only if conditional mean = m0
+garch_0.05_0.90,monitor plugin band0.25 (README),98,40,3000,0.013333333333333334,0.009806999344136478,0.018104459102940097,0.012564102564102564,1.0612244897959184,inconclusive,approximate: plug-in baseline
+garch_0.05_0.90,monitor plugin band0.25 (README),390,219,3000,0.073,0.06422716355771653,0.08286501334002667,0.05,1.4599999999999997,EXCEEDS bound,approximate: plug-in baseline
+garch_0.05_0.90,monitor plugin band0.25 (README),1950,1017,3000,0.339,0.32227616335612774,0.3561356410479395,0.25,1.356,EXCEEDS bound,approximate: plug-in baseline
+garch_0.05_0.90,monitor plugin band0,98,198,3000,0.066,0.057658731677105786,0.07545134975994472,0.012564102564102564,5.253061224489796,EXCEEDS bound,approximate: plug-in baseline
+garch_0.05_0.90,monitor plugin band0,390,1289,3000,0.42966666666666664,0.41205335058527726,0.4474598807382386,0.05,8.593333333333332,EXCEEDS bound,approximate: plug-in baseline
+garch_0.05_0.90,monitor plugin band0,1950,2939,3000,0.9796666666666667,0.9739687591983743,0.9841376868938565,0.25,3.9186666666666667,EXCEEDS bound,approximate: plug-in baseline
+garch_0.05_0.90,monitor cs baseline delta0.01,98,43,3000,0.014333333333333333,0.010658652128033432,0.019250248527713534,0.022564102564102566,0.6352272727272726,within bound,proved bound delta+m/A if iid-type null
+garch_0.05_0.90,monitor cs baseline delta0.01,390,266,3000,0.08866666666666667,0.0790134384978631,0.09937199966904958,0.060000000000000005,1.4777777777777776,EXCEEDS bound,proved bound delta+m/A if iid-type null
+garch_0.05_0.90,monitor cs baseline delta0.01,1950,1275,3000,0.425,0.4074171353109683,0.4427746990387525,0.26,1.6346153846153846,EXCEEDS bound,proved bound delta+m/A if iid-type null
+garch_0.05_0.90,Gaussian LR monitor (baseline),98,398,3000,0.13266666666666665,0.12099649763474854,0.14527639771366133,0.012564102564102564,10.559183673469388,EXCEEDS bound,valid only for exactly normal returns
+garch_0.05_0.90,Gaussian LR monitor (baseline),390,1768,3000,0.5893333333333334,0.5716255975195417,0.60681257312168,0.05,11.786666666666667,EXCEEDS bound,valid only for exactly normal returns
+garch_0.05_0.90,Gaussian LR monitor (baseline),1950,2976,3000,0.992,0.9881234414029639,0.9946181252628684,0.25,3.968,EXCEEDS bound,valid only for exactly normal returns
+garch_0.05_0.90,Page CUSUM up (Gaussian-calibrated),98,422,3000,0.14066666666666666,0.1286842100139114,0.15356822300386158,,,n/a (no bound),no finite-sample guarantee; threshold set for ARL=A on Gaussian
+garch_0.05_0.90,Page CUSUM up (Gaussian-calibrated),390,1446,3000,0.482,0.4641537704474057,0.49989226979652734,,,n/a (no bound),no finite-sample guarantee; threshold set for ARL=A on Gaussian
+garch_0.05_0.90,Page CUSUM up (Gaussian-calibrated),1950,2764,3000,0.9213333333333333,0.9111517519852578,0.9304372319345336,,,n/a (no bound),no finite-sample guarantee; threshold set for ARL=A on Gaussian
+garch_0.05_0.90,repeated 60-step z-test,98,1536,3000,0.512,0.4941089717056277,0.5298603347984171,,,n/a (no bound),not anytime-valid by design
+garch_0.05_0.90,repeated 60-step z-test,390,2938,3000,0.9793333333333333,0.9735958579819799,0.9838447740406939,,,n/a (no bound),not anytime-valid by design
+garch_0.05_0.90,repeated 60-step z-test,1950,3000,3000,1.0,0.9987211043351955,1.0000000000000002,,,n/a (no bound),not anytime-valid by design
+garch_0.08_0.90,"e-detector, KNOWN baseline (theorem)",98,496,3000,0.16533333333333333,0.1524696661807524,0.1790530079842236,0.012564102564102564,13.159183673469387,EXCEEDS bound,tau=2.7592 m0=0.95115; proved bound only if conditional mean = m0
+garch_0.08_0.90,"e-detector, KNOWN baseline (theorem)",390,2607,3000,0.869,0.8564528688683888,0.8806033061309855,0.05,17.38,EXCEEDS bound,tau=2.7592 m0=0.95115; proved bound only if conditional mean = m0
+garch_0.08_0.90,"e-detector, KNOWN baseline (theorem)",1950,3000,3000,1.0,0.9987211043351955,1.0000000000000002,0.25,4.0,EXCEEDS bound,tau=2.7592 m0=0.95115; proved bound only if conditional mean = m0
+garch_0.08_0.90,monitor plugin band0.25 (README),98,293,3000,0.09766666666666667,0.08755242127954076,0.10880999676540544,0.012564102564102564,7.773469387755102,EXCEEDS bound,approximate: plug-in baseline
+garch_0.08_0.90,monitor plugin band0.25 (README),390,1407,3000,0.469,0.4511931763877733,0.48688611514344465,0.05,9.379999999999999,EXCEEDS bound,approximate: plug-in baseline
+garch_0.08_0.90,monitor plugin band0.25 (README),1950,2908,3000,0.9693333333333334,0.9625381868231192,0.9749280231128511,0.25,3.8773333333333335,EXCEEDS bound,approximate: plug-in baseline
+garch_0.08_0.90,monitor plugin band0,98,611,3000,0.20366666666666666,0.18963858849945578,0.21845270366455186,0.012564102564102564,16.210204081632654,EXCEEDS bound,approximate: plug-in baseline
+garch_0.08_0.90,monitor plugin band0,390,2651,3000,0.8836666666666667,0.871699451864478,0.8946525421953954,0.05,17.673333333333332,EXCEEDS bound,approximate: plug-in baseline
+garch_0.08_0.90,monitor plugin band0,1950,3000,3000,1.0,0.9987211043351955,1.0000000000000002,0.25,4.0,EXCEEDS bound,approximate: plug-in baseline
+garch_0.08_0.90,monitor cs baseline delta0.01,98,356,3000,0.11866666666666667,0.10757890413593514,0.1307298002910893,0.022564102564102566,5.259090909090909,EXCEEDS bound,proved bound delta+m/A if iid-type null
+garch_0.08_0.90,monitor cs baseline delta0.01,390,1660,3000,0.5533333333333333,0.5354861823779503,0.5710440687511372,0.060000000000000005,9.222222222222221,EXCEEDS bound,proved bound delta+m/A if iid-type null
+garch_0.08_0.90,monitor cs baseline delta0.01,1950,2964,3000,0.988,0.9834322851964714,0.9913195126346792,0.26,3.8,EXCEEDS bound,proved bound delta+m/A if iid-type null
+garch_0.08_0.90,Gaussian LR monitor (baseline),98,1315,3000,0.43833333333333335,0.42066771266440195,0.4561566844675907,0.012564102564102564,34.88775510204082,EXCEEDS bound,valid only for exactly normal returns
+garch_0.08_0.90,Gaussian LR monitor (baseline),390,2832,3000,0.944,0.9351902063013525,0.951674134348301,0.05,18.88,EXCEEDS bound,valid only for exactly normal returns
+garch_0.08_0.90,Gaussian LR monitor (baseline),1950,3000,3000,1.0,0.9987211043351955,1.0000000000000002,0.25,4.0,EXCEEDS bound,valid only for exactly normal returns
+garch_0.08_0.90,Page CUSUM up (Gaussian-calibrated),98,912,3000,0.304,0.28779901644256545,0.320702310658038,,,n/a (no bound),no finite-sample guarantee; threshold set for ARL=A on Gaussian
+garch_0.08_0.90,Page CUSUM up (Gaussian-calibrated),390,2160,3000,0.72,0.7036592367439198,0.7357780491635662,,,n/a (no bound),no finite-sample guarantee; threshold set for ARL=A on Gaussian
+garch_0.08_0.90,Page CUSUM up (Gaussian-calibrated),1950,2960,3000,0.9866666666666667,0.98189554089706,0.9901930006558637,,,n/a (no bound),no finite-sample guarantee; threshold set for ARL=A on Gaussian
+garch_0.08_0.90,repeated 60-step z-test,98,2197,3000,0.7323333333333333,0.7162002006640801,0.7478722058170072,,,n/a (no bound),not anytime-valid by design
+garch_0.08_0.90,repeated 60-step z-test,390,2996,3000,0.9986666666666667,0.996576465319948,0.9994813827370204,,,n/a (no bound),not anytime-valid by design
+garch_0.08_0.90,repeated 60-step z-test,1950,3000,3000,1.0,0.9987211043351955,1.0000000000000002,,,n/a (no bound),not anytime-valid by design
+unremoved_seasonality,"e-detector, KNOWN baseline (theorem)",98,134,3000,0.04466666666666667,0.03783875645801978,0.05265922452739571,0.012564102564102564,3.5551020408163265,EXCEEDS bound,tau=2.8970 m0=0.98570; proved bound only if conditional mean = m0
+unremoved_seasonality,"e-detector, KNOWN baseline (theorem)",390,1621,3000,0.5403333333333333,0.5224591223934123,0.5581043800229601,0.05,10.806666666666667,EXCEEDS bound,tau=2.8970 m0=0.98570; proved bound only if conditional mean = m0
+unremoved_seasonality,"e-detector, KNOWN baseline (theorem)",1950,2979,3000,0.993,0.9893220254101368,0.9954169834643659,0.25,3.972,EXCEEDS bound,tau=2.8970 m0=0.98570; proved bound only if conditional mean = m0
+unremoved_seasonality,monitor plugin band0.25 (README),98,21,3000,0.007,0.004583016535634131,0.0106779745898633,0.012564102564102564,0.5571428571428572,within bound,approximate: plug-in baseline
+unremoved_seasonality,monitor plugin band0.25 (README),390,73,3000,0.024333333333333332,0.019397961417327268,0.030485361325123604,0.05,0.48666666666666664,within bound,approximate: plug-in baseline
+unremoved_seasonality,monitor plugin band0.25 (README),1950,407,3000,0.13566666666666666,0.12387773551417747,0.14838748646024358,0.25,0.5426666666666666,within bound,approximate: plug-in baseline
+unremoved_seasonality,monitor plugin band0,98,209,3000,0.06966666666666667,0.06109604032327277,0.0793379958789025,0.012564102564102564,5.544897959183674,EXCEEDS bound,approximate: plug-in baseline
+unremoved_seasonality,monitor plugin band0,390,1707,3000,0.569,0.5512017906173033,0.5866217217809536,0.05,11.379999999999999,EXCEEDS bound,approximate: plug-in baseline
+unremoved_seasonality,monitor plugin band0,1950,2991,3000,0.997,0.9943078922069902,0.998420885502194,0.25,3.988,EXCEEDS bound,approximate: plug-in baseline
+unremoved_seasonality,monitor cs baseline delta0.01,98,16,3000,0.005333333333333333,0.0032855469144743112,0.008646373863239135,0.022564102564102566,0.23636363636363633,within bound,proved bound delta+m/A if iid-type null
+unremoved_seasonality,monitor cs baseline delta0.01,390,95,3000,0.03166666666666667,0.02597477715944998,0.03855645511325043,0.060000000000000005,0.5277777777777778,within bound,proved bound delta+m/A if iid-type null
+unremoved_seasonality,monitor cs baseline delta0.01,1950,564,3000,0.188,0.17442080705243138,0.20237722384240678,0.26,0.7230769230769231,within bound,proved bound delta+m/A if iid-type null
+unremoved_seasonality,Gaussian LR monitor (baseline),98,702,3000,0.234,0.2191958770442105,0.24948449544946566,0.012564102564102564,18.624489795918368,EXCEEDS bound,valid only for exactly normal returns
+unremoved_seasonality,Gaussian LR monitor (baseline),390,2510,3000,0.8366666666666667,0.8230091031676273,0.8494631070847375,0.05,16.73333333333333,EXCEEDS bound,valid only for exactly normal returns
+unremoved_seasonality,Gaussian LR monitor (baseline),1950,3000,3000,1.0,0.9987211043351955,1.0000000000000002,0.25,4.0,EXCEEDS bound,valid only for exactly normal returns
+unremoved_seasonality,Page CUSUM up (Gaussian-calibrated),98,690,3000,0.23,0.21529167583472894,0.24539892782426567,,,n/a (no bound),no finite-sample guarantee; threshold set for ARL=A on Gaussian
+unremoved_seasonality,Page CUSUM up (Gaussian-calibrated),390,2237,3000,0.7456666666666667,0.7297756244445152,0.7609293448188442,,,n/a (no bound),no finite-sample guarantee; threshold set for ARL=A on Gaussian
+unremoved_seasonality,Page CUSUM up (Gaussian-calibrated),1950,2964,3000,0.988,0.9834322851964714,0.9913195126346792,,,n/a (no bound),no finite-sample guarantee; threshold set for ARL=A on Gaussian
+unremoved_seasonality,repeated 60-step z-test,98,2063,3000,0.6876666666666666,0.6708513664077966,0.7040019547526799,,,n/a (no bound),not anytime-valid by design
+unremoved_seasonality,repeated 60-step z-test,390,2999,3000,0.9996666666666667,0.9981141326938581,0.9999411575717809,,,n/a (no bound),not anytime-valid by design
+unremoved_seasonality,repeated 60-step z-test,1950,3000,3000,1.0,0.9987211043351955,1.0000000000000002,,,n/a (no bound),not anytime-valid by design

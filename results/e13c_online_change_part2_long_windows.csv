@@ -1,0 +1,13 @@
+scenario,ratio,method,paths,false_alarm_before_change,detected,median_delay,mean_delay,correct_direction,detected_within_390
+gaussian,1.25,"BJV rolling, k=250, matched",200,0.02,0.81,196.0,191.17283950617283,1.0,0.8
+gaussian,1.25,"BJV rolling, k=500, matched",200,0.03,0.96,277.0,288.4479166666667,1.0,0.855
+gaussian,1.5,"BJV rolling, k=250, matched",200,0.02,0.98,98.5,102.05102040816327,1.0,0.98
+gaussian,1.5,"BJV rolling, k=500, matched",200,0.015,0.985,131.0,134.88832487309645,1.0,0.985
+gaussian,2.0,"BJV rolling, k=250, matched",200,0.025,0.975,52.0,52.09230769230769,1.0,0.975
+gaussian,2.0,"BJV rolling, k=500, matched",200,0.01,0.99,67.5,68.36868686868686,1.0,0.99
+gaussian,0.8,"BJV rolling, k=250, matched",200,0.02,0.735,213.0,211.8843537414966,1.0,0.725
+gaussian,0.8,"BJV rolling, k=500, matched",200,0.03,0.96,326.5,316.7395833333333,1.0,0.745
+gaussian,0.67,"BJV rolling, k=250, matched",200,0.015,0.985,151.0,148.08629441624365,1.0,0.985
+gaussian,0.67,"BJV rolling, k=500, matched",200,0.02,0.98,218.5,217.72448979591837,0.9948979591836735,0.98
+gaussian,0.5,"BJV rolling, k=250, matched",200,0.03,0.97,114.5,111.85051546391753,0.9948453608247423,0.97
+gaussian,0.5,"BJV rolling, k=500, matched",200,0.015,0.985,171.0,169.41116751269035,1.0,0.985

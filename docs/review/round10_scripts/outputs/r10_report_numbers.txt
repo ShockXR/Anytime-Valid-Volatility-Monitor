@@ -1,0 +1,44 @@
+2024-2025 (E22 design) P1 BTC pooled: 13/38, control 0.080, p 6.52e-06; FOMC 8/16, CPI 5/22; watched 26; blind at release 1
+2024-2025 (E22 design) G1 BTC pooled: 13/38, control 0.080, p 6.21e-06; FOMC 9/16, CPI 4/22; watched 28; blind at release 0
+2024-2025 (E22 design) G0 BTC pooled: 13/38, control 0.080, p 6.21e-06; FOMC 9/16, CPI 4/22; watched 28; blind at release 0
+2024-2025 (E22 design) S2 BTC pooled: 23/38, control 0.154, p 5.7e-10; FOMC 13/16, CPI 10/22; watched 38; blind at release 0
+2026 (E23 design) P1 BTC pooled: 2/16, control 0.059, p 0.254; FOMC 1/6, CPI 1/10; watched 11; blind at release 3
+2026 (E23 design) G1 BTC pooled: 4/16, control 0.089, p 0.0564; FOMC 3/6, CPI 1/10; watched 12; blind at release 0
+2026 (E23 design) G0 BTC pooled: 4/16, control 0.089, p 0.0564; FOMC 3/6, CPI 1/10; watched 12; blind at release 0
+2026 (E23 design) S2 BTC pooled: 6/16, control 0.109, p 0.00703; FOMC 4/6, CPI 2/10; watched 16; blind at release 0
+2026 ETH pooled G1 vs P1: G1 5/16 p 0.023; P1 4/16
+2026 SOL pooled G1 vs P1: G1 5/16 p 0.032; P1 5/16
+BTC releases where G1 and P1 differ:
+                period       date event_type  up_post_G1  monitoring_at_start_G1  up_post_P1  monitoring_at_start_P1  tau2_over_m_up_at_release
+2024-2025 (E22 design) 2024-07-31       fomc       False                    True        True                    True                   1.981103
+2024-2025 (E22 design) 2025-01-29       fomc        True                    True       False                    True                   0.947856
+2024-2025 (E22 design) 2025-07-30       fomc        True                    True       False                   False                        NaN
+2024-2025 (E22 design) 2025-12-18        cpi       False                    True        True                    True                   3.661508
+     2026 (E23 design) 2026-06-17       fomc        True                    True       False                   False                        NaN
+     2026 (E23 design) 2026-09-16       fomc        True                   False       False                    True                   0.980110
+G1 period alarm share range: 0.456 to 0.525
+G1 alarms per monitored day range: 0.839 to 1.107
+G1 first-day share (first_day_alarms / segments_with_a_day): 2024-2025 BTC 0.683, 2024-2025 ETH 0.658, 2024-2025 SOL 0.607, 2026 (E23 BTC 0.691, 2026 (E23 ETH 0.621, 2026 (E23 SOL 0.615
+G1 BTC discarded / extra minutes: 2024-2025: 3, 4320, days 711.0, 2026 (E23: 5, 7200, days 297.0
+one discarded window per (days): 126 days = 4.1 months
+E19 diagnostic: unguarded rows matched / columns with a mismatch: 33 of 33 / 0
+future gate rows, columns, mismatches: 192, 14, 0
+selection rows (config, K, scheme, p_kept): 
+                                                             config  K                                    scheme                         p_single_window  p_kept_window_fails  formula_1_minus_prod
+                              P1 window (n_cs = 1080), delta = 0.01  1 same delta for every window (no spending)                               0.0002525             0.000252                   NaN
+                              P1 window (n_cs = 1080), delta = 0.01  1                       halving (Theorem 1)                               0.0002525             0.000252                   NaN
+                              P1 window (n_cs = 1080), delta = 0.01  2 same delta for every window (no spending)                     0.0002525;0.0002525             0.000505                   NaN
+                              P1 window (n_cs = 1080), delta = 0.01  2                       halving (Theorem 1)                     0.0001025;0.0001025             0.000205                   NaN
+                              P1 window (n_cs = 1080), delta = 0.01  3 same delta for every window (no spending)           0.0002525;0.0002525;0.0002525             0.000757                   NaN
+                              P1 window (n_cs = 1080), delta = 0.01  3                       halving (Theorem 1)             0.0001025;4.25e-05;4.25e-05             0.000187                   NaN
+                              P1 window (n_cs = 1080), delta = 0.01  4 same delta for every window (no spending) 0.0002525;0.0002525;0.0002525;0.0002525             0.001010                   NaN
+                              P1 window (n_cs = 1080), delta = 0.01  4                       halving (Theorem 1)    0.0001025;4.25e-05;2.75e-05;2.75e-05             0.000200                   NaN
+                             illustration (n_cs = 150), delta = 0.3  1 same delta for every window (no spending)                                0.013905             0.013905                   NaN
+                             illustration (n_cs = 150), delta = 0.3  1                       halving (Theorem 1)                                0.013905             0.013905                   NaN
+                             illustration (n_cs = 150), delta = 0.3  2 same delta for every window (no spending)                       0.013905;0.013905             0.027617                   NaN
+                             illustration (n_cs = 150), delta = 0.3  2                       halving (Theorem 1)                         0.00382;0.00382             0.007625                   NaN
+                             illustration (n_cs = 150), delta = 0.3  3 same delta for every window (no spending)              0.013905;0.013905;0.013905             0.041138                   NaN
+                             illustration (n_cs = 150), delta = 0.3  3                       halving (Theorem 1)               0.00382;0.001245;0.001245             0.006299                   NaN
+                             illustration (n_cs = 150), delta = 0.3  4 same delta for every window (no spending)     0.013905;0.013905;0.013905;0.013905             0.054471                   NaN
+                             illustration (n_cs = 150), delta = 0.3  4                       halving (Theorem 1)      0.00382;0.001245;0.000325;0.000325             0.005707                   NaN
+direct check through GuardedVolatilityMonitor (cal 200, n_cs = 150)  3           same delta 0.3 for every window                                  0.0144             0.043000              0.042581

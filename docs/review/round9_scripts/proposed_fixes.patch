@@ -1,0 +1,235 @@
+diff --git a/src/avmonitor/data.py b/src/avmonitor/data.py
+index ef63bdd..2325bd5 100644
+--- a/src/avmonitor/data.py
++++ b/src/avmonitor/data.py
+@@ -55,8 +55,10 @@ def load_bitstamp_csv(path: str | Path, start: str | None = None, end: str | Non
+         df = df[df.index >= pd.Timestamp(start, tz="UTC")]
+     if end is not None:
+         df = df[df.index < pd.Timestamp(end, tz="UTC")]
+-    df["logret"] = np.log(df["close"]).diff()
+     df["zero_volume"] = df["volume"] <= 0
++    # A filled (tradeless) minute repeats the previous close: no price was observed, so the returns on both
++    # sides of it are missing, not zero (docs/math.md 5.6, item 5), as for the gaps of load_binance.
++    df["logret"] = np.log(df["close"].where(~df["zero_volume"])).diff()
+     return df
+ 
+ 
+diff --git a/src/avmonitor/design.py b/src/avmonitor/design.py
+index 106854e..45c27a9 100644
+--- a/src/avmonitor/design.py
++++ b/src/avmonitor/design.py
+@@ -401,8 +401,10 @@ def sr_steps_constant_factor(A: float, F: float) -> int:
+     if not F > 1:
+         raise ValueError("F must exceed 1")
+     n = int(np.ceil(np.log1p(A * (F - 1.0) / F) / np.log(F)))
+-    while F * (F**n - 1.0) / (F - 1.0) < A:  # guard against rounding at an exact integer
++    while F * (F**n - 1.0) / (F - 1.0) < A:  # guard against rounding at an exact integer, both ways
+         n += 1
++    while n > 1 and F * (F ** (n - 1) - 1.0) / (F - 1.0) >= A:
++        n -= 1
+     return max(n, 1)
+ 
+ 
+diff --git a/src/avmonitor/detectors.py b/src/avmonitor/detectors.py
+index 8bfe14e..99bddaf 100644
+--- a/src/avmonitor/detectors.py
++++ b/src/avmonitor/detectors.py
+@@ -101,6 +101,9 @@ def calibrate(
+     tau = max(c * scale, floor)
+     x = np.minimum(r_cal**2, tau**2)
+     m0 = float(x.mean())
++    if not (tau > 0 and m0 > 0):
++        raise ValueError("degenerate calibration window (scale or truncated mean 0, for example more than half "
++                         "zero returns); pass floor > 0 or use a longer window")
+     v = float(x.var(ddof=1))
+     se = np.sqrt(v / len(x))
+     up = (m0 + margin_z * se) * (1 + null_band)
+@@ -116,6 +119,14 @@ DEFAULT_UP_GRID = (0.02, 0.05, 0.1, 0.2, 0.35, 0.5)
+ DEFAULT_DOWN_FRACTIONS = (0.1, 0.25, 0.5, 0.75, 0.95)
+ 
+ 
++def check_bets(up_grid, down_fractions) -> None:
++    """Raise unless every increase bet and every decrease fraction lies in [0, 1), so that every factor is positive."""
++    for name, v in (("increase bets", up_grid), ("decrease fractions", down_fractions)):
++        v = np.asarray(v, float)
++        if v.size == 0 or not np.all(np.isfinite(v)) or np.any(v < 0) or np.any(v >= 1):
++            raise ValueError(f"{name} must be finite and lie in [0, 1)")
++
++
+ @dataclass
+ class DetectorResult:
+     """Output of the array detectors: first alarm index per path (-1 if none) and optional paths."""
+@@ -194,11 +205,15 @@ def betting_edetector(
+     start : int
+         Monitoring starts at this index (earlier entries are ignored).
+ 
+-    Missing values (NaN) in ``x`` are skipped: the bet factor is 1 at that step
+-    (valid when missingness does not depend on the missing value, see
+-    ``docs/math.md`` 5.6). Before November 2026 a single NaN silently disabled
+-    the detector (independent review, m17).
++    Missing values (NaN) in ``x`` are skipped: the statistic is left unchanged at
++    that step (no bet and no new chain), as in ``VolatilityMonitor`` (valid when
++    missingness does not depend on the missing value, see ``docs/math.md`` 5.6).
++    Before November 2026 a single NaN silently disabled the detector (independent
++    review, m17), and until review round 9 (M1) a NaN step still added 1 to the
++    Shiryaev-Roberts statistic.
+     """
++    if not 0 <= lam_cap <= 1 or not 0 <= adaptive_weight <= 1:
++        raise ValueError("lam_cap and adaptive_weight must lie in [0, 1]")
+     x = np.atleast_2d(np.asarray(x, float))[:, start:]
+     reps, n = x.shape
+     y = x / m0
+@@ -239,7 +254,8 @@ def betting_edetector(
+     lam_path = np.empty(n) if (return_path and lam_adapt is not None) else None
+     for t in range(n):
+         g = sign * (y[:, t] - 1.0)  # gain per unit bet
+-        g = np.where(np.isfinite(g), g, 0.0)  # missing value: no bet
++        ok = np.isfinite(g)  # missing value: no bet and no new chain
++        g = np.where(ok, g, 0.0)
+         f = 1.0 + grid[None, :] * g[:, None]
+         if lam_adapt is not None:
+             f = np.concatenate([f, (1.0 + lam_adapt[:, t] * g)[:, None]], axis=1)
+@@ -247,9 +263,9 @@ def betting_edetector(
+                 lam_path[t] = lam_adapt[0, t]
+         with np.errstate(over="ignore"):
+             if kind == "SR":
+-                S = f * (S + 1.0)
++                S = np.where(ok[:, None], f * (S + 1.0), S)
+             elif kind == "CUSUM":
+-                S = f * np.maximum(S, 1.0)
++                S = np.where(ok[:, None], f * np.maximum(S, 1.0), S)
+             else:
+                 raise ValueError("kind must be 'SR' or 'CUSUM'")
+         M = S @ weights
+@@ -265,12 +281,10 @@ def betting_edetector(
+ 
+ def two_sided_alarm(up: DetectorResult, down: DetectorResult) -> np.ndarray:
+     """First alarm of either side. Run each side at threshold ``2 A`` to keep ARL >= A overall."""
+-    a, b = up.alarm.copy(), down.alarm.copy()
+-    a[a < 0] = np.iinfo(a.dtype).max
+-    b[b < 0] = np.iinfo(b.dtype).max
+-    out = np.minimum(a, b)
+-    out[out == np.iinfo(a.dtype).max] = -1
+-    return out
++    a, b = np.asarray(up.alarm, np.int64), np.asarray(down.alarm, np.int64)
++    big = np.iinfo(np.int64).max
++    out = np.minimum(np.where(a < 0, big, a), np.where(b < 0, big, b))
++    return np.where(out == big, -1, out)
+ 
+ 
+ # ----------------------------------------------------------------------------
+diff --git a/src/avmonitor/monitor.py b/src/avmonitor/monitor.py
+index 0e24ff9..7cb8ed7 100644
+--- a/src/avmonitor/monitor.py
++++ b/src/avmonitor/monitor.py
+@@ -76,7 +76,7 @@ from dataclasses import dataclass
+ import numpy as np
+ 
+ from .confseq import StreamingEBConfSeq
+-from .detectors import DEFAULT_DOWN_FRACTIONS, DEFAULT_UP_GRID
++from .detectors import DEFAULT_DOWN_FRACTIONS, DEFAULT_UP_GRID, check_bets
+ from .robust import MAD_NORMAL_SCALE
+ 
+ 
+@@ -140,6 +140,9 @@ class VolatilityMonitor:
+         self.band = null_band
+         self.up_grid = np.asarray(up_grid, float)
+         self.down_fractions = np.asarray(down_fractions, float)
++        check_bets(self.up_grid, self.down_fractions)
++        if not null_band >= 0:
++            raise ValueError("null_band must be nonnegative")
+         self.scale_floor = scale_floor
+         if baseline not in ("plugin", "cs"):
+             raise ValueError("baseline must be 'plugin' or 'cs'")
+diff --git a/src/avmonitor/multifreq.py b/src/avmonitor/multifreq.py
+index 9a7d9ad..2865a3d 100644
+--- a/src/avmonitor/multifreq.py
++++ b/src/avmonitor/multifreq.py
+@@ -72,7 +72,7 @@ from dataclasses import dataclass, field
+ 
+ import numpy as np
+ 
+-from .detectors import DEFAULT_DOWN_FRACTIONS, DEFAULT_UP_GRID
++from .detectors import DEFAULT_DOWN_FRACTIONS, DEFAULT_UP_GRID, check_bets
+ from .robust import MAD_NORMAL_SCALE
+ 
+ DEFAULT_FREQS = (1, 5, 15)
+@@ -356,6 +356,7 @@ class MultiFrequencyMonitor:
+         self.band = float(null_band)
+         self.up_grid = np.asarray(up_grid, float)
+         self.down_fractions = np.asarray(down_fractions, float)
++        check_bets(self.up_grid, self.down_fractions)
+         self.l_up = 1.0 - self.up_grid
+         self.l_dn = 1.0 - self.down_fractions
+         self.scale_floor = float(scale_floor)
+diff --git a/src/avmonitor/periodic.py b/src/avmonitor/periodic.py
+index 2c0d89f..fcc55ae 100644
+--- a/src/avmonitor/periodic.py
++++ b/src/avmonitor/periodic.py
+@@ -382,8 +382,9 @@ class PeriodicVolatilityMonitor(VolatilityMonitor):
+         if baseline == "known":
+             if tau is None or m0 is None:
+                 raise ValueError("baseline='known' needs tau and m0")
+-            if kw.get("margin_z") or kw.get("target_rel_width") is not None:
+-                raise ValueError("margin_z and target_rel_width do not apply to a known baseline")
++            if kw.get("margin_z") or kw.get("target_rel_width") is not None or kw.get("c_down") is not None:
++                raise ValueError("margin_z, target_rel_width and c_down do not apply to a known baseline "
++                                 "(give tau_down and m0_down for the decrease side)")
+             td = float(tau) if tau_down is None else float(tau_down)
+             md = float(m0) if m0_down is None else float(m0_down)
+             for name, (tt, mm) in (("increase", (float(tau), float(m0))), ("decrease", (td, md))):
+diff --git a/src/avmonitor/running.py b/src/avmonitor/running.py
+index 5bf49fb..4799a0e 100644
+--- a/src/avmonitor/running.py
++++ b/src/avmonitor/running.py
+@@ -52,7 +52,7 @@ import numpy as np
+ from scipy import optimize, special, stats
+ 
+ from .confseq import eb_confseq, psi_coef
+-from .detectors import DEFAULT_DOWN_FRACTIONS, DEFAULT_UP_GRID
++from .detectors import DEFAULT_DOWN_FRACTIONS, DEFAULT_UP_GRID, check_bets
+ from .monitor import Event
+ from .robust import MAD_NORMAL_SCALE
+ 
+@@ -352,7 +352,8 @@ def two_sided_sr(x, tau2, m_up, m_dn, levels, up_grid=DEFAULT_UP_GRID, down_frac
+     out = {L: [np.full(reps, -1), np.full(reps, -1)] for L in levels}
+     top = levels[-1]
+     for t in range(n):
+-        xt = x[:, t]
++        ok = np.isfinite(x[:, t])  # a missing return leaves both statistics unchanged, as in RunningTauMonitor
++        xt = np.where(ok, x[:, t], 0.0)
+         yu = xt / m_up[:, t]
+         on = (m_dn[:, t] > 0) & (tau2[:, t] > m_dn[:, t])
+         md = np.where(on, m_dn[:, t], 1.0)
+@@ -362,11 +363,11 @@ def two_sided_sr(x, tau2, m_up, m_dn, levels, up_grid=DEFAULT_UP_GRID, down_frac
+         fd = 1.0 + lam * (1.0 - (xt / md)[:, None])  # exactly 1 at an off step
+         with np.errstate(over="ignore"):
+             if kind == "SR":
+-                Su = fu * (Su + 1.0)
+-                Sd = fd * (Sd + on[:, None])  # an off step starts no chain
++                Su = np.where(ok[:, None], fu * (Su + 1.0), Su)
++                Sd = np.where(ok[:, None], fd * (Sd + on[:, None]), Sd)  # an off step starts no chain
+             else:
+-                Su = fu * np.maximum(Su, 1.0)
+-                Sd = np.where(on[:, None], fd * np.maximum(Sd, 1.0), Sd)
++                Su = np.where(ok[:, None], fu * np.maximum(Su, 1.0), Su)
++                Sd = np.where((on & ok)[:, None], fd * np.maximum(Sd, 1.0), Sd)
+         Mu = Su.mean(axis=1)
+         Md = Sd.mean(axis=1)
+         for L in levels:
+@@ -654,6 +655,7 @@ class RunningTauMonitor:
+         self.every = every
+         self.up_grid = np.asarray(up_grid, float)
+         self.down_fractions = np.asarray(down_fractions, float)
++        check_bets(self.up_grid, self.down_fractions)
+         self.n_pilot = n_pilot
+         self.t = -1
+         self.events: list[Event] = []
+@@ -1055,6 +1057,7 @@ class AwakeRunningTauMonitor:
+         self.epochs = set(int(e) for e in awake_epochs(n_learn))
+         self.up_grid = np.asarray(up_grid, float)
+         self.down_fractions = np.asarray(down_fractions, float)
++        check_bets(self.up_grid, self.down_fractions)
+         self.K = GRID_KMAX - GRID_KMIN + 1
+         self.t = -1
+         self.events: list[Event] = []

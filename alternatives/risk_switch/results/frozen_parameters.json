@@ -1,0 +1,162 @@
+{
+  "chosen": {
+    "ewma_minute": "ewma_minute_hl3d",
+    "ewma_hour": "ewma_hour_hl3d",
+    "ewma_day": "ewma_day_hl1d",
+    "robust_roll": "robust_roll_day_4320",
+    "switch_robust": "switch_robust_fa0.05_b0.75_hold",
+    "switch_gaussian": "switch_gaussian_fa0.05_hold",
+    "buy_and_hold": "buy_and_hold"
+  },
+  "over_budget": {
+    "ewma_minute": false,
+    "ewma_hour": false,
+    "ewma_day": false,
+    "robust_roll": false,
+    "switch_robust": false,
+    "switch_gaussian": true,
+    "buy_and_hold": false
+  },
+  "robust_to_sd": 1.2157051827014769,
+  "robust_to_sd_per_coin": {
+    "BTCUSDT": 1.2260107625682448,
+    "ETHUSDT": 1.2157051827014769,
+    "XRPUSDT": 1.279836406754503,
+    "SOLUSDT": 1.1527459530994293,
+    "DOGEUSDT": 1.1732745148353902
+  },
+  "data_checks": {
+    "BTCUSDT": {
+      "source": "Binance spot BTCUSDT via github.com/parshant231234-eng mirror",
+      "rows_read": 1052640,
+      "duplicates": 0,
+      "missing_minutes": 0,
+      "nonpositive_prices": 0,
+      "first": "2024-01-01 00:00:00+00:00",
+      "last": "2025-12-31 23:59:00+00:00"
+    },
+    "ETHUSDT": {
+      "source": "Binance spot ETHUSDT via github.com/parshant231234-eng mirror",
+      "rows_read": 1052640,
+      "duplicates": 0,
+      "missing_minutes": 0,
+      "nonpositive_prices": 0,
+      "first": "2024-01-01 00:00:00+00:00",
+      "last": "2025-12-31 23:59:00+00:00"
+    },
+    "XRPUSDT": {
+      "source": "Binance spot XRPUSDT via github.com/parshant231234-eng mirror",
+      "rows_read": 1052640,
+      "duplicates": 0,
+      "missing_minutes": 0,
+      "nonpositive_prices": 0,
+      "first": "2024-01-01 00:00:00+00:00",
+      "last": "2025-12-31 23:59:00+00:00"
+    },
+    "SOLUSDT": {
+      "source": "Binance spot SOLUSDT via github.com/parshant231234-eng mirror",
+      "rows_read": 1052640,
+      "duplicates": 0,
+      "missing_minutes": 0,
+      "nonpositive_prices": 0,
+      "first": "2024-01-01 00:00:00+00:00",
+      "last": "2025-12-31 23:59:00+00:00"
+    },
+    "DOGEUSDT": {
+      "source": "Binance spot DOGEUSDT via github.com/parshant231234-eng mirror",
+      "rows_read": 1052640,
+      "duplicates": 0,
+      "missing_minutes": 0,
+      "nonpositive_prices": 0,
+      "first": "2024-01-01 00:00:00+00:00",
+      "last": "2025-12-31 23:59:00+00:00"
+    }
+  },
+  "config": {
+    "symbols": [
+      "BTCUSDT",
+      "ETHUSDT",
+      "XRPUSDT",
+      "SOLUSDT",
+      "DOGEUSDT"
+    ],
+    "crypto_load": [
+      "2024-01-01",
+      "2026-01-01"
+    ],
+    "is_window": [
+      "2024-02-01",
+      "2025-01-01"
+    ],
+    "oos_window": [
+      "2025-01-01",
+      "2026-01-01"
+    ],
+    "nifty_load": [
+      "2017-04-01",
+      "2026-11-01"
+    ],
+    "nifty_window": [
+      "2017-06-01",
+      "2026-11-01"
+    ],
+    "target": {
+      "crypto": 0.4,
+      "nifty": 0.15
+    },
+    "w_max": 2.0,
+    "cost_base": {
+      "crypto": 5.0,
+      "nifty": 2.5
+    },
+    "cost_grid": {
+      "crypto": [
+        0.0,
+        2.0,
+        5.0,
+        10.0,
+        20.0
+      ],
+      "nifty": [
+        0.0,
+        1.0,
+        2.5,
+        5.0,
+        10.0
+      ]
+    },
+    "ewma_halflives_days": [
+      0.25,
+      1.0,
+      3.0,
+      10.0,
+      30.0
+    ],
+    "ewma_updates": [
+      "minute",
+      "hour",
+      "day"
+    ],
+    "robust_windows": [
+      1440,
+      4320
+    ],
+    "bands": [
+      0.25,
+      0.5,
+      0.75
+    ],
+    "false_alarm_budgets": [
+      0.05,
+      0.01
+    ],
+    "cal_len": 1440,
+    "fast_window": 120,
+    "max_cost_drag": 0.02,
+    "block": 10,
+    "n_boot": 2000,
+    "n_boot_grid": 500,
+    "seed": 0,
+    "profile_days": 20
+  }
+}

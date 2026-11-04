@@ -1,0 +1,6 @@
+no drift: P(M ever >= 20 over the 41 strata) = 0.0226 (s.e. 0.0011)
+falling rate, half-life 365 days: P(M ever >= 20 over the 41 strata) = 0.0223 (s.e. 0.0010)
+falling rate, half-life 182 days: P(M ever >= 20 over the 41 strata) = 0.0215 (s.e. 0.0010)
+falling rate, half-life 91 days: P(M ever >= 20 over the 41 strata) = 0.0258 (s.e. 0.0011)
+rising rate, doubling time 182 days: P(M ever >= 20 over the 41 strata) = 0.0179 (s.e. 0.0009)
+rising rate, doubling time 91 days: P(M ever >= 20 over the 41 strata) = 0.0142 (s.e. 0.0008)

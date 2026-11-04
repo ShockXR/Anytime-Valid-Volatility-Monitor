@@ -1,0 +1,25 @@
+## ALT2. Risk switch: does trading only on the monitor's alarms control risk better than volatility targeting?
+
+Prototype folder: `alternatives/risk_switch/` (README with problem, mathematics, comparison with existing approaches, implementation and methodology; `RESULTS.md` with the full tables; `run_experiment.py`; synthetic tests). Script `alternatives/risk_switch/run_experiment.py`, tables rendered by `summarise.py` into `alternatives/risk_switch/results/summary_tables.md`.
+
+**Question [REAL].** A long position is resized only when the monitor alarms, to `target volatility / (new regime's robust volatility)`, and held until the next alarm. Does this give better risk control than classic EWMA volatility targeting refreshed every minute, hour or day, after transaction costs? Benchmarks: buy and hold, EWMA targeting (Moreira and Muir 2017; Harvey et al. 2018, checked by web search), a daily-refreshed robust rolling estimate (same estimate, no change detection), and the same switch driven by the Gaussian likelihood-ratio monitor.
+
+**Method.** Binance one-minute bars for BTC, ETH, XRP, SOL, DOGE (2024 and 2025) and Nifty 50 one-minute bars (April 2017 to October 2026). Exposure decided at the close of minute t applies to minute t + 1; cost = 5 bp (crypto) or 2.5 bp (Nifty) per unit of turnover, sensitivity 0 to 20 bp. Targets 40% (crypto) and 15% (Nifty) a year, exposure capped at 2. Every setting was chosen on 2024 crypto with a rule stated in advance (lowest tracking RMS among variants whose cost drag is at most 2% a year, mean over the five coins) and then frozen for 2025 crypto and for Nifty. Chosen: EWMA half-lives 3 days (minute and hour refresh) and 1 day (daily refresh); robust rolling 3-day window; switch with 5% false-alarm budget per session, band 0.75, no provisional trade; Gaussian switch with the same settings (over budget, flagged). Metrics: tracking RMS (root mean square of log(weekly realised vol / target)), realised vol, maximum drawdown, worst day, Sharpe with circular block bootstrap 95% intervals (10-day blocks, 2000 draws) and paired differences against daily EWMA, turnover, trades and cost drag.
+
+**Results.** Out of sample, mean of the five coins in 2025 and Nifty 2017 to 2026, base costs.
+
+| Rule | Crypto 2025: tracking RMS | max drawdown | worst day | trades / yr | cost drag | Nifty: tracking RMS | max drawdown | worst day | trades / yr | cost drag | Sharpe diff vs EWMA day, Nifty [95% CI] |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| Buy and hold | | -61.0% | -16.9% | 0 | 0 | | -39.3% | -12.7% | 0 | 0 | +0.07 [-0.29, +0.44] |
+| EWMA, minute | 0.192 | -40.3% | -13.5% | 525,600 | 1.6% | 0.256 | -28.9% | -4.9% | 92,613 | 0.6% | -0.01 [-0.09, +0.06] |
+| EWMA, hour | 0.220 | -39.3% | -9.7% | 8,760 | 1.0% | 0.258 | -28.6% | -4.9% | 1,730 | 0.3% | +0.02 [-0.05, +0.09] |
+| EWMA, day | 0.205 | -41.6% | -10.2% | 365 | 1.5% | 0.242 | -30.8% | -5.5% | 246 | 0.4% | reference |
+| Robust rolling, day | 0.274 | -43.9% | -9.6% | 362 | 1.6% | 0.291 | -29.0% | -5.7% | 250 | 0.2% | +0.03 [-0.09, +0.14] |
+| Switch, robust monitor | 0.271 | -40.9% | -10.6% | 93 | 1.6% | 0.402 | -28.1% | -6.3% | 12 | 0.1% | +0.10 [-0.07, +0.26] |
+| Switch, Gaussian LR | 0.242 | -45.9% | -10.6% | 329 | 3.0% | 0.292 | -28.0% | -7.7% | 60 | 0.2% | -0.03 [-0.14, +0.08] |
+
+Alarm rates of the frozen robust monitor: 93 a year per coin on crypto in 2025 (250 with band 0.25), 12 a year on Nifty; the Gaussian monitor 331 and 60. On the equal-weight crypto portfolio the switch's Sharpe difference against daily EWMA is -0.05 [-0.41, +0.32]. In 2020 on Nifty every targeting rule held realised volatility at 16% to 18% against 31% for buy and hold, with worst days of 4.4% to 5.4% against 12.7%.
+
+**Reading.** The switch is a usable risk rule, not a better one. Its tails match EWMA targeting (drawdowns within two percentage points on crypto, smaller on Nifty) with a quarter of the trades on crypto and a twentieth on Nifty, and Sharpe ratios are indistinguishable everywhere. But it is a worse *volatility targeter*: tracking RMS 30% higher on crypto and 65% higher on Nifty, because exposure is frozen between alarms while volatility drifts, and each alarm-driven trade is four times the size of a daily EWMA adjustment, so crypto turnover (31 units a year) equals daily EWMA's despite fewer trades. The expected "matches with fewer trades" holds for trade counts, not for amounts traded. The one clear winner is the trigger: the robust e-detector beats the Gaussian likelihood-ratio monitor, which alarms three to five times as often, costs twice as much to follow and has worse tails on both markets.
+
+**Caveats.** One out-of-sample crypto year (a weak one, so all Sharpe ratios are near zero) and one equity index; a single cost per unit of turnover, no financing or impact; the Nifty backtest is on the index, not futures; the cap of 2 on exposure matters for Nifty in 2026 (a steady decline where levered targeting drew down 18% to 25% against 16% for buy and hold). Full tables, by-coin and by-year breakdowns and the cost grid are in `alternatives/risk_switch/RESULTS.md`.

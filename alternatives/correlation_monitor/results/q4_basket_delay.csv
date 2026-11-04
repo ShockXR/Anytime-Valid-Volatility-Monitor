@@ -1,0 +1,9 @@
+change,detector,false_alarm_before_change,detected,median_delay,q90_delay,paths
+all pairs 0.3 to 0.6,basket,0.031,0.969,72.0,136.0,1000
+all pairs 0.3 to 0.6,any of 6 pairs at 6A,0.047,0.953,132.0,235.0,1000
+all pairs 0.3 to 0.0,basket,0.038,0.962,77.0,131.0,1000
+all pairs 0.3 to 0.0,any of 6 pairs at 6A,0.028,0.972,150.0,266.9,1000
+"one pair 0.3 to 0.8, others fixed",basket,0.03,0.968,451.0,1088.4000000000005,1000
+"one pair 0.3 to 0.8, others fixed",any of 6 pairs at 6A,0.04,0.96,91.0,148.0,1000
+all pairs 0.3 to 0.9,basket,0.037,0.963,21.0,32.0,1000
+all pairs 0.3 to 0.9,any of 6 pairs at 6A,0.03,0.97,37.0,54.10000000000002,1000

@@ -1,0 +1,2 @@
+day,A,cal_len,k,hazard,paths,edetector_fa_per_day,bocpd_threshold_log_odds,bjv_threshold,bjv_studentised_threshold,bocpd_truncated_threshold_log_odds,bjv_nominal,bjv_nominal_series_length
+390,7800.0,2000,120,0.0001282051282051282,4000,0.0155,0.44740693777217677,3.5164809514856743,3.5528497072325838,0.3072126938558626,3.879769415055076,629

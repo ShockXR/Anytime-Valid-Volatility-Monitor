@@ -1,0 +1,3 @@
+monitor,steps,repeats,median_us_per_step,min_us_per_step,max_us_per_step
+"RankMonitor (omnibus, abs)",20000,3,79.15765160000774,73.06281375003891,81.01917359999788
+"VolatilityMonitor (plug-in, band 0.25)",20000,3,10.06317559999843,9.003571750008632,10.351376600010553

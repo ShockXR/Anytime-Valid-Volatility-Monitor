@@ -1,0 +1,73 @@
+scenario,band,method,horizon,alarm_rate,up_share,down_share,paths
+"intraday U-shape (amplitude 0.6), raw",0.0,plugin,390,0.636,0.467,0.26,1000
+"intraday U-shape (amplitude 0.6), raw",0.0,plugin,1950,0.997,0.954,0.846,1000
+"intraday U-shape (amplitude 0.6), raw",0.0,cs,390,0.07,0.061,0.009,1000
+"intraday U-shape (amplitude 0.6), raw",0.0,cs,1950,0.324,0.267,0.065,1000
+"intraday U-shape (amplitude 0.6), raw",0.0,A-grid-fixed,390,0.039,0.037,0.002,1000
+"intraday U-shape (amplitude 0.6), raw",0.0,A-grid-fixed,1950,0.182,0.178,0.005,1000
+"intraday U-shape (amplitude 0.6), raw",0.0,A-grid-run,390,0.068,0.037,0.032,1000
+"intraday U-shape (amplitude 0.6), raw",0.0,A-grid-run,1950,0.33,0.187,0.161,1000
+"intraday U-shape (amplitude 0.6), raw",0.0,B-lr,390,0.763,0.392,0.609,1000
+"intraday U-shape (amplitude 0.6), raw",0.0,B-lr,1950,1.0,0.942,0.988,1000
+"intraday U-shape (amplitude 0.6), raw",0.0,B-ind,390,0.378,0.245,0.178,1000
+"intraday U-shape (amplitude 0.6), raw",0.0,B-ind,1950,0.919,0.784,0.624,1000
+"intraday U-shape (amplitude 0.6), raw",0.25,plugin,390,0.021,0.021,0.0,1000
+"intraday U-shape (amplitude 0.6), raw",0.25,plugin,1950,0.114,0.114,0.0,1000
+"intraday U-shape (amplitude 0.6), raw",0.25,cs,390,0.001,0.001,0.0,1000
+"intraday U-shape (amplitude 0.6), raw",0.25,cs,1950,0.003,0.003,0.0,1000
+"intraday U-shape (amplitude 0.6), raw",0.25,A-grid-fixed,390,0.001,0.001,0.0,1000
+"intraday U-shape (amplitude 0.6), raw",0.25,A-grid-fixed,1950,0.001,0.001,0.0,1000
+"intraday U-shape (amplitude 0.6), raw",0.25,A-grid-run,390,0.001,0.001,0.0,1000
+"intraday U-shape (amplitude 0.6), raw",0.25,A-grid-run,1950,0.002,0.002,0.0,1000
+"intraday U-shape (amplitude 0.6), raw",0.25,B-lr,390,0.002,0.002,0.0,1000
+"intraday U-shape (amplitude 0.6), raw",0.25,B-lr,1950,0.01,0.01,0.0,1000
+"intraday U-shape (amplitude 0.6), raw",0.25,B-ind,390,0.003,0.003,0.0,1000
+"intraday U-shape (amplitude 0.6), raw",0.25,B-ind,1950,0.018,0.018,0.0,1000
+"slow SV (log-vol sd 0.15, half-life 390)",0.0,plugin,390,0.465,0.231,0.234,1000
+"slow SV (log-vol sd 0.15, half-life 390)",0.0,plugin,1950,0.987,0.619,0.635,1000
+"slow SV (log-vol sd 0.15, half-life 390)",0.0,cs,390,0.167,0.094,0.073,1000
+"slow SV (log-vol sd 0.15, half-life 390)",0.0,cs,1950,0.757,0.397,0.39,1000
+"slow SV (log-vol sd 0.15, half-life 390)",0.0,A-grid-fixed,390,0.136,0.072,0.064,1000
+"slow SV (log-vol sd 0.15, half-life 390)",0.0,A-grid-fixed,1950,0.694,0.363,0.354,1000
+"slow SV (log-vol sd 0.15, half-life 390)",0.0,A-grid-run,390,0.166,0.07,0.096,1000
+"slow SV (log-vol sd 0.15, half-life 390)",0.0,A-grid-run,1950,0.7,0.343,0.382,1000
+"slow SV (log-vol sd 0.15, half-life 390)",0.0,B-lr,390,0.449,0.217,0.235,1000
+"slow SV (log-vol sd 0.15, half-life 390)",0.0,B-lr,1950,0.958,0.649,0.669,1000
+"slow SV (log-vol sd 0.15, half-life 390)",0.0,B-ind,390,0.282,0.163,0.12,1000
+"slow SV (log-vol sd 0.15, half-life 390)",0.0,B-ind,1950,0.886,0.57,0.524,1000
+"slow SV (log-vol sd 0.15, half-life 390)",0.25,plugin,390,0.1,0.064,0.036,1000
+"slow SV (log-vol sd 0.15, half-life 390)",0.25,plugin,1950,0.538,0.314,0.233,1000
+"slow SV (log-vol sd 0.15, half-life 390)",0.25,cs,390,0.025,0.022,0.003,1000
+"slow SV (log-vol sd 0.15, half-life 390)",0.25,cs,1950,0.206,0.125,0.081,1000
+"slow SV (log-vol sd 0.15, half-life 390)",0.25,A-grid-fixed,390,0.018,0.014,0.004,1000
+"slow SV (log-vol sd 0.15, half-life 390)",0.25,A-grid-fixed,1950,0.148,0.09,0.058,1000
+"slow SV (log-vol sd 0.15, half-life 390)",0.25,A-grid-run,390,0.022,0.017,0.005,1000
+"slow SV (log-vol sd 0.15, half-life 390)",0.25,A-grid-run,1950,0.17,0.097,0.073,1000
+"slow SV (log-vol sd 0.15, half-life 390)",0.25,B-lr,390,0.01,0.01,0.0,1000
+"slow SV (log-vol sd 0.15, half-life 390)",0.25,B-lr,1950,0.059,0.057,0.002,1000
+"slow SV (log-vol sd 0.15, half-life 390)",0.25,B-ind,390,0.007,0.007,0.0,1000
+"slow SV (log-vol sd 0.15, half-life 390)",0.25,B-ind,1950,0.04,0.04,0.0,1000
+"GARCH(1,1) 0.05 / 0.94",0.0,plugin,390,0.847,0.463,0.48,1000
+"GARCH(1,1) 0.05 / 0.94",0.0,plugin,1950,1.0,0.901,0.917,1000
+"GARCH(1,1) 0.05 / 0.94",0.0,cs,390,0.527,0.307,0.234,1000
+"GARCH(1,1) 0.05 / 0.94",0.0,cs,1950,0.976,0.78,0.636,1000
+"GARCH(1,1) 0.05 / 0.94",0.0,A-grid-fixed,390,0.475,0.292,0.192,1000
+"GARCH(1,1) 0.05 / 0.94",0.0,A-grid-fixed,1950,0.964,0.768,0.592,1000
+"GARCH(1,1) 0.05 / 0.94",0.0,A-grid-run,390,0.54,0.288,0.269,1000
+"GARCH(1,1) 0.05 / 0.94",0.0,A-grid-run,1950,0.978,0.75,0.717,1000
+"GARCH(1,1) 0.05 / 0.94",0.0,B-lr,390,0.866,0.459,0.573,1000
+"GARCH(1,1) 0.05 / 0.94",0.0,B-lr,1950,1.0,0.93,0.985,1000
+"GARCH(1,1) 0.05 / 0.94",0.0,B-ind,390,0.656,0.407,0.301,1000
+"GARCH(1,1) 0.05 / 0.94",0.0,B-ind,1950,0.998,0.914,0.871,1000
+"GARCH(1,1) 0.05 / 0.94",0.25,plugin,390,0.401,0.273,0.132,1000
+"GARCH(1,1) 0.05 / 0.94",0.25,plugin,1950,0.949,0.742,0.492,1000
+"GARCH(1,1) 0.05 / 0.94",0.25,cs,390,0.199,0.157,0.042,1000
+"GARCH(1,1) 0.05 / 0.94",0.25,cs,1950,0.734,0.575,0.219,1000
+"GARCH(1,1) 0.05 / 0.94",0.25,A-grid-fixed,390,0.17,0.132,0.038,1000
+"GARCH(1,1) 0.05 / 0.94",0.25,A-grid-fixed,1950,0.667,0.515,0.194,1000
+"GARCH(1,1) 0.05 / 0.94",0.25,A-grid-run,390,0.197,0.138,0.059,1000
+"GARCH(1,1) 0.05 / 0.94",0.25,A-grid-run,1950,0.734,0.538,0.275,1000
+"GARCH(1,1) 0.05 / 0.94",0.25,B-lr,390,0.174,0.161,0.013,1000
+"GARCH(1,1) 0.05 / 0.94",0.25,B-lr,1950,0.653,0.614,0.087,1000
+"GARCH(1,1) 0.05 / 0.94",0.25,B-ind,390,0.126,0.126,0.0,1000
+"GARCH(1,1) 0.05 / 0.94",0.25,B-ind,1950,0.516,0.516,0.0,1000

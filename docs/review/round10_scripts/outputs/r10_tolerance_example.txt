@@ -1,0 +1,7 @@
+rise by k at minute s of window 1 (tau part = minutes 0 to 359): share of first windows KEPT by the guard (rho > 1.25), median rho
+s =  360: k=2: kept 1.000 (median rho 2.08); k=4: kept 0.133 (median rho 1.20); k=8: kept 0.000 (median rho 0.95); k=16: kept 0.000 (median rho 0.86); k=32: kept 0.000 (median rho 0.82)
+s =  540: k=2: kept 1.000 (median rho 2.48); k=4: kept 1.000 (median rho 1.59); k=8: kept 0.756 (median rho 1.29); k=16: kept 0.079 (median rho 1.17); k=32: kept 0.000 (median rho 1.12)
+s =  900: k=2: kept 1.000 (median rho 3.33); k=4: kept 1.000 (median rho 2.47); k=8: kept 1.000 (median rho 2.16); k=16: kept 1.000 (median rho 2.04); k=32: kept 1.000 (median rho 1.98)
+s = 1260: k=2: kept 1.000 (median rho 4.55); k=4: kept 1.000 (median rho 3.80); k=8: kept 1.000 (median rho 3.50); k=16: kept 1.000 (median rho 3.39); k=32: kept 1.000 (median rho 3.32)
+rise x2 at minute 900 (middle of the CS part), 100 paths: first-day alarm share, unguarded P1 0.93, guarded P1 (GE) 0.89
+rise x4 at minute 900 (middle of the CS part), 100 paths: first-day alarm share, unguarded P1 1.00, guarded P1 (GE) 1.00

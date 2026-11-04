@@ -1,0 +1,11 @@
+scenario,detector,true_m0,fa_1day,bound_1day,fa_5days,bound_5days,paths
+gaussian rho 0.3,sign,0.194255,0.02,0.05,0.154,0.25,2000
+gaussian rho 0.3,product c3,0.2982228523871589,0.0,0.05,0.062,0.25,2000
+student t4 rho 0.3,sign,0.194255,0.0225,0.05,0.1675,0.25,2000
+student t4 rho 0.3,product c3,0.3833749647236474,0.0,0.05,0.0905,0.25,2000
+jumps rho 0.3,sign,0.192482,0.019,0.05,0.1635,0.25,2000
+jumps rho 0.3,product c3,0.29310095096452077,0.0,0.05,0.055,0.25,2000
+cojumps rho 0.3,sign,0.192071,0.016,0.05,0.1545,0.25,2000
+cojumps rho 0.3,product c3,0.2912455485533631,0.0,0.05,0.063,0.25,2000
+gaussian rho 0.6,sign,0.410156,0.0175,0.05,0.1525,0.25,2000
+gaussian rho 0.6,product c3,0.5963366846305512,0.0,0.05,0.113,0.25,2000

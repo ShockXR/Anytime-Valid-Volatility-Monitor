@@ -1,22 +1,63 @@
 [build-system]
-requires = ["setuptools>=68"]
+requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "avmonitor"
-version = "0.1.0"
+dynamic = ["version"]
 description = "Anytime-valid online detection of volatility regime changes"
 readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "ShockXR" }]
 requires-python = ">=3.10"
+keywords = [
+    "volatility",
+    "change detection",
+    "sequential analysis",
+    "e-values",
+    "e-detector",
+    "anytime-valid inference",
+    "confidence sequences",
+    "false discovery rate",
+    "realized quarticity",
+    "high-frequency returns",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Financial and Insurance Industry",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering :: Mathematics",
+    "Topic :: Office/Business :: Financial :: Investment",
+]
 dependencies = [
-    "numpy",
-    "pandas",
-    "scipy",
-    "matplotlib",
+    "numpy>=1.23",
+    "scipy>=1.9",
+    "pandas>=2.1",
+    "matplotlib>=3.6",
 ]
 
+[project.urls]
+Homepage = "https://github.com/ShockXR/Anytime-Valid-Volatility-Monitor"
+Repository = "https://github.com/ShockXR/Anytime-Valid-Volatility-Monitor"
+Issues = "https://github.com/ShockXR/Anytime-Valid-Volatility-Monitor/issues"
+Changelog = "https://github.com/ShockXR/Anytime-Valid-Volatility-Monitor/blob/main/CHANGELOG.md"
+
+[project.scripts]
+avmonitor = "avmonitor.cli:main"
+
 [project.optional-dependencies]
-dev = ["pytest", "jupyter"]
+dev = ["pytest>=7", "jupyter"]
+
+[tool.setuptools.dynamic]
+version = { attr = "avmonitor.__version__" }
 
 [tool.setuptools.packages.find]
 where = ["src"]

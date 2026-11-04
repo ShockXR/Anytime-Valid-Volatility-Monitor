@@ -1,0 +1,33 @@
+scenario,procedure,psi,strata,mean_expected_log_e_per_release,mean_fomc,mean_cpi,rules
+pooled 2024 to 2026 (planning),E25 (p estimated from the stratum),2.0,39,0.1828580473056904,0.30085067207542143,0.11678217743464109,original
+pooled 2024 to 2026 (planning),E25 (p estimated from the stratum),4.0,39,0.28546838891153575,0.5064504482849767,0.16171843566240882,original
+pooled 2024 to 2026 (planning),E25 (p estimated from the stratum),8.0,39,0.3045990825928757,0.6189953124242623,0.1285371938872992,original
+pooled 2024 to 2026 (planning),E25 (p estimated from the stratum),16.0,39,0.25096234767857095,0.6551683280596772,0.024606998665151435,original
+pooled 2024 to 2026 (planning),oracle (true control rate),2.0,39,0.22879783892416647,0.3832124572353705,0.14232565266989222,original
+pooled 2024 to 2026 (planning),oracle (true control rate),4.0,39,0.36984635727566734,0.6698490724222801,0.2018448367935643,original
+pooled 2024 to 2026 (planning),oracle (true control rate),8.0,39,0.3990244336863736,0.8402612536725312,0.15193181449412535,original
+pooled 2024 to 2026 (planning),oracle (true control rate),16.0,39,0.3127303237776099,0.8984697521888053,-0.015283756132659532,original
+2026 only (E23 design),E25 (p estimated from the stratum),2.0,39,0.11827785290901224,0.2824325460931259,0.026351224725908576,original
+2026 only (E23 design),E25 (p estimated from the stratum),4.0,39,0.16823772222853497,0.4810279856539071,-0.0069248252896734796,original
+2026 only (E23 design),E25 (p estimated from the stratum),8.0,39,0.1441616628262924,0.5926212804362806,-0.10697572303530087,original
+2026 only (E23 design),E25 (p estimated from the stratum),16.0,39,0.05347537675816367,0.6293697402258012,-0.2690254667837133,original
+2026 only (E23 design),oracle (true control rate),2.0,39,0.15093564377331,0.3636580475600443,0.031811097652738915,original
+2026 only (E23 design),oracle (true control rate),4.0,39,0.22572021156542768,0.6539059110066823,-0.014063780121674863,original
+2026 only (E23 design),oracle (true control rate),8.0,39,0.19579451545895502,0.8415671856782189,-0.1658381798638327,original
+2026 only (E23 design),oracle (true control rate),16.0,39,0.04815434286177764,0.9116232182754923,-0.43538822736990246,original
+half of the pooled excess,E25 (p estimated from the stratum),2.0,39,0.07810442773338447,0.1356596641678015,0.04587349533011092,original
+half of the pooled excess,E25 (p estimated from the stratum),4.0,39,0.08519618410547235,0.1905281496683207,0.026210283390277235,original
+half of the pooled excess,E25 (p estimated from the stratum),8.0,39,0.016953007322231668,0.16449560768377922,-0.06567084888023497,original
+half of the pooled excess,E25 (p estimated from the stratum),16.0,39,-0.11802411731951278,0.07070128044986482,-0.22371034007036428,original
+half of the pooled excess,oracle (true control rate),2.0,39,0.09755826805509354,0.17246112759850624,0.05561266671078239,original
+half of the pooled excess,oracle (true control rate),4.0,39,0.10736721553752157,0.2483464131485516,0.0284188648753447,original
+half of the pooled excess,oracle (true control rate),8.0,39,0.0053057210791548305,0.20800726476193873,-0.10820714338320414,original
+half of the pooled excess,oracle (true control rate),16.0,39,-0.21222795969868175,0.055464433641348454,-0.3621356999690986,original
+null (release rate = control rate),E25 (p estimated from the stratum),2.0,39,-0.026649191838921504,-0.0295313437398184,-0.025035186774419235,original
+null (release rate = control rate),E25 (p estimated from the stratum),4.0,39,-0.11507602070059104,-0.12539414894833528,-0.10929786888185429,original
+null (release rate = control rate),E25 (p estimated from the stratum),8.0,39,-0.2706930679484123,-0.2900040970567037,-0.2598788916477691,original
+null (release rate = control rate),E25 (p estimated from the stratum),16.0,39,-0.4870105823175965,-0.5137657671599476,-0.47202767880588015,original
+null (release rate = control rate),oracle (true control rate),2.0,39,-0.03368130281397936,-0.03829020203835787,-0.031100319248327388,original
+null (release rate = control rate),oracle (true control rate),4.0,39,-0.15511192620062422,-0.17315624612517672,-0.1450071070428749,original
+null (release rate = control rate),oracle (true control rate),8.0,39,-0.38841299152806386,-0.42424672414865394,-0.3683461012605334,original
+null (release rate = control rate),oracle (true control rate),16.0,39,-0.7371862431749735,-0.7875408849061082,-0.7089876438055378,original

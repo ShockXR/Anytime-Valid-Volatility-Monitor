@@ -1,0 +1,9 @@
+data_set,primary_endpoint,evidence
+five coins (E6),none was pre-specified,Q6d and Q6e are research questions; no test is named primary.
+five coins (E13),none was pre-specified,"Q13d (verifiable, 6cfe39c) names the comparison, not a primary test."
+"five coins (E14, E15, E17)",none was pre-specified,"Q14d, Q15d and Q17f name analyses, not a primary test."
+Nifty 50 monitor (E7),none was pre-specified,"A primary configuration (calibration 750, band 0.25) was stated, in the same commit as the results (38856a3), but no endpoint or test."
+Nifty events (E7),none was pre-specified,"Five event types, no primary type or multiplicity plan (c20ea73)."
+Nifty 50 and India VIX (E7),none was pre-specified,"Eight cells, no primary cell (0627d14)."
+Nifty 50 (E13),none was pre-specified,As E13 crypto.
+FOMC and CPI (E12),"BTC, streaming robust monitor (band 0.25), up alarm within 6 hours, FOMC and CPI, exact stratified permutation test, Holm at 5%",Stated as fixed before the first run in the docstring committed with the results (47a5982); not verifiable from the commit order.

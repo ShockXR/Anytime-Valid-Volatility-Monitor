@@ -1,0 +1,4 @@
+coin,symbol,files,first_file,last_file,rows_read,duplicate_timestamps,duplicate_rows_identical,last_bar_in_files,stream_end_exclusive,missing_minutes_loaded,missing_minutes_monitored,nonpositive_prices,nan_returns_monitored,monitored_minutes,first,last
+BTC,BTCUSDT,11,BTCUSDT_1m_2025-12.csv,BTCUSDT_1m_2026-10.csv,472320,0,True,2026-10-24 23:59:00+00:00,2026-10-25 00:00,0,0,0,0,427680,2025-12-12 00:00:00+00:00,2026-10-24 23:59:00+00:00
+ETH,ETHUSDT,11,ETHUSDT_1m_2025-12.csv,ETHUSDT_1m_2026-10.csv,472320,0,True,2026-10-24 23:59:00+00:00,2026-10-25 00:00,0,0,0,0,427680,2025-12-12 00:00:00+00:00,2026-10-24 23:59:00+00:00
+SOL,SOLUSDT,11,SOLUSDT_1m_2025-12.csv,SOLUSDT_1m_2026-10.csv,472320,0,True,2026-10-24 23:59:00+00:00,2026-10-25 00:00,0,0,0,0,427680,2025-12-12 00:00:00+00:00,2026-10-24 23:59:00+00:00

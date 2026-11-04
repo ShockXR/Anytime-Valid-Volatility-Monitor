@@ -1,0 +1,35 @@
+gate,period,coin,check,compared,mismatches,detail
+2 causality,2026 (E23 design),BTC,cut at 2026-04-01,77,0,"alarms before the cut: full run 77, cut run 77; columns ['index', 'direction', 'delay', 'baseline_scale', 'max_abs_recent_over_scale'] identical: True; deseasonalised returns before the cut identical: True; monitoring flags identical: True"
+2 causality,2026 (E23 design),BTC,cut at 2026-07-01,143,0,"alarms before the cut: full run 143, cut run 143; columns ['index', 'direction', 'delay', 'baseline_scale', 'max_abs_recent_over_scale'] identical: True; deseasonalised returns before the cut identical: True; monitoring flags identical: True"
+2 causality,2026 (E23 design),BTC,cut at 2026-08-12 14:37,174,0,"alarms before the cut: full run 174, cut run 174; columns ['index', 'direction', 'delay', 'baseline_scale', 'max_abs_recent_over_scale'] identical: True; deseasonalised returns before the cut identical: True; monitoring flags identical: True"
+2 causality,2026 (E23 design),BTC,cut at 2026-09-15,211,0,"alarms before the cut: full run 211, cut run 211; columns ['index', 'direction', 'delay', 'baseline_scale', 'max_abs_recent_over_scale'] identical: True; deseasonalised returns before the cut identical: True; monitoring flags identical: True"
+3 pipeline,2026 (E23 design),BTC,E25's S2 run reproduces the committed S2 alarms (e23_alarms.csv),243,0,"own 243 alarms, committed 243"
+3 pipeline,2026 (E23 design),BTC,committed e23_alarms.csv: time = stream start + index minutes,243,0,
+3 pipeline,2026 (E23 design),BTC,release outcomes Z from E25's own S2 run equal up_post of e23_windows.csv (S2),16,0,"releases with the outcome: 6 (E25), 6 (e23_windows.csv)"
+3 pipeline,2026 (E23 design),BTC,release outcomes Z from committed e23_alarms.csv equal up_post of e23_windows.csv (S2),16,0,"releases with the outcome: 6 (E25), 6 (e23_windows.csv)"
+3 pipeline,2026 (E23 design),BTC,E25's window outcome on E12's control anchors equals control_up_post_rate of e23_windows.csv,16,0,E12.control_anchors on a gap-free minute index
+3 pipeline,2026 (E23 design),ETH,E25's S2 run reproduces the committed S2 alarms (e23_alarms.csv),225,0,"own 225 alarms, committed 225"
+3 pipeline,2026 (E23 design),ETH,committed e23_alarms.csv: time = stream start + index minutes,225,0,
+3 pipeline,2026 (E23 design),ETH,release outcomes Z from E25's own S2 run equal up_post of e23_windows.csv (S2),16,0,"releases with the outcome: 7 (E25), 7 (e23_windows.csv)"
+3 pipeline,2026 (E23 design),ETH,release outcomes Z from committed e23_alarms.csv equal up_post of e23_windows.csv (S2),16,0,"releases with the outcome: 7 (E25), 7 (e23_windows.csv)"
+3 pipeline,2026 (E23 design),ETH,E25's window outcome on E12's control anchors equals control_up_post_rate of e23_windows.csv,16,0,E12.control_anchors on a gap-free minute index
+3 pipeline,2026 (E23 design),SOL,E25's S2 run reproduces the committed S2 alarms (e23_alarms.csv),207,0,"own 207 alarms, committed 207"
+3 pipeline,2026 (E23 design),SOL,committed e23_alarms.csv: time = stream start + index minutes,207,0,
+3 pipeline,2026 (E23 design),SOL,release outcomes Z from E25's own S2 run equal up_post of e23_windows.csv (S2),16,0,"releases with the outcome: 7 (E25), 7 (e23_windows.csv)"
+3 pipeline,2026 (E23 design),SOL,release outcomes Z from committed e23_alarms.csv equal up_post of e23_windows.csv (S2),16,0,"releases with the outcome: 7 (E25), 7 (e23_windows.csv)"
+3 pipeline,2026 (E23 design),SOL,E25's window outcome on E12's control anchors equals control_up_post_rate of e23_windows.csv,16,0,E12.control_anchors on a gap-free minute index
+3 pipeline,2024 to 2025 (E22 design),BTC,E25's S2 run reproduces the committed S2 alarms (e22_alarms.csv),658,0,"own 658 alarms, committed 658"
+3 pipeline,2024 to 2025 (E22 design),BTC,committed e22_alarms.csv: time = stream start + index minutes,658,0,
+3 pipeline,2024 to 2025 (E22 design),BTC,release outcomes Z from E25's own S2 run equal up_post of e22_windows.csv (S2),38,0,"releases with the outcome: 23 (E25), 23 (e22_windows.csv)"
+3 pipeline,2024 to 2025 (E22 design),BTC,release outcomes Z from committed e22_alarms.csv equal up_post of e22_windows.csv (S2),38,0,"releases with the outcome: 23 (E25), 23 (e22_windows.csv)"
+3 pipeline,2024 to 2025 (E22 design),BTC,E25's window outcome on E12's control anchors equals control_up_post_rate of e22_windows.csv,38,0,E12.control_anchors on a gap-free minute index
+3 pipeline,2024 to 2025 (E22 design),ETH,E25's S2 run reproduces the committed S2 alarms (e22_alarms.csv),570,0,"own 570 alarms, committed 570"
+3 pipeline,2024 to 2025 (E22 design),ETH,committed e22_alarms.csv: time = stream start + index minutes,570,0,
+3 pipeline,2024 to 2025 (E22 design),ETH,release outcomes Z from E25's own S2 run equal up_post of e22_windows.csv (S2),38,0,"releases with the outcome: 21 (E25), 21 (e22_windows.csv)"
+3 pipeline,2024 to 2025 (E22 design),ETH,release outcomes Z from committed e22_alarms.csv equal up_post of e22_windows.csv (S2),38,0,"releases with the outcome: 21 (E25), 21 (e22_windows.csv)"
+3 pipeline,2024 to 2025 (E22 design),ETH,E25's window outcome on E12's control anchors equals control_up_post_rate of e22_windows.csv,38,0,E12.control_anchors on a gap-free minute index
+3 pipeline,2024 to 2025 (E22 design),SOL,E25's S2 run reproduces the committed S2 alarms (e22_alarms.csv),461,0,"own 461 alarms, committed 461"
+3 pipeline,2024 to 2025 (E22 design),SOL,committed e22_alarms.csv: time = stream start + index minutes,461,0,
+3 pipeline,2024 to 2025 (E22 design),SOL,release outcomes Z from E25's own S2 run equal up_post of e22_windows.csv (S2),38,0,"releases with the outcome: 22 (E25), 22 (e22_windows.csv)"
+3 pipeline,2024 to 2025 (E22 design),SOL,release outcomes Z from committed e22_alarms.csv equal up_post of e22_windows.csv (S2),38,0,"releases with the outcome: 22 (E25), 22 (e22_windows.csv)"
+3 pipeline,2024 to 2025 (E22 design),SOL,E25's window outcome on E12's control anchors equals control_up_post_rate of e22_windows.csv,38,0,E12.control_anchors on a gap-free minute index

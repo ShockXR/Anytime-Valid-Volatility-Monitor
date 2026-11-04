@@ -1,0 +1,12 @@
+date,event_type,group,n,kind
+2026-10-28,fomc,Wed 14:00 ET,21,event file
+2026-11-10,cpi,Tue 08:30 ET,22,event file
+2026-12-09,fomc,Wed 14:00 ET,21,event file
+2026-12-10,cpi,Thu 08:30 ET,23,event file
+2027-01-13,cpi,Wed 08:30 ET,21,event file
+2027-02-11,cpi,Thu 08:30 ET,23,event file
+2027-03-10,cpi,Wed 08:30 ET,21,event file
+2027-03-17,fomc,Wed 14:00 ET,21,event file
+2027-04-13,cpi,Tue 08:30 ET,22,event file
+2027-04-28,fomc,Wed 14:00 ET,21,event file
+2027-05-12,cpi,Wed 08:30 ET,21,event file

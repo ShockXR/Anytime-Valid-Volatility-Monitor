@@ -1,0 +1,22 @@
+PASS SR recursion equals sum_j prod_{s>=j} f_s | rec=17.9756 brute=17.9756
+PASS CUSUM recursion equals max_j prod_{s>=j} f_s, and C <= M | C=1.3651 max-prod=1.3651
+PASS betting_edetector(up, one bet) path equals f_t(M_{t-1}+1)
+PASS betting_edetector(down) uses 1 + lam(1 - Y) with lam_max = 1/(B-1)
+PASS design.lam_max matches
+PASS increase factor positive at Y=0 for lam<1
+PASS decrease factor positive at Y=B for lam<1/(B-1)
+PASS E[f] = 1 + lam (E[Y] - 1) = 1 at the null boundary
+PASS calibrate: tau = c * median|r| / 0.6745
+PASS calibrate: m0 = mean(min(r^2, tau^2))
+PASS kappa2, kappa4 (raw MAD c=3): code = Monte Carlo = doc table | a=2.023 k2=0.9247 (mc 0.9250) k4=0.7045 (mc 0.7053)
+PASS kappa2, kappa4 (scaled MAD c=3): code = Monte Carlo = doc table | a=3.000 k2=0.9950 (mc 0.9954) k4=0.9638 (mc 0.9650)
+PASS effective_cutoff: raw MAD a = c*0.6745, scaled a = c
+PASS E[min(Z^2, a^2)] = kappa_2(a)
+PASS false alarm within first day (true baseline, Gaussian) is below m/A = 5% | measured 0.0090 over 6000 paths [SYNTHETIC]
+PASS TH6 Proposition 1b: law Y_t=1 alarms at step 2A = 15600, last step of day 40 | first alarm step 15600
+PASS cs_baseline upper/lower bounds cover the true truncated mean at least 1-delta/2 each | coverage up=1.0000 low=1.0000 (target 0.995) [SYNTHETIC]
+PASS decrease_speed_limit = ceil(log(1+A/B)/log(B/(B-1))) | 58 steps
+PASS single bet at lam_max on all-zero returns reaches A in the floor number of steps (+/- 1) | 58 vs 58
+PASS VolatilityMonitor default calibration window is 1440 returns
+
+20/20 checks passed

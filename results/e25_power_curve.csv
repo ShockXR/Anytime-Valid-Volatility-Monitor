@@ -1,0 +1,513 @@
+scenario,procedure,date,P_cross_by_date,strata_entered,rules
+pooled 2024 to 2026 (planning),E25 (p estimated from the stratum),2026-11-01 00:00,0.0,0,amended
+pooled 2024 to 2026 (planning),E25 (p estimated from the stratum),2026-11-26 01:00,0.0,1,amended
+pooled 2024 to 2026 (planning),E25 (p estimated from the stratum),2026-12-01 00:00,0.0,1,amended
+pooled 2024 to 2026 (planning),E25 (p estimated from the stratum),2026-12-10 13:30,0.0,2,amended
+pooled 2024 to 2026 (planning),E25 (p estimated from the stratum),2027-01-01 00:00,0.0,2,amended
+pooled 2024 to 2026 (planning),E25 (p estimated from the stratum),2027-01-07 01:00,0.03095,3,amended
+pooled 2024 to 2026 (planning),E25 (p estimated from the stratum),2027-01-07 19:30,0.13335,4,amended
+pooled 2024 to 2026 (planning),E25 (p estimated from the stratum),2027-02-01 00:00,0.13335,4,amended
+pooled 2024 to 2026 (planning),E25 (p estimated from the stratum),2027-02-11 13:30,0.188,5,amended
+pooled 2024 to 2026 (planning),E25 (p estimated from the stratum),2027-03-01 00:00,0.188,5,amended
+pooled 2024 to 2026 (planning),E25 (p estimated from the stratum),2027-03-11 19:30,0.25645,6,amended
+pooled 2024 to 2026 (planning),E25 (p estimated from the stratum),2027-04-01 00:00,0.25645,6,amended
+pooled 2024 to 2026 (planning),E25 (p estimated from the stratum),2027-04-07 18:30,0.31155,7,amended
+pooled 2024 to 2026 (planning),E25 (p estimated from the stratum),2027-04-15 00:00,0.31155,8,amended
+pooled 2024 to 2026 (planning),E25 (p estimated from the stratum),2027-05-01 00:00,0.31155,8,amended
+pooled 2024 to 2026 (planning),E25 (p estimated from the stratum),2027-05-12 12:30,0.35755,9,amended
+pooled 2024 to 2026 (planning),E25 (p estimated from the stratum),2027-05-27 00:00,0.4345,10,amended
+pooled 2024 to 2026 (planning),E25 (p estimated from the stratum),2027-06-01 00:00,0.4345,10,amended
+pooled 2024 to 2026 (planning),E25 (p estimated from the stratum),2027-06-10 12:30,0.4549,11,amended
+pooled 2024 to 2026 (planning),E25 (p estimated from the stratum),2027-07-01 00:00,0.4549,11,amended
+pooled 2024 to 2026 (planning),E25 (p estimated from the stratum),2027-07-08 00:00,0.53945,12,amended
+pooled 2024 to 2026 (planning),E25 (p estimated from the stratum),2027-07-08 18:30,0.5876,13,amended
+pooled 2024 to 2026 (planning),E25 (p estimated from the stratum),2027-08-01 00:00,0.5876,13,amended
+pooled 2024 to 2026 (planning),E25 (p estimated from the stratum),2027-08-11 18:30,0.6107,14,amended
+pooled 2024 to 2026 (planning),E25 (p estimated from the stratum),2027-08-26 00:00,0.6545,15,amended
+pooled 2024 to 2026 (planning),E25 (p estimated from the stratum),2027-09-01 00:00,0.6545,15,amended
+pooled 2024 to 2026 (planning),E25 (p estimated from the stratum),2027-09-08 18:30,0.67955,16,amended
+pooled 2024 to 2026 (planning),E25 (p estimated from the stratum),2027-10-01 00:00,0.67955,16,amended
+pooled 2024 to 2026 (planning),E25 (p estimated from the stratum),2027-10-14 12:30,0.74985,18,amended
+pooled 2024 to 2026 (planning),E25 (p estimated from the stratum),2027-11-01 00:00,0.74985,18,amended
+pooled 2024 to 2026 (planning),E25 (p estimated from the stratum),2027-11-11 19:30,0.77555,19,amended
+pooled 2024 to 2026 (planning),E25 (p estimated from the stratum),2027-11-25 01:00,0.81115,20,amended
+pooled 2024 to 2026 (planning),E25 (p estimated from the stratum),2027-12-01 00:00,0.81115,20,amended
+pooled 2024 to 2026 (planning),E25 (p estimated from the stratum),2027-12-10 13:30,0.8204,21,amended
+pooled 2024 to 2026 (planning),E25 (p estimated from the stratum),2028-01-01 00:00,0.8204,21,amended
+pooled 2024 to 2026 (planning),E25 (p estimated from the stratum),2028-01-06 01:00,0.85505,22,amended
+pooled 2024 to 2026 (planning),E25 (p estimated from the stratum),2028-01-07 19:30,0.872,23,amended
+pooled 2024 to 2026 (planning),E25 (p estimated from the stratum),2028-02-01 00:00,0.872,23,amended
+pooled 2024 to 2026 (planning),E25 (p estimated from the stratum),2028-02-10 13:30,0.88175,24,amended
+pooled 2024 to 2026 (planning),E25 (p estimated from the stratum),2028-03-01 00:00,0.88175,24,amended
+pooled 2024 to 2026 (planning),E25 (p estimated from the stratum),2028-03-09 19:30,0.89365,25,amended
+pooled 2024 to 2026 (planning),E25 (p estimated from the stratum),2028-04-01 00:00,0.89365,25,amended
+pooled 2024 to 2026 (planning),E25 (p estimated from the stratum),2028-04-05 18:30,0.90335,26,amended
+pooled 2024 to 2026 (planning),E25 (p estimated from the stratum),2028-05-01 00:00,0.90335,26,amended
+pooled 2024 to 2026 (planning),E25 (p estimated from the stratum),2028-05-10 12:30,0.9117,27,amended
+pooled 2024 to 2026 (planning),E25 (p estimated from the stratum),2028-05-25 00:00,0.9241,28,amended
+pooled 2024 to 2026 (planning),E25 (p estimated from the stratum),2028-06-01 00:00,0.9241,28,amended
+pooled 2024 to 2026 (planning),E25 (p estimated from the stratum),2028-06-08 12:30,0.9275,29,amended
+pooled 2024 to 2026 (planning),E25 (p estimated from the stratum),2028-07-01 00:00,0.9275,29,amended
+pooled 2024 to 2026 (planning),E25 (p estimated from the stratum),2028-07-06 00:00,0.9402,30,amended
+pooled 2024 to 2026 (planning),E25 (p estimated from the stratum),2028-07-06 18:30,0.948,31,amended
+pooled 2024 to 2026 (planning),E25 (p estimated from the stratum),2028-08-01 00:00,0.948,31,amended
+pooled 2024 to 2026 (planning),E25 (p estimated from the stratum),2028-08-09 18:30,0.95115,32,amended
+pooled 2024 to 2026 (planning),E25 (p estimated from the stratum),2028-08-24 00:00,0.95775,33,amended
+pooled 2024 to 2026 (planning),E25 (p estimated from the stratum),2028-09-01 00:00,0.95775,33,amended
+pooled 2024 to 2026 (planning),E25 (p estimated from the stratum),2028-09-06 18:30,0.96095,34,amended
+pooled 2024 to 2026 (planning),E25 (p estimated from the stratum),2028-10-01 00:00,0.96095,34,amended
+pooled 2024 to 2026 (planning),E25 (p estimated from the stratum),2028-10-12 12:30,0.9726,36,amended
+pooled 2024 to 2026 (planning),E25 (p estimated from the stratum),2028-11-01 00:00,0.9726,36,amended
+pooled 2024 to 2026 (planning),E25 (p estimated from the stratum),2028-11-09 19:30,0.97555,37,amended
+pooled 2024 to 2026 (planning),E25 (p estimated from the stratum),2028-11-23 01:00,0.98005,38,amended
+pooled 2024 to 2026 (planning),E25 (p estimated from the stratum),2028-12-01 00:00,0.98005,38,amended
+pooled 2024 to 2026 (planning),E25 (p estimated from the stratum),2028-12-08 13:30,0.981,39,amended
+pooled 2024 to 2026 (planning),E25 (p estimated from the stratum),2029-01-01 00:00,0.981,39,amended
+pooled 2024 to 2026 (planning),oracle (true control rate),2026-11-01 00:00,0.0,0,amended
+pooled 2024 to 2026 (planning),oracle (true control rate),2026-11-26 01:00,0.0,1,amended
+pooled 2024 to 2026 (planning),oracle (true control rate),2026-12-01 00:00,0.0,1,amended
+pooled 2024 to 2026 (planning),oracle (true control rate),2026-12-10 13:30,0.0,2,amended
+pooled 2024 to 2026 (planning),oracle (true control rate),2027-01-01 00:00,0.0,2,amended
+pooled 2024 to 2026 (planning),oracle (true control rate),2027-01-07 01:00,0.22465,3,amended
+pooled 2024 to 2026 (planning),oracle (true control rate),2027-01-07 19:30,0.4138,4,amended
+pooled 2024 to 2026 (planning),oracle (true control rate),2027-02-01 00:00,0.4138,4,amended
+pooled 2024 to 2026 (planning),oracle (true control rate),2027-02-11 13:30,0.4138,5,amended
+pooled 2024 to 2026 (planning),oracle (true control rate),2027-03-01 00:00,0.4138,5,amended
+pooled 2024 to 2026 (planning),oracle (true control rate),2027-03-11 19:30,0.47265,6,amended
+pooled 2024 to 2026 (planning),oracle (true control rate),2027-04-01 00:00,0.47265,6,amended
+pooled 2024 to 2026 (planning),oracle (true control rate),2027-04-07 18:30,0.55175,7,amended
+pooled 2024 to 2026 (planning),oracle (true control rate),2027-04-15 00:00,0.55175,8,amended
+pooled 2024 to 2026 (planning),oracle (true control rate),2027-05-01 00:00,0.55175,8,amended
+pooled 2024 to 2026 (planning),oracle (true control rate),2027-05-12 12:30,0.61805,9,amended
+pooled 2024 to 2026 (planning),oracle (true control rate),2027-05-27 00:00,0.75285,10,amended
+pooled 2024 to 2026 (planning),oracle (true control rate),2027-06-01 00:00,0.75285,10,amended
+pooled 2024 to 2026 (planning),oracle (true control rate),2027-06-10 12:30,0.75285,11,amended
+pooled 2024 to 2026 (planning),oracle (true control rate),2027-07-01 00:00,0.75285,11,amended
+pooled 2024 to 2026 (planning),oracle (true control rate),2027-07-08 00:00,0.8001,12,amended
+pooled 2024 to 2026 (planning),oracle (true control rate),2027-07-08 18:30,0.8401,13,amended
+pooled 2024 to 2026 (planning),oracle (true control rate),2027-08-01 00:00,0.8401,13,amended
+pooled 2024 to 2026 (planning),oracle (true control rate),2027-08-11 18:30,0.8401,14,amended
+pooled 2024 to 2026 (planning),oracle (true control rate),2027-08-26 00:00,0.8681,15,amended
+pooled 2024 to 2026 (planning),oracle (true control rate),2027-09-01 00:00,0.8681,15,amended
+pooled 2024 to 2026 (planning),oracle (true control rate),2027-09-08 18:30,0.89235,16,amended
+pooled 2024 to 2026 (planning),oracle (true control rate),2027-10-01 00:00,0.89235,16,amended
+pooled 2024 to 2026 (planning),oracle (true control rate),2027-10-14 12:30,0.9155,18,amended
+pooled 2024 to 2026 (planning),oracle (true control rate),2027-11-01 00:00,0.9155,18,amended
+pooled 2024 to 2026 (planning),oracle (true control rate),2027-11-11 19:30,0.9312,19,amended
+pooled 2024 to 2026 (planning),oracle (true control rate),2027-11-25 01:00,0.957,20,amended
+pooled 2024 to 2026 (planning),oracle (true control rate),2027-12-01 00:00,0.957,20,amended
+pooled 2024 to 2026 (planning),oracle (true control rate),2027-12-10 13:30,0.957,21,amended
+pooled 2024 to 2026 (planning),oracle (true control rate),2028-01-01 00:00,0.957,21,amended
+pooled 2024 to 2026 (planning),oracle (true control rate),2028-01-06 01:00,0.96445,22,amended
+pooled 2024 to 2026 (planning),oracle (true control rate),2028-01-07 19:30,0.9718,23,amended
+pooled 2024 to 2026 (planning),oracle (true control rate),2028-02-01 00:00,0.9718,23,amended
+pooled 2024 to 2026 (planning),oracle (true control rate),2028-02-10 13:30,0.9782,24,amended
+pooled 2024 to 2026 (planning),oracle (true control rate),2028-03-01 00:00,0.9782,24,amended
+pooled 2024 to 2026 (planning),oracle (true control rate),2028-03-09 19:30,0.9782,25,amended
+pooled 2024 to 2026 (planning),oracle (true control rate),2028-04-01 00:00,0.9782,25,amended
+pooled 2024 to 2026 (planning),oracle (true control rate),2028-04-05 18:30,0.9797,26,amended
+pooled 2024 to 2026 (planning),oracle (true control rate),2028-05-01 00:00,0.9797,26,amended
+pooled 2024 to 2026 (planning),oracle (true control rate),2028-05-10 12:30,0.98255,27,amended
+pooled 2024 to 2026 (planning),oracle (true control rate),2028-05-25 00:00,0.9878,28,amended
+pooled 2024 to 2026 (planning),oracle (true control rate),2028-06-01 00:00,0.9878,28,amended
+pooled 2024 to 2026 (planning),oracle (true control rate),2028-06-08 12:30,0.9878,29,amended
+pooled 2024 to 2026 (planning),oracle (true control rate),2028-07-01 00:00,0.9878,29,amended
+pooled 2024 to 2026 (planning),oracle (true control rate),2028-07-06 00:00,0.98955,30,amended
+pooled 2024 to 2026 (planning),oracle (true control rate),2028-07-06 18:30,0.99105,31,amended
+pooled 2024 to 2026 (planning),oracle (true control rate),2028-08-01 00:00,0.99105,31,amended
+pooled 2024 to 2026 (planning),oracle (true control rate),2028-08-09 18:30,0.9929,32,amended
+pooled 2024 to 2026 (planning),oracle (true control rate),2028-08-24 00:00,0.9929,33,amended
+pooled 2024 to 2026 (planning),oracle (true control rate),2028-09-01 00:00,0.9929,33,amended
+pooled 2024 to 2026 (planning),oracle (true control rate),2028-09-06 18:30,0.994,34,amended
+pooled 2024 to 2026 (planning),oracle (true control rate),2028-10-01 00:00,0.994,34,amended
+pooled 2024 to 2026 (planning),oracle (true control rate),2028-10-12 12:30,0.9967,36,amended
+pooled 2024 to 2026 (planning),oracle (true control rate),2028-11-01 00:00,0.9967,36,amended
+pooled 2024 to 2026 (planning),oracle (true control rate),2028-11-09 19:30,0.9967,37,amended
+pooled 2024 to 2026 (planning),oracle (true control rate),2028-11-23 01:00,0.9973,38,amended
+pooled 2024 to 2026 (planning),oracle (true control rate),2028-12-01 00:00,0.9973,38,amended
+pooled 2024 to 2026 (planning),oracle (true control rate),2028-12-08 13:30,0.99785,39,amended
+pooled 2024 to 2026 (planning),oracle (true control rate),2029-01-01 00:00,0.99785,39,amended
+2026 only (E23 design),E25 (p estimated from the stratum),2026-11-01 00:00,0.0,0,amended
+2026 only (E23 design),E25 (p estimated from the stratum),2026-11-26 01:00,0.0,1,amended
+2026 only (E23 design),E25 (p estimated from the stratum),2026-12-01 00:00,0.0,1,amended
+2026 only (E23 design),E25 (p estimated from the stratum),2026-12-10 13:30,0.0,2,amended
+2026 only (E23 design),E25 (p estimated from the stratum),2027-01-01 00:00,0.0,2,amended
+2026 only (E23 design),E25 (p estimated from the stratum),2027-01-07 01:00,0.02275,3,amended
+2026 only (E23 design),E25 (p estimated from the stratum),2027-01-07 19:30,0.0646,4,amended
+2026 only (E23 design),E25 (p estimated from the stratum),2027-02-01 00:00,0.0646,4,amended
+2026 only (E23 design),E25 (p estimated from the stratum),2027-02-11 13:30,0.0845,5,amended
+2026 only (E23 design),E25 (p estimated from the stratum),2027-03-01 00:00,0.0845,5,amended
+2026 only (E23 design),E25 (p estimated from the stratum),2027-03-11 19:30,0.1112,6,amended
+2026 only (E23 design),E25 (p estimated from the stratum),2027-04-01 00:00,0.1112,6,amended
+2026 only (E23 design),E25 (p estimated from the stratum),2027-04-07 18:30,0.13255,7,amended
+2026 only (E23 design),E25 (p estimated from the stratum),2027-04-15 00:00,0.13255,8,amended
+2026 only (E23 design),E25 (p estimated from the stratum),2027-05-01 00:00,0.13255,8,amended
+2026 only (E23 design),E25 (p estimated from the stratum),2027-05-12 12:30,0.14965,9,amended
+2026 only (E23 design),E25 (p estimated from the stratum),2027-05-27 00:00,0.1941,10,amended
+2026 only (E23 design),E25 (p estimated from the stratum),2027-06-01 00:00,0.1941,10,amended
+2026 only (E23 design),E25 (p estimated from the stratum),2027-06-10 12:30,0.2027,11,amended
+2026 only (E23 design),E25 (p estimated from the stratum),2027-07-01 00:00,0.2027,11,amended
+2026 only (E23 design),E25 (p estimated from the stratum),2027-07-08 00:00,0.27115,12,amended
+2026 only (E23 design),E25 (p estimated from the stratum),2027-07-08 18:30,0.30035,13,amended
+2026 only (E23 design),E25 (p estimated from the stratum),2027-08-01 00:00,0.30035,13,amended
+2026 only (E23 design),E25 (p estimated from the stratum),2027-08-11 18:30,0.3126,14,amended
+2026 only (E23 design),E25 (p estimated from the stratum),2027-08-26 00:00,0.3518,15,amended
+2026 only (E23 design),E25 (p estimated from the stratum),2027-09-01 00:00,0.3518,15,amended
+2026 only (E23 design),E25 (p estimated from the stratum),2027-09-08 18:30,0.36695,16,amended
+2026 only (E23 design),E25 (p estimated from the stratum),2027-10-01 00:00,0.36695,16,amended
+2026 only (E23 design),E25 (p estimated from the stratum),2027-10-14 12:30,0.4308,18,amended
+2026 only (E23 design),E25 (p estimated from the stratum),2027-11-01 00:00,0.4308,18,amended
+2026 only (E23 design),E25 (p estimated from the stratum),2027-11-11 19:30,0.44965,19,amended
+2026 only (E23 design),E25 (p estimated from the stratum),2027-11-25 01:00,0.50025,20,amended
+2026 only (E23 design),E25 (p estimated from the stratum),2027-12-01 00:00,0.50025,20,amended
+2026 only (E23 design),E25 (p estimated from the stratum),2027-12-10 13:30,0.50945,21,amended
+2026 only (E23 design),E25 (p estimated from the stratum),2028-01-01 00:00,0.50945,21,amended
+2026 only (E23 design),E25 (p estimated from the stratum),2028-01-06 01:00,0.57005,22,amended
+2026 only (E23 design),E25 (p estimated from the stratum),2028-01-07 19:30,0.59,23,amended
+2026 only (E23 design),E25 (p estimated from the stratum),2028-02-01 00:00,0.59,23,amended
+2026 only (E23 design),E25 (p estimated from the stratum),2028-02-10 13:30,0.6013,24,amended
+2026 only (E23 design),E25 (p estimated from the stratum),2028-03-01 00:00,0.6013,24,amended
+2026 only (E23 design),E25 (p estimated from the stratum),2028-03-09 19:30,0.61395,25,amended
+2026 only (E23 design),E25 (p estimated from the stratum),2028-04-01 00:00,0.61395,25,amended
+2026 only (E23 design),E25 (p estimated from the stratum),2028-04-05 18:30,0.6257,26,amended
+2026 only (E23 design),E25 (p estimated from the stratum),2028-05-01 00:00,0.6257,26,amended
+2026 only (E23 design),E25 (p estimated from the stratum),2028-05-10 12:30,0.6351,27,amended
+2026 only (E23 design),E25 (p estimated from the stratum),2028-05-25 00:00,0.6578,28,amended
+2026 only (E23 design),E25 (p estimated from the stratum),2028-06-01 00:00,0.6578,28,amended
+2026 only (E23 design),E25 (p estimated from the stratum),2028-06-08 12:30,0.6624,29,amended
+2026 only (E23 design),E25 (p estimated from the stratum),2028-07-01 00:00,0.6624,29,amended
+2026 only (E23 design),E25 (p estimated from the stratum),2028-07-06 00:00,0.69415,30,amended
+2026 only (E23 design),E25 (p estimated from the stratum),2028-07-06 18:30,0.70755,31,amended
+2026 only (E23 design),E25 (p estimated from the stratum),2028-08-01 00:00,0.70755,31,amended
+2026 only (E23 design),E25 (p estimated from the stratum),2028-08-09 18:30,0.71345,32,amended
+2026 only (E23 design),E25 (p estimated from the stratum),2028-08-24 00:00,0.73195,33,amended
+2026 only (E23 design),E25 (p estimated from the stratum),2028-09-01 00:00,0.73195,33,amended
+2026 only (E23 design),E25 (p estimated from the stratum),2028-09-06 18:30,0.7396,34,amended
+2026 only (E23 design),E25 (p estimated from the stratum),2028-10-01 00:00,0.7396,34,amended
+2026 only (E23 design),E25 (p estimated from the stratum),2028-10-12 12:30,0.7721,36,amended
+2026 only (E23 design),E25 (p estimated from the stratum),2028-11-01 00:00,0.7721,36,amended
+2026 only (E23 design),E25 (p estimated from the stratum),2028-11-09 19:30,0.7813,37,amended
+2026 only (E23 design),E25 (p estimated from the stratum),2028-11-23 01:00,0.8058,38,amended
+2026 only (E23 design),E25 (p estimated from the stratum),2028-12-01 00:00,0.8058,38,amended
+2026 only (E23 design),E25 (p estimated from the stratum),2028-12-08 13:30,0.80945,39,amended
+2026 only (E23 design),E25 (p estimated from the stratum),2029-01-01 00:00,0.80945,39,amended
+2026 only (E23 design),oracle (true control rate),2026-11-01 00:00,0.0,0,amended
+2026 only (E23 design),oracle (true control rate),2026-11-26 01:00,0.0,1,amended
+2026 only (E23 design),oracle (true control rate),2026-12-01 00:00,0.0,1,amended
+2026 only (E23 design),oracle (true control rate),2026-12-10 13:30,0.0,2,amended
+2026 only (E23 design),oracle (true control rate),2027-01-01 00:00,0.0,2,amended
+2026 only (E23 design),oracle (true control rate),2027-01-07 01:00,0.08765,3,amended
+2026 only (E23 design),oracle (true control rate),2027-01-07 19:30,0.17595,4,amended
+2026 only (E23 design),oracle (true control rate),2027-02-01 00:00,0.17595,4,amended
+2026 only (E23 design),oracle (true control rate),2027-02-11 13:30,0.26035,5,amended
+2026 only (E23 design),oracle (true control rate),2027-03-01 00:00,0.26035,5,amended
+2026 only (E23 design),oracle (true control rate),2027-03-11 19:30,0.26035,6,amended
+2026 only (E23 design),oracle (true control rate),2027-04-01 00:00,0.26035,6,amended
+2026 only (E23 design),oracle (true control rate),2027-04-07 18:30,0.27705,7,amended
+2026 only (E23 design),oracle (true control rate),2027-04-15 00:00,0.3707,8,amended
+2026 only (E23 design),oracle (true control rate),2027-05-01 00:00,0.3707,8,amended
+2026 only (E23 design),oracle (true control rate),2027-05-12 12:30,0.3707,9,amended
+2026 only (E23 design),oracle (true control rate),2027-05-27 00:00,0.4094,10,amended
+2026 only (E23 design),oracle (true control rate),2027-06-01 00:00,0.4094,10,amended
+2026 only (E23 design),oracle (true control rate),2027-06-10 12:30,0.4519,11,amended
+2026 only (E23 design),oracle (true control rate),2027-07-01 00:00,0.4519,11,amended
+2026 only (E23 design),oracle (true control rate),2027-07-08 00:00,0.593,12,amended
+2026 only (E23 design),oracle (true control rate),2027-07-08 18:30,0.593,13,amended
+2026 only (E23 design),oracle (true control rate),2027-08-01 00:00,0.593,13,amended
+2026 only (E23 design),oracle (true control rate),2027-08-11 18:30,0.6014,14,amended
+2026 only (E23 design),oracle (true control rate),2027-08-26 00:00,0.65165,15,amended
+2026 only (E23 design),oracle (true control rate),2027-09-01 00:00,0.65165,15,amended
+2026 only (E23 design),oracle (true control rate),2027-09-08 18:30,0.6815,16,amended
+2026 only (E23 design),oracle (true control rate),2027-10-01 00:00,0.6815,16,amended
+2026 only (E23 design),oracle (true control rate),2027-10-14 12:30,0.6994,18,amended
+2026 only (E23 design),oracle (true control rate),2027-11-01 00:00,0.6994,18,amended
+2026 only (E23 design),oracle (true control rate),2027-11-11 19:30,0.71815,19,amended
+2026 only (E23 design),oracle (true control rate),2027-11-25 01:00,0.7864,20,amended
+2026 only (E23 design),oracle (true control rate),2027-12-01 00:00,0.7864,20,amended
+2026 only (E23 design),oracle (true control rate),2027-12-10 13:30,0.7864,21,amended
+2026 only (E23 design),oracle (true control rate),2028-01-01 00:00,0.7864,21,amended
+2026 only (E23 design),oracle (true control rate),2028-01-06 01:00,0.8006,22,amended
+2026 only (E23 design),oracle (true control rate),2028-01-07 19:30,0.8148,23,amended
+2026 only (E23 design),oracle (true control rate),2028-02-01 00:00,0.8148,23,amended
+2026 only (E23 design),oracle (true control rate),2028-02-10 13:30,0.8291,24,amended
+2026 only (E23 design),oracle (true control rate),2028-03-01 00:00,0.8291,24,amended
+2026 only (E23 design),oracle (true control rate),2028-03-09 19:30,0.84325,25,amended
+2026 only (E23 design),oracle (true control rate),2028-04-01 00:00,0.84325,25,amended
+2026 only (E23 design),oracle (true control rate),2028-04-05 18:30,0.84325,26,amended
+2026 only (E23 design),oracle (true control rate),2028-05-01 00:00,0.84325,26,amended
+2026 only (E23 design),oracle (true control rate),2028-05-10 12:30,0.84555,27,amended
+2026 only (E23 design),oracle (true control rate),2028-05-25 00:00,0.86075,28,amended
+2026 only (E23 design),oracle (true control rate),2028-06-01 00:00,0.86075,28,amended
+2026 only (E23 design),oracle (true control rate),2028-06-08 12:30,0.86895,29,amended
+2026 only (E23 design),oracle (true control rate),2028-07-01 00:00,0.86895,29,amended
+2026 only (E23 design),oracle (true control rate),2028-07-06 00:00,0.9031,30,amended
+2026 only (E23 design),oracle (true control rate),2028-07-06 18:30,0.9031,31,amended
+2026 only (E23 design),oracle (true control rate),2028-08-01 00:00,0.9031,31,amended
+2026 only (E23 design),oracle (true control rate),2028-08-09 18:30,0.9043,32,amended
+2026 only (E23 design),oracle (true control rate),2028-08-24 00:00,0.91485,33,amended
+2026 only (E23 design),oracle (true control rate),2028-09-01 00:00,0.91485,33,amended
+2026 only (E23 design),oracle (true control rate),2028-09-06 18:30,0.9217,34,amended
+2026 only (E23 design),oracle (true control rate),2028-10-01 00:00,0.9217,34,amended
+2026 only (E23 design),oracle (true control rate),2028-10-12 12:30,0.9256,36,amended
+2026 only (E23 design),oracle (true control rate),2028-11-01 00:00,0.9256,36,amended
+2026 only (E23 design),oracle (true control rate),2028-11-09 19:30,0.9304,37,amended
+2026 only (E23 design),oracle (true control rate),2028-11-23 01:00,0.9475,38,amended
+2026 only (E23 design),oracle (true control rate),2028-12-01 00:00,0.9475,38,amended
+2026 only (E23 design),oracle (true control rate),2028-12-08 13:30,0.9528,39,amended
+2026 only (E23 design),oracle (true control rate),2029-01-01 00:00,0.9528,39,amended
+half of the pooled excess,E25 (p estimated from the stratum),2026-11-01 00:00,0.0,0,amended
+half of the pooled excess,E25 (p estimated from the stratum),2026-11-26 01:00,0.0,1,amended
+half of the pooled excess,E25 (p estimated from the stratum),2026-12-01 00:00,0.0,1,amended
+half of the pooled excess,E25 (p estimated from the stratum),2026-12-10 13:30,0.0,2,amended
+half of the pooled excess,E25 (p estimated from the stratum),2027-01-01 00:00,0.0,2,amended
+half of the pooled excess,E25 (p estimated from the stratum),2027-01-07 01:00,0.00665,3,amended
+half of the pooled excess,E25 (p estimated from the stratum),2027-01-07 19:30,0.0335,4,amended
+half of the pooled excess,E25 (p estimated from the stratum),2027-02-01 00:00,0.0335,4,amended
+half of the pooled excess,E25 (p estimated from the stratum),2027-02-11 13:30,0.04825,5,amended
+half of the pooled excess,E25 (p estimated from the stratum),2027-03-01 00:00,0.04825,5,amended
+half of the pooled excess,E25 (p estimated from the stratum),2027-03-11 19:30,0.06895,6,amended
+half of the pooled excess,E25 (p estimated from the stratum),2027-04-01 00:00,0.06895,6,amended
+half of the pooled excess,E25 (p estimated from the stratum),2027-04-07 18:30,0.08885,7,amended
+half of the pooled excess,E25 (p estimated from the stratum),2027-04-15 00:00,0.08885,8,amended
+half of the pooled excess,E25 (p estimated from the stratum),2027-05-01 00:00,0.08885,8,amended
+half of the pooled excess,E25 (p estimated from the stratum),2027-05-12 12:30,0.1039,9,amended
+half of the pooled excess,E25 (p estimated from the stratum),2027-05-27 00:00,0.1265,10,amended
+half of the pooled excess,E25 (p estimated from the stratum),2027-06-01 00:00,0.1265,10,amended
+half of the pooled excess,E25 (p estimated from the stratum),2027-06-10 12:30,0.13235,11,amended
+half of the pooled excess,E25 (p estimated from the stratum),2027-07-01 00:00,0.13235,11,amended
+half of the pooled excess,E25 (p estimated from the stratum),2027-07-08 00:00,0.1597,12,amended
+half of the pooled excess,E25 (p estimated from the stratum),2027-07-08 18:30,0.18,13,amended
+half of the pooled excess,E25 (p estimated from the stratum),2027-08-01 00:00,0.18,13,amended
+half of the pooled excess,E25 (p estimated from the stratum),2027-08-11 18:30,0.1908,14,amended
+half of the pooled excess,E25 (p estimated from the stratum),2027-08-26 00:00,0.2072,15,amended
+half of the pooled excess,E25 (p estimated from the stratum),2027-09-01 00:00,0.2072,15,amended
+half of the pooled excess,E25 (p estimated from the stratum),2027-09-08 18:30,0.21715,16,amended
+half of the pooled excess,E25 (p estimated from the stratum),2027-10-01 00:00,0.21715,16,amended
+half of the pooled excess,E25 (p estimated from the stratum),2027-10-14 12:30,0.25275,18,amended
+half of the pooled excess,E25 (p estimated from the stratum),2027-11-01 00:00,0.25275,18,amended
+half of the pooled excess,E25 (p estimated from the stratum),2027-11-11 19:30,0.26805,19,amended
+half of the pooled excess,E25 (p estimated from the stratum),2027-11-25 01:00,0.28845,20,amended
+half of the pooled excess,E25 (p estimated from the stratum),2027-12-01 00:00,0.28845,20,amended
+half of the pooled excess,E25 (p estimated from the stratum),2027-12-10 13:30,0.29475,21,amended
+half of the pooled excess,E25 (p estimated from the stratum),2028-01-01 00:00,0.29475,21,amended
+half of the pooled excess,E25 (p estimated from the stratum),2028-01-06 01:00,0.3175,22,amended
+half of the pooled excess,E25 (p estimated from the stratum),2028-01-07 19:30,0.33475,23,amended
+half of the pooled excess,E25 (p estimated from the stratum),2028-02-01 00:00,0.33475,23,amended
+half of the pooled excess,E25 (p estimated from the stratum),2028-02-10 13:30,0.3448,24,amended
+half of the pooled excess,E25 (p estimated from the stratum),2028-03-01 00:00,0.3448,24,amended
+half of the pooled excess,E25 (p estimated from the stratum),2028-03-09 19:30,0.3589,25,amended
+half of the pooled excess,E25 (p estimated from the stratum),2028-04-01 00:00,0.3589,25,amended
+half of the pooled excess,E25 (p estimated from the stratum),2028-04-05 18:30,0.3714,26,amended
+half of the pooled excess,E25 (p estimated from the stratum),2028-05-01 00:00,0.3714,26,amended
+half of the pooled excess,E25 (p estimated from the stratum),2028-05-10 12:30,0.38195,27,amended
+half of the pooled excess,E25 (p estimated from the stratum),2028-05-25 00:00,0.39765,28,amended
+half of the pooled excess,E25 (p estimated from the stratum),2028-06-01 00:00,0.39765,28,amended
+half of the pooled excess,E25 (p estimated from the stratum),2028-06-08 12:30,0.40225,29,amended
+half of the pooled excess,E25 (p estimated from the stratum),2028-07-01 00:00,0.40225,29,amended
+half of the pooled excess,E25 (p estimated from the stratum),2028-07-06 00:00,0.419,30,amended
+half of the pooled excess,E25 (p estimated from the stratum),2028-07-06 18:30,0.4316,31,amended
+half of the pooled excess,E25 (p estimated from the stratum),2028-08-01 00:00,0.4316,31,amended
+half of the pooled excess,E25 (p estimated from the stratum),2028-08-09 18:30,0.43825,32,amended
+half of the pooled excess,E25 (p estimated from the stratum),2028-08-24 00:00,0.45065,33,amended
+half of the pooled excess,E25 (p estimated from the stratum),2028-09-01 00:00,0.45065,33,amended
+half of the pooled excess,E25 (p estimated from the stratum),2028-09-06 18:30,0.4591,34,amended
+half of the pooled excess,E25 (p estimated from the stratum),2028-10-01 00:00,0.4591,34,amended
+half of the pooled excess,E25 (p estimated from the stratum),2028-10-12 12:30,0.48495,36,amended
+half of the pooled excess,E25 (p estimated from the stratum),2028-11-01 00:00,0.48495,36,amended
+half of the pooled excess,E25 (p estimated from the stratum),2028-11-09 19:30,0.49655,37,amended
+half of the pooled excess,E25 (p estimated from the stratum),2028-11-23 01:00,0.51135,38,amended
+half of the pooled excess,E25 (p estimated from the stratum),2028-12-01 00:00,0.51135,38,amended
+half of the pooled excess,E25 (p estimated from the stratum),2028-12-08 13:30,0.51575,39,amended
+half of the pooled excess,E25 (p estimated from the stratum),2029-01-01 00:00,0.51575,39,amended
+half of the pooled excess,oracle (true control rate),2026-11-01 00:00,0.0,0,amended
+half of the pooled excess,oracle (true control rate),2026-11-26 01:00,0.0,1,amended
+half of the pooled excess,oracle (true control rate),2026-12-01 00:00,0.0,1,amended
+half of the pooled excess,oracle (true control rate),2026-12-10 13:30,0.0,2,amended
+half of the pooled excess,oracle (true control rate),2027-01-01 00:00,0.0,2,amended
+half of the pooled excess,oracle (true control rate),2027-01-07 01:00,0.0521,3,amended
+half of the pooled excess,oracle (true control rate),2027-01-07 19:30,0.12585,4,amended
+half of the pooled excess,oracle (true control rate),2027-02-01 00:00,0.12585,4,amended
+half of the pooled excess,oracle (true control rate),2027-02-11 13:30,0.12585,5,amended
+half of the pooled excess,oracle (true control rate),2027-03-01 00:00,0.12585,5,amended
+half of the pooled excess,oracle (true control rate),2027-03-11 19:30,0.1461,6,amended
+half of the pooled excess,oracle (true control rate),2027-04-01 00:00,0.1461,6,amended
+half of the pooled excess,oracle (true control rate),2027-04-07 18:30,0.18365,7,amended
+half of the pooled excess,oracle (true control rate),2027-04-15 00:00,0.18365,8,amended
+half of the pooled excess,oracle (true control rate),2027-05-01 00:00,0.18365,8,amended
+half of the pooled excess,oracle (true control rate),2027-05-12 12:30,0.20685,9,amended
+half of the pooled excess,oracle (true control rate),2027-05-27 00:00,0.26805,10,amended
+half of the pooled excess,oracle (true control rate),2027-06-01 00:00,0.26805,10,amended
+half of the pooled excess,oracle (true control rate),2027-06-10 12:30,0.26805,11,amended
+half of the pooled excess,oracle (true control rate),2027-07-01 00:00,0.26805,11,amended
+half of the pooled excess,oracle (true control rate),2027-07-08 00:00,0.2906,12,amended
+half of the pooled excess,oracle (true control rate),2027-07-08 18:30,0.3244,13,amended
+half of the pooled excess,oracle (true control rate),2027-08-01 00:00,0.3244,13,amended
+half of the pooled excess,oracle (true control rate),2027-08-11 18:30,0.3244,14,amended
+half of the pooled excess,oracle (true control rate),2027-08-26 00:00,0.34185,15,amended
+half of the pooled excess,oracle (true control rate),2027-09-01 00:00,0.34185,15,amended
+half of the pooled excess,oracle (true control rate),2027-09-08 18:30,0.3649,16,amended
+half of the pooled excess,oracle (true control rate),2027-10-01 00:00,0.3649,16,amended
+half of the pooled excess,oracle (true control rate),2027-10-14 12:30,0.3961,18,amended
+half of the pooled excess,oracle (true control rate),2027-11-01 00:00,0.3961,18,amended
+half of the pooled excess,oracle (true control rate),2027-11-11 19:30,0.4117,19,amended
+half of the pooled excess,oracle (true control rate),2027-11-25 01:00,0.45205,20,amended
+half of the pooled excess,oracle (true control rate),2027-12-01 00:00,0.45205,20,amended
+half of the pooled excess,oracle (true control rate),2027-12-10 13:30,0.45205,21,amended
+half of the pooled excess,oracle (true control rate),2028-01-01 00:00,0.45205,21,amended
+half of the pooled excess,oracle (true control rate),2028-01-06 01:00,0.46635,22,amended
+half of the pooled excess,oracle (true control rate),2028-01-07 19:30,0.4839,23,amended
+half of the pooled excess,oracle (true control rate),2028-02-01 00:00,0.4839,23,amended
+half of the pooled excess,oracle (true control rate),2028-02-10 13:30,0.5079,24,amended
+half of the pooled excess,oracle (true control rate),2028-03-01 00:00,0.5079,24,amended
+half of the pooled excess,oracle (true control rate),2028-03-09 19:30,0.5079,25,amended
+half of the pooled excess,oracle (true control rate),2028-04-01 00:00,0.5079,25,amended
+half of the pooled excess,oracle (true control rate),2028-04-05 18:30,0.5139,26,amended
+half of the pooled excess,oracle (true control rate),2028-05-01 00:00,0.5139,26,amended
+half of the pooled excess,oracle (true control rate),2028-05-10 12:30,0.52475,27,amended
+half of the pooled excess,oracle (true control rate),2028-05-25 00:00,0.5547,28,amended
+half of the pooled excess,oracle (true control rate),2028-06-01 00:00,0.5547,28,amended
+half of the pooled excess,oracle (true control rate),2028-06-08 12:30,0.5547,29,amended
+half of the pooled excess,oracle (true control rate),2028-07-01 00:00,0.5547,29,amended
+half of the pooled excess,oracle (true control rate),2028-07-06 00:00,0.5657,30,amended
+half of the pooled excess,oracle (true control rate),2028-07-06 18:30,0.58025,31,amended
+half of the pooled excess,oracle (true control rate),2028-08-01 00:00,0.58025,31,amended
+half of the pooled excess,oracle (true control rate),2028-08-09 18:30,0.598,32,amended
+half of the pooled excess,oracle (true control rate),2028-08-24 00:00,0.598,33,amended
+half of the pooled excess,oracle (true control rate),2028-09-01 00:00,0.598,33,amended
+half of the pooled excess,oracle (true control rate),2028-09-06 18:30,0.6073,34,amended
+half of the pooled excess,oracle (true control rate),2028-10-01 00:00,0.6073,34,amended
+half of the pooled excess,oracle (true control rate),2028-10-12 12:30,0.64735,36,amended
+half of the pooled excess,oracle (true control rate),2028-11-01 00:00,0.64735,36,amended
+half of the pooled excess,oracle (true control rate),2028-11-09 19:30,0.64735,37,amended
+half of the pooled excess,oracle (true control rate),2028-11-23 01:00,0.6574,38,amended
+half of the pooled excess,oracle (true control rate),2028-12-01 00:00,0.6574,38,amended
+half of the pooled excess,oracle (true control rate),2028-12-08 13:30,0.669,39,amended
+half of the pooled excess,oracle (true control rate),2029-01-01 00:00,0.669,39,amended
+null (release rate = control rate),E25 (p estimated from the stratum),2026-11-01 00:00,0.0,0,amended
+null (release rate = control rate),E25 (p estimated from the stratum),2026-11-26 01:00,0.0,1,amended
+null (release rate = control rate),E25 (p estimated from the stratum),2026-12-01 00:00,0.0,1,amended
+null (release rate = control rate),E25 (p estimated from the stratum),2026-12-10 13:30,0.0,2,amended
+null (release rate = control rate),E25 (p estimated from the stratum),2027-01-01 00:00,0.0,2,amended
+null (release rate = control rate),E25 (p estimated from the stratum),2027-01-07 01:00,0.0004,3,amended
+null (release rate = control rate),E25 (p estimated from the stratum),2027-01-07 19:30,0.0022,4,amended
+null (release rate = control rate),E25 (p estimated from the stratum),2027-02-01 00:00,0.0022,4,amended
+null (release rate = control rate),E25 (p estimated from the stratum),2027-02-11 13:30,0.0037,5,amended
+null (release rate = control rate),E25 (p estimated from the stratum),2027-03-01 00:00,0.0037,5,amended
+null (release rate = control rate),E25 (p estimated from the stratum),2027-03-11 19:30,0.0052,6,amended
+null (release rate = control rate),E25 (p estimated from the stratum),2027-04-01 00:00,0.0052,6,amended
+null (release rate = control rate),E25 (p estimated from the stratum),2027-04-07 18:30,0.00685,7,amended
+null (release rate = control rate),E25 (p estimated from the stratum),2027-04-15 00:00,0.00685,8,amended
+null (release rate = control rate),E25 (p estimated from the stratum),2027-05-01 00:00,0.00685,8,amended
+null (release rate = control rate),E25 (p estimated from the stratum),2027-05-12 12:30,0.0085,9,amended
+null (release rate = control rate),E25 (p estimated from the stratum),2027-05-27 00:00,0.0097,10,amended
+null (release rate = control rate),E25 (p estimated from the stratum),2027-06-01 00:00,0.0097,10,amended
+null (release rate = control rate),E25 (p estimated from the stratum),2027-06-10 12:30,0.00995,11,amended
+null (release rate = control rate),E25 (p estimated from the stratum),2027-07-01 00:00,0.00995,11,amended
+null (release rate = control rate),E25 (p estimated from the stratum),2027-07-08 00:00,0.0111,12,amended
+null (release rate = control rate),E25 (p estimated from the stratum),2027-07-08 18:30,0.0121,13,amended
+null (release rate = control rate),E25 (p estimated from the stratum),2027-08-01 00:00,0.0121,13,amended
+null (release rate = control rate),E25 (p estimated from the stratum),2027-08-11 18:30,0.0124,14,amended
+null (release rate = control rate),E25 (p estimated from the stratum),2027-08-26 00:00,0.01315,15,amended
+null (release rate = control rate),E25 (p estimated from the stratum),2027-09-01 00:00,0.01315,15,amended
+null (release rate = control rate),E25 (p estimated from the stratum),2027-09-08 18:30,0.01375,16,amended
+null (release rate = control rate),E25 (p estimated from the stratum),2027-10-01 00:00,0.01375,16,amended
+null (release rate = control rate),E25 (p estimated from the stratum),2027-10-14 12:30,0.015,18,amended
+null (release rate = control rate),E25 (p estimated from the stratum),2027-11-01 00:00,0.015,18,amended
+null (release rate = control rate),E25 (p estimated from the stratum),2027-11-11 19:30,0.0156,19,amended
+null (release rate = control rate),E25 (p estimated from the stratum),2027-11-25 01:00,0.01615,20,amended
+null (release rate = control rate),E25 (p estimated from the stratum),2027-12-01 00:00,0.01615,20,amended
+null (release rate = control rate),E25 (p estimated from the stratum),2027-12-10 13:30,0.0163,21,amended
+null (release rate = control rate),E25 (p estimated from the stratum),2028-01-01 00:00,0.0163,21,amended
+null (release rate = control rate),E25 (p estimated from the stratum),2028-01-06 01:00,0.01685,22,amended
+null (release rate = control rate),E25 (p estimated from the stratum),2028-01-07 19:30,0.0177,23,amended
+null (release rate = control rate),E25 (p estimated from the stratum),2028-02-01 00:00,0.0177,23,amended
+null (release rate = control rate),E25 (p estimated from the stratum),2028-02-10 13:30,0.0179,24,amended
+null (release rate = control rate),E25 (p estimated from the stratum),2028-03-01 00:00,0.0179,24,amended
+null (release rate = control rate),E25 (p estimated from the stratum),2028-03-09 19:30,0.01855,25,amended
+null (release rate = control rate),E25 (p estimated from the stratum),2028-04-01 00:00,0.01855,25,amended
+null (release rate = control rate),E25 (p estimated from the stratum),2028-04-05 18:30,0.019,26,amended
+null (release rate = control rate),E25 (p estimated from the stratum),2028-05-01 00:00,0.019,26,amended
+null (release rate = control rate),E25 (p estimated from the stratum),2028-05-10 12:30,0.0193,27,amended
+null (release rate = control rate),E25 (p estimated from the stratum),2028-05-25 00:00,0.0196,28,amended
+null (release rate = control rate),E25 (p estimated from the stratum),2028-06-01 00:00,0.0196,28,amended
+null (release rate = control rate),E25 (p estimated from the stratum),2028-06-08 12:30,0.0197,29,amended
+null (release rate = control rate),E25 (p estimated from the stratum),2028-07-01 00:00,0.0197,29,amended
+null (release rate = control rate),E25 (p estimated from the stratum),2028-07-06 00:00,0.01995,30,amended
+null (release rate = control rate),E25 (p estimated from the stratum),2028-07-06 18:30,0.02025,31,amended
+null (release rate = control rate),E25 (p estimated from the stratum),2028-08-01 00:00,0.02025,31,amended
+null (release rate = control rate),E25 (p estimated from the stratum),2028-08-09 18:30,0.02045,32,amended
+null (release rate = control rate),E25 (p estimated from the stratum),2028-08-24 00:00,0.02045,33,amended
+null (release rate = control rate),E25 (p estimated from the stratum),2028-09-01 00:00,0.02045,33,amended
+null (release rate = control rate),E25 (p estimated from the stratum),2028-09-06 18:30,0.02075,34,amended
+null (release rate = control rate),E25 (p estimated from the stratum),2028-10-01 00:00,0.02075,34,amended
+null (release rate = control rate),E25 (p estimated from the stratum),2028-10-12 12:30,0.02115,36,amended
+null (release rate = control rate),E25 (p estimated from the stratum),2028-11-01 00:00,0.02115,36,amended
+null (release rate = control rate),E25 (p estimated from the stratum),2028-11-09 19:30,0.0214,37,amended
+null (release rate = control rate),E25 (p estimated from the stratum),2028-11-23 01:00,0.0216,38,amended
+null (release rate = control rate),E25 (p estimated from the stratum),2028-12-01 00:00,0.0216,38,amended
+null (release rate = control rate),E25 (p estimated from the stratum),2028-12-08 13:30,0.02165,39,amended
+null (release rate = control rate),E25 (p estimated from the stratum),2029-01-01 00:00,0.02165,39,amended
+null (release rate = control rate),oracle (true control rate),2026-11-01 00:00,0.0,0,amended
+null (release rate = control rate),oracle (true control rate),2026-11-26 01:00,0.0,1,amended
+null (release rate = control rate),oracle (true control rate),2026-12-01 00:00,0.0,1,amended
+null (release rate = control rate),oracle (true control rate),2026-12-10 13:30,0.0,2,amended
+null (release rate = control rate),oracle (true control rate),2027-01-01 00:00,0.0,2,amended
+null (release rate = control rate),oracle (true control rate),2027-01-07 01:00,0.00325,3,amended
+null (release rate = control rate),oracle (true control rate),2027-01-07 19:30,0.0107,4,amended
+null (release rate = control rate),oracle (true control rate),2027-02-01 00:00,0.0107,4,amended
+null (release rate = control rate),oracle (true control rate),2027-02-11 13:30,0.0107,5,amended
+null (release rate = control rate),oracle (true control rate),2027-03-01 00:00,0.0107,5,amended
+null (release rate = control rate),oracle (true control rate),2027-03-11 19:30,0.01225,6,amended
+null (release rate = control rate),oracle (true control rate),2027-04-01 00:00,0.01225,6,amended
+null (release rate = control rate),oracle (true control rate),2027-04-07 18:30,0.0151,7,amended
+null (release rate = control rate),oracle (true control rate),2027-04-15 00:00,0.0151,8,amended
+null (release rate = control rate),oracle (true control rate),2027-05-01 00:00,0.0151,8,amended
+null (release rate = control rate),oracle (true control rate),2027-05-12 12:30,0.0159,9,amended
+null (release rate = control rate),oracle (true control rate),2027-05-27 00:00,0.01785,10,amended
+null (release rate = control rate),oracle (true control rate),2027-06-01 00:00,0.01785,10,amended
+null (release rate = control rate),oracle (true control rate),2027-06-10 12:30,0.01785,11,amended
+null (release rate = control rate),oracle (true control rate),2027-07-01 00:00,0.01785,11,amended
+null (release rate = control rate),oracle (true control rate),2027-07-08 00:00,0.01835,12,amended
+null (release rate = control rate),oracle (true control rate),2027-07-08 18:30,0.019,13,amended
+null (release rate = control rate),oracle (true control rate),2027-08-01 00:00,0.019,13,amended
+null (release rate = control rate),oracle (true control rate),2027-08-11 18:30,0.019,14,amended
+null (release rate = control rate),oracle (true control rate),2027-08-26 00:00,0.0192,15,amended
+null (release rate = control rate),oracle (true control rate),2027-09-01 00:00,0.0192,15,amended
+null (release rate = control rate),oracle (true control rate),2027-09-08 18:30,0.01975,16,amended
+null (release rate = control rate),oracle (true control rate),2027-10-01 00:00,0.01975,16,amended
+null (release rate = control rate),oracle (true control rate),2027-10-14 12:30,0.0211,18,amended
+null (release rate = control rate),oracle (true control rate),2027-11-01 00:00,0.0211,18,amended
+null (release rate = control rate),oracle (true control rate),2027-11-11 19:30,0.0214,19,amended
+null (release rate = control rate),oracle (true control rate),2027-11-25 01:00,0.0222,20,amended
+null (release rate = control rate),oracle (true control rate),2027-12-01 00:00,0.0222,20,amended
+null (release rate = control rate),oracle (true control rate),2027-12-10 13:30,0.0222,21,amended
+null (release rate = control rate),oracle (true control rate),2028-01-01 00:00,0.0222,21,amended
+null (release rate = control rate),oracle (true control rate),2028-01-06 01:00,0.0223,22,amended
+null (release rate = control rate),oracle (true control rate),2028-01-07 19:30,0.02265,23,amended
+null (release rate = control rate),oracle (true control rate),2028-02-01 00:00,0.02265,23,amended
+null (release rate = control rate),oracle (true control rate),2028-02-10 13:30,0.02315,24,amended
+null (release rate = control rate),oracle (true control rate),2028-03-01 00:00,0.02315,24,amended
+null (release rate = control rate),oracle (true control rate),2028-03-09 19:30,0.02315,25,amended
+null (release rate = control rate),oracle (true control rate),2028-04-01 00:00,0.02315,25,amended
+null (release rate = control rate),oracle (true control rate),2028-04-05 18:30,0.02325,26,amended
+null (release rate = control rate),oracle (true control rate),2028-05-01 00:00,0.02325,26,amended
+null (release rate = control rate),oracle (true control rate),2028-05-10 12:30,0.02345,27,amended
+null (release rate = control rate),oracle (true control rate),2028-05-25 00:00,0.02365,28,amended
+null (release rate = control rate),oracle (true control rate),2028-06-01 00:00,0.02365,28,amended
+null (release rate = control rate),oracle (true control rate),2028-06-08 12:30,0.02365,29,amended
+null (release rate = control rate),oracle (true control rate),2028-07-01 00:00,0.02365,29,amended
+null (release rate = control rate),oracle (true control rate),2028-07-06 00:00,0.0237,30,amended
+null (release rate = control rate),oracle (true control rate),2028-07-06 18:30,0.02395,31,amended
+null (release rate = control rate),oracle (true control rate),2028-08-01 00:00,0.02395,31,amended
+null (release rate = control rate),oracle (true control rate),2028-08-09 18:30,0.02425,32,amended
+null (release rate = control rate),oracle (true control rate),2028-08-24 00:00,0.02425,33,amended
+null (release rate = control rate),oracle (true control rate),2028-09-01 00:00,0.02425,33,amended
+null (release rate = control rate),oracle (true control rate),2028-09-06 18:30,0.02435,34,amended
+null (release rate = control rate),oracle (true control rate),2028-10-01 00:00,0.02435,34,amended
+null (release rate = control rate),oracle (true control rate),2028-10-12 12:30,0.02465,36,amended
+null (release rate = control rate),oracle (true control rate),2028-11-01 00:00,0.02465,36,amended
+null (release rate = control rate),oracle (true control rate),2028-11-09 19:30,0.02465,37,amended
+null (release rate = control rate),oracle (true control rate),2028-11-23 01:00,0.02475,38,amended
+null (release rate = control rate),oracle (true control rate),2028-12-01 00:00,0.02475,38,amended
+null (release rate = control rate),oracle (true control rate),2028-12-08 13:30,0.02485,39,amended
+null (release rate = control rate),oracle (true control rate),2029-01-01 00:00,0.02485,39,amended

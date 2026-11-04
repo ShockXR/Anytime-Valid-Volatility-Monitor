@@ -1,0 +1,253 @@
+scenario,ratio,method,paths,false_alarm_before_change,detected,median_delay,mean_delay,correct_direction,detected_within_390
+gaussian,1.25,"e-detector, plug-in",200,0.02,0.98,104.0,115.3061224489796,1.0,0.975
+gaussian,1.25,"e-detector, CS baseline",200,0.0,1.0,201.0,242.5,1.0,0.85
+gaussian,1.25,"BOCPD, matched",200,0.02,0.9,120.0,145.26666666666668,0.9944444444444444,0.875
+gaussian,1.25,"BOCPD, p >= 0.5",200,0.055,0.915,110.0,136.34972677595627,0.994535519125683,0.895
+gaussian,1.25,"BOCPD on truncated returns, matched",200,0.025,0.85,130.5,165.92352941176472,0.9941176470588236,0.815
+gaussian,1.25,"BJV rolling, matched",200,0.01,0.305,113.0,229.5245901639344,0.918032786885246,0.26
+gaussian,1.25,"BJV rolling, nominal 5% per day",200,0.0,0.155,116.0,184.83870967741936,0.967741935483871,0.14
+gaussian,1.25,"BJV rolling, studentised, matched",200,0.015,0.29,115.0,256.1034482758621,0.8620689655172413,0.23
+gaussian,2.0,"e-detector, plug-in",200,0.035,0.965,20.0,20.528497409326423,1.0,0.965
+gaussian,2.0,"e-detector, CS baseline",200,0.0,1.0,25.0,26.54,1.0,1.0
+gaussian,2.0,"BOCPD, matched",200,0.025,0.975,13.0,14.605128205128205,1.0,0.975
+gaussian,2.0,"BOCPD, p >= 0.5",200,0.045,0.955,12.0,13.8848167539267,1.0,0.955
+gaussian,2.0,"BOCPD on truncated returns, matched",200,0.025,0.975,19.0,20.476923076923075,1.0,0.975
+gaussian,2.0,"BJV rolling, matched",200,0.03,0.97,40.0,40.623711340206185,1.0,0.97
+gaussian,2.0,"BJV rolling, nominal 5% per day",200,0.005,0.995,46.0,46.39698492462311,1.0,0.995
+gaussian,2.0,"BJV rolling, studentised, matched",200,0.025,0.975,55.0,55.30769230769231,1.0,0.975
+gaussian,0.67,"e-detector, plug-in",200,0.025,0.975,109.0,104.53333333333332,1.0,0.975
+gaussian,0.67,"e-detector, CS baseline",200,0.0,1.0,178.0,179.55,1.0,1.0
+gaussian,0.67,"BOCPD, matched",200,0.02,0.98,51.0,54.60204081632653,1.0,0.98
+gaussian,0.67,"BOCPD, p >= 0.5",200,0.02,0.98,47.5,51.81632653061224,1.0,0.98
+gaussian,0.67,"BOCPD on truncated returns, matched",200,0.02,0.98,50.5,54.0969387755102,1.0,0.98
+gaussian,0.67,"BJV rolling, matched",200,0.03,0.85,96.0,96.3470588235294,1.0,0.85
+gaussian,0.67,"BJV rolling, nominal 5% per day",200,0.01,0.715,101.0,100.63636363636364,1.0,0.715
+gaussian,0.67,"BJV rolling, studentised, matched",200,0.035,0.76,98.0,103.88157894736842,0.993421052631579,0.75
+jumps,1.25,"e-detector, plug-in",200,0.01,0.99,104.5,112.64646464646464,0.9949494949494948,0.99
+jumps,1.25,"e-detector, CS baseline",200,0.0,1.0,252.5,298.925,1.0,0.765
+jumps,1.25,"BOCPD, matched",200,0.82,0.18,179.5,337.30555555555554,0.9722222222222222,0.125
+jumps,1.25,"BOCPD, p >= 0.5",200,0.86,0.14,158.0,300.0357142857143,0.9642857142857144,0.105
+jumps,1.25,"BOCPD on truncated returns, matched",200,0.015,0.81,131.5,161.62962962962962,1.0,0.78
+jumps,1.25,"BJV rolling, matched",200,0.02,0.275,111.0,299.7454545454545,0.9090909090909092,0.215
+jumps,1.25,"BJV rolling, nominal 5% per day",200,0.0,0.15,109.5,252.0,0.9333333333333332,0.125
+jumps,1.25,"BJV rolling, studentised, matched",200,0.01,0.185,108.0,319.8378378378378,0.8648648648648649,0.145
+jumps,2.0,"e-detector, plug-in",200,0.015,0.985,18.0,19.48730964467005,1.0,0.985
+jumps,2.0,"e-detector, CS baseline",200,0.0,1.0,24.0,25.455,1.0,1.0
+jumps,2.0,"BOCPD, matched",200,0.795,0.205,19.0,20.317073170731707,1.0,0.205
+jumps,2.0,"BOCPD, p >= 0.5",200,0.825,0.175,19.0,20.17142857142857,1.0,0.175
+jumps,2.0,"BOCPD on truncated returns, matched",200,0.015,0.985,18.0,20.19796954314721,0.9949238578680204,0.985
+jumps,2.0,"BJV rolling, matched",200,0.025,0.975,38.0,39.0,1.0,0.975
+jumps,2.0,"BJV rolling, nominal 5% per day",200,0.01,0.99,44.0,45.48989898989899,1.0,0.99
+jumps,2.0,"BJV rolling, studentised, matched",200,0.02,0.97,56.0,59.02061855670103,0.9948453608247424,0.97
+jumps,0.67,"e-detector, plug-in",200,0.02,0.98,117.0,117.31122448979592,1.0,0.98
+jumps,0.67,"e-detector, CS baseline",200,0.0,1.0,203.5,207.66,1.0,1.0
+jumps,0.67,"BOCPD, matched",200,0.825,0.175,39.0,40.6,0.9428571428571428,0.175
+jumps,0.67,"BOCPD, p >= 0.5",200,0.845,0.155,33.0,34.67741935483871,0.935483870967742,0.155
+jumps,0.67,"BOCPD on truncated returns, matched",200,0.0,1.0,51.0,55.995,1.0,1.0
+jumps,0.67,"BJV rolling, matched",200,0.015,0.905,100.0,100.81767955801104,0.988950276243094,0.895
+jumps,0.67,"BJV rolling, nominal 5% per day",200,0.015,0.8,106.0,106.6875,1.0,0.795
+jumps,0.67,"BJV rolling, studentised, matched",200,0.02,0.835,105.0,111.65269461077844,0.994011976047904,0.825
+student t5,1.25,"e-detector, plug-in",200,0.01,0.99,161.0,175.03535353535352,1.0,0.965
+student t5,1.25,"e-detector, CS baseline",200,0.0,1.0,413.0,434.58,1.0,0.445
+student t5,1.25,"BOCPD, matched",200,0.63,0.37,108.0,153.56756756756758,1.0,0.34
+student t5,1.25,"BOCPD, p >= 0.5",200,0.685,0.315,98.0,140.38095238095238,1.0,0.295
+student t5,1.25,"BOCPD on truncated returns, matched",200,0.08,0.61,169.5,249.4262295081967,0.9918032786885246,0.53
+student t5,1.25,"BJV rolling, matched",200,0.16,0.555,138.0,373.990990990991,0.8108108108108109,0.365
+student t5,1.25,"BJV rolling, nominal 5% per day",200,0.075,0.39,175.5,457.8589743589744,0.7307692307692307,0.225
+student t5,1.25,"BJV rolling, studentised, matched",200,0.01,0.11,117.0,239.72727272727272,0.8636363636363636,0.09
+student t5,2.0,"e-detector, plug-in",200,0.035,0.965,25.0,25.38860103626943,1.0,0.965
+student t5,2.0,"e-detector, CS baseline",200,0.0,1.0,32.0,33.87,1.0,1.0
+student t5,2.0,"BOCPD, matched",200,0.62,0.38,15.0,16.013157894736842,1.0,0.38
+student t5,2.0,"BOCPD, p >= 0.5",200,0.685,0.315,15.0,16.396825396825395,0.984126984126984,0.315
+student t5,2.0,"BOCPD on truncated returns, matched",200,0.115,0.885,27.0,28.67796610169492,1.0,0.885
+student t5,2.0,"BJV rolling, matched",200,0.185,0.815,45.0,46.26993865030675,1.0,0.815
+student t5,2.0,"BJV rolling, nominal 5% per day",200,0.095,0.905,52.0,52.92265193370166,1.0,0.905
+student t5,2.0,"BJV rolling, studentised, matched",200,0.0,0.97,78.0,79.04123711340206,1.0,0.97
+student t5,0.67,"e-detector, plug-in",200,0.035,0.965,107.0,109.61139896373057,1.0,0.965
+student t5,0.67,"e-detector, CS baseline",200,0.0,1.0,174.0,182.365,1.0,1.0
+student t5,0.67,"BOCPD, matched",200,0.605,0.395,34.0,40.936708860759495,0.9746835443037974,0.395
+student t5,0.67,"BOCPD, p >= 0.5",200,0.69,0.31,32.5,37.66129032258065,0.9838709677419356,0.31
+student t5,0.67,"BOCPD on truncated returns, matched",200,0.125,0.875,51.0,59.12571428571429,1.0,0.875
+student t5,0.67,"BJV rolling, matched",200,0.155,0.78,101.0,153.7051282051282,0.967948717948718,0.735
+student t5,0.67,"BJV rolling, nominal 5% per day",200,0.08,0.7,105.0,135.90714285714284,0.9714285714285714,0.675
+student t5,0.67,"BJV rolling, studentised, matched",200,0.015,0.405,110.0,108.39506172839506,1.0,0.405
+price noise,1.25,"e-detector, plug-in",200,0.03,0.97,184.0,198.4381443298969,1.0,0.895
+price noise,1.25,"e-detector, CS baseline",200,0.0,0.965,483.0,546.2383419689119,1.0,0.42
+price noise,1.25,"BOCPD, matched",200,0.045,0.62,180.0,317.8467741935484,1.0,0.505
+price noise,1.25,"BOCPD, p >= 0.5",200,0.07,0.68,187.0,316.7647058823529,1.0,0.56
+price noise,1.25,"BOCPD on truncated returns, matched",200,0.045,0.53,181.5,288.5660377358491,1.0,0.455
+price noise,1.25,"BJV rolling, matched",200,0.025,0.115,129.0,252.4782608695652,0.9130434782608696,0.1
+price noise,1.25,"BJV rolling, nominal 5% per day",200,0.015,0.05,125.5,241.6,0.8,0.045
+price noise,1.25,"BJV rolling, studentised, matched",200,0.04,0.135,130.0,300.85185185185185,0.8148148148148148,0.11
+price noise,2.0,"e-detector, plug-in",200,0.05,0.95,26.0,28.178947368421053,1.0,0.95
+price noise,2.0,"e-detector, CS baseline",200,0.0,1.0,35.0,36.92,1.0,1.0
+price noise,2.0,"BOCPD, matched",200,0.03,0.97,21.0,23.510309278350515,1.0,0.97
+price noise,2.0,"BOCPD, p >= 0.5",200,0.055,0.945,20.0,22.17460317460317,1.0,0.945
+price noise,2.0,"BOCPD on truncated returns, matched",200,0.02,0.98,28.0,29.9030612244898,1.0,0.98
+price noise,2.0,"BJV rolling, matched",200,0.03,0.97,56.0,57.31443298969072,1.0,0.97
+price noise,2.0,"BJV rolling, nominal 5% per day",200,0.01,0.985,63.0,63.81725888324873,1.0,0.985
+price noise,2.0,"BJV rolling, studentised, matched",200,0.04,0.955,69.0,69.58115183246073,1.0,0.955
+price noise,0.67,"e-detector, plug-in",200,0.0,1.0,166.5,170.685,1.0,0.995
+price noise,0.67,"e-detector, CS baseline",200,0.0,1.0,332.5,353.575,1.0,0.675
+price noise,0.67,"BOCPD, matched",200,0.03,0.875,123.0,177.6342857142857,1.0,0.825
+price noise,0.67,"BOCPD, p >= 0.5",200,0.055,0.925,116.0,161.83243243243243,1.0,0.88
+price noise,0.67,"BOCPD on truncated returns, matched",200,0.04,0.885,123.0,176.43502824858757,1.0,0.835
+price noise,0.67,"BJV rolling, matched",200,0.03,0.4,119.5,317.775,0.9,0.305
+price noise,0.67,"BJV rolling, nominal 5% per day",200,0.005,0.195,120.0,267.64102564102564,0.8717948717948718,0.165
+price noise,0.67,"BJV rolling, studentised, matched",200,0.035,0.38,120.0,380.5657894736842,0.868421052631579,0.26
+ticks,1.25,"e-detector, plug-in",200,0.02,0.98,114.0,132.12244897959184,1.0,0.98
+ticks,1.25,"e-detector, CS baseline",200,0.005,0.995,264.0,281.99497487437185,1.0,0.81
+ticks,1.25,"BOCPD, matched",200,0.015,0.845,114.0,148.57988165680473,0.9940828402366864,0.815
+ticks,1.25,"BOCPD, p >= 0.5",200,0.03,0.905,115.0,154.79005524861878,0.994475138121547,0.87
+ticks,1.25,"BOCPD on truncated returns, matched",200,0.005,0.465,152.0,196.8172043010753,1.0,0.44
+ticks,1.25,"BJV rolling, matched",200,0.02,0.28,109.5,193.375,0.9464285714285714,0.255
+ticks,1.25,"BJV rolling, nominal 5% per day",200,0.0,0.17,110.5,147.7941176470588,0.9705882352941176,0.165
+ticks,1.25,"BJV rolling, studentised, matched",200,0.03,0.245,110.0,170.6122448979592,0.9387755102040816,0.225
+ticks,2.0,"e-detector, plug-in",200,0.045,0.955,24.0,25.85340314136125,1.0,0.955
+ticks,2.0,"e-detector, CS baseline",200,0.0,1.0,30.0,32.52,1.0,1.0
+ticks,2.0,"BOCPD, matched",200,0.02,0.98,14.0,15.43877551020408,1.0,0.98
+ticks,2.0,"BOCPD, p >= 0.5",200,0.035,0.965,13.0,14.66321243523316,1.0,0.965
+ticks,2.0,"BOCPD on truncated returns, matched",200,0.01,0.99,33.0,35.535353535353536,1.0,0.99
+ticks,2.0,"BJV rolling, matched",200,0.005,0.995,40.0,41.49246231155779,1.0,0.995
+ticks,2.0,"BJV rolling, nominal 5% per day",200,0.0,1.0,46.5,47.475,1.0,1.0
+ticks,2.0,"BJV rolling, studentised, matched",200,0.015,0.985,57.0,56.5736040609137,1.0,0.985
+ticks,0.67,"e-detector, plug-in",200,0.01,0.99,72.0,72.12626262626263,1.0,0.99
+ticks,0.67,"e-detector, CS baseline",200,0.0,1.0,278.0,277.6,1.0,1.0
+ticks,0.67,"BOCPD, matched",200,0.015,0.985,56.0,59.20812182741117,1.0,0.985
+ticks,0.67,"BOCPD, p >= 0.5",200,0.03,0.97,53.0,55.00515463917526,1.0,0.97
+ticks,0.67,"BOCPD on truncated returns, matched",200,0.01,0.99,63.0,64.81818181818181,1.0,0.99
+ticks,0.67,"BJV rolling, matched",200,0.0,0.89,98.0,104.86516853932584,0.9887640449438202,0.88
+ticks,0.67,"BJV rolling, nominal 5% per day",200,0.0,0.76,105.0,104.25,1.0,0.76
+ticks,0.67,"BJV rolling, studentised, matched",200,0.005,0.85,104.5,101.81764705882352,1.0,0.85
+gaussian,1.5,"e-detector, plug-in",200,0.015,0.985,37.0,40.20812182741117,1.0,0.985
+gaussian,1.5,"e-detector, CS baseline",200,0.0,1.0,55.0,59.89,1.0,1.0
+gaussian,1.5,"BOCPD, matched",200,0.015,0.985,35.0,39.31979695431472,1.0,0.985
+gaussian,1.5,"BOCPD, p >= 0.5",200,0.045,0.955,31.0,37.12041884816754,1.0,0.955
+gaussian,1.5,"BOCPD on truncated returns, matched",200,0.015,0.985,44.0,47.263959390862944,1.0,0.985
+gaussian,1.5,"BJV rolling, matched",200,0.01,0.935,78.0,90.05882352941177,0.9946524064171124,0.925
+gaussian,1.5,"BJV rolling, nominal 5% per day",200,0.005,0.85,88.5,92.55882352941175,0.9941176470588236,0.845
+gaussian,1.5,"BJV rolling, studentised, matched",200,0.015,0.905,88.0,93.68508287292818,1.0,0.9
+gaussian,0.8,"e-detector, plug-in",200,0.015,0.985,169.0,170.0203045685279,1.0,0.985
+gaussian,0.8,"e-detector, CS baseline",200,0.0,1.0,336.5,348.9,1.0,0.71
+gaussian,0.8,"BOCPD, matched",200,0.03,0.865,137.0,173.0057803468208,1.0,0.82
+gaussian,0.8,"BOCPD, p >= 0.5",200,0.035,0.9,124.0,147.92777777777778,1.0,0.87
+gaussian,0.8,"BOCPD on truncated returns, matched",200,0.025,0.875,137.0,168.41714285714286,1.0,0.835
+gaussian,0.8,"BJV rolling, matched",200,0.03,0.315,112.0,241.14285714285717,0.9365079365079364,0.275
+gaussian,0.8,"BJV rolling, nominal 5% per day",200,0.01,0.165,116.0,189.93939393939397,1.0,0.155
+gaussian,0.8,"BJV rolling, studentised, matched",200,0.015,0.25,114.0,210.58,0.96,0.225
+gaussian,0.5,"e-detector, plug-in",200,0.025,0.975,81.0,78.57435897435897,1.0,0.975
+gaussian,0.5,"e-detector, CS baseline",200,0.0,1.0,136.0,134.08,1.0,1.0
+gaussian,0.5,"BOCPD, matched",200,0.025,0.975,26.0,26.93846153846154,1.0,0.975
+gaussian,0.5,"BOCPD, p >= 0.5",200,0.045,0.955,25.0,25.29319371727749,1.0,0.955
+gaussian,0.5,"BOCPD on truncated returns, matched",200,0.03,0.97,26.0,26.572164948453608,1.0,0.97
+gaussian,0.5,"BJV rolling, matched",200,0.015,0.985,75.0,75.09644670050761,1.0,0.985
+gaussian,0.5,"BJV rolling, nominal 5% per day",200,0.0,1.0,81.5,80.935,1.0,1.0
+gaussian,0.5,"BJV rolling, studentised, matched",200,0.025,0.975,80.0,81.08205128205128,1.0,0.975
+jumps,1.5,"e-detector, plug-in",200,0.02,0.98,43.0,45.44897959183673,1.0,0.98
+jumps,1.5,"e-detector, CS baseline",200,0.0,1.0,65.0,70.315,1.0,1.0
+jumps,1.5,"BOCPD, matched",200,0.785,0.215,64.0,77.32558139534883,1.0,0.215
+jumps,1.5,"BOCPD, p >= 0.5",200,0.815,0.185,51.0,71.29729729729729,1.0,0.185
+jumps,1.5,"BOCPD on truncated returns, matched",200,0.02,0.98,49.0,53.265306122448976,1.0,0.98
+jumps,1.5,"BJV rolling, matched",200,0.015,0.885,83.0,86.32768361581921,0.9943502824858758,0.88
+jumps,1.5,"BJV rolling, nominal 5% per day",200,0.0,0.8,90.5,89.46875,1.0,0.8
+jumps,1.5,"BJV rolling, studentised, matched",200,0.01,0.83,94.0,104.93373493975903,0.9879518072289156,0.82
+jumps,0.8,"e-detector, plug-in",200,0.02,0.98,188.0,189.9795918367347,1.0,0.975
+jumps,0.8,"e-detector, CS baseline",200,0.0,1.0,344.5,395.215,1.0,0.59
+jumps,0.8,"BOCPD, matched",200,0.82,0.18,84.5,95.52777777777776,0.6944444444444444,0.18
+jumps,0.8,"BOCPD, p >= 0.5",200,0.83,0.17,74.5,90.58823529411764,0.7058823529411765,0.17
+jumps,0.8,"BOCPD on truncated returns, matched",200,0.025,0.89,117.0,183.37640449438203,0.99438202247191,0.815
+jumps,0.8,"BJV rolling, matched",200,0.035,0.35,117.0,304.74285714285713,0.9142857142857144,0.28
+jumps,0.8,"BJV rolling, nominal 5% per day",200,0.0,0.15,112.5,226.26666666666668,0.9,0.135
+jumps,0.8,"BJV rolling, studentised, matched",200,0.02,0.275,118.0,235.83636363636364,0.9272727272727272,0.24
+jumps,0.5,"e-detector, plug-in",200,0.02,0.98,81.0,79.16836734693878,1.0,0.98
+jumps,0.5,"e-detector, CS baseline",200,0.0,1.0,127.5,127.9,1.0,1.0
+jumps,0.5,"BOCPD, matched",200,0.83,0.17,21.5,23.5,0.9411764705882352,0.17
+jumps,0.5,"BOCPD, p >= 0.5",200,0.84,0.16,20.0,21.71875,0.9375,0.16
+jumps,0.5,"BOCPD on truncated returns, matched",200,0.04,0.96,25.0,26.70833333333333,1.0,0.96
+jumps,0.5,"BJV rolling, matched",200,0.035,0.965,79.0,76.76683937823834,1.0,0.965
+jumps,0.5,"BJV rolling, nominal 5% per day",200,0.005,0.995,84.0,82.04020100502512,1.0,0.995
+jumps,0.5,"BJV rolling, studentised, matched",200,0.015,0.985,85.0,83.75634517766497,1.0,0.985
+student t5,1.5,"e-detector, plug-in",200,0.03,0.97,50.0,58.48453608247423,1.0,0.97
+student t5,1.5,"e-detector, CS baseline",200,0.005,0.995,86.0,97.4321608040201,1.0,0.995
+student t5,1.5,"BOCPD, matched",200,0.58,0.42,43.0,46.07142857142857,1.0,0.42
+student t5,1.5,"BOCPD, p >= 0.5",200,0.605,0.395,43.0,44.44303797468354,1.0,0.395
+student t5,1.5,"BOCPD on truncated returns, matched",200,0.09,0.91,67.0,74.0,1.0,0.91
+student t5,1.5,"BJV rolling, matched",200,0.14,0.735,80.0,130.14965986394557,0.9727891156462584,0.695
+student t5,1.5,"BJV rolling, nominal 5% per day",200,0.05,0.745,88.0,130.6241610738255,0.9798657718120806,0.715
+student t5,1.5,"BJV rolling, studentised, matched",200,0.005,0.5,109.0,123.94,1.0,0.49
+student t5,0.8,"e-detector, plug-in",200,0.04,0.96,206.5,230.53125,1.0,0.875
+student t5,0.8,"e-detector, CS baseline",200,0.0,0.99,473.0,533.7171717171717,1.0,0.325
+student t5,0.8,"BOCPD, matched",200,0.605,0.395,93.0,110.35443037974684,0.9493670886075948,0.385
+student t5,0.8,"BOCPD, p >= 0.5",200,0.67,0.33,86.5,99.45454545454544,0.9242424242424242,0.32
+student t5,0.8,"BOCPD on truncated returns, matched",200,0.105,0.865,146.0,230.41618497109823,1.0,0.74
+student t5,0.8,"BJV rolling, matched",200,0.14,0.525,171.0,417.4190476190476,0.7714285714285715,0.31
+student t5,0.8,"BJV rolling, nominal 5% per day",200,0.075,0.34,142.5,348.9117647058824,0.75,0.235
+student t5,0.8,"BJV rolling, studentised, matched",200,0.01,0.09,137.0,402.8888888888889,0.7777777777777778,0.06
+student t5,0.5,"e-detector, plug-in",200,0.025,0.975,74.0,75.27179487179487,1.0,0.975
+student t5,0.5,"e-detector, CS baseline",200,0.005,0.995,116.0,116.56281407035176,1.0,0.995
+student t5,0.5,"BOCPD, matched",200,0.59,0.41,23.0,23.37804878048781,1.0,0.41
+student t5,0.5,"BOCPD, p >= 0.5",200,0.66,0.34,22.0,22.61764705882353,1.0,0.34
+student t5,0.5,"BOCPD on truncated returns, matched",200,0.1,0.9,25.0,26.68888888888889,1.0,0.9
+student t5,0.5,"BJV rolling, matched",200,0.215,0.785,76.0,73.87898089171975,1.0,0.785
+student t5,0.5,"BJV rolling, nominal 5% per day",200,0.105,0.895,82.0,80.62569832402235,1.0,0.895
+student t5,0.5,"BJV rolling, studentised, matched",200,0.015,0.935,98.0,95.5187165775401,1.0,0.935
+price noise,1.5,"e-detector, plug-in",200,0.02,0.98,56.5,65.36734693877551,1.0,0.98
+price noise,1.5,"e-detector, CS baseline",200,0.0,1.0,106.0,112.415,1.0,1.0
+price noise,1.5,"BOCPD, matched",200,0.035,0.955,62.0,72.72774869109948,1.0,0.955
+price noise,1.5,"BOCPD, p >= 0.5",200,0.05,0.94,56.0,67.09042553191489,1.0,0.94
+price noise,1.5,"BOCPD on truncated returns, matched",200,0.035,0.945,71.0,79.14814814814815,1.0,0.945
+price noise,1.5,"BJV rolling, matched",200,0.05,0.62,96.0,132.5806451612903,0.9758064516129032,0.59
+price noise,1.5,"BJV rolling, nominal 5% per day",200,0.01,0.49,101.0,110.22448979591836,1.0,0.485
+price noise,1.5,"BJV rolling, studentised, matched",200,0.03,0.585,100.0,131.63247863247864,0.9743589743589745,0.565
+price noise,0.8,"e-detector, plug-in",200,0.015,0.985,286.0,313.005076142132,1.0,0.72
+price noise,0.8,"e-detector, CS baseline",200,0.005,0.855,677.0,750.4152046783626,1.0,0.08
+price noise,0.8,"BOCPD, matched",200,0.025,0.645,270.0,490.91472868217056,1.0,0.355
+price noise,0.8,"BOCPD, p >= 0.5",200,0.055,0.72,238.0,432.49305555555554,1.0,0.44
+price noise,0.8,"BOCPD on truncated returns, matched",200,0.015,0.655,270.0,478.587786259542,1.0,0.36
+price noise,0.8,"BJV rolling, matched",200,0.03,0.15,252.0,450.7,0.9333333333333332,0.085
+price noise,0.8,"BJV rolling, nominal 5% per day",200,0.0,0.055,152.0,310.1818181818182,0.9090909090909092,0.04
+price noise,0.8,"BJV rolling, studentised, matched",200,0.015,0.155,340.0,531.6774193548387,0.7419354838709677,0.08
+price noise,0.5,"e-detector, plug-in",200,0.035,0.965,122.0,122.02590673575128,1.0,0.965
+price noise,0.5,"e-detector, CS baseline",200,0.0,1.0,223.5,221.92,1.0,1.0
+price noise,0.5,"BOCPD, matched",200,0.015,0.985,66.0,70.03553299492386,1.0,0.985
+price noise,0.5,"BOCPD, p >= 0.5",200,0.015,0.985,62.0,64.01015228426395,1.0,0.985
+price noise,0.5,"BOCPD on truncated returns, matched",200,0.01,0.99,65.5,69.58585858585859,1.0,0.99
+price noise,0.5,"BJV rolling, matched",200,0.01,0.81,104.0,122.07407407407408,0.9814814814814816,0.79
+price noise,0.5,"BJV rolling, nominal 5% per day",200,0.005,0.64,108.5,127.4765625,0.9765625,0.625
+price noise,0.5,"BJV rolling, studentised, matched",200,0.025,0.73,109.0,140.47260273972603,0.958904109589041,0.695
+ticks,1.5,"e-detector, plug-in",200,0.03,0.97,50.0,54.83505154639175,1.0,0.97
+ticks,1.5,"e-detector, CS baseline",200,0.0,1.0,69.5,75.335,1.0,1.0
+ticks,1.5,"BOCPD, matched",200,0.02,0.98,43.0,46.954081632653065,1.0,0.98
+ticks,1.5,"BOCPD, p >= 0.5",200,0.03,0.97,38.5,44.50515463917526,1.0,0.97
+ticks,1.5,"BOCPD on truncated returns, matched",200,0.015,0.97,72.5,78.28350515463917,1.0,0.97
+ticks,1.5,"BJV rolling, matched",200,0.015,0.93,81.0,82.78494623655914,1.0,0.93
+ticks,1.5,"BJV rolling, nominal 5% per day",200,0.0,0.825,86.0,87.07272727272728,1.0,0.825
+ticks,1.5,"BJV rolling, studentised, matched",200,0.02,0.875,87.0,88.90285714285714,1.0,0.875
+ticks,0.8,"e-detector, plug-in",200,0.025,0.975,132.0,144.37948717948717,1.0,0.975
+ticks,0.8,"e-detector, CS baseline",200,0.0,1.0,518.5,540.01,1.0,0.105
+ticks,0.8,"BOCPD, matched",200,0.015,0.855,132.0,187.90058479532163,1.0,0.785
+ticks,0.8,"BOCPD, p >= 0.5",200,0.02,0.905,121.0,165.90055248618785,1.0,0.86
+ticks,0.8,"BOCPD on truncated returns, matched",200,0.005,0.83,154.0,243.2710843373494,1.0,0.73
+ticks,0.8,"BJV rolling, matched",200,0.005,0.305,119.0,275.62295081967216,0.9508196721311476,0.245
+ticks,0.8,"BJV rolling, nominal 5% per day",200,0.0,0.12,115.5,220.16666666666663,0.9583333333333334,0.11
+ticks,0.8,"BJV rolling, studentised, matched",200,0.005,0.28,116.0,216.76785714285717,0.9642857142857144,0.245
+ticks,0.5,"e-detector, plug-in",200,0.035,0.965,53.0,51.16580310880829,1.0,0.965
+ticks,0.5,"e-detector, CS baseline",200,0.0,1.0,194.0,193.91,1.0,1.0
+ticks,0.5,"BOCPD, matched",200,0.02,0.98,28.0,28.862244897959183,1.0,0.98
+ticks,0.5,"BOCPD, p >= 0.5",200,0.035,0.965,26.0,27.150259067357517,1.0,0.965
+ticks,0.5,"BOCPD on truncated returns, matched",200,0.01,0.99,29.0,30.28787878787879,1.0,0.99
+ticks,0.5,"BJV rolling, matched",200,0.02,0.98,76.0,76.33673469387755,1.0,0.98
+ticks,0.5,"BJV rolling, nominal 5% per day",200,0.0,1.0,83.0,81.15,1.0,1.0
+ticks,0.5,"BJV rolling, studentised, matched",200,0.02,0.98,84.0,81.97448979591837,1.0,0.98
+gaussian,1.25,"BJV rolling, k=250, matched",200,0.02,0.81,196.0,191.17283950617283,1.0,0.8
+gaussian,1.25,"BJV rolling, k=500, matched",200,0.03,0.96,277.0,288.4479166666667,1.0,0.855
+gaussian,1.5,"BJV rolling, k=250, matched",200,0.02,0.98,98.5,102.05102040816328,1.0,0.98
+gaussian,1.5,"BJV rolling, k=500, matched",200,0.015,0.985,131.0,134.88832487309645,1.0,0.985
+gaussian,2.0,"BJV rolling, k=250, matched",200,0.025,0.975,52.0,52.09230769230769,1.0,0.975
+gaussian,2.0,"BJV rolling, k=500, matched",200,0.01,0.99,67.5,68.36868686868686,1.0,0.99
+gaussian,0.8,"BJV rolling, k=250, matched",200,0.02,0.735,213.0,211.8843537414966,1.0,0.725
+gaussian,0.8,"BJV rolling, k=500, matched",200,0.03,0.96,326.5,316.7395833333333,1.0,0.745
+gaussian,0.67,"BJV rolling, k=250, matched",200,0.015,0.985,151.0,148.08629441624365,1.0,0.985
+gaussian,0.67,"BJV rolling, k=500, matched",200,0.02,0.98,218.5,217.7244897959184,0.9948979591836736,0.98
+gaussian,0.5,"BJV rolling, k=250, matched",200,0.03,0.97,114.5,111.85051546391752,0.9948453608247424,0.97
+gaussian,0.5,"BJV rolling, k=500, matched",200,0.015,0.985,171.0,169.41116751269035,1.0,0.985

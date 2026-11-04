@@ -1,0 +1,105 @@
+# Alternative prototype directions
+
+These are other ways to build on Bapat (2026). Each one was first written down as an idea (round 1) and then built as a small, separate prototype (round 2) with its own README, code, tests and RESULTS file. They are kept apart from the main package on purpose, except A2, which proved useful enough to move into `src/avmonitor/confseq.py`.
+
+Every number below is copied from the RESULTS file of the prototype, which in turn is produced by its `run_experiment.py` with fixed seeds. Labels: [SYNTHETIC] simulation, [REAL] market data.
+
+## Summary table
+
+Scores run from 1 (weak) to 10 (strong). They are our judgement, explained in each entry, not measurements. "Feasibility" means how easy it would be to turn the prototype into a finished study. "Interest" means our guess of how interesting the direction is to a researcher in sequential analysis and high-frequency econometrics.
+
+| | Direction | Folder | Novelty | Validity | Relevance | Feasibility | Demonstration | Interest | Total (of 60) |
+|---|---|---|---|---|---|---|---|---|---|
+| A7 | Correlation-break monitor | `correlation_monitor/` | 7 | 9 | 8 | 9 | 8 | 7 | **48** |
+| A2 | Confidence-sequence baseline | `src/avmonitor/confseq.py` (E8) | 6 | 10 | 7 | 9 | 6 | 8 | **46** |
+| A5 | Robust local plug-in estimator of quarticity | `robust_iq_estimator/` | 7 | 7 | 8 | 7 | 7 | 9 | **45** |
+| A4 | Rank (conformal) two-sample e-detector | `two_sample_betting/` | 6 | 10 | 7 | 8 | 7 | 7 | **45** |
+| A8 | Sequential fixed-accuracy estimation of the volatility level | `sequential_estimation/` | 6 | 8 | 6 | 9 | 8 | 8 | **45** |
+| A1 | Pre-averaging before truncation, block monitor | `preaveraging/` | 6 | 8 | 6 | 9 | 8 | 7 | **44** |
+| A3 | Quarticity-stream monitor | `quarticity_stream/` | 5 | 9 | 5 | 9 | 6 | 8 | **42** |
+| A6 | Change-triggered risk switch | `risk_switch/` | 3 | 7 | 6 | 9 | 6 | 3 | **34** |
+
+For comparison, the main direction (the robust volatility monitor itself) scores 57 of 70 on the seven criteria used in `RESEARCH_STRATEGY_BAPAT.md`, section 8.
+
+**Names in other documents.** The experiment report and the strategy number the alternatives by report part, not by the letters used here: A1 and A3 are report part ALT1, A2 is E8, A4 is ALT5, A5 is ALT3, A6 is ALT2, A7 is ALT4 and A8 is ALT6.
+
+**Recommended follow-ups.** A5 is the natural estimation paper with Prof. Bapat, because it stays inside his estimator and answers his own future-work items. A7 is the natural second detection paper, because it reuses the same machinery for the multivariate question the paper lists as future work. A1 matters for any use of the monitor at second-level sampling, because it found a failure of the main monitor's guarantee and a provable fix.
+
+**One lesson that appears in four directions.** The e-detector's guarantee needs the *conditional* mean of the statistic, given the past, to stay at the baseline. Anything that makes consecutive values of the statistic depend on each other breaks it, even when the *unconditional* mean is right: volatility clustering (E10), price-level noise and overlapping pre-averaged windows (A1), a reference window that is reused for every new observation (A4) and a plug-in baseline (E4e). Each prototype found its own fix: a forecast, non-overlapping blocks, a growing reference, a confidence sequence. A8 meets the same issue in estimation: under clustering, rules built for independent returns stop far too early for the long-run level, and the honest target becomes the recent window's average.
+
+---
+
+## A1. Noise-robust first stage: pre-averaging, then truncation
+
+**Question.** Truncation removes jumps but not microstructure noise. Does averaging returns over small blocks first (Jacod et al. 2009) fix that, for the estimator and for the monitor?
+
+**Results [SYNTHETIC].**
+* The plain truncated quarticity estimator breaks between noise ratios 0.1 and 0.25: its bias is exactly `(1 + 2 gamma^2)^2`, 26% at 0.25 and a factor 9 at 1. Pre-averaging then truncation is unbiased at every noise level (mean ratio 0.99 to 1.00), at the price of a relative RMSE of 0.11 against 0.02 when there is no noise.
+* After pre-averaging, the paper's *clipping* leaves a jump bias that grows with the window (+12% to +18% with four jumps a day); *dropping* the window removes it.
+* **A correction to the main package:** price-level noise breaks the monitor's conditional null on raw returns. Its one-day false alarm rate rises from 5.0% to 8.5%, 18%, 31% and 41.5% at noise ratios 0.5, 1, 2 and 4. Overlapping pre-averaged returns are worse (100%). Non-overlapping blocks restore the guarantee at every block size tested (0% to 6.5% in 28 cells, down to blocks of 4 returns), because they use disjoint prices. The best block size is about 6γ / v (v the factor by which the standard deviation changes); the rule k = max(4, ⌈4γ⌉) is within 10% of the best delay in all eight cells.
+* **Benchmark against Podolskij and Vetter (2009).** Their modulated bipower and tripower variation is unbiased without jumps but 2.5 to 3 times less precise than pre-averaging with MAD dropping, and with eight 100-sd jumps a day it overstates quarticity by a factor 4.5 to 5.8 at n = 23,400; ours stays within 0.98 to 1.05 of the truth in all 20 noise and jump cells. (Their constants were derived by us and checked by simulation, because the paper's full text was not reachable from our machine.)
+
+**Scores.** Novelty 6: the estimator is known, the composition as a monitor and the noise failure are new to us. Validity 8: the estimator's fourth-moment correction is derived under local constancy, a heuristic. Relevance 6: high at one-second sampling, low at one minute for BTC. Feasibility 9, Demonstration 8 (two figures make the point), Interest 7.
+
+## A2. Confidence-sequence baseline (now in the main package)
+
+**Question.** The default monitor plugs in an estimated baseline, which voids the proof. Can a running confidence sequence for the pre-change level restore it?
+
+**Results.** Yes, with a proof: P(false alarm within m steps) ≤ δ + m / A (`docs/math.md`, Theorem 6.4). In simulation the false alarm rate is at most 0.27% against a 5% bound, at a cost of 1.8 to 7.6 times the delay with a 390-step calibration (E8). On real data the share of decrease alarms followed by lower volatility rose from 90% to 97%.
+
+**Scores.** Novelty 6 (betting confidence sequences exist; their use as a detector baseline with this bound is ours), Validity 10, Relevance 7, Feasibility 9, Demonstration 6, Interest 8.
+
+## A3. Monitor quarticity itself
+
+**Question.** Does the same e-detector on `min(r^4, tau^4)`, the paper's own target, see changes the variance monitor cannot?
+
+**Results.** Valid in all 12 null cells [SYNTHETIC]. For a pure variance change it is 1% to 28% faster for increases and 1.8 to 2.6 times slower for decreases (its bets are capped). It detects changes in the volatility of volatility at a fixed mean variance (82.5% to 99% of paths, against 2% to 8% for the variance monitor), but slowly (thousands of steps). A surprise: at c = 3 fatter tails at fixed variance are seen by the *variance* monitor, as a decrease, because clipping removes the tails. On BTC and DOGE [REAL] it alarms at the same rate as the variance monitor (0.70 against 0.69 per day) and mostly on the same days; no pure shape change was found in six months.
+
+**Scores.** Novelty 5, Validity 9, Relevance 5, Feasibility 9, Demonstration 6 (strong synthetic story, weak real-data story), Interest 8 (closest to the paper's own quantity, and the clipping-level effect is worth a discussion).
+
+## A4. Rank (conformal) two-sample e-detector
+
+**Question.** Instead of betting on the mean of the truncated statistic against an estimated baseline, bet on the *ranks* of new returns among all past returns. Ranks need no baseline at all.
+
+**Results [SYNTHETIC].** Exactly valid for any return law, reference length and horizon: 1.9% to 3.5% per day (bound 5%) and 22.2% to 24.3% per week (bound 35%), where the plug-in mean monitor reaches 51% to 57% per week. Ranking against a *fixed* reference window instead makes a false alarm near certain within a week (98% to 100%): the same trap as the plug-in baseline. Against the main monitor it is 4% to 19% slower for variance changes, 2.9 times faster for a change from Gaussian to fat tails, and 1.7 to 2.8 times faster than the confidence-sequence version (A2). Truncation does not matter for ranks. [REAL] On BTC and ETH both designs raise similar numbers of alarms and about half coincide within an hour; the rank detector alone found shape changes at constant scale on BTC.
+
+**Scores.** Novelty 6 (conformal test martingales and two-sample betting exist; the combination and the fixed-reference demonstration are ours), Validity 10 (the strongest guarantee in the repository), Relevance 7, Feasibility 8, Demonstration 7, Interest 7.
+
+## A5. Robust local plug-in estimator of integrated quarticity
+
+**Question.** Averaging local fourth powers (which is what the paper's estimator does once averaged) is known to be inefficient. Does squaring a local variance instead (Jacod and Rosenbaum 2013), with robust truncation, give a better estimator?
+
+**Results.**
+* [SYNTHETIC] Under constant volatility the plug-in with a growing cut-off `sqrt(2 log n)` and dropped returns (PI-LU) has a simulated asymptotic variance of 8.46 against the efficient bound 8 (efficiency 0.95; 0.976 in closed form). Untruncated RQ has 0.74. The paper's averaged kernel is a truncated RQ with edge weights, and truncation already helps it: 0.86 with the estimated daily MAD and the kappa correction (simulated), 0.98 with an oracle cut-off (closed form). So the gain over the corrected kernel is modest. With jumps PI-LU has the lowest RMSE of the 15 estimators in 6 of 8 cells at n = 390 and 1440, and its 95% intervals cover 92.6% to 97.2% in all 18 cells.
+* [SYNTHETIC] Truncating against one daily MAD stops converging when volatility moves during the day (bias still minus 11% at n = 23,400 with the kappa correction, minus 14% without, under stochastic volatility with an intraday pattern); a local scale restores the usual `sqrt(n)` rate. Under the paper's constant-volatility design this problem does not arise.
+* [REAL] On BTC and DOGE, large one-minute returns come in bursts (44% to 65% have a large neighbour, against 8.9% by chance; similar bursts are documented for other markets by Christensen, Oomen and Podolskij 2014 and Bajgrowicz, Scaillet and Treccani 2016). Our normalised version of the robust kernel (scaled MAD, c = 3) is 0.33 to 0.42 times MedRQ on these data. The true quarticity is unknown on real data; if a calibrated burst model is right, every estimator that truncates against a scale measured over hours is biased down by about 35% to 59% at one minute. A neighbour-guarded version (PI-NN) is designed for this; its settings were chosen after seeing the data, so it still needs an out-of-sample check.
+
+**Scores.** Novelty 7 (each ingredient is known; exact finite-sample corrections, the analysis of the MAD rule and what bursts mean for truncated quarticity estimators are new to us), Validity 7 (no central limit theorem proved; coverage is numerical), Relevance 8, Feasibility 7 (a paper needs a CLT), Demonstration 7, Interest 9 (it is the paper's own estimation problem). This direction says the most about the published estimator, so it must be presented as "what the MAD idea needs in order to be consistent and efficient", not as a correction.
+
+## A6. Change-triggered risk switch
+
+**Question.** Does scaling a position down after an increase alarm (and up after a decrease alarm) control risk better than ordinary volatility targeting?
+
+**Results [REAL].** Tails are on a par with daily EWMA targeting (2025 crypto portfolio: maximum drawdown 34.4% against 33.8%, and 54.6% for buy and hold; Nifty over nine years: 28.1% against 30.8% and 39.3%) with far fewer trades (93 against 365 changes a year per coin). But it keeps delivered risk further from the target (weekly volatility 0.27 log units off target against 0.19 to 0.22), and Sharpe ratios cannot be told apart.
+
+**Scores.** Novelty 3, Validity 7 (an honest backtest with costs and paired bootstrap intervals), Relevance 6, Feasibility 9, Demonstration 6, Interest 3 (a trading rule is far from the paper's topic). Kept as a negative result.
+
+## A7. Correlation-break monitor
+
+**Question.** The paper names a multivariate extension as future work. Can the same machinery detect breaks in the dependence between two assets, online and with a guarantee, without being fooled by volatility changes?
+
+**Results.** A betting e-detector on the sign concordance `sign(r1) sign(r2)` is bounded and scale-free, so pure volatility changes and persistent GARCH clustering do not trigger it (false alarms 2.3% to 3.1% against 5% [SYNTHETIC]), while every other detector tested is triggered. It is also faster than a product of standardised returns truncated at c = 3, whose bets are capped by the truncation bound (174 against 246 steps for a correlation change from 0.3 to 0.6). Truncating the product at c = 2 is a little faster still (158 steps) but inherits the product's sensitivity to volatility changes. A basket version monitors several pairs at once. On Binance coins [REAL] it finds correlation breaks about once a month per pair, clustered after sell-offs.
+
+**Scores.** Novelty 7, Validity 9, Relevance 8 (correlation breaks after sell-offs are the risk diversification does not cover), Feasibility 9, Demonstration 8, Interest 7.
+
+## A8. Sequential fixed-accuracy estimation of the volatility level
+
+**Question.** Purely sequential estimation is a classical part of sequential analysis. How many one-minute returns are needed before the volatility level can be stated to within plus or minus d (relative) with 95% confidence, if one decides when to stop by looking at the data? The benchmark is the oracle sample size n* = z² CV² / d², which needs the unknown shape of the returns. Any such rule runs on a running estimate of the variance of r², that is, of quarticity, the quantity the paper estimates robustly.
+
+**Results.**
+* [SYNTHETIC] Truncation makes the classical rules work on returns. Chow and Robbins (1965), in Nadas' relative form, on min(r², τ²) with τ three times the pilot's scaled MAD, covers at 0.936 to 0.964 (nominal 0.95) with 0.96 to 1.01 times the oracle sample, for normal, t5, t3 and jump returns, at every d from 0.4 to 0.05 and for any pilot from 10 to 100 returns. On raw squares the same rule covers 0.72 to 0.78 for t3 and needs a sample that grows like d^(-3) instead of d^(-2). No stopping rule can guarantee coverage of the raw variance for every law (a sequential form of Bahadur and Savage 1956), so the truncated variance is the right target.
+* [SYNTHETIC, closed form] The price of a guarantee that holds whenever one stops. A betting confidence sequence stopped when its width reaches the target covers in every independent-data cell (at least 0.969). It needs 2 log(2/α) / z² = 1.92 times the oracle as d goes to 0 (the price of an exponential tail bound in place of the central limit theorem), and 1.548 with the running intersection (a Brownian first-passage limit, 1.545 by simulation); 1.57 to 1.84 at practical accuracies. Time-uniform bets not matched to the target cost 5.6 to 14.6 times the oracle.
+* [SYNTHETIC] Under GARCH clustering every rule built for independent data stops 7 to 47 times too early for the stationary level (coverage 0.28 to 0.82). What Chow and Robbins does cover, at 0.948 to 0.966, is the average conditional truncated variance over the window it used. The running intersection of a confidence sequence is invalid for such a moving target (0.68 to 0.79); without it the sequences cover 0.986 to 1.000.
+* [REAL, no coverage claim] On BTCUSDT (July to December 2025, 4392 hourly start times): about 50 minutes for plus or minus 20% on volatility with truncated Chow and Robbins, 66 with raw squares and 140 with the betting sequence; for plus or minus 20% on the variance, 220, 411 and 505 minutes. A stationary bootstrap of quiet days reproduces the synthetic coverage when returns are resampled independently (0.949 truncated, 0.919 raw) and breaks every procedure when 30-minute blocks are kept (0.70 to 0.82).
+
+**Scores.** Novelty 6 (every building block is classical; the closed-form price 2 log(2/α) / z² of stopping a confidence sequence at a target width, the 1.548 limit with intersection and the invalidity of the intersection for a moving target were not found in our searches, which were not exhaustive), Validity 8 (proved for any law with independent returns; under clustering only the window average is covered), Relevance 6 (the level moves within hours, so a fixed-accuracy estimate is a snapshot), Feasibility 9, Demonstration 8, Interest 8 (purely sequential estimation is a classical topic of sequential analysis, and the link to quarticity is direct). A mostly clarifying result: the classical theory works once returns are truncated and accuracy is relative, the cost of anytime validity is exact and modest, and the real limit is the moving level, which is what the main monitor is for.
