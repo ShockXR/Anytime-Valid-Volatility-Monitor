@@ -71,6 +71,7 @@ Per-segment calibration details are stored in ``segments``.
 from __future__ import annotations
 
 import math
+import warnings
 from dataclasses import dataclass
 
 import numpy as np
@@ -78,6 +79,11 @@ import numpy as np
 from .confseq import StreamingEBConfSeq
 from .detectors import DEFAULT_DOWN_FRACTIONS, DEFAULT_UP_GRID, check_bets
 from .robust import MAD_NORMAL_SCALE
+
+# Below this calibration length VolatilityMonitor warns (it still runs). With n returns the scaled MAD has a
+# relative standard error of about 1.17 / sqrt(n) for normal data: 12 percent at n = 100, so the baseline
+# variance m0 is off by about 23 percent, already as large as the smallest change the default bets target.
+MIN_ADVISED_CAL_LEN = 100
 
 
 @dataclass
@@ -142,6 +148,13 @@ class VolatilityMonitor:
             raise ValueError("c_down must be positive")
         if int(cal_len) < 2:  # a one-return window gives scale = |r| and a meaningless baseline (audit A1-B-002)
             raise ValueError("cal_len must be at least 2")
+        if int(cal_len) < MIN_ADVISED_CAL_LEN:
+            warnings.warn(
+                f"cal_len={int(cal_len)} is short: the scaled MAD of n returns has a relative standard error of "
+                f"about 1.17/sqrt(n) ({1.17 / math.sqrt(int(cal_len)):.0%} here), so the baseline variance is "
+                f"off by about twice that and the false alarm bound m / threshold no longer describes the "
+                f"monitor. Use at least {MIN_ADVISED_CAL_LEN} returns (the experiments use 120 to 1440).",
+                UserWarning, stacklevel=2)
         self.cal_len = cal_len
         self.band = null_band
         self.up_grid = np.asarray(up_grid, float)
@@ -149,6 +162,9 @@ class VolatilityMonitor:
         check_bets(self.up_grid, self.down_fractions)
         if not null_band >= 0:
             raise ValueError("null_band must be nonnegative")
+        if null_band >= 1:
+            warnings.warn(f"null_band={null_band} is 1 or more, so the decrease side can never bet and the monitor "
+                          "only looks for volatility increases (audit A4-B-003)", UserWarning, stacklevel=2)
         self.scale_floor = scale_floor
         if baseline not in ("plugin", "cs"):
             raise ValueError("baseline must be 'plugin' or 'cs'")
@@ -350,6 +366,10 @@ class VolatilityMonitor:
 
     def update(self, r: float) -> Event | None:
         """Feed one return; returns an ``Event`` if an alarm fires at this step."""
+        try:  # fail at once on a string, None or an array (audit A4-B-004), not when calibration ends
+            r = float(r)
+        except (TypeError, ValueError):
+            raise TypeError(f"a return must be one number, got {type(r).__name__}: {r!r}") from None
         self.t += 1
         if not self.calibrated:
             self._feed_calibration(r)
@@ -374,8 +394,15 @@ class VolatilityMonitor:
 
     def run(self, returns) -> list[Event]:
         """Feed ``returns`` in order through ``update``; returns ``self.events`` (all alarms so far)."""
-        for r in np.asarray(returns, float):
+        r_all = np.asarray(returns, float)
+        for r in r_all:
             self.update(r)
+        if r_all.size and not self.segments and not self.calibrated:
+            n_fin = int(np.isfinite(r_all).sum())
+            warnings.warn(
+                f"the monitor never finished calibrating on these {r_all.size} returns ({n_fin} finite), so it "
+                f"could not alarm at all: no alarm here does not mean no change. Calibration needs about "
+                f"cal_len={self.cal_len} usable returns.", UserWarning, stacklevel=2)
         return self.events
 
 

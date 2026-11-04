@@ -60,19 +60,36 @@ def load_bitstamp_csv(path: str | Path, start: str | None = None, end: str | Non
     if filled not in ("missing", "zero"):
         raise ValueError("filled must be 'missing' or 'zero'")
     df = pd.read_csv(path)
+    n_raw = len(df)
     df["time"] = pd.to_datetime(df["timestamp"], unit="s", utc=True)
-    df = df.set_index("time").sort_index()
-    df = df[~df.index.duplicated()]
-    if start is not None:
-        df = df[df.index >= pd.Timestamp(start, tz="UTC")]
-    if end is not None:
-        df = df[df.index < pd.Timestamp(end, tz="UTC")]
+    df = df.set_index("time")
+    n_dup = int(df.index.duplicated().sum())
+    # stable sort, so a duplicated minute always keeps the first row read (the default sort is not stable,
+    # so which duplicate survived used to be arbitrary)
+    df = _finish(df, start, end, "UTC")
+    bad_price = _mask_nonpositive(df)
     df["zero_volume"] = df["volume"] <= 0
     # A filled (tradeless) minute repeats the previous close: no price was observed, so the returns on both
     # sides of it are missing, not zero (docs/math.md 5.6, item 5), as for the gaps of load_binance.
     close = df["close"] if filled == "zero" else df["close"].where(~df["zero_volume"])
     df["logret"] = np.log(close).diff()
+    df.attrs["checks"] = dict(source="Bitstamp BTC/USD via github.com/ff137 mirror", rows_read=n_raw,
+                              duplicates=n_dup, nonpositive_prices=bad_price,
+                              first=str(df.index[0]) if len(df) else "", last=str(df.index[-1]) if len(df) else "")
     return df
+
+
+def _mask_nonpositive(df: pd.DataFrame) -> int:
+    """Set open, high, low and close to NaN on bars whose close is zero or negative; return how many.
+
+    A price of 0 or below is a feed error, and its log return would be -inf or NaN and could pass as a huge
+    move. The returns on both sides of such a bar become NaN (missing), never zero.
+    """
+    bad = (df["close"] <= 0).to_numpy()
+    cols = [c for c in ("open", "high", "low", "close") if c in df.columns]
+    if bad.any():
+        df.loc[bad, cols] = np.nan
+    return int(bad.sum())
 
 
 def intraday_scale(returns: pd.Series, lookback_days: int = 20, smooth: int = 15, start: str = "past",
@@ -290,8 +307,7 @@ def load_binance(symbol: str, start: str, end: str, root: Path = DATA_ROOT, down
     missing = int(len(full.difference(df.index)))
     df = df.reindex(full)
     df.index.name = "time"
-    bad_price = int((df["close"] <= 0).sum())
-    df.loc[df["close"] <= 0, ["open", "high", "low", "close"]] = np.nan
+    bad_price = _mask_nonpositive(df)
     df["logret"] = np.log(df["close"]).diff()
     df["zero_volume"] = df["volume"].fillna(0) <= 0
     df.attrs["checks"] = dict(source=f"Binance spot {symbol} via github.com/parshant231234-eng mirror",
@@ -318,6 +334,7 @@ def load_nifty(start: str, end: str, root: Path = DATA_ROOT, download: bool = Tr
     df = raw.set_index("time")[["open", "high", "low", "close"]].astype(float)
     n_dup = int(df.index.duplicated().sum())
     df = _finish(df, start, end, "Asia/Kolkata")
+    bad_price = _mask_nonpositive(df)
     df["session"] = df.index.floor("D")
     lc = np.log(df["close"])
     df["logret"] = lc.groupby(df["session"]).diff()
@@ -326,7 +343,7 @@ def load_nifty(start: str, end: str, root: Path = DATA_ROOT, download: bool = Tr
     df.loc[gap.values & df["logret"].notna().values, "logret"] = np.nan
     bars = df.groupby("session").size()
     df.attrs["checks"] = dict(source="Nifty 50 index via github.com/technovusin/nifty50-historical-data",
-                              rows=len(df), duplicates=n_dup, sessions=int(bars.size),
+                              rows=len(df), duplicates=n_dup, nonpositive_prices=bad_price, sessions=int(bars.size),
                               median_bars_per_session=float(bars.median()),
                               short_sessions=int((bars < 360).sum()),
                               first=str(df.index[0]), last=str(df.index[-1]))

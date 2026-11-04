@@ -12,6 +12,16 @@ overlapped in time, so some 0.3.0 work (the first paper drafts, E17) has commits
 
 Round 3: theory TH4 to TH6, experiments E16 to E25, the paper, and the preparation of a release.
 
+### Fixed (4 November 2026, after the validation audit)
+
+- Loaders: the Bitstamp loader keeps the first row read for a duplicated minute (stable sort) and reports
+  its checks; the Bitstamp and Nifty loaders mask nonpositive prices.
+- `VolatilityMonitor` warns for `cal_len` below 100, when it never finished calibrating, and when
+  `null_band` is 1 or more; `update` rejects a non-number at once.
+- `gaussian_lr_edetector` and `page_cusum` skip missing values instead of freezing at NaN.
+- The command line prints a short `error:` line and exits with status 2 instead of a traceback.
+- No stored result changed (465 of 465 result files identical after the quick tier and an E4 rerun).
+
 ### Added
 
 - Release preparation: complete package metadata in `pyproject.toml` (license, author, keywords,

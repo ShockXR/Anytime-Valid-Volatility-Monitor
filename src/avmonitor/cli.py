@@ -27,6 +27,8 @@ STEPS_PER_DAY = {"binance": 1440, "bitstamp": 1440, "nifty": 375}
 
 def _threshold(steps_per_day: int, budget: float) -> float:
     """Alarm level A such that P(any false alarm within one day) <= budget (docs/math.md, Theorem B)."""
+    if not 0 < budget <= 1:
+        raise ValueError(f"--budget must be a probability in (0, 1], got {budget}")
     return steps_per_day / budget
 
 
@@ -79,6 +81,9 @@ def cmd_run(a) -> int:
     # (calendar days; sessions markets need extra days for weekends and holidays).
     warm_days = int(a.lookback_days * (1.6 if a.source == "nifty" else 1.0)) + 7
     start = pd.Timestamp(a.start)
+    if not pd.Timestamp(a.end) > start:
+        raise ValueError(f"--end ({a.end}) must be after --start ({a.start})")
+    _threshold(STEPS_PER_DAY[a.source], a.budget)  # check --budget before loading any data
     aw = argparse.Namespace(**vars(a))
     aw.start = (start - pd.Timedelta(days=warm_days)).strftime("%Y-%m-%d")
     try:
@@ -192,7 +197,16 @@ def main(argv=None) -> int:
         q.set_defaults(func=fn)
 
     a = p.parse_args(argv)
-    return a.func(a)
+    try:
+        return a.func(a)
+    except FileNotFoundError as e:
+        name = getattr(e, "filename", None) or e
+        print(f"error: data file not found: {name}. Add --download to fetch it from the public mirror "
+              "(see docs or scripts/download_data.py).", file=sys.stderr)
+        return 2
+    except (ValueError, KeyError, OSError) as e:
+        print(f"error: {type(e).__name__}: {e}", file=sys.stderr)
+        return 2
 
 
 if __name__ == "__main__":

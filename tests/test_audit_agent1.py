@@ -558,14 +558,15 @@ def test_array_detector_rejects_unknown_kind_even_for_empty_input():
         D.betting_edetector(np.empty((1, 0)), 1.0, kind="BOGUS")
 
 
-def test_benchmark_detectors_go_dead_after_one_nan_documented():
-    # Documented limitation (reports/CODE_AUDIT.md, A1-B-008): unlike betting_edetector and VolatilityMonitor, the two
-    # benchmarks do not skip missing values, so a single NaN freezes their statistic at NaN and no alarm can follow.
+def test_benchmark_detectors_skip_a_nan_instead_of_going_dead():
+    # Was a documented limitation (reports/CODE_AUDIT.md, A1-B-007): one NaN froze both benchmark statistics at
+    # NaN. Fixed on 4 Nov 2026: a missing value is skipped, as in betting_edetector and VolatilityMonitor. The only
+    # callers (E4, E11) pass simulated data without NaN, so no stored result changes.
     rng = np.random.default_rng(0)
     r = np.r_[rng.standard_normal(100), 3 * rng.standard_normal(200)]
     r_nan = r.copy()
     r_nan[5] = np.nan
     assert D.gaussian_lr_edetector(r, 1.0, threshold=100).alarm[0] >= 100
     assert D.page_cusum(r**2, 1.0, 0.5, 20.0).alarm[0] >= 100
-    assert D.gaussian_lr_edetector(r_nan, 1.0, threshold=100).alarm[0] == -1
-    assert D.page_cusum(r_nan**2, 1.0, 0.5, 20.0).alarm[0] == -1
+    assert D.gaussian_lr_edetector(r_nan, 1.0, threshold=100).alarm[0] >= 100
+    assert D.page_cusum(r_nan**2, 1.0, 0.5, 20.0).alarm[0] >= 100
