@@ -51,11 +51,15 @@ Round 3: theory TH4 to TH6, experiments E16 to E25, the paper, and the preparati
   false-alarm rates (R2), new null laws and change shapes (R3), a walk-forward backtest on every asset and
   year from 2017 to October 2026 (R4), property tests (R5, now `tests/test_round4_properties.py`), an
   independent check of R2 and R4 (V1), and a post hoc search for a faster setting on real calm days (R6).
+- Second wave: a placebo matched on last-hour volatility and a strong-forecast check on January to
+  October 2026 data (W1), a full clean-copy rerun of E18 (W2: every E18 file byte-identical), and a
+  measurement of the start-up look-ahead in `experiments/e07_nifty.py` (W3: 3 April 2017 alarms; fix
+  proposed, not applied).
 - README, pitch, strategy and `docs/limitations.md`: test counts; the blind share is about 70% on crypto
   and about half on the Nifty 50; the README setting leaves almost all of its 5% budget unused; new
   limitations on what the monitor watches (the clipped square, not the variance), the realistic
   seasonality pipeline, bid-ask bounce, changes during calibration, short bursts, what a real alarm shows,
-  and two data vendor changes. The README and pitch number traces were regenerated (0 untraced) and their
+  two data vendor changes, and the E7 look-ahead; the README's forecast bullet adds the 2026 check. The README and pitch number traces were regenerated (0 untraced) and their
   two entries in `results/MANIFEST.csv` rebuilt; every other result file is unchanged.
 
 ### Added

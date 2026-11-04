@@ -1,0 +1,15 @@
+START 2026-11-04T03:21:29Z
+N1: stream Nifty 2024-2025, Nifty 50: 185250 monitored steps
+BOCPD w=375 truncated=False: 101 s for (1, 185250)
+BOCPD w=375 truncated=True: 102 s for (1, 185250)
+BOCPD w=250 truncated=False: 96 s for (1, 185250)
+BOCPD w=250 truncated=True: 95 s for (1, 185250)
+N1, e-detector: 2 alarms, identical
+N1, BOCPD, w=250: 2 alarms, identical
+N1, BOCPD, w=375: 2 alarms, identical
+N1, BOCPD on truncated returns, w=250: 2 alarms, identical
+N1, BOCPD on truncated returns, w=375: 2 alarms, identical
+N1, BJV rolling, k=120: 3 alarms, identical
+N1, BJV rolling, k=375: 1 alarms, identical
+wrote /home/user/wt-repro/docs/demo/replay.html (0.09 MB)
+EXIT 0 END 2026-11-04T03:24:52Z
