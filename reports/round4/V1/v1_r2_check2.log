@@ -1,0 +1,4 @@
+D GLR t3 oracle h=2.834e+122: null FA within 390 = 0.0575 +- 0.0102
+D GLR t3 oracle x2: early 0.052 detected 0.948 median 250 IQR (158-349) time 30s
+E README t3 oracle h=471.1: null FA within 390 = 0.0525 +- 0.0098
+E README t3 oracle x2: early 0.058 detected 0.942 median 80 IQR (48-132) time 42s

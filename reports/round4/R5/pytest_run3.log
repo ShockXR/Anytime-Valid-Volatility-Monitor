@@ -1,0 +1,14 @@
+................................x...x..................                  [100%]
+=============================== warnings summary ===============================
+reports/round4/R5/test_round4_properties.py::test_expected_gaussian_lr_factor_is_one_only_for_gaussian_data
+  /home/user/.venv-bapat/lib/python3.13/site-packages/numpy/_core/_methods.py:190: RuntimeWarning: overflow encountered in square
+    x = um.square(x, out=x)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+============================= slowest 5 durations ==============================
+2.20s call     reports/round4/R5/test_round4_properties.py::test_larger_threshold_never_alarms_earlier
+1.46s call     reports/round4/R5/test_round4_properties.py::test_sign_invariance_global_and_per_return
+1.33s call     reports/round4/R5/test_round4_properties.py::test_pickle_or_deepcopy_mid_stream_then_continue_equals_uninterrupted[deepcopy]
+1.17s call     reports/round4/R5/test_round4_properties.py::test_cli_simulate_subprocess_matches_the_python_api[args1]
+1.17s call     reports/round4/R5/test_round4_properties.py::test_cli_simulate_subprocess_matches_the_python_api[args2]
+53 passed, 2 xfailed, 1 warning in 28.21s

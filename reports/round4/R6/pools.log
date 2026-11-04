@@ -1,0 +1,14 @@
+pool BTC: 81 calm of 184 days, 116640 returns
+pool ETH: 95 calm of 184 days, 136800 returns
+pool XRP: 95 calm of 184 days, 136800 returns
+pool SOL: 100 calm of 184 days, 144000 returns
+pool DOGE: 94 calm of 184 days, 135360 returns
+pool Nifty 50: 639 calm of 1191 days, 238522 returns
+    dataset  period_days  calm_days  days_undefined  pool_returns  zero_share     scale          tau2            m0         B  clipped_share  sd_X_over_m0  distinct_abs_values
+0       BTC          184         81               0        116640    0.025189  0.000351  1.107306e-06  1.785033e-07  6.203285       0.041529      1.563548               113703
+1       ETH          184         95               0        136800    0.005263  0.000612  3.367572e-06  5.083832e-07  6.624082       0.035051      1.573777               136081
+2       XRP          184         95               0        136800    0.026784  0.000653  3.840361e-06  5.848414e-07  6.566500       0.035651      1.573041               133137
+3       SOL          184        100               0        144000    0.033438  0.000740  4.925513e-06  7.080162e-07  6.956780       0.027500      1.558716               139186
+4      DOGE          184         94               0        135360    0.029514  0.000810  5.905425e-06  8.652996e-07  6.824717       0.029492      1.561523               131366
+5  Nifty 50         1191        639               0        238522    0.004465  0.000212  4.054981e-07  5.991593e-08  6.767785       0.030249      1.563516               237458
+pools built in 17 s

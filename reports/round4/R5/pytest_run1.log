@@ -1,0 +1,19 @@
+................................x...x............                        [100%]
+=============================== warnings summary ===============================
+reports/round4/R5/test_round4_properties.py::test_expected_gaussian_lr_factor_is_one_only_for_gaussian_data
+  /home/user/.venv-bapat/lib/python3.13/site-packages/numpy/_core/_methods.py:190: RuntimeWarning: overflow encountered in square
+    x = um.square(x, out=x)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+============================= slowest 10 durations =============================
+2.75s call     reports/round4/R5/test_round4_properties.py::test_larger_threshold_never_alarms_earlier
+2.54s call     reports/round4/R5/test_round4_properties.py::test_sign_invariance_global_and_per_return
+2.40s call     reports/round4/R5/test_round4_properties.py::test_pickle_or_deepcopy_mid_stream_then_continue_equals_uninterrupted[deepcopy]
+1.97s call     reports/round4/R5/test_round4_properties.py::test_pickle_or_deepcopy_mid_stream_then_continue_equals_uninterrupted[pickle]
+1.41s call     reports/round4/R5/test_round4_properties.py::test_cli_simulate_subprocess_matches_the_python_api[args0]
+1.35s call     reports/round4/R5/test_round4_properties.py::test_wider_null_band_or_larger_margin_never_alarms_earlier
+1.25s call     reports/round4/R5/test_round4_properties.py::test_scale_invariance_of_the_monitors[0.5]
+1.22s call     reports/round4/R5/test_round4_properties.py::test_cli_simulate_subprocess_matches_the_python_api[args1]
+1.19s call     reports/round4/R5/test_round4_properties.py::test_scale_invariance_of_the_monitors[3.7]
+1.17s call     reports/round4/R5/test_round4_properties.py::test_streaming_equals_batch_equals_random_chunks
+47 passed, 2 xfailed, 1 warning in 33.47s

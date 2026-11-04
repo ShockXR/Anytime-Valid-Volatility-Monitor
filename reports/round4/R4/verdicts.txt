@@ -1,0 +1,12 @@
+Q1 plugin: asset-years 27; up useful 100.00%; down useful 96.30%; every asset's rate stable: False -> PARTIAL
+   ratio metric: up post/pre beats placebo in 0 of 27; down in 0 of 27
+   unstable asset-years: NIFTY 2021 (1.95), NIFTY 2024 (2.48)
+Q1 cs: asset-years 27; up useful 100.00%; down useful 81.48%; every asset's rate stable: False -> PARTIAL
+   ratio metric: up post/pre beats placebo in 0 of 27; down in 0 of 27
+   unstable asset-years: NIFTY 2018 (0.31), NIFTY 2019 (0.29), NIFTY 2023 (0.23), NIFTY 2024 (1.02), BTC 2026 (0.47)
+Q2 plugin: assets with all four checks within limits: 6 of 7 -> PASS
+Q2 cs: assets with all four checks within limits: 4 of 7 -> FAILED
+Q3 crypto asset-years in [60%, 80%]: 17 of 17 (range 0.637 to 0.717) -> VERIFIED
+Q3 Nifty years in [60%, 80%]: 1 of 10 (range 0.426 to 0.649)
+Q3 cs crypto calibrating share range 0.407 to 0.572; blind for up 0.471 to 0.581
+Q3 cs Nifty calibrating share range 0.140 to 0.436

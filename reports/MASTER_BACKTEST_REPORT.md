@@ -51,10 +51,10 @@ BTC 1-minute bars for 2024-01 to 2024-03 match the manifest hashes, with no dupl
 
 ## 6. Open items, most serious first
 
-1. **Loaders** (A4-B-001, A4-B-002): make the duplicate rule deterministic and mask nonpositive prices. Not changed here because it could move published numbers; run the reproduction manifest check after any change.
-2. **Monitor input checks** (A4-B-003 to A4-B-005): calibration lengths 2 to 10 are still accepted (the null alarm rate is inflated), non-numeric input fails late, and all-NaN or constant streams leave the monitor blind with no warning.
-3. **Benchmark detectors die after one NaN** (A1-B-007): the Gaussian likelihood-ratio and Page CUSUM comparators; the main detector skips missing values.
-4. **CLI errors**: a mistyped date, unknown symbol or empty file prints a raw traceback.
+1. **Loaders** (A4-B-001, A4-B-002): make the duplicate rule deterministic and mask nonpositive prices. Not changed here because it could move published numbers; run the reproduction manifest check after any change. **Fixed on 4 November 2026** (`EXECUTION_SUMMARY.md`, follow-up item 1).
+2. **Monitor input checks** (A4-B-003 to A4-B-005): calibration lengths 2 to 10 are still accepted (the null alarm rate is inflated), non-numeric input fails late, and all-NaN or constant streams leave the monitor blind with no warning. **Fixed on 4 November 2026** with warnings (follow-up item 2).
+3. **Benchmark detectors die after one NaN** (A1-B-007): the Gaussian likelihood-ratio and Page CUSUM comparators; the main detector skips missing values. **Fixed on 4 November 2026**: both now skip a missing value (follow-up item 3).
+4. **CLI errors**: a mistyped date, unknown symbol or empty file prints a raw traceback. **Fixed on 4 November 2026** (follow-up item 4).
 5. **E18 to E25 not rerun on a clean clone**; the tracer accepts coincidental matches (A1-B-016).
 6. Forward tests E24 (after 1 June 2027) and E25 (from 26 November 2026) are pre-registered and must be run exactly as written.
 

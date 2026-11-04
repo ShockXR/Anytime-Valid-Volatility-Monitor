@@ -1,0 +1,73 @@
+law,method,horizon_m,k,paths,rate,ci_low,ci_high,bound,k_up,k_down,verdict,note
+t30_to_t5,"e-detector, KNOWN baseline (theorem)",switch+390,183,1898,0.0964172813487882,0.08394176425805353,0.11052322167978693,0.05,7,176,EXCEEDS bound,paths silent before the switch; bound as if a fresh segment
+t30_to_t5,"e-detector, KNOWN baseline (theorem)",switch+975,593,1898,0.3124341412012645,0.2919787986239467,0.33364722617222986,0.125,9,584,EXCEEDS bound,paths silent before the switch; bound as if a fresh segment
+t30_to_t5,monitor plugin band0.25 (README),switch+390,0,1999,0.0,-1.0842021724855044e-19,0.0019180747993251188,0.05,0,0,within bound,paths silent before the switch; bound as if a fresh segment
+t30_to_t5,monitor plugin band0.25 (README),switch+975,0,1999,0.0,-1.0842021724855044e-19,0.0019180747993251188,0.125,0,0,within bound,paths silent before the switch; bound as if a fresh segment
+t30_to_t5,monitor plugin band0,switch+390,211,1800,0.11722222222222223,0.10316979892985863,0.13290503158741074,0.05,12,199,EXCEEDS bound,paths silent before the switch; bound as if a fresh segment
+t30_to_t5,monitor plugin band0,switch+975,636,1800,0.35333333333333333,0.33158429208679147,0.3757070798385483,0.125,15,621,EXCEEDS bound,paths silent before the switch; bound as if a fresh segment
+t30_to_t5,"e-detector, KNOWN baseline (theorem)",98,2,2000,0.001,0.000274273176083379,0.0036390101892285302,0.012564102564102564,2,0,within bound,tau=2.9336 m0=0.98867 
+t30_to_t5,"e-detector, KNOWN baseline (theorem)",390,27,2000,0.0135,0.00929443086767369,0.019570924557625397,0.05,18,9,within bound,tau=2.9336 m0=0.98867 
+t30_to_t5,"e-detector, KNOWN baseline (theorem)",1950,695,2000,0.3475,0.32694098377557623,0.36864373709258014,0.25,71,624,EXCEEDS bound,tau=2.9336 m0=0.98867 
+t30_to_t5,monitor plugin band0.25 (README),98,0,2000,0.0,0.0,0.0019171176005129348,0.012564102564102564,0,0,within bound,plug-in; median m0hat=0.9869 
+t30_to_t5,monitor plugin band0.25 (README),390,1,2000,0.0005,8.826546015058292e-05,0.0028269350227618393,0.05,1,0,within bound,plug-in; median m0hat=0.9869 
+t30_to_t5,monitor plugin band0.25 (README),1950,1,2000,0.0005,8.826546015058292e-05,0.0028269350227618393,0.25,1,0,within bound,plug-in; median m0hat=0.9869 
+t30_to_t5,monitor plugin band0,98,1,2000,0.0005,8.826546015058292e-05,0.0028269350227618393,0.012564102564102564,1,0,within bound,plug-in; median m0hat=0.9869 
+t30_to_t5,monitor plugin band0,390,36,2000,0.018,0.013029914582859979,0.02481818678403449,0.05,23,13,within bound,plug-in; median m0hat=0.9869 
+t30_to_t5,monitor plugin band0,1950,836,2000,0.418,0.39656059709573477,0.43975381019074933,0.25,128,708,EXCEEDS bound,plug-in; median m0hat=0.9869 
+t30_to_t5,monitor cs baseline delta0.01,98,0,2000,0.0,0.0,0.0019171176005129348,0.022564102564102566,0,0,within bound,cs 
+t30_to_t5,monitor cs baseline delta0.01,390,1,2000,0.0005,8.826546015058292e-05,0.0028269350227618393,0.060000000000000005,1,0,within bound,cs 
+t30_to_t5,monitor cs baseline delta0.01,1950,11,2000,0.0055,0.003073865015608807,0.009822164291298487,0.26,1,10,within bound,cs 
+t5_to_t30,"e-detector, KNOWN baseline (theorem)",switch+390,328,1902,0.17245005257623555,0.15613683905771641,0.19008374926399935,0.05,326,2,EXCEEDS bound,paths silent before the switch; bound as if a fresh segment
+t5_to_t30,"e-detector, KNOWN baseline (theorem)",switch+975,1092,1902,0.5741324921135647,0.5517824065917977,0.5961837202888413,0.125,1090,2,EXCEEDS bound,paths silent before the switch; bound as if a fresh segment
+t5_to_t30,monitor plugin band0.25 (README),switch+390,1,2000,0.0005,8.826546015058292e-05,0.0028269350227618393,0.05,1,0,within bound,paths silent before the switch; bound as if a fresh segment
+t5_to_t30,monitor plugin band0.25 (README),switch+975,8,2000,0.004,0.002028222209821939,0.007873558449886893,0.125,8,0,within bound,paths silent before the switch; bound as if a fresh segment
+t5_to_t30,monitor plugin band0,switch+390,419,1786,0.23460246360582307,0.21553210258403838,0.25481208876786676,0.05,408,11,EXCEEDS bound,paths silent before the switch; bound as if a fresh segment
+t5_to_t30,monitor plugin band0,switch+975,1025,1786,0.5739081746920492,0.5508391789573452,0.5966599069952887,0.125,1008,17,EXCEEDS bound,paths silent before the switch; bound as if a fresh segment
+t5_to_t30,"e-detector, KNOWN baseline (theorem)",98,1,2000,0.0005,8.826546015058292e-05,0.0028269350227618393,0.012564102564102564,1,0,within bound,tau=2.5023 m0=0.86505 
+t5_to_t30,"e-detector, KNOWN baseline (theorem)",390,33,2000,0.0165,0.01177275112217586,0.02308110159752015,0.05,16,17,within bound,tau=2.5023 m0=0.86505 
+t5_to_t30,"e-detector, KNOWN baseline (theorem)",1950,1190,2000,0.595,0.5733234423694048,0.6163123052864977,0.25,1133,57,EXCEEDS bound,tau=2.5023 m0=0.86505 
+t5_to_t30,monitor plugin band0.25 (README),98,0,2000,0.0,0.0,0.0019171176005129348,0.012564102564102564,0,0,within bound,plug-in; median m0hat=0.8642 
+t5_to_t30,monitor plugin band0.25 (README),390,0,2000,0.0,0.0,0.0019171176005129348,0.05,0,0,within bound,plug-in; median m0hat=0.8642 
+t5_to_t30,monitor plugin band0.25 (README),1950,8,2000,0.004,0.002028222209821939,0.007873558449886893,0.25,8,0,within bound,plug-in; median m0hat=0.8642 
+t5_to_t30,monitor plugin band0,98,2,2000,0.001,0.000274273176083379,0.0036390101892285302,0.012564102564102564,2,0,within bound,plug-in; median m0hat=0.8642 
+t5_to_t30,monitor plugin band0,390,58,2000,0.029,0.02250029695161516,0.03730562782806803,0.05,33,25,within bound,plug-in; median m0hat=0.8642 
+t5_to_t30,monitor plugin band0,1950,1239,2000,0.6195,0.5980116719515136,0.6405301369419638,0.25,1118,121,EXCEEDS bound,plug-in; median m0hat=0.8642 
+t5_to_t30,monitor cs baseline delta0.01,98,0,2000,0.0,0.0,0.0019171176005129348,0.022564102564102566,0,0,within bound,cs 
+t5_to_t30,monitor cs baseline delta0.01,390,2,2000,0.001,0.000274273176083379,0.0036390101892285302,0.060000000000000005,1,1,within bound,cs 
+t5_to_t30,monitor cs baseline delta0.01,1950,19,2000,0.0095,0.006090191210478055,0.014790501155625134,0.26,18,1,within bound,cs 
+ma1_-0.1,"e-detector, KNOWN baseline (theorem)",98,0,2000,0.0,0.0,0.0019171176005129348,0.012564102564102564,0,0,within bound,tau=3.0002 m0=0.99631 
+ma1_-0.1,"e-detector, KNOWN baseline (theorem)",390,16,2000,0.008,0.00493025378658916,0.012956189932315568,0.05,13,3,within bound,tau=3.0002 m0=0.99631 
+ma1_-0.1,"e-detector, KNOWN baseline (theorem)",1950,249,2000,0.1245,0.11074633065003775,0.13969342466794749,0.25,124,125,within bound,tau=3.0002 m0=0.99631 
+ma1_-0.1,monitor plugin band0.25 (README),98,0,2000,0.0,0.0,0.0019171176005129348,0.012564102564102564,0,0,within bound,plug-in; median m0hat=0.9952 
+ma1_-0.1,monitor plugin band0.25 (README),390,0,2000,0.0,0.0,0.0019171176005129348,0.05,0,0,within bound,plug-in; median m0hat=0.9952 
+ma1_-0.1,monitor plugin band0.25 (README),1950,0,2000,0.0,0.0,0.0019171176005129348,0.25,0,0,within bound,plug-in; median m0hat=0.9952 
+ma1_-0.1,monitor plugin band0,98,0,2000,0.0,0.0,0.0019171176005129348,0.012564102564102564,0,0,within bound,plug-in; median m0hat=0.9952 
+ma1_-0.1,monitor plugin band0,390,40,2000,0.02,0.014721643767243237,0.02711878912924918,0.05,27,13,within bound,plug-in; median m0hat=0.9952 
+ma1_-0.1,monitor plugin band0,1950,573,2000,0.2865,0.2671087895476373,0.30670981966778166,0.25,288,285,EXCEEDS bound,plug-in; median m0hat=0.9952 
+ma1_-0.1,monitor cs baseline delta0.01,98,0,2000,0.0,0.0,0.0019171176005129348,0.022564102564102566,0,0,within bound,cs 
+ma1_-0.1,monitor cs baseline delta0.01,390,0,2000,0.0,0.0,0.0019171176005129348,0.060000000000000005,0,0,within bound,cs 
+ma1_-0.1,monitor cs baseline delta0.01,1950,0,2000,0.0,0.0,0.0019171176005129348,0.26,0,0,within bound,cs 
+ma1_0.3,"e-detector, KNOWN baseline (theorem)",98,4,2000,0.002,0.0007780147254709095,0.005131434404639974,0.012564102564102564,4,0,within bound,tau=2.9984 m0=0.99422 
+ma1_0.3,"e-detector, KNOWN baseline (theorem)",390,47,2000,0.0235,0.01771813278982021,0.03110888028346862,0.05,40,7,within bound,tau=2.9984 m0=0.99422 
+ma1_0.3,"e-detector, KNOWN baseline (theorem)",1950,470,2000,0.235,0.21693633948945693,0.2540797328388149,0.25,285,185,inconclusive,tau=2.9984 m0=0.99422 
+ma1_0.3,monitor plugin band0.25 (README),98,0,2000,0.0,0.0,0.0019171176005129348,0.012564102564102564,0,0,within bound,plug-in; median m0hat=0.9959 
+ma1_0.3,monitor plugin band0.25 (README),390,0,2000,0.0,0.0,0.0019171176005129348,0.05,0,0,within bound,plug-in; median m0hat=0.9959 
+ma1_0.3,monitor plugin band0.25 (README),1950,3,2000,0.0015,0.0005102543486519297,0.004401111899059467,0.25,3,0,within bound,plug-in; median m0hat=0.9959 
+ma1_0.3,monitor plugin band0,98,2,2000,0.001,0.000274273176083379,0.0036390101892285302,0.012564102564102564,2,0,within bound,plug-in; median m0hat=0.9959 
+ma1_0.3,monitor plugin band0,390,72,2000,0.036,0.02868448710149568,0.045094598031780314,0.05,56,16,within bound,plug-in; median m0hat=0.9959 
+ma1_0.3,monitor plugin band0,1950,740,2000,0.37,0.3491082171303705,0.3913902334457629,0.25,395,345,EXCEEDS bound,plug-in; median m0hat=0.9959 
+ma1_0.3,monitor cs baseline delta0.01,98,0,2000,0.0,0.0,0.0019171176005129348,0.022564102564102566,0,0,within bound,cs 
+ma1_0.3,monitor cs baseline delta0.01,390,1,2000,0.0005,8.826546015058292e-05,0.0028269350227618393,0.060000000000000005,1,0,within bound,cs 
+ma1_0.3,monitor cs baseline delta0.01,1950,2,2000,0.001,0.000274273176083379,0.0036390101892285302,0.26,2,0,within bound,cs 
+seasonal_amp1.0,"e-detector, KNOWN baseline (theorem)",98,6,2000,0.003,0.0013756111462276122,0.006530003748682246,0.012564102564102564,6,0,within bound,tau=2.9017 m0=0.94295 
+seasonal_amp1.0,"e-detector, KNOWN baseline (theorem)",390,82,2000,0.041,0.033153361352687295,0.050606552604583584,0.05,68,14,inconclusive,tau=2.9017 m0=0.94295 
+seasonal_amp1.0,"e-detector, KNOWN baseline (theorem)",1950,747,2000,0.3735,0.35256091914971066,0.39492411160321905,0.25,424,323,EXCEEDS bound,tau=2.9017 m0=0.94295 
+seasonal_amp1.0,monitor plugin band0.25 (README),98,0,2000,0.0,0.0,0.0019171176005129348,0.012564102564102564,0,0,within bound,plug-in; median m0hat=0.9444 
+seasonal_amp1.0,monitor plugin band0.25 (README),390,0,2000,0.0,0.0,0.0019171176005129348,0.05,0,0,within bound,plug-in; median m0hat=0.9444 
+seasonal_amp1.0,monitor plugin band0.25 (README),1950,1,2000,0.0005,8.826546015058292e-05,0.0028269350227618393,0.25,1,0,within bound,plug-in; median m0hat=0.9444 
+seasonal_amp1.0,monitor plugin band0,98,6,2000,0.003,0.0013756111462276122,0.006530003748682246,0.012564102564102564,6,0,within bound,plug-in; median m0hat=0.9444 
+seasonal_amp1.0,monitor plugin band0,390,76,2000,0.038,0.03046747631677216,0.0473039403461018,0.05,62,14,within bound,plug-in; median m0hat=0.9444 
+seasonal_amp1.0,monitor plugin band0,1950,806,2000,0.403,0.38170862766088504,0.42466329315361456,0.25,450,356,EXCEEDS bound,plug-in; median m0hat=0.9444 
+seasonal_amp1.0,monitor cs baseline delta0.01,98,0,2000,0.0,0.0,0.0019171176005129348,0.022564102564102566,0,0,within bound,cs 
+seasonal_amp1.0,monitor cs baseline delta0.01,390,0,2000,0.0,0.0,0.0019171176005129348,0.060000000000000005,0,0,within bound,cs 
+seasonal_amp1.0,monitor cs baseline delta0.01,1950,0,2000,0.0,0.0,0.0019171176005129348,0.26,0,0,within bound,cs 

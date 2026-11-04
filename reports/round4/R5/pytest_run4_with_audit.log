@@ -1,0 +1,29 @@
+................................x...x................................... [ 64%]
+........................................                                 [100%]
+=============================== warnings summary ===============================
+reports/round4/R5/test_round4_properties.py::test_expected_gaussian_lr_factor_is_one_only_for_gaussian_data
+  /home/user/.venv-bapat/lib/python3.13/site-packages/numpy/_core/_methods.py:190: RuntimeWarning: overflow encountered in square
+    x = um.square(x, out=x)
+
+tests/test_audit_agent1.py::test_truncation_never_exceeds_its_cap
+  /home/user/anytime-valid-volatility-monitor/tests/test_audit_agent1.py:169: RuntimeWarning: overflow encountered in square
+    assert np.all(np.minimum(r**2, tau**2) <= tau**2)
+
+tests/test_audit_agent1.py::test_empty_and_short_inputs_do_not_crash_the_detectors
+  /home/user/anytime-valid-volatility-monitor/src/avmonitor/detectors.py:387: RuntimeWarning: Mean of empty slice
+    out["false_alarm_rate"] = float(fa.mean())
+
+tests/test_audit_agent1.py::test_empty_and_short_inputs_do_not_crash_the_detectors
+  /home/user/.venv-bapat/lib/python3.13/site-packages/numpy/_core/_methods.py:142: RuntimeWarning: invalid value encountered in scalar divide
+    ret = ret.dtype.type(ret / rcount)
+
+tests/test_audit_agent1.py::test_empty_and_short_inputs_do_not_crash_the_detectors
+  /home/user/anytime-valid-volatility-monitor/src/avmonitor/detectors.py:388: RuntimeWarning: Mean of empty slice
+    out["mean_run_length_censored"] = float(np.where(fa, alarm + 1, horizon).mean())
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+============================= slowest 3 durations ==============================
+2.04s call     reports/round4/R5/test_round4_properties.py::test_larger_threshold_never_alarms_earlier
+1.85s call     reports/round4/R5/test_round4_properties.py::test_sign_invariance_global_and_per_return
+1.21s call     reports/round4/R5/test_round4_properties.py::test_pickle_or_deepcopy_mid_stream_then_continue_equals_uninterrupted[deepcopy]
+110 passed, 2 xfailed, 5 warnings in 28.04s

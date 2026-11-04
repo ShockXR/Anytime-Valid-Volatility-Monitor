@@ -66,11 +66,31 @@ there are none, calibration restarts with fresh data. Counts are kept in
 ``cal_stats``. Windows with ``scale > 0`` and ``m0 > 0`` are handled exactly as
 before, so the default output is unchanged whenever the old code did not fail.
 Per-segment calibration details are stored in ``segments``.
+
+Seeing that the monitor is blind
+--------------------------------
+While it calibrates, the monitor cannot raise an alarm. A stream that is all
+NaN, or a price that never moves, keeps it calibrating for ever: every window
+reaches ``cal_max`` and is thrown away. ``status()`` returns a small dictionary
+that shows this at any moment (steps spent calibrating and monitoring,
+calibration restarts in a row, and whether the increase side of the current
+segment can gain any evidence at all); ``run`` also warns at its end when the
+monitor never finished calibrating. Neither changes any alarm.
+
+Checked arguments
+-----------------
+``threshold`` must be a finite number above 1: the bound m / A says nothing
+for A <= 1, and with A = inf a statistic that overflows to inf still alarms
+(inf >= 2 inf). ``c`` and ``c_down`` must be finite and positive. A
+calibration window whose returns are so large that ``(c * scale)^2``
+overflows gives ``tau^2 = inf``, which the degenerate-window rule above
+rejects, instead of an ``OverflowError``.
 """
 
 from __future__ import annotations
 
 import math
+import warnings
 from dataclasses import dataclass
 
 import numpy as np
@@ -78,6 +98,33 @@ import numpy as np
 from .confseq import StreamingEBConfSeq
 from .detectors import DEFAULT_DOWN_FRACTIONS, DEFAULT_UP_GRID, check_bets
 from .robust import MAD_NORMAL_SCALE
+
+def _sq(x) -> float:
+    """``x ** 2`` exactly as before for every finite result; ``inf`` instead of ``OverflowError`` (audit R5-B-001)."""
+    try:
+        return x**2
+    except OverflowError:  # a Python float raises here; numpy.float64 already gives inf
+        return math.inf
+
+
+def _as_return(r):
+    """One return as a number, for the ``update`` methods of the subclasses (same rule as ``VolatilityMonitor``).
+
+    A Python float or a ``numpy.float64`` (what ``run`` passes) is returned unchanged, so their arithmetic is
+    exactly as before; anything ``float()`` cannot convert raises ``TypeError`` at once (audit A4-B-004).
+    """
+    if type(r) is float or type(r) is np.float64:
+        return r
+    try:
+        return float(r)
+    except (TypeError, ValueError):
+        raise TypeError(f"a return must be one number, got {type(r).__name__}: {r!r}") from None
+
+
+# Below this calibration length VolatilityMonitor warns (it still runs). With n returns the scaled MAD has a
+# relative standard error of about 1.17 / sqrt(n) for normal data: 12 percent at n = 100, so the baseline
+# variance m0 is off by about 23 percent, already as large as the smallest change the default bets target.
+MIN_ADVISED_CAL_LEN = 100
 
 
 @dataclass
@@ -89,6 +136,14 @@ class Event:
     monitored_since: int  # first monitored index of this segment
     baseline_scale: float  # robust sd of the calibration window
     stat: float  # value of the side's statistic at the alarm
+
+
+def _number(v, name: str) -> float:
+    """``float(v)``, with a ``ValueError`` that names the argument when ``v`` is not a number."""
+    try:
+        return float(v)
+    except (TypeError, ValueError):
+        raise ValueError(f"{name} must be a finite number, got {v!r}") from None
 
 
 def _usable(scale: float, tau2: float, m0: float | None = None) -> bool:
@@ -128,20 +183,31 @@ class VolatilityMonitor:
         cal_max: int | None = None,
         c_down: float | None = None,
     ):
-        self.A = float(threshold)
-        if not self.A > 0:  # also true for NaN; the bound m / A is meaningless otherwise (audit A1-B-001)
-            raise ValueError("threshold must be a positive number (the false alarm bound is m / threshold)")
+        self.A = _number(threshold, "threshold")
+        # A <= 1 makes the bound m / A empty, NaN never alarms (audit A1-B-001), and inf alarms once a statistic
+        # overflows to inf, because inf >= 2 * inf (audit R5-B-002).
+        if not (math.isfinite(self.A) and self.A > 1):
+            raise ValueError(f"threshold must be a finite number above 1 (the false alarm bound is m / threshold), "
+                             f"got {threshold!r}")
         self.c = c
-        if not (math.isfinite(c) and c > 0):
-            raise ValueError("c must be a finite positive number")
+        c_value = _number(c, "c")
+        if not (math.isfinite(c_value) and c_value > 0):
+            raise ValueError(f"c must be a finite positive number, got {c!r}")
         # The decrease side may use its own truncation constant (docs/theory_delay.md, 6.3). Each side is an
         # e-detector for its own truncated statistic, so the two-sided guarantee needs only each side's own
         # null; it is proved for a known baseline and for baseline="cs" (docs/math.md, Theorem 6.4).
-        self.c_down = float(c) if c_down is None else float(c_down)
-        if not self.c_down > 0:
-            raise ValueError("c_down must be positive")
+        self.c_down = float(c) if c_down is None else _number(c_down, "c_down")
+        if not (math.isfinite(self.c_down) and self.c_down > 0):
+            raise ValueError(f"c_down must be a finite positive number, got {c_down!r}")
         if int(cal_len) < 2:  # a one-return window gives scale = |r| and a meaningless baseline (audit A1-B-002)
             raise ValueError("cal_len must be at least 2")
+        if int(cal_len) < MIN_ADVISED_CAL_LEN:
+            warnings.warn(
+                f"cal_len={int(cal_len)} is short: the scaled MAD of n returns has a relative standard error of "
+                f"about 1.17/sqrt(n) ({1.17 / math.sqrt(int(cal_len)):.0%} here), so the baseline variance is "
+                f"off by about twice that and the false alarm bound m / threshold no longer describes the "
+                f"monitor. Use at least {MIN_ADVISED_CAL_LEN} returns (the experiments use 120 to 1440).",
+                UserWarning, stacklevel=2)
         self.cal_len = cal_len
         self.band = null_band
         self.up_grid = np.asarray(up_grid, float)
@@ -149,6 +215,9 @@ class VolatilityMonitor:
         check_bets(self.up_grid, self.down_fractions)
         if not null_band >= 0:
             raise ValueError("null_band must be nonnegative")
+        if null_band >= 1:
+            warnings.warn(f"null_band={null_band} is 1 or more, so the decrease side can never bet and the monitor "
+                          "only looks for volatility increases (audit A4-B-003)", UserWarning, stacklevel=2)
         self.scale_floor = scale_floor
         if baseline not in ("plugin", "cs"):
             raise ValueError("baseline must be 'plugin' or 'cs'")
@@ -176,6 +245,8 @@ class VolatilityMonitor:
         self.events: list[Event] = []
         self.segments: list[dict] = []
         self.cal_stats = {"calibrations": 0, "extended": 0, "fallback": 0, "restarted": 0}
+        self.cal_steps = 0  # returns fed to calibration so far (no alarm is possible during these steps)
+        self.restarts_in_a_row = 0  # calibration restarts since the last finished calibration
         self._reset()
 
     def _reset(self):
@@ -198,7 +269,7 @@ class VolatilityMonitor:
         if r.size == 0:
             return 0.0, 0.0, 0.0
         scale = max(float(np.median(np.abs(r)) * MAD_NORMAL_SCALE), self.scale_floor)
-        tau2 = (self.c * scale) ** 2
+        tau2 = _sq(self.c * scale)
         m0 = float(np.mean(np.minimum(r**2, tau2)))
         return scale, tau2, m0
 
@@ -210,12 +281,14 @@ class VolatilityMonitor:
 
     def _restart(self):
         self.cal_stats["restarted"] += 1
+        self.restarts_in_a_row += 1
         self.buffer = []
         self._cs = None
         self._cs_dn = None
         self._n_tau_used = 0
 
     def _feed_calibration(self, r: float):
+        self.cal_steps += 1
         self.buffer.append(r)
         if self.baseline == "plugin":
             if len(self.buffer) >= self.cal_len:
@@ -236,7 +309,7 @@ class VolatilityMonitor:
                 return
             if not usable:
                 scale = self._fallback_scale(r)
-                tau2 = (self.c * scale) ** 2
+                tau2 = _sq(self.c * scale)
                 m0 = float(np.mean(np.minimum(r**2, tau2))) if r.size else 0.0
                 if not _usable(scale, tau2, m0):
                     self._restart()
@@ -248,7 +321,7 @@ class VolatilityMonitor:
         if self.c_down == self.c:
             tau2_dn, m0_dn = tau2, m0
         else:
-            tau2_dn = (self.c_down * scale) ** 2
+            tau2_dn = _sq(self.c_down * scale)
             m0_dn = float(np.mean(np.minimum(r**2, tau2_dn))) if r.size else 0.0
         self.tau2_dn = tau2_dn
         if self.margin_z:
@@ -277,14 +350,14 @@ class VolatilityMonitor:
                     return
                 if not usable:
                     scale = self._fallback_scale(rr)
-                    tau2 = (self.c * scale) ** 2
+                    tau2 = _sq(self.c * scale)
                     if not _usable(scale, tau2):
                         self._restart()
                         return
                     self._fallback = True
             self.tau_scale = scale
             self.tau2 = tau2
-            self.tau2_dn = tau2 if self.c_down == self.c else (self.c_down * scale) ** 2
+            self.tau2_dn = tau2 if self.c_down == self.c else _sq(self.c_down * scale)
             half = self.delta / 2
             self._cs = StreamingEBConfSeq(tau2, half, half, n_plan=self.cs_n_plan, c=self.cs_c)
             if self.c_down != self.c:
@@ -333,6 +406,7 @@ class VolatilityMonitor:
             self.lam_dn = np.zeros(len(self.down_fractions))
         self.start = self.t + 1
         self.calibrated = True
+        self.restarts_in_a_row = 0
         self.cal_stats["calibrations"] += 1
         self.cal_stats["extended"] += int(self._extended)
         self.cal_stats["fallback"] += int(self._fallback)
@@ -350,6 +424,10 @@ class VolatilityMonitor:
 
     def update(self, r: float) -> Event | None:
         """Feed one return; returns an ``Event`` if an alarm fires at this step."""
+        try:  # fail at once on a string, None or an array (audit A4-B-004), not when calibration ends
+            r = float(r)
+        except (TypeError, ValueError):
+            raise TypeError(f"a return must be one number, got {type(r).__name__}: {r!r}") from None
         self.t += 1
         if not self.calibrated:
             self._feed_calibration(r)
@@ -374,9 +452,43 @@ class VolatilityMonitor:
 
     def run(self, returns) -> list[Event]:
         """Feed ``returns`` in order through ``update``; returns ``self.events`` (all alarms so far)."""
-        for r in np.asarray(returns, float):
+        r_all = np.asarray(returns, float)
+        for r in r_all:
             self.update(r)
+        if r_all.size and not self.segments and not self.calibrated:
+            n_fin = int(np.isfinite(r_all).sum())
+            warnings.warn(
+                f"the monitor never finished calibrating on these {r_all.size} returns ({n_fin} finite), so it "
+                f"could not alarm at all: no alarm here does not mean no change. Calibration needs about "
+                f"cal_len={self.cal_len} usable returns.", UserWarning, stacklevel=2)
         return self.events
+
+    def status(self) -> dict:
+        """Where the monitor stands now, to see whether it is blind (it changes nothing).
+
+        Keys: ``step`` (index of the last return fed, -1 before any), ``state`` ("calibrating" or "monitoring"),
+        ``steps_calibrating`` and ``steps_monitoring`` (totals so far; no alarm is possible while calibrating),
+        ``window`` (returns in the current calibration window, 0 while monitoring), ``restarts_in_a_row`` and
+        ``restarts_total`` (windows thrown away because they were all missing or all zero), ``calibrations``,
+        ``alarms``, and for a monitored segment ``tau2_over_m_up`` and ``up_can_gain`` (False when ``tau^2`` is
+        not above the increase side's null value, so that side's bets can never win and it cannot alarm) and
+        ``down_active``. ``blind`` is True while calibrating after at least one restart in a row, or while
+        monitoring with neither side able to gain.
+        """
+        out = dict(step=self.t, state="monitoring" if self.calibrated else "calibrating",
+                   steps_calibrating=self.cal_steps, steps_monitoring=self.t + 1 - self.cal_steps,
+                   window=0 if self.calibrated else len(self.buffer), restarts_in_a_row=self.restarts_in_a_row,
+                   restarts_total=self.cal_stats["restarted"], calibrations=self.cal_stats["calibrations"],
+                   alarms=len(self.events), tau2_over_m_up=None, up_can_gain=None, down_active=None)
+        if self.calibrated:
+            m_up, tau2 = getattr(self, "m_up", math.nan), getattr(self, "tau2", math.nan)
+            ratio = tau2 / m_up if m_up > 0 else math.inf
+            out.update(tau2_over_m_up=float(ratio), up_can_gain=bool(ratio > 1.0),
+                       down_active=bool(getattr(self, "down_active", False)))
+            out["blind"] = not (out["up_can_gain"] or out["down_active"])
+        else:
+            out["blind"] = self.restarts_in_a_row > 0
+        return out
 
 
 class GaussianLRMonitor(VolatilityMonitor):
@@ -398,13 +510,15 @@ class GaussianLRMonitor(VolatilityMonitor):
             self.S_dn = np.zeros(len(self.down_ratios))
 
     def update(self, r: float) -> Event | None:
+        r = _as_return(r)
         self.t += 1
         if not self.calibrated:
             self._feed_calibration(r)
             return None
         if not np.isfinite(r):
             return None
-        z2 = (r / self.scale) ** 2
+        with np.errstate(over="ignore"):
+            z2 = _sq(r / self.scale)
         with np.errstate(over="ignore"):
             fu = np.exp(np.minimum(-np.log(self.up_ratios) + 0.5 * (1 - 1 / self.up_ratios**2) * z2, 700))
             fd = np.exp(np.minimum(-np.log(self.down_ratios) + 0.5 * (1 - 1 / self.down_ratios**2) * z2, 700))

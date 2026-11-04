@@ -1,0 +1,61 @@
+REAL DATA {'sessions_raw': 2369, 'short_sessions_dropped': ['2021-11-04', '2023-11-12', '2024-03-02', '2024-05-18', '2024-11-01', '2025-10-21'], 'frozen_sessions_dropped': ['2017-07-10', '2021-02-24'], 'sessions': 2361, 'returns': 882001, 'flagged_returns': 998}
+sessions whose profile uses the future (line 150): ['2017-04-03', '2017-04-05', '2017-04-06', '2017-04-07', '2017-04-10', '2017-04-11', '2017-04-12', '2017-04-13', '2017-04-17', '2017-04-18']
+committed variant reproduces session_profile exactly: yes
+pooled profile / first past-only profile (session 11), quantiles 5/50/95: [0.77  0.97  1.187]
+committed: monitored returns 882001
+no_lookahead: monitored returns 878261
+drop_line150: monitored returns 878238
+returns that differ committed vs no_lookahead: 3740
+returns that differ no_lookahead vs drop_line150: 23
+== committed: 7057 alarms over all 8 configurations
+== no_lookahead: 7028 alarms over all 8 configurations
+== drop_line150: 7029 alarms over all 8 configurations
+committed rerun reproduces results/e07b_alarms.csv (all configs, same times): True
+committed rerun reproduces results/e07b_monitor_summary.csv: True
+variant                       committed  no_lookahead  drop_line150
+alarms_total                 611.000000    608.000000    608.000000
+alarms_2017                   45.000000     42.000000     42.000000
+alarms_apr2017                 5.000000      2.000000      2.000000
+dev_alarms                   300.000000    297.000000    297.000000
+dev_per_session                0.256400      0.253800      0.253800
+dev_up_hit                    73.330000     72.840000     72.840000
+dev_up_control                45.540000     45.040000     45.040000
+dev_down_hit                  85.930000     85.930000     85.930000
+dev_down_control              54.460000     54.960000     54.960000
+dev_up_next_vs_prev           72.730000     72.220000     72.220000
+dev_down_next_vs_prev         66.670000     66.670000     66.670000
+dev_median_delay             462.500000    464.000000    464.000000
+dev_share_first30              4.330000      4.380000      4.380000
+held-out_alarms              311.000000    311.000000    311.000000
+held-out_per_session           0.261100      0.261100      0.261100
+held-out_up_hit               78.260000     78.260000     78.260000
+held-out_up_control           47.010000     47.010000     47.010000
+held-out_down_hit             76.000000     76.000000     76.000000
+held-out_down_control         52.990000     52.990000     52.990000
+held-out_up_next_vs_prev      78.260000     78.260000     78.260000
+held-out_down_next_vs_prev    65.330000     65.330000     65.330000
+held-out_median_delay        404.000000    404.000000    404.000000
+held-out_share_first30         4.180000      4.180000      4.180000
+budget_sessions               11.000000     11.000000     11.000000
+budget_with_alarm              9.000000      9.000000      9.000000
+ordinary_sessions           2178.000000   2178.000000   2178.000000
+ordinary_with_alarm          540.000000    538.000000    538.000000
+rate_ordinary                  0.247934      0.247016      0.247016
+fisher_p                       0.000124      0.000120      0.000120
+robust cal 375 band 0.0: committed 1334, no_lookahead 1329, common 1327, only committed 7, only no_lookahead 2, last differing time 2017-04-25 09:52:00+05:30
+robust cal 375 band 0.25: committed 827, no_lookahead 825, common 823, only committed 4, only no_lookahead 2, last differing time 2017-04-25 12:15:00+05:30
+robust cal 375 band 0.5: committed 416, no_lookahead 414, common 412, only committed 4, only no_lookahead 2, last differing time 2017-06-02 12:00:00+05:30
+robust cal 750 band 0.0: committed 872, no_lookahead 869, common 865, only committed 7, only no_lookahead 4, last differing time 2017-05-04 09:17:00+05:30
+robust cal 750 band 0.25: committed 611, no_lookahead 608, common 606, only committed 5, only no_lookahead 2, last differing time 2017-04-26 10:08:00+05:30
+   only committed: ['2017-04-06 15:06:00+05:30', '2017-04-12 09:55:00+05:30', '2017-04-18 14:52:00+05:30', '2017-04-21 11:42:00+05:30', '2017-04-26 10:08:00+05:30']
+   only no_lookahead: ['2017-04-21 10:42:00+05:30', '2017-04-26 10:07:00+05:30']
+robust cal 750 band 0.5: committed 331, no_lookahead 327, common 325, only committed 6, only no_lookahead 2, last differing time 2017-06-02 13:51:00+05:30
+docs-table cells that change at printed precision (committed -> no_lookahead): 8
+   {'detector': 'robust e-detector', 'cal_len': 375, 'band': 0.0, 'period': 'dev', 'changes': {'up_next_vs_baseline_hi': (76, 77), 'down_next_vs_baseline_lo': (70, 69)}}
+   {'detector': 'robust e-detector', 'cal_len': 375, 'band': 0.25, 'period': 'dev', 'changes': {'median_delay': (552.0, 545.0)}}
+   {'detector': 'robust e-detector', 'cal_len': 375, 'band': 0.5, 'period': 'dev', 'changes': {'alarms_per_session': (0.18, 0.17), 'up_next_vs_baseline_hi': (85, 86), 'median_delay': (1154.5, 1167.0)}}
+   {'detector': 'robust e-detector', 'cal_len': 750, 'band': 0.0, 'period': 'dev', 'changes': {'down_next_vs_baseline': (74, 75), 'up_next_vs_baseline_lo': (65, 64), 'down_next_vs_baseline_lo': (68, 69), 'median_delay': (197.0, 195.0)}}
+   {'detector': 'robust e-detector', 'cal_len': 750, 'band': 0.25, 'period': 'dev', 'changes': {'alarms_per_session': (0.26, 0.25), 'control_up_next_vs_baseline': (46, 45), 'control_down_next_vs_baseline': (54, 55), 'median_delay': (462.5, 464.0)}}
+   {'detector': 'robust e-detector', 'cal_len': 750, 'band': 0.5, 'period': 'dev', 'changes': {'up_next_vs_baseline': (77, 79), 'up_next_vs_baseline_lo': (68, 69), 'up_next_vs_baseline_hi': (84, 86), 'median_delay': (1130.0, 1151.5)}}
+   {'detector': 'Gaussian LR', 'cal_len': 375, 'band': 0.0, 'period': 'dev', 'changes': {'alarms_per_session': (0.7, 0.69), 'median_delay': (120.0, 119.0)}}
+   {'detector': 'Gaussian LR', 'cal_len': 750, 'band': 0.0, 'period': 'dev', 'changes': {'control_up_next_vs_baseline': (43, 42), 'control_down_next_vs_baseline': (57, 58), 'up_next_vs_baseline_lo': (57, 56), 'down_next_vs_baseline_lo': (75, 76)}}

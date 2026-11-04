@@ -1,0 +1,17 @@
+ticks {0.2: 0.5137670882046224, 0.4: 1.1026130057871344, 0.6: 1.9431087620556355}
+t30_to_t3 done in 42 s
+t3_to_t30 done in 37 s
+ma1_-0.3 done in 40 s
+ma1_-0.6 done in 46 s
+tick_zero20 done in 153 s
+tick_zero40 done in 159 s
+tick_zero60 done in 491 s
+twopiece_0.6_1.4 done in 38 s
+twopiece_0.4_1.6 done in 38 s
+missing_5pct done in 37 s
+missing_blocks done in 33 s
+seasonal_pipeline done in 84 s
+fc_gjr done in 48 s
+fc_egarch done in 50 s
+fc_lnsv done in 45 s
+EXIT

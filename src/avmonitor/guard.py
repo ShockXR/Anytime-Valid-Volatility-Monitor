@@ -56,7 +56,7 @@ import math
 
 import numpy as np
 
-from .monitor import Event, VolatilityMonitor
+from .monitor import Event, VolatilityMonitor, _as_return
 from .periodic import PeriodicVolatilityMonitor
 
 
@@ -186,6 +186,7 @@ class _GuardMixin:
         rm.segments[-1]["start"] = rm.start
         self._rank = rm
         self.calibrated = True
+        self.restarts_in_a_row = 0
         self.start = self.t + 1
         self.scale = info["tau2"] ** 0.5 / self.c
         self.cal_stats["calibrations"] += 1
@@ -206,6 +207,7 @@ class _GuardMixin:
     def update(self, r: float) -> Event | None:
         if self._rank is None:
             return super().update(r)
+        r = _as_return(r)
         self.t += 1
         rm = self._rank
         if self._rank_boundary():  # the daily restart of P1 applies to the fallback's statistics too

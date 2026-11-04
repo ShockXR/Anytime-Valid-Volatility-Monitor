@@ -92,6 +92,10 @@ Placeholder modules with no public classes or functions: `avmonitor.strategy`.
 
 Streaming volatility regime monitor.
 
+Constants:
+
+- `MIN_ADVISED_CAL_LEN = 100`
+
 ### class `Event`
 
 ```python
@@ -130,6 +134,7 @@ Members:
 
 - `update(r: float) -> Event | None`: Feed one return; returns an ``Event`` if an alarm fires at this step.
 - `run(returns) -> list[Event]`: Feed ``returns`` in order through ``update``; returns ``self.events`` (all alarms so far).
+- `status() -> dict`: Where the monitor stands now, to see whether it is blind (it changes nothing).
 
 ### class `GaussianLRMonitor`
 

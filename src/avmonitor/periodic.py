@@ -43,7 +43,7 @@ import numpy as np
 from scipy import optimize
 
 from .detectors import DEFAULT_DOWN_FRACTIONS, DEFAULT_UP_GRID
-from .monitor import Event, VolatilityMonitor
+from .monitor import Event, VolatilityMonitor, _as_return
 
 LAND = 1e-9  # landing draws aim at 2A (1 + LAND), so floating point never falls just short (as in E16)
 
@@ -437,6 +437,7 @@ class PeriodicVolatilityMonitor(VolatilityMonitor):
     def update(self, r: float) -> Event | None:
         if self.period is None and self.statistic == "sr":
             return super().update(r)
+        r = _as_return(r)
         self.t += 1
         if not self.calibrated:
             self._feed_calibration(r)

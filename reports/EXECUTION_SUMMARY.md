@@ -33,21 +33,29 @@ PARTIALLY VERIFIED: real-data integrity (BTC 2024-01 to 2024-03 only), full repr
 FAILED: loaders keep an arbitrary duplicate and do not mask nonpositive prices (Bitstamp, Nifty); monitor accepts calibration lengths 2 to 10 and silently goes blind on constant or all-NaN streams; the two benchmark detectors die after one NaN.
 UNVERIFIED: the mathematical proofs have not been checked by a human.
 
+## Follow-up on 4 November 2026 (after the merge of PRs 1 to 3)
+
+Items 1 to 4 of the old "Next steps" list are done, each with tests in `tests/test_input_hardening.py` (19 tests, all written for this follow-up):
+
+1. **Loaders.** The Bitstamp loader now sorts with a stable sort, so a duplicated minute always keeps the first row read, and it reports `rows_read`, `duplicates` and `nonpositive_prices` in `df.attrs["checks"]`. The Bitstamp and Nifty loaders now mask bars with a close of 0 or below (open, high, low and close become NaN, so the returns on both sides are missing, never minus infinity), as the Binance loader already did. Fixes A4-B-001 and A4-B-002 (R-B9, R-B10).
+2. **Monitor.** `VolatilityMonitor` warns when `cal_len` is below 100 (`MIN_ADVISED_CAL_LEN`; the scaled MAD of n returns has a relative standard error of about 1.17/sqrt(n), 12 percent at n = 100, and every experiment uses 120 or more), warns at the end of `run` when it never finished calibrating (an all-NaN or frozen feed, so "no alarm" would otherwise look like "no change"), warns when `null_band` is 1 or more (the decrease side is then off), and `update` rejects a non-number at once. Fixes A4-B-003 to A4-B-005 (R-B7). Calibration lengths 2 to 99 still run, with the warning.
+3. **Benchmark detectors.** `gaussian_lr_edetector` and `page_cusum` now skip a missing value (the statistic stays where it was), as `betting_edetector` does. Their only callers are E4 and E11, which use simulated data without NaN; E4 was rerun with the new code and its outputs are byte-identical. Fixes A1-B-007.
+4. **Command line.** `python -m avmonitor` prints one line starting with `error:` and exits with status 2 for a missing data file (with a hint to add `--download`), `--end` not after `--start`, a `--budget` outside (0, 1], and other bad input, instead of a traceback.
+
+Checks after the follow-up (OUR CHECK, 4 November 2026): full suite 656 passed; `scripts/reproduce.py --tier quick --steps run,compare` and the E4 rerun give 465 of 465 result files identical; `scripts/trace_numbers.py` 0 untraced; a fuzz run of 400 hostile streams (NaN, infinities, 1e6 outliers, frozen feeds, tiny scales) through the monitor and both benchmarks raised no exception, gave no non-finite statistic, and every monitor that never calibrated warned. The suite also passes with the pinned versions in `requirements.txt`.
+
 ## Next steps, in order
 
-1. Make the duplicate rule deterministic and mask nonpositive prices in all loaders; run `python scripts/reproduce.py --steps compare` and `--tier full --steps run,compare --from E18` in a copy.
-2. Add a warning when the monitor stays blind, and a minimum calibration length with a justified default.
-3. Make the benchmark detectors skip NaN or document that they do not.
-4. Wrap CLI errors in short messages.
-5. Run the pre-registered forward tests exactly as written: E25 from 26 November 2026 (`python experiments/e25_sequential_events.py status`), E24 after 1 June 2027.
+1. Run the full tier from E18 in a copy (`--tier full --steps run,compare --from E18`); not run in this follow-up.
+2. Run the pre-registered forward tests exactly as written: E25 from 26 November 2026 (`python experiments/e25_sequential_events.py status`), E24 after 1 June 2027.
 
 ## How to resume
 
 ```bash
-git checkout claude/project-thread-tddcw4
+git checkout main
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt && pip install -e . --no-deps
-python -m pytest -q -p no:cacheprovider                         # expect 637 passed
+python -m pytest -q -p no:cacheprovider                         # expect 656 passed
 python scripts/reproduce.py --steps compare                     # expect 465 identical
 python scripts/trace_numbers.py                                 # expect 0 untraced
 ```

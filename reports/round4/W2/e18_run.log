@@ -1,0 +1,230 @@
+START 2026-11-04T02:38:02Z
+BOCPD w=375 truncated=False: 94 s for (1, 185250)
+BOCPD w=375 truncated=True: 96 s for (1, 185250)
+BOCPD w=250 truncated=False: 90 s for (1, 185250)
+BOCPD w=250 truncated=True: 93 s for (1, 185250)
+nifty: BOCPD done after 211 s
+done Nifty 2024-2025 Nifty 50 after 223 s
+BOCPD w=1440 truncated=True: 839 s for (15, 264960)
+BOCPD w=1440 truncated=False: 871 s for (15, 264960)
+BOCPD w=720 truncated=False: 474 s for (15, 264960)
+BOCPD w=720 truncated=True: 466 s for (15, 264960)
+BOCPD w=250 truncated=False: 221 s for (15, 264960)
+BOCPD w=250 truncated=True: 216 s for (15, 264960)
+crypto: BOCPD done after 1787 s
+done H2 2024 BTC after 1809 s
+done H2 2024 ETH after 1832 s
+done H2 2024 XRP after 1855 s
+done H2 2024 SOL after 1879 s
+done H2 2024 DOGE after 1903 s
+done H1 2025 BTC after 1925 s
+done H1 2025 ETH after 1948 s
+done H1 2025 XRP after 1971 s
+done H1 2025 SOL after 1993 s
+done H1 2025 DOGE after 2016 s
+done H2 2025 BTC after 2040 s
+done H2 2025 ETH after 2064 s
+done H2 2025 XRP after 2087 s
+done H2 2025 SOL after 2111 s
+done H2 2025 DOGE after 2134 s
+S2 done BTC
+S2 done ETH
+S2 done XRP
+S2 done SOL
+S2 done DOGE
+S2 done Nifty 50
+         stream    asset  e13_alarms  e18_alarms  identical_times_and_directions
+Nifty 2024-2025 Nifty 50         148         148                            True
+        H1 2025      BTC         125         125                            True
+        H1 2025      ETH         122         122                            True
+        H1 2025      XRP         127         127                            True
+        H1 2025      SOL         119         119                            True
+        H1 2025     DOGE         119         119                            True
+        H2 2025      BTC         127         127                            True
+        H2 2025      ETH         122         122                            True
+        H2 2025      XRP         129         129                            True
+        H2 2025      SOL         123         123                            True
+        H2 2025     DOGE         126         126                            True
+S3 thresholds against E13's: 96 rows, largest relative difference 0.00e+00
+total 2164 s
+wrote /home/user/wt-repro/results/figures/e18_events.png
+event asset edetector_last_up_before_T  size_3h_before_alarm  size_alarm_to_T  size_T_to_T6h  size_T6h_to_T24h  price_change_pct_3h_before_alarm  price_change_pct_alarm_to_T  price_change_pct_T_to_T24h
+   C1   BTC  2024-08-04 17:44:00+00:00                  1.68             1.53           4.02              3.49                             -3.55                         0.91                       -7.12
+   C1   ETH  2024-08-04 17:49:00+00:00                  2.45             1.70           6.34              3.62                             -5.92                        -0.24                      -10.02
+   C1   XRP  2024-08-04 17:44:00+00:00                  1.56             1.14           3.16              2.44                             -2.25                         0.95                       -6.48
+   C1   SOL  2024-08-04 17:23:00+00:00                  2.01             1.71           4.68              3.52                             -5.78                         3.96                       -6.18
+   C1  DOGE  2024-08-04 17:45:00+00:00                  1.95             1.46           4.07              3.15                             -4.25                         4.38                       -9.05
+   C2   BTC  2025-04-06 17:48:00+00:00                  0.90             2.34           1.72              2.20                             -1.79                        -3.40                        0.93
+   C2   ETH  2025-04-06 17:05:00+00:00                  0.93             2.78           1.87              2.37                             -1.02                        -8.67                       -1.75
+   C2   XRP  2025-04-06 17:47:00+00:00                  0.88             2.06           2.03              2.38                             -1.44                        -6.15                       -1.20
+   C2   SOL  2025-04-06 17:21:00+00:00                  0.88             2.14           1.74              2.14                             -0.67                        -7.03                        1.02
+   C2  DOGE  2025-04-06 17:46:00+00:00                  0.81             2.01           1.67              1.99                             -3.05                        -5.03                        0.21
+   C3   BTC  2025-10-10 15:30:00+00:00                  1.99             2.40           5.95              1.62                             -1.89                        -2.17                       -4.70
+   C3   ETH  2025-10-10 15:23:00+00:00                  1.78             2.78           5.94              1.85                             -3.19                        -4.92                       -5.93
+   C3   XRP  2025-10-10 15:24:00+00:00                  1.59             2.59          16.61              2.95                             -2.15                        -2.94                       -9.98
+   C3   SOL  2025-10-10 15:23:00+00:00                  1.77             2.26           6.00              2.05                             -3.04                        -4.43                      -13.52
+   C3  DOGE  2025-10-10 15:30:00+00:00                  1.73             1.90          11.89              2.24                             -3.95                        -3.57                      -20.44
+wrote /home/user/wt-repro/results/e18_context.csv
+awake Nifty 2024-2025 Nifty 50 awake-A band 0.25: 122 alarms, 12 s
+awake H2 2024 BTC awake-A band 0.25: 154 alarms, 16 s
+awake Nifty 2024-2025 Nifty 50 awake-A band 0.0: 209 alarms, 14 s
+awake Nifty 2024-2025 Nifty 50 awake-B band 0.25: 112 alarms, 5 s
+awake Nifty 2024-2025 Nifty 50 awake-B band 0.0: 569 alarms, 4 s
+awake H2 2024 BTC awake-A band 0.0: 294 alarms, 20 s
+awake H2 2024 BTC awake-B band 0.25: 166 alarms, 7 s
+awake H2 2024 BTC awake-B band 0.0: 820 alarms, 6 s
+awake H2 2024 ETH awake-A band 0.25: 155 alarms, 16 s
+awake H2 2024 XRP awake-A band 0.25: 163 alarms, 17 s
+awake H2 2024 ETH awake-A band 0.0: 285 alarms, 20 s
+awake H2 2024 ETH awake-B band 0.25: 158 alarms, 8 s
+awake H2 2024 ETH awake-B band 0.0: 842 alarms, 6 s
+awake H2 2024 XRP awake-A band 0.0: 300 alarms, 20 s
+awake H2 2024 XRP awake-B band 0.25: 157 alarms, 8 s
+awake H2 2024 XRP awake-B band 0.0: 808 alarms, 6 s
+awake H2 2024 SOL awake-A band 0.25: 132 alarms, 17 s
+awake H2 2024 DOGE awake-A band 0.25: 145 alarms, 16 s
+awake H2 2024 SOL awake-A band 0.0: 249 alarms, 20 s
+awake H2 2024 SOL awake-B band 0.25: 123 alarms, 7 s
+awake H2 2024 SOL awake-B band 0.0: 713 alarms, 5 s
+awake H2 2024 DOGE awake-A band 0.0: 277 alarms, 19 s
+awake H2 2024 DOGE awake-B band 0.25: 137 alarms, 7 s
+awake H2 2024 DOGE awake-B band 0.0: 781 alarms, 6 s
+awake H1 2025 BTC awake-A band 0.25: 106 alarms, 14 s
+awake H1 2025 ETH awake-A band 0.25: 147 alarms, 16 s
+awake H1 2025 BTC awake-A band 0.0: 281 alarms, 20 s
+awake H1 2025 BTC awake-B band 0.25: 168 alarms, 7 s
+awake H1 2025 BTC awake-B band 0.0: 760 alarms, 6 s
+awake H1 2025 ETH awake-A band 0.0: 264 alarms, 19 s
+awake H1 2025 ETH awake-B band 0.25: 138 alarms, 12 s
+awake H1 2025 ETH awake-B band 0.0: 709 alarms, 5 s
+awake H1 2025 XRP awake-A band 0.25: 167 alarms, 22 s
+awake H1 2025 SOL awake-A band 0.25: 126 alarms, 16 s
+awake H1 2025 XRP awake-A band 0.0: 279 alarms, 20 s
+awake H1 2025 XRP awake-B band 0.25: 148 alarms, 7 s
+awake H1 2025 XRP awake-B band 0.0: 732 alarms, 6 s
+awake H1 2025 SOL awake-A band 0.0: 246 alarms, 19 s
+awake H1 2025 SOL awake-B band 0.25: 108 alarms, 7 s
+awake H1 2025 SOL awake-B band 0.0: 644 alarms, 6 s
+awake H1 2025 DOGE awake-A band 0.25: 143 alarms, 17 s
+awake H2 2025 BTC awake-A band 0.25: 140 alarms, 17 s
+awake H1 2025 DOGE awake-A band 0.0: 257 alarms, 19 s
+awake H1 2025 DOGE awake-B band 0.25: 124 alarms, 7 s
+awake H1 2025 DOGE awake-B band 0.0: 697 alarms, 6 s
+awake H2 2025 BTC awake-A band 0.0: 278 alarms, 19 s
+awake H2 2025 BTC awake-B band 0.25: 161 alarms, 8 s
+awake H2 2025 BTC awake-B band 0.0: 785 alarms, 6 s
+awake H2 2025 ETH awake-A band 0.25: 127 alarms, 17 s
+awake H2 2025 XRP awake-A band 0.25: 153 alarms, 18 s
+awake H2 2025 ETH awake-A band 0.0: 251 alarms, 20 s
+awake H2 2025 ETH awake-B band 0.25: 139 alarms, 8 s
+awake H2 2025 ETH awake-B band 0.0: 723 alarms, 6 s
+awake H2 2025 XRP awake-A band 0.0: 260 alarms, 20 s
+awake H2 2025 XRP awake-B band 0.25: 137 alarms, 8 s
+awake H2 2025 XRP awake-B band 0.0: 706 alarms, 6 s
+awake H2 2025 SOL awake-A band 0.25: 126 alarms, 17 s
+awake H2 2025 DOGE awake-A band 0.25: 132 alarms, 17 s
+awake H2 2025 SOL awake-A band 0.0: 232 alarms, 20 s
+awake H2 2025 SOL awake-B band 0.25: 126 alarms, 8 s
+awake H2 2025 SOL awake-B band 0.0: 663 alarms, 6 s
+awake H2 2025 DOGE awake-A band 0.0: 254 alarms, 19 s
+awake H2 2025 DOGE awake-B band 0.25: 121 alarms, 8 s
+awake H2 2025 DOGE awake-B band 0.0: 701 alarms, 6 s
+E14 check Nifty 2024-2025 Nifty 50 awake-A band 0.25: identical (122 alarms here, 122 in E14)
+E14 check Nifty 2024-2025 Nifty 50 awake-A band 0.0: identical (209 alarms here, 209 in E14)
+E14 check Nifty 2024-2025 Nifty 50 awake-B band 0.25: identical (112 alarms here, 112 in E14)
+E14 check Nifty 2024-2025 Nifty 50 awake-B band 0.0: identical (569 alarms here, 569 in E14)
+E14 check H2 2025 BTC awake-A band 0.25: identical (140 alarms here, 140 in E14)
+E14 check H2 2025 BTC awake-A band 0.0: identical (278 alarms here, 278 in E14)
+E14 check H2 2025 BTC awake-B band 0.25: identical (161 alarms here, 161 in E14)
+E14 check H2 2025 BTC awake-B band 0.0: identical (785 alarms here, 785 in E14)
+E14 check H2 2025 ETH awake-A band 0.25: identical (127 alarms here, 127 in E14)
+E14 check H2 2025 ETH awake-A band 0.0: identical (251 alarms here, 251 in E14)
+E14 check H2 2025 ETH awake-B band 0.25: identical (139 alarms here, 139 in E14)
+E14 check H2 2025 ETH awake-B band 0.0: identical (723 alarms here, 723 in E14)
+E14 check H2 2025 XRP awake-A band 0.25: identical (153 alarms here, 153 in E14)
+E14 check H2 2025 XRP awake-A band 0.0: identical (260 alarms here, 260 in E14)
+E14 check H2 2025 XRP awake-B band 0.25: identical (137 alarms here, 137 in E14)
+E14 check H2 2025 XRP awake-B band 0.0: identical (706 alarms here, 706 in E14)
+E14 check H2 2025 SOL awake-A band 0.25: identical (126 alarms here, 126 in E14)
+E14 check H2 2025 SOL awake-A band 0.0: identical (232 alarms here, 232 in E14)
+E14 check H2 2025 SOL awake-B band 0.25: identical (126 alarms here, 126 in E14)
+E14 check H2 2025 SOL awake-B band 0.0: identical (663 alarms here, 663 in E14)
+E14 check H2 2025 DOGE awake-A band 0.25: identical (132 alarms here, 132 in E14)
+E14 check H2 2025 DOGE awake-A band 0.0: identical (254 alarms here, 254 in E14)
+E14 check H2 2025 DOGE awake-B band 0.25: identical (121 alarms here, 121 in E14)
+E14 check H2 2025 DOGE awake-B band 0.0: identical (701 alarms here, 701 in E14)
+event    asset monitor  null_band  watching_at_T       last_alarm_before_T last_alarm_direction  delay_min  n_up_7d_before  n_down_7d_before  alarms_per_day_7d_before  stream_alarms_per_day
+   N1 Nifty 50 awake-A       0.25           True 2024-05-31 15:19:00+05:30                   up       20.0               1                 0                      0.20                   0.25
+   N2 Nifty 50 awake-A       0.25           True 2024-07-29 12:22:00+05:30                   up      107.0               1                 0                      0.20                   0.25
+   N3 Nifty 50 awake-A       0.25           True 2025-04-03 13:23:00+05:30                 down       51.0               0                 1                      0.25                   0.25
+   N1 Nifty 50 awake-A       0.00           True 2024-05-31 15:27:00+05:30                   up       16.0               2                 0                      0.40                   0.42
+   N2 Nifty 50 awake-A       0.00           True 2024-07-30 11:43:00+05:30                 down       51.0               1                 1                      0.40                   0.42
+   N3 Nifty 50 awake-A       0.00           True 2025-04-04 10:54:00+05:30                   up       51.0               1                 1                      0.50                   0.42
+   N1 Nifty 50 awake-B       0.25           True 2024-05-31 15:24:00+05:30                   up        7.0               1                 0                      0.20                   0.23
+   N2 Nifty 50 awake-B       0.25           True 2024-07-29 12:17:00+05:30                   up      107.0               1                 0                      0.20                   0.23
+   N3 Nifty 50 awake-B       0.25           True 2025-04-03 12:12:00+05:30                 down       20.0               0                 1                      0.25                   0.23
+   N1 Nifty 50 awake-B       0.00           True 2024-06-03 11:23:00+05:30                 down        5.0               2                 2                      0.80                   1.15
+   N2 Nifty 50 awake-B       0.00           True 2024-08-01 14:49:00+05:30                   up       50.0               2                 4                      1.20                   1.15
+   N3 Nifty 50 awake-B       0.00           True 2025-04-04 12:44:00+05:30                 down       16.0               2                 4                      1.50                   1.15
+   C1      BTC awake-A       0.25           True 2024-08-04 17:53:00+00:00                   up       45.0               5                 2                      1.00                   0.84
+   C1      BTC awake-A       0.00           True 2024-08-04 15:00:00+00:00                   up       32.0               7                 7                      2.00                   1.60
+   C1      BTC awake-B       0.25           True 2024-08-04 17:46:00+00:00                   up       37.0               5                 1                      0.86                   0.90
+   C1      BTC awake-B       0.00           True 2024-08-04 17:44:00+00:00                   up       18.0              12                20                      4.57                   4.46
+   C1      ETH awake-A       0.25           True 2024-08-04 17:19:00+00:00                   up       54.0               5                 3                      1.14                   0.84
+   C1      ETH awake-A       0.00           True 2024-08-04 17:10:00+00:00                   up       38.0               6                 3                      1.29                   1.55
+   C1      ETH awake-B       0.25           True 2024-08-04 17:18:00+00:00                   up       54.0               4                 0                      0.57                   0.86
+   C1      ETH awake-B       0.00           True 2024-08-04 21:26:00+00:00                 down       18.0              16                17                      4.71                   4.58
+   C1      XRP awake-A       0.25           True 2024-08-04 14:55:00+00:00                   up       66.0               3                 3                      0.86                   0.89
+   C1      XRP awake-A       0.00           True 2024-08-04 14:51:00+00:00                   up       54.0               8                 7                      2.14                   1.63
+   C1      XRP awake-B       0.25           True 2024-08-02 15:15:00+00:00                   up       45.0               2                 2                      0.57                   0.85
+   C1      XRP awake-B       0.00           True 2024-08-04 14:40:00+00:00                   up       38.0              15                17                      4.57                   4.39
+   C1      SOL awake-A       0.25           True 2024-08-04 17:24:00+00:00                   up       70.0               4                 1                      0.71                   0.72
+   C1      SOL awake-A       0.00           True 2024-08-04 17:23:00+00:00                   up       58.0               5                 2                      1.00                   1.35
+   C1      SOL awake-B       0.25           True 2024-08-04 17:23:00+00:00                   up       68.0               4                 0                      0.57                   0.67
+   C1      SOL awake-B       0.00           True 2024-08-04 20:41:00+00:00                 down       19.0              15                14                      4.14                   3.88
+   C1     DOGE awake-A       0.25           True 2024-08-04 17:45:00+00:00                   up       58.0               3                 2                      0.71                   0.79
+   C1     DOGE awake-A       0.00           True 2024-08-04 17:19:00+00:00                   up       55.0               6                 4                      1.43                   1.51
+   C1     DOGE awake-B       0.25           True 2024-08-02 12:52:00+00:00                   up       45.0               2                 0                      0.29                   0.74
+   C1     DOGE awake-B       0.00           True 2024-08-04 17:46:00+00:00                   up       22.0              15                12                      3.86                   4.24
+   C2      BTC awake-A       0.25           True 2025-03-23 10:38:00+00:00                 down        NaN               0                 0                      0.00                   0.59
+   C2      BTC awake-A       0.00           True 2025-04-06 17:54:00+00:00                   up      874.0               3                 4                      1.00                   1.55
+   C2      BTC awake-B       0.25           True 2025-04-06 17:52:00+00:00                   up      863.0               3                 2                      0.71                   0.93
+   C2      BTC awake-B       0.00           True 2025-04-06 17:43:00+00:00                   up      261.0              10                11                      3.00                   4.20
+   C2      ETH awake-A       0.25           True 2025-04-06 17:12:00+00:00                   up        NaN               4                 3                      1.00                   0.81
+   C2      ETH awake-A       0.00           True 2025-04-06 17:11:00+00:00                   up        NaN               6                 3                      1.29                   1.46
+   C2      ETH awake-B       0.25           True 2025-04-06 17:03:00+00:00                   up      420.0               6                 1                      1.00                   0.76
+   C2      ETH awake-B       0.00           True 2025-04-06 18:52:00+00:00                   up      224.0              11                13                      3.43                   3.92
+   C2      XRP awake-A       0.25           True 2025-04-06 17:57:00+00:00                   up      421.0               6                 3                      1.29                   0.92
+   C2      XRP awake-A       0.00           True 2025-04-06 17:47:00+00:00                   up      412.0               5                 3                      1.14                   1.54
+   C2      XRP awake-B       0.25           True 2025-04-06 17:46:00+00:00                   up      414.0               5                 2                      1.00                   0.82
+   C2      XRP awake-B       0.00           True 2025-04-06 17:28:00+00:00                   up      216.0              11                14                      3.57                   4.04
+   C2      SOL awake-A       0.25           True 2025-04-06 17:46:00+00:00                   up      874.0               3                 3                      0.86                   0.70
+   C2      SOL awake-A       0.00           True 2025-04-06 17:44:00+00:00                   up      874.0               4                 4                      1.14                   1.36
+   C2      SOL awake-B       0.25           True 2025-04-06 17:45:00+00:00                   up      867.0               3                 2                      0.71                   0.60
+   C2      SOL awake-B       0.00           True 2025-04-06 19:56:00+00:00                 down      227.0               9                10                      2.71                   3.56
+   C2     DOGE awake-A       0.25           True 2025-04-06 17:57:00+00:00                   up        NaN               2                 2                      0.57                   0.79
+   C2     DOGE awake-A       0.00           True 2025-04-06 17:47:00+00:00                   up        NaN               6                 3                      1.29                   1.42
+   C2     DOGE awake-B       0.25           True 2025-04-06 17:47:00+00:00                   up        NaN               2                 1                      0.43                   0.69
+   C2     DOGE awake-B       0.00           True 2025-04-06 18:57:00+00:00                   up      217.0               9                11                      2.86                   3.85
+   C3      BTC awake-A       0.25           True 2025-09-28 05:59:00+00:00                 down      676.0               0                 0                      0.00                   0.76
+   C3      BTC awake-A       0.00           True 2025-10-10 15:23:00+00:00                   up       67.0               5                 5                      1.43                   1.51
+   C3      BTC awake-B       0.25           True 2025-10-10 15:28:00+00:00                   up       56.0               5                 2                      1.00                   0.88
+   C3      BTC awake-B       0.00           True 2025-10-10 19:30:00+00:00                   up       58.0              11                15                      3.71                   4.27
+   C3      ETH awake-A       0.25           True 2025-10-10 15:29:00+00:00                   up       77.0               3                 2                      0.71                   0.69
+   C3      ETH awake-A       0.00           True 2025-10-10 15:23:00+00:00                   up       73.0               5                 5                      1.43                   1.36
+   C3      ETH awake-B       0.25           True 2025-10-10 15:24:00+00:00                   up       61.0               5                 1                      0.86                   0.76
+   C3      ETH awake-B       0.00           True 2025-10-10 19:25:00+00:00                   up     1394.0              11                17                      4.00                   3.93
+   C3      XRP awake-A       0.25           True 2025-10-10 15:28:00+00:00                   up       74.0               2                 2                      0.57                   0.83
+   C3      XRP awake-A       0.00           True 2025-10-10 15:27:00+00:00                   up       71.0               4                 3                      1.00                   1.41
+   C3      XRP awake-B       0.25           True 2025-10-10 15:22:00+00:00                   up       58.0               3                 0                      0.43                   0.74
+   C3      XRP awake-B       0.00           True 2025-10-10 19:30:00+00:00                   up       56.0              10                13                      3.29                   3.84
+   C3      SOL awake-A       0.25           True 2025-10-10 15:25:00+00:00                   up       74.0               3                 2                      0.71                   0.68
+   C3      SOL awake-A       0.00           True 2025-10-10 15:20:00+00:00                   up       70.0               5                 3                      1.14                   1.26
+   C3      SOL awake-B       0.25           True 2025-10-10 15:21:00+00:00                   up       58.0               4                 0                      0.57                   0.68
+   C3      SOL awake-B       0.00           True 2025-10-10 16:58:00+00:00                 down       58.0              12                14                      3.71                   3.60
+   C3     DOGE awake-A       0.25           True 2025-10-10 15:31:00+00:00                   up       70.0               2                 2                      0.57                   0.72
+   C3     DOGE awake-A       0.00           True 2025-10-10 15:31:00+00:00                   up       65.0               3                 3                      0.86                   1.38
+   C3     DOGE awake-B       0.25           True 2025-10-10 15:30:00+00:00                   up       58.0               2                 0                      0.29                   0.66
+   C3     DOGE awake-B       0.00           True 2025-10-10 19:29:00+00:00                   up       58.0              12                15                      3.86                   3.81
+wrote /home/user/wt-repro/results/e18_awake.csv after 422 s
+EXIT 0 END 2026-11-04T03:21:14Z

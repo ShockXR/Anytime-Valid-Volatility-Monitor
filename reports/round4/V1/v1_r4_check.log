@@ -1,0 +1,10 @@
+BTC u equal to R4 saved run: True | calib equal to my blind: True | alarm idx equal: True
+BTC 2024: steps 498240 (R4 498240) | blind 0.7100 (R4 0.7100) | up 133 (R4 133) | down 112 (R4 112) | up hit 0.940 over 133 (R4 0.940 over 133)
+BTC 2025: steps 525600 (R4 525600) | blind 0.6942 (R4 0.6942) | up 138 (R4 138) | down 116 (R4 116) | up hit 0.928 over 138 (R4 0.928 over 138)
+BTC 2026: steps 427680 (R4 427680) | blind 0.6599 (R4 0.6599) | up 117 (R4 117) | down 78 (R4 78) | up hit 0.906 over 117 (R4 0.906 over 117)
+BTC time 9 s
+NIFTY u equal to R4 saved run: True | calib equal to my blind: True | alarm idx equal: True
+NIFTY 2023: steps 91870 (R4 91870) | blind 0.4260 (R4 0.4260) | up 25 (R4 25) | down 27 (R4 27) | up hit 0.960 over 25 (R4 0.960 over 25)
+NIFTY 2024: steps 92250 (R4 92250) | blind 0.6488 (R4 0.6488) | up 43 (R4 43) | down 37 (R4 37) | up hit 0.977 over 43 (R4 0.977 over 43)
+NIFTY 2025: steps 93000 (R4 93000) | blind 0.5543 (R4 0.5543) | up 36 (R4 36) | down 33 (R4 33) | up hit 0.861 over 36 (R4 0.861 over 36)
+NIFTY time 10 s

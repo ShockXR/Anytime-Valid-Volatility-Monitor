@@ -1,0 +1,20 @@
+truth (tau^2, m0): {'gaussian': (np.float64(9.007794496815121), 0.9956172717737548), 'student_t3': (np.float64(3.8527618590013737), 0.6055637571302165), 'jumps_p0.5pct_sd8': (np.float64(9.101860537618306), 1.0280022672223772)}
+tuning gaussian done in 36s
+tuning student_t3 done in 35s
+tuning jumps_p0.5pct_sd8 done in 43s
+check gaussian done in 35s
+check student_t3 done in 36s
+check jumps_p0.5pct_sd8 done in 38s
+change gaussian f=2.000 done in 6s
+change gaussian f=1.500 done in 6s
+change gaussian f=0.500 done in 5s
+change gaussian f=0.667 done in 5s
+change student_t3 f=2.000 done in 6s
+change student_t3 f=1.500 done in 6s
+change student_t3 f=0.500 done in 5s
+change student_t3 f=0.667 done in 6s
+change jumps_p0.5pct_sd8 f=2.000 done in 5s
+change jumps_p0.5pct_sd8 f=1.500 done in 5s
+change jumps_p0.5pct_sd8 f=0.500 done in 5s
+change jumps_p0.5pct_sd8 f=0.667 done in 5s
+EXIT total 291s

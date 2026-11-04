@@ -1,0 +1,184 @@
+Wed Nov  4 01:58:49 UTC 2026
+REAL DATA. E22: E12's release test with P0 (plug-in, reproduction), P1, S1, S2.
+BTC P0: 499 alarms, monitored 0.298, watched 0.298, 7 s
+ETH P0: 492 alarms, monitored 0.307, watched 0.307, 6 s
+SOL P0: 473 alarms, monitored 0.334, watched 0.334, 6 s
+                                    check                              column  compared  mismatches  max_abs_diff
+                      P0 vs e12_tests.csv                          (row keys)        60           0           NaN
+                      P0 vs e12_tests.csv                              events        60           0           0.0
+                      P0 vs e12_tests.csv                         events_with        60           0           0.0
+                      P0 vs e12_tests.csv                          rate_event        60           0           0.0
+                      P0 vs e12_tests.csv                       rate_event_lo        60           0           0.0
+                      P0 vs e12_tests.csv                       rate_event_hi        60           0           0.0
+                      P0 vs e12_tests.csv                     control_windows        60           0           0.0
+                      P0 vs e12_tests.csv                 weekday_time_groups        60           0           0.0
+                      P0 vs e12_tests.csv                rate_control_matched        60           0           0.0
+                      P0 vs e12_tests.csv      expected_from_matched_controls        60           0           0.0
+                      P0 vs e12_tests.csv                  rate_ratio_matched        60           0           0.0
+                      P0 vs e12_tests.csv                 expected_under_null        60           0           0.0
+                      P0 vs e12_tests.csv            p_stratified_permutation        60           0           0.0
+                      P0 vs e12_tests.csv      p_stratified_permutation_fewer        60           0           0.0
+                      P0 vs e12_tests.csv                 p_stratified_fisher        60           0           0.0
+P0 Holm (primary family) vs e12_tests.csv                          (row keys)         2           0           NaN
+P0 Holm (primary family) vs e12_tests.csv                      p_holm_primary         2           0           0.0
+              P0 vs e12_event_windows.csv                          (row keys)       114           0           NaN
+              P0 vs e12_event_windows.csv                 monitoring_at_start       114           0           0.0
+              P0 vs e12_event_windows.csv                monitored_share_post       114           0           0.0
+              P0 vs e12_event_windows.csv                            any_post       114           0           0.0
+              P0 vs e12_event_windows.csv                             up_post       114           0           0.0
+              P0 vs e12_event_windows.csv                          up_post_1h       114           0           0.0
+              P0 vs e12_event_windows.csv                           n_up_post       114           0           0.0
+              P0 vs e12_event_windows.csv                           down_post       114           0           0.0
+              P0 vs e12_event_windows.csv                  first_up_delay_min       114           0           0.0
+              P0 vs e12_event_windows.csv  first_up_max_abs_recent_over_scale       114           0           0.0
+              P0 vs e12_event_windows.csv         first_up_post_over_baseline       114           0           0.0
+              P0 vs e12_event_windows.csv                              up_pre       114           0           0.0
+              P0 vs e12_event_windows.csv                    last_up_lead_min       114           0           0.0
+              P0 vs e12_event_windows.csv                         down_follow       114           0           0.0
+              P0 vs e12_event_windows.csv               first_down_follow_min       114           0           0.0
+              P0 vs e12_event_windows.csv                       down_after_up       114           0           0.0
+              P0 vs e12_event_windows.csv         abs_ret_first_hour_over_pre       114           0           0.0
+              P0 vs e12_event_windows.csv               abs_ret_post_over_pre       114           0           0.0
+              P0 vs e12_event_windows.csv                          n_controls       114           0           0.0
+              P0 vs e12_event_windows.csv                control_up_post_rate       114           0           0.0
+              P0 vs e12_event_windows.csv             control_up_post_1h_rate       114           0           0.0
+              P0 vs e12_event_windows.csv                 control_up_pre_rate       114           0           0.0
+              P0 vs e12_event_windows.csv            control_down_follow_rate       114           0           0.0
+              P0 vs e12_event_windows.csv control_down_after_up_given_up_rate       114           0           0.0
+              P0 vs e12_event_windows.csv    control_monitoring_at_start_rate       114           0           0.0
+            P0 vs e12_monitor_summary.csv                          (row keys)         3           0           NaN
+            P0 vs e12_monitor_summary.csv                              alarms         3           0           0.0
+            P0 vs e12_monitor_summary.csv                                  up         3           0           0.0
+            P0 vs e12_monitor_summary.csv                                down         3           0           0.0
+            P0 vs e12_monitor_summary.csv                     monitored_share         3           0           0.0
+P0 reproduces E12 exactly.
+BTC P1: 373 alarms, monitored 0.475, watched 0.470, 8 s
+ETH P1: 380 alarms, monitored 0.464, watched 0.464, 8 s
+SOL P1: 341 alarms, monitored 0.519, watched 0.519, 8 s
+BTC S1: 383 alarms, monitored 0.461, watched 0.449, 8 s
+ETH S1: 388 alarms, monitored 0.453, watched 0.453, 8 s
+SOL S1: 353 alarms, monitored 0.502, watched 0.502, 8 s
+/home/user/wt-repro/experiments/e12_crypto_events.py:207: RuntimeWarning: divide by zero encountered in scalar divide
+  post = float(np.median(np.abs(seg)) * MAD_NORMAL_SCALE / e.baseline_scale) if seg.size >= MIN_FINITE else np.nan
+/home/user/wt-repro/experiments/e12_crypto_events.py:210: RuntimeWarning: divide by zero encountered in scalar divide
+  max_abs_recent_over_scale=float(np.nanmax(recent) / e.baseline_scale), post_over_baseline=post))
+BTC S2: 658 alarms, monitored 1.000, watched 1.000, 32 s
+ETH S2: 570 alarms, monitored 1.000, watched 1.000, 32 s
+SOL S2: 461 alarms, monitored 1.000, watched 1.000, 32 s
+                                    check                              column  compared  mismatches  max_abs_diff
+                      P0 vs e12_tests.csv                          (row keys)        60           0           NaN
+                      P0 vs e12_tests.csv                              events        60           0           0.0
+                      P0 vs e12_tests.csv                         events_with        60           0           0.0
+                      P0 vs e12_tests.csv                          rate_event        60           0           0.0
+                      P0 vs e12_tests.csv                       rate_event_lo        60           0           0.0
+                      P0 vs e12_tests.csv                       rate_event_hi        60           0           0.0
+                      P0 vs e12_tests.csv                     control_windows        60           0           0.0
+                      P0 vs e12_tests.csv                 weekday_time_groups        60           0           0.0
+                      P0 vs e12_tests.csv                rate_control_matched        60           0           0.0
+                      P0 vs e12_tests.csv      expected_from_matched_controls        60           0           0.0
+                      P0 vs e12_tests.csv                  rate_ratio_matched        60           0           0.0
+                      P0 vs e12_tests.csv                 expected_under_null        60           0           0.0
+                      P0 vs e12_tests.csv            p_stratified_permutation        60           0           0.0
+                      P0 vs e12_tests.csv      p_stratified_permutation_fewer        60           0           0.0
+                      P0 vs e12_tests.csv                 p_stratified_fisher        60           0           0.0
+P0 Holm (primary family) vs e12_tests.csv                          (row keys)         2           0           NaN
+P0 Holm (primary family) vs e12_tests.csv                      p_holm_primary         2           0           0.0
+              P0 vs e12_event_windows.csv                          (row keys)       114           0           NaN
+              P0 vs e12_event_windows.csv                 monitoring_at_start       114           0           0.0
+              P0 vs e12_event_windows.csv                monitored_share_post       114           0           0.0
+              P0 vs e12_event_windows.csv                            any_post       114           0           0.0
+              P0 vs e12_event_windows.csv                             up_post       114           0           0.0
+              P0 vs e12_event_windows.csv                          up_post_1h       114           0           0.0
+              P0 vs e12_event_windows.csv                           n_up_post       114           0           0.0
+              P0 vs e12_event_windows.csv                           down_post       114           0           0.0
+              P0 vs e12_event_windows.csv                  first_up_delay_min       114           0           0.0
+              P0 vs e12_event_windows.csv  first_up_max_abs_recent_over_scale       114           0           0.0
+              P0 vs e12_event_windows.csv         first_up_post_over_baseline       114           0           0.0
+              P0 vs e12_event_windows.csv                              up_pre       114           0           0.0
+              P0 vs e12_event_windows.csv                    last_up_lead_min       114           0           0.0
+              P0 vs e12_event_windows.csv                         down_follow       114           0           0.0
+              P0 vs e12_event_windows.csv               first_down_follow_min       114           0           0.0
+              P0 vs e12_event_windows.csv                       down_after_up       114           0           0.0
+              P0 vs e12_event_windows.csv         abs_ret_first_hour_over_pre       114           0           0.0
+              P0 vs e12_event_windows.csv               abs_ret_post_over_pre       114           0           0.0
+              P0 vs e12_event_windows.csv                          n_controls       114           0           0.0
+              P0 vs e12_event_windows.csv                control_up_post_rate       114           0           0.0
+              P0 vs e12_event_windows.csv             control_up_post_1h_rate       114           0           0.0
+              P0 vs e12_event_windows.csv                 control_up_pre_rate       114           0           0.0
+              P0 vs e12_event_windows.csv            control_down_follow_rate       114           0           0.0
+              P0 vs e12_event_windows.csv control_down_after_up_given_up_rate       114           0           0.0
+              P0 vs e12_event_windows.csv    control_monitoring_at_start_rate       114           0           0.0
+            P0 vs e12_monitor_summary.csv                          (row keys)         3           0           NaN
+            P0 vs e12_monitor_summary.csv                              alarms         3           0           0.0
+            P0 vs e12_monitor_summary.csv                                  up         3           0           0.0
+            P0 vs e12_monitor_summary.csv                                down         3           0           0.0
+            P0 vs e12_monitor_summary.csv                     monitored_share         3           0           0.0
+       S2 vs e14g_e12_tests.csv (awake-B)                          (row keys)         6           0           NaN
+       S2 vs e14g_e12_tests.csv (awake-B)                            releases         6           0           0.0
+       S2 vs e14g_e12_tests.csv (awake-B)                    awake_at_release         6           0           0.0
+       S2 vs e14g_e12_tests.csv (awake-B)                        up_within_6h         6           0           0.0
+       S2 vs e14g_e12_tests.csv (awake-B)                        stratified_p         6           0           0.0
+arm coin  alarms  alarms_per_day  alarms_per_monitored_day  long_run_bound_per_monitored_day  monitored_share  watched_share  period_alarm_share  first_day_alarm_share  segments_up_off  up_off_share_of_monitored
+ P0  BTC     499          0.7018                    2.3541                            0.0500           0.2981         0.2981              0.7028                 0.9157              0.0                     0.0000
+ P0  ETH     492          0.6920                    2.2569                            0.0500           0.3066         0.3066              0.6930                 0.8882              0.0                     0.0000
+ P0  SOL     473          0.6653                    1.9939                            0.0500           0.3337         0.3337              0.6662                 0.8901              0.0                     0.0000
+ P1  BTC     373          0.5246                    1.1045                            0.0404           0.4750         0.4704              0.5254                 0.6890              1.0                     0.0096
+ P1  ETH     380          0.5345                    1.1515                            0.0404           0.4641         0.4641              0.5352                 0.6745              0.0                     0.0000
+ P1  SOL     341          0.4796                    0.9241                            0.0404           0.5190         0.5190              0.4810                 0.6170              0.0                     0.0000
+ S1  BTC     383          0.5387                    1.1687                            0.0404           0.4609         0.4491              0.5394                 0.7102              2.0                     0.0257
+ S1  ETH     388          0.5457                    1.2050                            0.0404           0.4529         0.4529              0.5465                 0.6864              0.0                     0.0000
+ S1  SOL     353          0.4965                    0.9888                            0.0404           0.5021         0.5021              0.4979                 0.6271              0.0                     0.0000
+ S2  BTC     658          0.9255                    0.9256                            0.0500           0.9999         0.9999              0.4806                 0.5873              NaN                        NaN
+ S2  ETH     570          0.8017                    0.8018                            0.0500           0.9999         0.9999              0.4450                 0.5236              NaN                        NaN
+ S2  SOL     461          0.6484                    0.6485                            0.0500           0.9999         0.9999              0.3933                 0.4221              NaN                        NaN
+arm family coin event_type  events  events_with  rate_event  rate_control_matched  p_stratified_permutation  p_holm_family  p_stratified_fisher
+ P0   F22e  BTC       fomc      16            9     0.56250               0.13887                   0.00012        0.00025              0.00096
+ P0   F22e  BTC        cpi      22            5     0.22727               0.11684                   0.10984        0.10984              0.12825
+ P1   F22a  BTC       fomc      16            8     0.50000               0.10911                   0.00017        0.00033              0.00137
+ P1   F22a  BTC        cpi      22            5     0.22727               0.05942                   0.00972        0.00972              0.02036
+ P1   F22b  ETH       fomc      16            9     0.56250               0.09469                   0.00001        0.00002              0.00015
+ P1   F22b  ETH        cpi      22            6     0.27273               0.11582                   0.03760        0.07520              0.05141
+ P1   F22b  SOL       fomc      16           10     0.62500               0.11991                   0.00000        0.00002              0.00008
+ P1   F22b  SOL        cpi      22            4     0.18182               0.06145                   0.04625        0.07520              0.07919
+ S1   F22c  BTC       fomc      16            8     0.50000               0.12444                   0.00040        0.00198              0.00243
+ S1   F22c  BTC        cpi      22            3     0.13636               0.05516                   0.12421        0.12421              0.16662
+ S1   F22c  ETH       fomc      16            7     0.43750               0.09469                   0.00050        0.00198              0.00329
+ S1   F22c  ETH        cpi      22            8     0.36364               0.11262                   0.00230        0.00690              0.00524
+ S1   F22c  SOL       fomc      16           11     0.68750               0.12082                   0.00000        0.00000              0.00001
+ S1   F22c  SOL        cpi      22            4     0.18182               0.06096                   0.04525        0.09050              0.07766
+ S2   F22d  BTC       fomc      16           13     0.81250               0.18757                   0.00000        0.00000              0.00001
+ S2   F22d  BTC        cpi      22           10     0.45455               0.13028                   0.00027        0.00080              0.00069
+ S2   F22d  ETH       fomc      16           10     0.62500               0.18848                   0.00020        0.00079              0.00123
+ S2   F22d  ETH        cpi      22           11     0.50000               0.16785                   0.00039        0.00080              0.00079
+ S2   F22d  SOL       fomc      16           12     0.75000               0.18485                   0.00000        0.00001              0.00004
+ S2   F22d  SOL        cpi      22           10     0.45455               0.13775                   0.00042        0.00080              0.00141
+arm coin event_type  releases  monitoring_at_release  blind_at_release  watched_at_release  watched_share_of_releases  mean_watched_share_of_6h  control_watched_at_start_rate  control_mean_watched_share_of_6h  up_within_6h  up_within_6h_when_watched  median_tau2_over_m_up_at_release
+ P0  BTC       fomc        16                      9                 0                   9                      0.562                     0.117                          0.417                             0.344             9                          9                             5.710
+ P0  BTC        cpi        22                      9                 0                   9                      0.409                     0.451                          0.402                             0.397             5                          4                             5.660
+ P0  ETH       fomc        16                      8                 0                   8                      0.500                     0.136                          0.329                             0.306             8                          8                             5.831
+ P0  ETH        cpi        22                      8                 0                   8                      0.364                     0.209                          0.365                             0.356             7                          6                             6.156
+ P0  SOL       fomc        16                      9                 0                   9                      0.562                     0.111                          0.426                             0.341             9                          9                             5.853
+ P0  SOL        cpi        22                     12                 0                  12                      0.545                     0.263                          0.381                             0.399             9                          9                             5.746
+ P1  BTC       fomc        16                     11                 1                  10                      0.625                     0.279                          0.701                             0.644             8                          8                             5.716
+ P1  BTC        cpi        22                     16                 0                  16                      0.727                     0.660                          0.602                             0.596             5                          5                             7.703
+ P1  ETH       fomc        16                     12                 0                  12                      0.750                     0.310                          0.666                             0.591             9                          9                             5.467
+ P1  ETH        cpi        22                     13                 0                  13                      0.591                     0.507                          0.595                             0.584             6                          5                             6.671
+ P1  SOL       fomc        16                     13                 0                  13                      0.812                     0.289                          0.656                             0.617            10                         10                             5.704
+ P1  SOL        cpi        22                     16                 0                  16                      0.727                     0.613                          0.633                             0.623             4                          4                             6.075
+ S1  BTC       fomc        16                     11                 1                  10                      0.625                     0.298                          0.657                             0.606             8                          8                             6.577
+ S1  BTC        cpi        22                     14                 0                  14                      0.636                     0.579                          0.585                             0.582             3                          3                             7.076
+ S1  ETH       fomc        16                     10                 0                  10                      0.625                     0.286                          0.639                             0.568             7                          7                             5.816
+ S1  ETH        cpi        22                     15                 0                  15                      0.682                     0.486                          0.591                             0.576             8                          7                             5.745
+ S1  SOL       fomc        16                     14                 0                  14                      0.875                     0.312                          0.611                             0.580            11                         11                             5.408
+ S1  SOL        cpi        22                     14                 0                  14                      0.636                     0.483                          0.596                             0.587             4                          4                             6.285
+ S2  BTC       fomc        16                     16                 0                  16                      1.000                     1.000                          1.000                             1.000            13                         13                               NaN
+ S2  BTC        cpi        22                     22                 0                  22                      1.000                     1.000                          1.000                             1.000            10                         10                               NaN
+ S2  ETH       fomc        16                     16                 0                  16                      1.000                     1.000                          1.000                             1.000            10                         10                               NaN
+ S2  ETH        cpi        22                     22                 0                  22                      1.000                     1.000                          1.000                             1.000            11                         11                               NaN
+ S2  SOL       fomc        16                     16                 0                  16                      1.000                     1.000                          1.000                             1.000            12                         12                               NaN
+ S2  SOL        cpi        22                     22                 0                  22                      1.000                     1.000                          1.000                             1.000            10                         10                               NaN
+
+real	2m44.134s
+user	2m39.659s
+sys	0m2.955s
+Wed Nov  4 02:01:33 UTC 2026

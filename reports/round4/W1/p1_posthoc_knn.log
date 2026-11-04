@@ -1,0 +1,16 @@
+NIFTY
+BTC
+ETH
+XRP
+SOL
+DOGE
+BITSTAMP
+                  match direction  cells  cells_p_lt_005  hit_alarm  hit_control  diff_points  min_diff  max_diff
+0         + last 10 min      down     27               1      0.952        0.936        1.530    -9.977     9.617
+1         + last 10 min        up     27              20      0.914        0.835        7.840     1.473    20.325
+2             last hour      down     27               5      0.952        0.929        2.293   -11.057    12.687
+3             last hour        up     27              25      0.914        0.750       16.387     6.602    27.764
+4        last hour + 6h      down     27               4      0.952        0.935        1.688   -11.395    12.760
+5        last hour + 6h        up     27              26      0.914        0.752       16.178     6.953    28.066
+6  last hour + 6h + day      down     27               2      0.952        0.939        1.277   -11.395     9.992
+7  last hour + 6h + day        up     27              27      0.914        0.754       15.975     6.887    28.693
