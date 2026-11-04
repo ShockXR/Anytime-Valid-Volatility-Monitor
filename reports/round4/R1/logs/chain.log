@@ -1,0 +1,11 @@
+chain start Wed Nov  4 02:01:58 UTC 2026
+START e23_run Wed Nov  4 02:01:58 UTC 2026
+END e23_run rc=0 wall=132s Wed Nov  4 02:04:10 UTC 2026
+START e18_run Wed Nov  4 02:04:10 UTC 2026
+E18 killed at Wed Nov  4 02:31:06 UTC 2026 (over the 25 minute budget)
+E18 ended at Wed Nov  4 02:31:09 UTC 2026
+START e25_gates Wed Nov  4 02:31:09 UTC 2026
+END e25_gates rc=0 wall=170s Wed Nov  4 02:33:59 UTC 2026
+START e19_pools Wed Nov  4 02:33:59 UTC 2026
+END e19_pools rc=0 wall=18s Wed Nov  4 02:34:17 UTC 2026
+CHAIN2_DONE

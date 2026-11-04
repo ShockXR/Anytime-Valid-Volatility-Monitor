@@ -1,0 +1,8 @@
+BOCPD w=375 truncated=True: 129 s for (1, 185250)
+BOCPD w=375 truncated=False: 133 s for (1, 185250)
+BOCPD w=250 truncated=False: 140 s for (1, 185250)
+BOCPD w=250 truncated=True: 140 s for (1, 185250)
+nifty: BOCPD done after 299 s
+done Nifty 2024-2025 Nifty 50 after 312 s
+BOCPD w=1440 truncated=True: 963 s for (15, 264960)
+BOCPD w=1440 truncated=False: 1006 s for (15, 264960)

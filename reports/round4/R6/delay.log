@@ -1,0 +1,5 @@
+gaussian x2.0: 2000 paths, seed 9975000, 12 s
+gaussian x0.5: 2000 paths, seed 9975001, 15 s
+student_t3 x2.0: 2000 paths, seed 9975010, 18 s
+student_t3 x0.5: 2000 paths, seed 9975011, 15 s
+EXIT
