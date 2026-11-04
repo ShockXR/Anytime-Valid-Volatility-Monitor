@@ -1,0 +1,59 @@
+................................x...x..............F...                  [100%]
+=================================== FAILURES ===================================
+_______ test_streaming_monitor_equals_the_array_detector_on_one_segment ________
+
+    def test_streaming_monitor_equals_the_array_detector_on_one_segment():
+        """Within the first segment, S_up.mean() and S_dn.mean() of VolatilityMonitor equal the SR paths of
+        betting_edetector run on the same min(r^2, tau^2) with m0 = m_up (up) and m0 = m_dn, upper = tau_dn^2 (down),
+        and the first alarm of the monitor is the earlier of the two array alarms at level 2A."""
+        for j, (r, kw) in enumerate(_cases(8, ({}, {"c_down": 1.5}, {"null_band": 0.2}))):
+            m = VolatilityMonitor(**kw)
+            up_path, dn_path = [], []
+            first = None
+            for t, v in enumerate(r):
+                ev = m.update(float(v))
+                if m.calibrated and t >= m.start and first is None:  # the step that closes the window is not monitored
+                    up_path.append(m.S_up.mean())
+                    dn_path.append(m.S_dn.mean())
+                if ev is not None:
+                    first = ev
+                    break
+            if not m.segments:
+                continue
+            seg = m.segments[0]
+            start = seg["start"]
+            end = first.index if first is not None else r.size - 1
+            rr = r[start:end + 1]
+            xu = np.minimum(rr**2, seg["tau2"])
+            xd = np.minimum(rr**2, seg["tau2_dn"])
+            up = D.betting_edetector(xu, seg["m_up"], "up", threshold=2 * m.A, grid=m.up_grid, return_path=True)
+            dn = D.betting_edetector(xd, seg["m_dn"], "down", upper=seg["tau2_dn"], threshold=2 * m.A,
+                                     grid=m.down_fractions, return_path=True)
+>           np.testing.assert_allclose(up.stat_path, up_path, rtol=1e-10)
+E           AssertionError: 
+E           Not equal to tolerance rtol=1e-10, atol=0
+E           
+E           (shapes (58,), (57,) mismatch)
+E            ACTUAL: array([ 1.115527,  2.527666,  3.509449,  4.091004,  4.290524,  4.825228,
+E                   7.664215,  8.414469,  7.532541,  8.946739, 13.283413, 11.270247,
+E                  10.925622, 10.383253, 11.098943, 11.149495, 12.67867 , 13.02214 ,...
+E            DESIRED: array([ 1.115527,  2.527666,  3.509449,  4.091004,  4.290524,  4.825228,
+E                   7.664215,  8.414469,  7.532541,  8.946739, 13.283413, 11.270247,
+E                  10.925622, 10.383253, 11.098943, 11.149495, 12.67867 , 13.02214 ,...
+
+reports/round4/R5/test_round4_properties.py:844: AssertionError
+=============================== warnings summary ===============================
+reports/round4/R5/test_round4_properties.py::test_expected_gaussian_lr_factor_is_one_only_for_gaussian_data
+  /home/user/.venv-bapat/lib/python3.13/site-packages/numpy/_core/_methods.py:190: RuntimeWarning: overflow encountered in square
+    x = um.square(x, out=x)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+============================= slowest 5 durations ==============================
+2.56s call     reports/round4/R5/test_round4_properties.py::test_larger_threshold_never_alarms_earlier
+1.88s call     reports/round4/R5/test_round4_properties.py::test_cli_simulate_subprocess_matches_the_python_api[args0]
+1.66s call     reports/round4/R5/test_round4_properties.py::test_cli_simulate_subprocess_matches_the_python_api[args1]
+1.55s call     reports/round4/R5/test_round4_properties.py::test_cli_simulate_subprocess_matches_the_python_api[args2]
+1.41s call     reports/round4/R5/test_round4_properties.py::test_sign_invariance_global_and_per_return
+=========================== short test summary info ============================
+FAILED reports/round4/R5/test_round4_properties.py::test_streaming_monitor_equals_the_array_detector_on_one_segment
+1 failed, 52 passed, 2 xfailed, 1 warning in 31.44s

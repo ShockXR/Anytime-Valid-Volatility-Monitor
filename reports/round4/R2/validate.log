@@ -1,0 +1,53 @@
+gaussian           f=2.0  README: plug-in, band 0.25     h=  1.56e+04 alarms= 40/40 mismatches=0
+gaussian           f=2.0  README: plug-in, band 0.25     h=     170.7 alarms= 40/40 mismatches=0
+gaussian           f=2.0  plug-in, band 0                h=  1.56e+04 alarms= 40/40 mismatches=0
+gaussian           f=2.0  plug-in, band 0                h=      1033 alarms= 40/40 mismatches=0
+gaussian           f=2.0  confidence-sequence baseline   h=  1.56e+04 alarms= 40/40 mismatches=0
+gaussian           f=2.0  confidence-sequence baseline   h=     217.2 alarms= 40/40 mismatches=0
+gaussian           f=2.0  known baseline (theorem)       h=  1.56e+04 alarms= 40/40 mismatches=0
+gaussian           f=2.0  known baseline (theorem)       h=     828.3 alarms= 40/40 mismatches=0
+gaussian           f=2.0  Gaussian LR monitor            h=  1.56e+04 alarms= 40/40 mismatches=0
+gaussian           f=2.0  Gaussian LR monitor            h=      1337 alarms= 40/40 mismatches=0
+gaussian           f=2.0  Page CUSUM up                  h=     16.75 alarms= 40/40 mismatches=0
+gaussian           f=2.0  repeated 60-step z-test        h=     2.512 alarms= 40/40 mismatches=0
+gaussian 2.0 cell done in 3 s
+student_t3         f=0.5  README: plug-in, band 0.25     h=  1.56e+04 alarms= 28/40 mismatches=0
+student_t3         f=0.5  README: plug-in, band 0.25     h=     173.6 alarms= 40/40 mismatches=0
+student_t3         f=0.5  plug-in, band 0                h=  1.56e+04 alarms= 40/40 mismatches=0
+student_t3         f=0.5  plug-in, band 0                h=       879 alarms= 40/40 mismatches=0
+student_t3         f=0.5  confidence-sequence baseline   h=  1.56e+04 alarms= 39/40 mismatches=0
+student_t3         f=0.5  confidence-sequence baseline   h=     224.9 alarms= 40/40 mismatches=0
+student_t3         f=0.5  known baseline (theorem)       h=  1.56e+04 alarms= 40/40 mismatches=0
+student_t3         f=0.5  known baseline (theorem)       h=     733.5 alarms= 40/40 mismatches=0
+student_t3         f=0.5  Gaussian LR monitor            h=  1.56e+04 alarms= 40/40 mismatches=0
+student_t3         f=0.5  Gaussian LR monitor            h= 5.463e+31 alarms= 24/40 mismatches=0
+student_t3         f=0.5  Page CUSUM up                  h=     312.3 alarms= 26/40 mismatches=0
+student_t3         f=0.5  repeated 60-step z-test        h=         6 alarms= 40/40 mismatches=0
+student_t3 0.5 cell done in 3 s
+jumps_p0.5pct_sd8  f=1.0  README: plug-in, band 0.25     h=  1.56e+04 alarms=  0/40 mismatches=0
+jumps_p0.5pct_sd8  f=1.0  README: plug-in, band 0.25     h=     154.5 alarms= 40/40 mismatches=0
+jumps_p0.5pct_sd8  f=1.0  plug-in, band 0                h=  1.56e+04 alarms=  0/40 mismatches=0
+jumps_p0.5pct_sd8  f=1.0  plug-in, band 0                h=     730.8 alarms= 40/40 mismatches=0
+jumps_p0.5pct_sd8  f=1.0  confidence-sequence baseline   h=  1.56e+04 alarms=  0/40 mismatches=0
+jumps_p0.5pct_sd8  f=1.0  confidence-sequence baseline   h=     190.8 alarms= 40/40 mismatches=0
+jumps_p0.5pct_sd8  f=1.0  known baseline (theorem)       h=  1.56e+04 alarms=  0/40 mismatches=0
+jumps_p0.5pct_sd8  f=1.0  known baseline (theorem)       h=     625.3 alarms= 40/40 mismatches=0
+jumps_p0.5pct_sd8  f=1.0  Gaussian LR monitor            h=  1.56e+04 alarms= 37/40 mismatches=0
+jumps_p0.5pct_sd8  f=1.0  Gaussian LR monitor            h= 3.291e+07 alarms= 35/40 mismatches=0
+jumps_p0.5pct_sd8  f=1.0  Page CUSUM up                  h=     47.86 alarms= 36/40 mismatches=0
+jumps_p0.5pct_sd8  f=1.0  repeated 60-step z-test        h=     5.001 alarms= 35/40 mismatches=0
+jumps_p0.5pct_sd8 1.0 cell done in 3 s
+gaussian           f=1.0  README: plug-in, band 0.25     h=  1.56e+04 alarms=  0/40 mismatches=0
+gaussian           f=1.0  README: plug-in, band 0.25     h=       166 alarms= 39/40 mismatches=0
+gaussian           f=1.0  plug-in, band 0                h=  1.56e+04 alarms=  8/40 mismatches=0
+gaussian           f=1.0  plug-in, band 0                h=     714.1 alarms= 40/40 mismatches=0
+gaussian           f=1.0  confidence-sequence baseline   h=  1.56e+04 alarms=  0/40 mismatches=0
+gaussian           f=1.0  confidence-sequence baseline   h=     211.5 alarms= 39/40 mismatches=0
+gaussian           f=1.0  known baseline (theorem)       h=  1.56e+04 alarms=  5/40 mismatches=0
+gaussian           f=1.0  known baseline (theorem)       h=     667.9 alarms= 40/40 mismatches=0
+gaussian           f=1.0  Gaussian LR monitor            h=  1.56e+04 alarms=  9/40 mismatches=0
+gaussian           f=1.0  Gaussian LR monitor            h=      1529 alarms= 32/40 mismatches=0
+gaussian           f=1.0  Page CUSUM up                  h=     15.18 alarms= 32/40 mismatches=0
+gaussian           f=1.0  repeated 60-step z-test        h=     2.361 alarms= 34/40 mismatches=0
+gaussian 1.0 cell done in 4 s
+TOTAL MISMATCHES 0

@@ -1,0 +1,11 @@
+A README gaussian null @349.6: false alarm within 390: 97/2000 = 0.0485 (+-0.0094)
+A README gaussian x2 @349.6: N=1000 early=0.057 detected=0.943 median=37 IQR=(22-59)  bootSE(median)~1.3
+time 11
+B Page t3 null @936.6: false alarm within 390: 390/8000 = 0.0488 (+-0.0047)
+B Page t3 x2 @936.6: N=2000 early=0.059 detected=0.941 median=204 IQR=(138-276)  bootSE(median)~2.8
+B' probe: Page CUSUM on r^2 / mean(cal r^2), t3, h=277.55 x2: N=2000 early=0.053 detected=0.900 median=339 IQR=(209-546)  bootSE(median)~6.8
+time 38
+C GLR(gauss-tuned) t3 null @21233: false alarm within 390: 666/666 = 1.0000 (+-0.0000)
+C GLR(gauss-tuned) t3 x2 @21233: N=666 early=1.000 detected=0.000 median=nan IQR=(nan-nan)  bootSE(median)~nan
+C0 GLR gaussian null @21233: false alarm within 390: 88/2000 = 0.0440 (+-0.0090)
+EXIT time 56

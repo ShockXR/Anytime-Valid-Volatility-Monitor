@@ -1,0 +1,49 @@
+   asset monitor  year  n_blind_for_up_stretches  median_days  longest_days  share_of_steps_in_stretches_over_2_days
+   NIFTY      cs  2017                        30          2.0         2.000                                    0.000
+   NIFTY      cs  2018                        23          2.0         2.000                                    0.000
+   NIFTY      cs  2019                        22          2.0         2.000                                    0.000
+   NIFTY      cs  2020                        35          2.0         2.000                                    0.000
+   NIFTY      cs  2021                        40          2.0         2.000                                    0.000
+   NIFTY      cs  2022                        35          2.0         2.000                                    0.000
+   NIFTY      cs  2023                        18          2.0         2.000                                    0.000
+   NIFTY      cs  2024                        53          2.0         2.000                                    0.000
+   NIFTY      cs  2025                        36          2.0         2.000                                    0.000
+   NIFTY      cs  2026                        27          2.0         2.000                                    0.000
+     BTC      cs  2024                       193          1.0         1.197                                    0.000
+     BTC      cs  2025                       189          1.0         7.189                                    0.034
+     BTC      cs  2026                       118          1.0        49.043                                    0.187
+     ETH      cs  2024                       194          1.0         1.000                                    0.000
+     ETH      cs  2025                       195          1.0         1.000                                    0.000
+     ETH      cs  2026                       145          1.0         1.000                                    0.000
+     XRP      cs  2024                       198          1.0         1.000                                    0.000
+     XRP      cs  2025                       197          1.0         1.000                                    0.000
+     XRP      cs  2026                       148          1.0         1.000                                    0.000
+     SOL      cs  2024                       174          1.0         1.000                                    0.000
+     SOL      cs  2025                       180          1.0         1.000                                    0.000
+     SOL      cs  2026                       140          1.0         1.000                                    0.000
+    DOGE      cs  2024                       185          1.0         1.000                                    0.000
+    DOGE      cs  2025                       189          1.0         1.000                                    0.000
+    DOGE      cs  2026                       144          1.0         1.000                                    0.000
+BITSTAMP      cs  2025                       180          1.0         1.000                                    0.000
+BITSTAMP      cs  2026                       130          1.0        28.870                                    0.097
+          median_days  longest_days
+asset                              
+BITSTAMP          1.0      1.000000
+BTC               1.0      1.005556
+DOGE              1.0      1.000000
+ETH               1.0      1.000000
+NIFTY             2.0      2.000000
+SOL               1.0      1.000000
+XRP               1.0      1.000000
+                             n  share_post_lt_pre  ...    hit  median_post_over_base
+fam    monitor direction                           ...                              
+Nifty  cs      down        116              0.310  ...  0.991                  0.306
+               up          200              0.630  ...  0.945                  2.538
+       plugin  down        281              0.292  ...  0.950                  0.404
+               up          324              0.608  ...  0.944                  2.069
+crypto cs      down       1081              0.317  ...  0.969                  0.249
+               up         1812              0.684  ...  0.919                  2.614
+       plugin  down       1731              0.324  ...  0.952                  0.336
+               up         2110              0.678  ...  0.909                  2.205
+
+[8 rows x 5 columns]

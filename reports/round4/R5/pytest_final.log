@@ -1,0 +1,5 @@
+................................x...x...................                 [100%]
+=========================== short test summary info ============================
+XFAIL reports/round4/R5/test_round4_properties.py::test_calibration_window_of_huge_returns_does_not_crash - R5-B-001: (c * scale) ** 2 on a Python float raises OverflowError when the median |r| of a calibration window exceeds about 4.5e153 (monitor.py _plugin_stats, _calibrate, _feed_cs; detectors.calibrate tau ** 2); the documented path is a degenerate window that is extended or restarted, not an uncaught exception
+XFAIL reports/round4/R5/test_round4_properties.py::test_infinite_threshold_can_still_alarm_after_overflow - R5-B-002: threshold=inf is accepted but an alarm fires once a statistic overflows to inf, because inf >= 2 * inf is True (monitor.py update)
+54 passed, 2 xfailed in 27.93s

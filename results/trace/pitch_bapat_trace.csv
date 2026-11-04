@@ -1,5 +1,5 @@
 line,number,context,status,source,how,tier,in_scope,weak,cooccur,row_check,scope,hint
-22,637,"...ith a command line and an executed notebook. 637 tests, and one command (`scripts/reproduce.p...",traced_md,docs/limitations.md,literal,other,yes,,single,,all,
+22,762,"...ith a command line and an executed notebook. 762 tests, and one command (`scripts/reproduce.p...",traced_md,docs/report_parts/E15.md,literal,primary,yes,,single,,all,
 26,"2,000","...weights, the raw MAD and a sample with about 2,000 missing minutes (E1, E6) [PUBLISHED vs SYNTH...",traced_md,docs/report_parts/E01_E05.md,literal,primary,yes,,single,,E1 E6,
 27,1.1%,"...`docs/math.md`, Theorems A and B). Measured: 1.1% to 1.4% within the first day against a 5% bo...",traced_md,docs/report_parts/E9.md,literal,primary,yes,yes,docs/report_parts/E9.md,,E9,
 27,1.4%,"...th.md`, Theorems A and B). Measured: 1.1% to 1.4% within the first day against a 5% bound for...",traced_md,docs/report_parts/E9.md,literal,primary,yes,,docs/report_parts/E9.md,,E9,

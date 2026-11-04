@@ -1,0 +1,29 @@
+NIFTY plugin done
+NIFTY cs done
+BTC plugin done
+BTC cs done
+ETH plugin done
+ETH cs done
+XRP plugin done
+XRP cs done
+SOL plugin done
+SOL cs done
+DOGE plugin done
+DOGE cs done
+BITSTAMP plugin done
+BITSTAMP cs done
+       asset monitor      years    steps  blind_share  blind_for_up_share  up_per_1000  down_per_1000  n_up  n_down
+0      NIFTY  plugin  2017-2026   883486        0.519               0.519        0.769          0.670   326     284
+1      NIFTY      cs  2017-2026   883486        0.271               0.271        0.315          0.181   202     116
+2        BTC  plugin  2024-2026  1451520        0.689               0.689        0.861          0.679   388     306
+3        BTC      cs  2024-2026  1451520        0.500               0.560        0.429          0.265   311     192
+4        ETH  plugin  2024-2026  1451520        0.682               0.682        0.868          0.617   401     285
+5        ETH      cs  2024-2026  1451520        0.530               0.530        0.511          0.270   349     184
+6        XRP  plugin  2024-2026  1451520        0.690               0.690        0.806          0.741   362     333
+7        XRP      cs  2024-2026  1451520        0.539               0.539        0.493          0.317   330     212
+8        SOL  plugin  2024-2026  1451520        0.658               0.658        0.743          0.590   369     293
+9        SOL      cs  2024-2026  1451520        0.490               0.490        0.426          0.240   315     178
+10      DOGE  plugin  2024-2026  1451520        0.677               0.677        0.758          0.692   356     325
+11      DOGE      cs  2024-2026  1451520        0.514               0.514        0.439          0.293   310     207
+12  BITSTAMP  plugin  2025-2026   914400        0.679               0.679        0.820          0.662   238     192
+13  BITSTAMP      cs  2025-2026   914400        0.489               0.531        0.431          0.240   199     111

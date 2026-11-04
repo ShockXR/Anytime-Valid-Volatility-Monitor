@@ -44,6 +44,20 @@ Round 3: theory TH4 to TH6, experiments E16 to E25, the paper, and the preparati
 - No stored result changed: quick tier 465 of 465 identical, and the loaders and seven monitor
   configurations give byte-identical output on the real files (`reports/round4/M/REPORT.md`).
 
+### Research record (4 November 2026, round 4)
+
+- Backtests and stress tests by AI agents, summarised in `reports/round4/ROUND4_SUMMARY.md`: integrity of
+  every data file and a clean-copy rerun of E22 and E23 (R1), detection speed at equal measured
+  false-alarm rates (R2), new null laws and change shapes (R3), a walk-forward backtest on every asset and
+  year from 2017 to October 2026 (R4), property tests (R5, now `tests/test_round4_properties.py`), an
+  independent check of R2 and R4 (V1), and a post hoc search for a faster setting on real calm days (R6).
+- README, pitch, strategy and `docs/limitations.md`: test counts; the blind share is about 70% on crypto
+  and about half on the Nifty 50; the README setting leaves almost all of its 5% budget unused; new
+  limitations on what the monitor watches (the clipped square, not the variance), the realistic
+  seasonality pipeline, bid-ask bounce, changes during calibration, short bursts, what a real alarm shows,
+  and two data vendor changes. The README and pitch number traces were regenerated (0 untraced) and their
+  two entries in `results/MANIFEST.csv` rebuilt; every other result file is unchanged.
+
 ### Added
 
 - Release preparation: complete package metadata in `pyproject.toml` (license, author, keywords,
