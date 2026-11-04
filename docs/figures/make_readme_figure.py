@@ -8,7 +8,8 @@ it runs no experiment. Run from the repository root:
 
     python docs/figures/make_readme_figure.py
 
-It writes docs/figures/nifty_2024-06-04_alarm.png.
+It writes docs/figures/nifty_2024-06-04_alarm.png (two panels, for desktop width) and
+docs/figures/nifty_2024-06-04_alarm_phone.png (the evidence panel only, readable at phone width).
 """
 
 import datetime as dt
@@ -25,6 +26,7 @@ from matplotlib.ticker import FixedLocator, FuncFormatter  # noqa: E402
 ROOT = Path(__file__).resolve().parents[2]
 SRC = ROOT / "docs" / "demo" / "replay.html"
 OUT = ROOT / "docs" / "figures" / "nifty_2024-06-04_alarm.png"
+OUT_PHONE = ROOT / "docs" / "figures" / "nifty_2024-06-04_alarm_phone.png"
 
 INK = "#1d2433"
 INK2 = "#5b6475"
@@ -157,6 +159,69 @@ def main() -> None:
     OUT.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(OUT, facecolor="white")
     print("wrote", OUT.relative_to(ROOT))
+    plt.close(fig)
+    phone(d, idx, alarm_i, open_i)
+
+
+def phone(d: dict, idx, alarm_i: int, open_i: int) -> None:
+    """The evidence panel alone, on a narrower window, with type sized for a 375 px screen."""
+    lo, hi = idx("2024-06-03 15:19"), idx("2024-06-04 09:48")  # 15:19: monitoring resumed
+    gap = 4
+    xpos = {i: (i - lo) + (gap if i >= open_i else 0) for i in range(lo, hi + 1)}
+    recal = [(max(a, lo), min(b, hi + 1)) for a, b in d["recal"] if b > lo and a <= hi]
+
+    plt.rcParams.update({"font.family": "Inter", "font.size": 13, "axes.edgecolor": GRID,
+                         "axes.labelcolor": INK2, "xtick.color": INK2, "ytick.color": INK2})
+    fig, ax = plt.subplots(figsize=(4.6, 5.0), dpi=200)
+    fig.patch.set_facecolor("white")
+    ax.set_facecolor("white")
+    for s in ("top", "right"):
+        ax.spines[s].set_visible(False)
+    for a, b in recal:
+        ax.axvspan(xpos[a] - 0.5, xpos[b - 1] + 0.5, facecolor=RECAL, edgecolor="#b8bcc6", hatch="///",
+                   lw=0, zorder=0)
+    ax.axvline(xpos[open_i] - 0.5, color=INK2, lw=1, ls=(0, (2, 2)), zorder=2)
+
+    seg_x, seg_y = [], []
+    for i in range(lo, hi + 1):
+        w = d["wu"][i]
+        if (i == open_i or w is None) and seg_x:
+            ax.plot(seg_x, seg_y, color=EVIDENCE, lw=2.6, zorder=4)
+            seg_x, seg_y = [], []
+        if w is None:
+            continue
+        seg_x.append(xpos[i])
+        seg_y.append(w)
+    if seg_x:
+        ax.plot(seg_x, seg_y, color=EVIDENCE, lw=2.6, zorder=4)
+
+    ax.set_yscale("log")
+    ax.set_ylim(0.3, 3e5)
+    ax.axhline(d["thr"], color=THRESH, lw=1.6, ls=(0, (6, 3)), zorder=3)
+    ax.text(xpos[lo] + 0.3, d["thr"] * 1.5, f"alarm threshold\n2A = {d['thr']:,.0f}", color=THRESH,
+            fontsize=13, va="bottom")
+    ax.plot([xpos[alarm_i]], [d["wu"][alarm_i]], "o", ms=9, mfc=THRESH, mec="white", mew=1.5, zorder=5)
+    ax.annotate("up alarm\n09:26 IST,\n11 min after\nthe open", xy=(xpos[alarm_i], d["wu"][alarm_i]),
+                xytext=(xpos[alarm_i] + 2.5, 40), color=INK, fontsize=13, fontweight="semibold",
+                arrowprops={"arrowstyle": "-", "color": INK2, "lw": 1})
+    ax.text((xpos[alarm_i + 1] + xpos[hi]) / 2, 1.0, "recalibrating", ha="center", va="center",
+            color=INK2, fontsize=12, bbox={"boxstyle": "round,pad=0.25", "fc": "white", "ec": "#b8bcc6", "lw": 0.8})
+    ax.text((xpos[open_i - 1] + xpos[open_i]) / 2 - 0.5, 0.5, "overnight", transform=ax.get_xaxis_transform(),
+            rotation=90, ha="center", va="center", color=INK2, fontsize=11)
+    ax.set_ylabel("evidence of a rise (log scale)", fontsize=12)
+    ax.yaxis.set_major_locator(FixedLocator([1, 10, 100, 1000, 10000, 100000]))
+    ax.yaxis.set_major_formatter(FuncFormatter(lambda v, _: f"{v:,.0f}"))
+    ax.yaxis.grid(True, color=GRID, lw=0.8)
+    ax.set_axisbelow(True)
+    ticks = ["2024-06-03 15:19", "2024-06-04 09:15", "2024-06-04 09:45"]
+    ax.set_xticks([xpos[idx(s)] for s in ticks], ["3 Jun\n15:19", "4 Jun\n09:15", "09:45"])
+    ax.set_xlim(xpos[lo] - 1, xpos[hi] + 1)
+    ax.set_xlabel("India time (IST), one point per minute", fontsize=12)
+    ax.set_title("Nifty 50, 4 June 2024", loc="left", color=INK, fontsize=15, fontweight="semibold", pad=8)
+    fig.text(0.02, 0.008, "Real data, single historical case (E18)", color=INK2, fontsize=11)
+    fig.subplots_adjust(left=0.235, right=0.96, top=0.93, bottom=0.215)
+    fig.savefig(OUT_PHONE, facecolor="white")
+    print("wrote", OUT_PHONE.relative_to(ROOT))
 
 
 if __name__ == "__main__":
