@@ -67,6 +67,7 @@ def load_bitstamp_csv(path: str | Path, start: str | None = None, end: str | Non
     # stable sort, so a duplicated minute always keeps the first row read (the default sort is not stable,
     # so which duplicate survived used to be arbitrary)
     df = _finish(df, start, end, "UTC")
+    bad_other = _mask_nonfinite(df)  # first, so that the bars masked for a close <= 0 are not counted twice
     bad_price = _mask_nonpositive(df)
     df["zero_volume"] = df["volume"] <= 0
     # A filled (tradeless) minute repeats the previous close: no price was observed, so the returns on both
@@ -74,7 +75,7 @@ def load_bitstamp_csv(path: str | Path, start: str | None = None, end: str | Non
     close = df["close"] if filled == "zero" else df["close"].where(~df["zero_volume"])
     df["logret"] = np.log(close).diff()
     df.attrs["checks"] = dict(source="Bitstamp BTC/USD via github.com/ff137 mirror", rows_read=n_raw,
-                              duplicates=n_dup, nonpositive_prices=bad_price,
+                              duplicates=n_dup, nonpositive_prices=bad_price, nonfinite_prices=bad_other,
                               first=str(df.index[0]) if len(df) else "", last=str(df.index[-1]) if len(df) else "")
     return df
 
@@ -86,6 +87,21 @@ def _mask_nonpositive(df: pd.DataFrame) -> int:
     move. The returns on both sides of such a bar become NaN (missing), never zero.
     """
     bad = (df["close"] <= 0).to_numpy()
+    cols = [c for c in ("open", "high", "low", "close") if c in df.columns]
+    if bad.any():
+        df.loc[bad, cols] = np.nan
+    return int(bad.sum())
+
+
+def _mask_nonfinite(df: pd.DataFrame) -> int:
+    """Set open, high, low and close to NaN on bars whose close is infinite or missing; return how many.
+
+    Added in round 4 next to ``_mask_nonpositive``: an infinite close (a parse or feed error) would give
+    returns of +inf and -inf. A missing close already gives NaN returns; it is counted so that the checks show
+    it. Call it before any NaN rows for missing minutes are inserted, so that those are not counted.
+    """
+    close = pd.to_numeric(df["close"], errors="coerce").to_numpy(float)
+    bad = ~np.isfinite(close)
     cols = [c for c in ("open", "high", "low", "close") if c in df.columns]
     if bad.any():
         df.loc[bad, cols] = np.nan
@@ -305,6 +321,7 @@ def load_binance(symbol: str, start: str, end: str, root: Path = DATA_ROOT, down
     df = _finish(df, start, end, "UTC")
     full = pd.date_range(pd.Timestamp(start, tz="UTC"), pd.Timestamp(end, tz="UTC"), freq="1min", inclusive="left")
     missing = int(len(full.difference(df.index)))
+    bad_other = _mask_nonfinite(df)  # before the NaN rows of missing minutes are inserted
     df = df.reindex(full)
     df.index.name = "time"
     bad_price = _mask_nonpositive(df)
@@ -312,7 +329,8 @@ def load_binance(symbol: str, start: str, end: str, root: Path = DATA_ROOT, down
     df["zero_volume"] = df["volume"].fillna(0) <= 0
     df.attrs["checks"] = dict(source=f"Binance spot {symbol} via github.com/parshant231234-eng mirror",
                               rows_read=n_raw, duplicates=n_dup, missing_minutes=missing,
-                              nonpositive_prices=bad_price, first=str(df.index[0]), last=str(df.index[-1]))
+                              nonpositive_prices=bad_price, nonfinite_prices=bad_other,
+                              first=str(df.index[0]), last=str(df.index[-1]))
     return df
 
 
@@ -334,6 +352,7 @@ def load_nifty(start: str, end: str, root: Path = DATA_ROOT, download: bool = Tr
     df = raw.set_index("time")[["open", "high", "low", "close"]].astype(float)
     n_dup = int(df.index.duplicated().sum())
     df = _finish(df, start, end, "Asia/Kolkata")
+    bad_other = _mask_nonfinite(df)  # first, so that the bars masked for a close <= 0 are not counted twice
     bad_price = _mask_nonpositive(df)
     df["session"] = df.index.floor("D")
     lc = np.log(df["close"])
@@ -343,7 +362,8 @@ def load_nifty(start: str, end: str, root: Path = DATA_ROOT, download: bool = Tr
     df.loc[gap.values & df["logret"].notna().values, "logret"] = np.nan
     bars = df.groupby("session").size()
     df.attrs["checks"] = dict(source="Nifty 50 index via github.com/technovusin/nifty50-historical-data",
-                              rows=len(df), duplicates=n_dup, nonpositive_prices=bad_price, sessions=int(bars.size),
+                              rows=len(df), duplicates=n_dup, nonpositive_prices=bad_price,
+                              nonfinite_prices=bad_other, sessions=int(bars.size),
                               median_bars_per_session=float(bars.median()),
                               short_sessions=int((bars < 360).sum()),
                               first=str(df.index[0]), last=str(df.index[-1]))
