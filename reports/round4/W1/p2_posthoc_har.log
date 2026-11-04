@@ -1,0 +1,10 @@
+BTC
+ETH
+NIFTY
+   asset horizon            forecast     n       b      cU   cU_lo   cU_hi      cD   cD_lo   cD_hi     seed
+0    BTC      60  HAR (no last hour)  7127  1.0168  0.7081  0.5528  0.8792 -0.3627 -0.4712 -0.2512  9989100
+1    BTC     day  HAR (no last hour)  7104  1.0397  0.1445  0.0785  0.2103 -0.1960 -0.3244 -0.0779  9989101
+2    ETH      60  HAR (no last hour)  7127  1.0507  0.7152  0.5448  0.8888 -0.2630 -0.4046 -0.1105  9989110
+3    ETH     day  HAR (no last hour)  7104  1.0778  0.1817  0.1062  0.2571 -0.2346 -0.3472 -0.1415  9989111
+4  NIFTY      60  HAR (no last hour)  1342  0.9817  0.4755  0.1881  0.8191  0.0190 -0.2402  0.2881  9989120
+5  NIFTY     day  HAR (no last hour)  1393  1.0267  0.2989  0.1403  0.4772  0.0200 -0.1583  0.1838  9989121
