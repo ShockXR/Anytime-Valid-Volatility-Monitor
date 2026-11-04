@@ -27,6 +27,7 @@ z-test checked at every step (not anytime-valid).
 
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass, field
 
 import numpy as np
@@ -99,7 +100,11 @@ def calibrate(
         raise ValueError("calibration window has fewer than 2 finite returns")
     scale = float(np.median(np.abs(r_cal)) * MAD_NORMAL_SCALE)
     tau = max(c * scale, floor)
-    x = np.minimum(r_cal**2, tau**2)
+    try:
+        tau2 = tau**2
+    except OverflowError:  # returns so large that tau^2 overflows a Python float (audit R5-B-001)
+        tau2 = math.inf
+    x = np.minimum(r_cal**2, tau2)
     m0 = float(x.mean())
     if not (tau > 0 and m0 > 0):
         raise ValueError("degenerate calibration window (scale or truncated mean 0, for example more than half "
@@ -366,9 +371,25 @@ def repeated_window_ztest(
     ``var_r2`` is the variance of a squared return (``2 sigma^4`` for normal data,
     which is where quarticity enters). Each single look has size ``level``, but
     looking at every step makes a false alarm certain eventually.
+
+    A missing value (NaN or infinite) is skipped, as in the monitor: the window
+    holds the last ``window`` observed returns, no look is taken at a missing
+    step, and the alarm index is the position of the return that completed the
+    window (before round 4 every window after the first NaN was NaN, so no
+    alarm could follow; without missing values the output is unchanged).
     """
-    r2 = np.atleast_2d(np.asarray(r, float))[:, start:] ** 2
+    rr = np.atleast_2d(np.asarray(r, float))[:, start:]
+    r2 = rr**2
     reps, n = r2.shape
+    ok = np.isfinite(r2)
+    if not ok.all():  # compress each row to its observed returns, then map the alarm back
+        first = np.full(reps, -1)
+        for i in range(reps):
+            idx = np.flatnonzero(ok[i])
+            a = repeated_window_ztest(rr[i, idx], sigma0_sq, var_r2, window, level).alarm[0]
+            if a >= 0:
+                first[i] = idx[a] + start
+        return DetectorResult(first)
     if n < window:  # fewer than one full window: no look is possible (audit A1-B-005, was a crash in argmax)
         return DetectorResult(np.full(reps, -1))
     cs = np.cumsum(r2, axis=1)
