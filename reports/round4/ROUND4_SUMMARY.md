@@ -27,7 +27,7 @@ Labels as in the rest of the repository: **[SYNTHETIC]** = our simulation, **[RE
 | R4 | Opus | Walk-forward backtest on every asset and year, 2017 to October 2026 | done | `R4/REPORT.md` |
 | R5 | Fable | Metamorphic and property tests of the code | done; moved to `tests/test_round4_properties.py` | `R5/REPORT.md` |
 | V1 | Opus | Independent check of R2's and R4's code and numbers | done: both CONFIRMED | `V1/REPORT.md` |
-| R6 | Fable | Is there a faster setting that still keeps its promise on real calm days? (post hoc, after R2) |_STATUS | `R6/REPORT.md` |
+| R6 | Fable | Is there a faster setting that still keeps its promise on real calm days? (post hoc, after R2) | done (its pools and batch files are not committed; `r6_pools.py` and `run_null.sh` rebuild them in about 12 minutes) | `R6/REPORT.md` |
 
 ## What changed in the repository
 
@@ -36,13 +36,13 @@ Labels as in the rest of the repository: **[SYNTHETIC]** = our simulation, **[RE
 * README: status line; the blind-share sentence now separates crypto and the Nifty 50; the E21 bullet says that the README setting and the confidence-sequence baseline leave almost all of the 5% budget unused; the usage example says the README setting is very conservative and slow; a new bullet points to this summary.
 * `docs/limitations.md`: the confidence-sequence blind mode on Bitstamp; how conservative the README setting is; new limitations from R3 (what the monitor watches, the realistic seasonality pipeline, bid-ask bounce, a change during calibration, short bursts); what a real alarm shows (R4 and V1); two data vendor changes (R1); the test count.
 * `CHANGELOG.md`: a round 4 entry.
-* Nothing in `results/`, `experiments/` or the pre-registrations was changed, and neither forward test (E24 after 1 June 2027, E25 from 26 November 2026) was run.
+* In `results/` only the README and pitch number traces were regenerated (0 untraced) and their two lines in `results/MANIFEST.csv` rebuilt; nothing in `experiments/` or the pre-registrations was changed, and neither forward test (E24 after 1 June 2027, E25 from 26 November 2026) was run.
 
 ## Open items, in order
 
 1. Decide with Prof. Bapat whether the README should recommend a faster default: the plug-in with band 0.1 (approximate, about twice as fast) or the confidence-sequence baseline with band 0 (proved, as fast as today). Both were found post hoc (R2, R6), so test the chosen one on data not yet seen, for example as a secondary arm of the forward tests, without changing their pre-registered primary settings.
 2. A placebo matched on recent volatility for the real-data usefulness checks (V1's caveat on R4), and a strong-forecast comparison on the 2026 data (E20 did it for earlier years).
-3. Document the late-2026 Nifty vendor change (the last 14 minutes of each session are frozen in the 2026-08 to 2026-10 files, so about 360 returns per session are monitored, not 375; `R1/REPORT.md`).
+3. The late-2026 Nifty vendor change is now in `docs/limitations.md` (the last 14 minutes of each session are frozen in the 2026-08 to 2026-10 files, so about 360 returns per session are monitored, not 375; `R1/REPORT.md`); any future live run should state 360 in its configuration.
 4. Rerun E18 and E19 p1 on a clean copy (each needs more than half an hour on two cores; E18 was stopped at its time budget in this round).
 5. The small look-ahead V1 noticed in `experiments/e07_nifty.py` (early 2017 only) is not yet measured.
 6. Run the forward tests exactly as pre-registered: E25 from 26 November 2026 (`python experiments/e25_sequential_events.py status`), E24 after 1 June 2027.
